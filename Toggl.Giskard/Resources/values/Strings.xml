@@ -36,8 +36,17 @@
     <string name="BeginningOfWeek">First day of the week</string>
     <string name="DurationFormat">Duration display format</string>
     <string name="DefaultWorkspace">Default Workspace</string>
+    <string name="Total">Total</string>
+    <string name="ManualMode">Manual Mode</string>
+    <string name="ManualModeExplanation">You can add your data manually, instead of tracking in real time.</string>
+    <string name="TryLoggingInInstead"><u>Try logging in instead.</u></string>
+    <string name="ForgotPassword">Forgot your password?</string>
+    <string name="Duration">Duration</string>
+    <string name="DeleteEntry">Delete this entry</string>
 
     <string name="MainTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.MainTemplateSelector, Toggl.Giskard</string>
+    <string name="ReportsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.ReportsTemplateSelector, Toggl.Giskard</string>
+    <string name="CalendarTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.CalendarTemplateSelector, Toggl.Giskard</string>
     <string name="SettingsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SettingsTemplateSelector, Toggl.Giskard</string>
     <string name="SelectTagsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectTagsTemplateSelector, Toggl.Giskard</string>
     <string name="SuggestionsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SuggestionsTemplateSelector, Toggl.Giskard</string>
@@ -47,7 +56,7 @@
     <string name="SelectProjectTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectProjectTemplateSelector, Toggl.Giskard</string>
     <string name="SelectWorkspaceTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectWorkspaceTemplateSelector, Toggl.Giskard</string>
     <string name="SelectDateFormatTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectDateFormatTemplateSelector, Toggl.Giskard</string>
-    <string name="SelectBeginningOfWeekTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectBeginningOfWeekTemplateSelector, Toggl.Giskard</string>
     <string name="SelectDurationFormatTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectDurationFormatTemplateSelector, Toggl.Giskard</string>
+    <string name="SelectBeginningOfWeekTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.SelectBeginningOfWeekTemplateSelector, Toggl.Giskard</string>
     <string name="StartTimeEntrySuggestionsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.StartTimeEntrySuggestionsTemplateSelector, Toggl.Giskard</string>
 </resources>

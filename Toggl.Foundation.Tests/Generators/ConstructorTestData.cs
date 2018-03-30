@@ -82,6 +82,11 @@ namespace Toggl.Foundation.Tests.Generators
         public ElevenParameterConstructorTestData() : base(11) { }
     }
 
+    public sealed class TwelveParameterConstructorTestData : ConstructorTestData
+    {
+        public TwelveParameterConstructorTestData() : base(12) { }
+    }
+
     public sealed class ConstructorTestDataTests
     {
         public sealed class TheGeneratedSequence

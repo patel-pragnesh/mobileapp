@@ -15,7 +15,7 @@ using Toggl.Giskard.Extensions;
 namespace Toggl.Giskard.Fragments
 {
     [MvxDialogFragmentPresentation(AddToBackStack = true)]
-    public class SelectColorFragment : MvxDialogFragment<SelectColorViewModel>
+    public sealed class SelectColorFragment : MvxDialogFragment<SelectColorViewModel>
     {
         private int customColorEnabledHeight;
         private int customColorDisabledHeight;

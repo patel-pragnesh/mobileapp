@@ -59,7 +59,7 @@ namespace Toggl.Daneel.Views
             this.DelayBind(() =>
             {
                 var colorConverter = new MvxRGBValueConverter();
-                var taskCountConverter = new TaskCountConverter();
+                var taskCountConverter = new TaskCountValueConverter();
                 var visibilityConverter = new MvxVisibilityValueConverter();
                 var projectSelectedColorCombiner
                     = new ProjectSelectedColorValueCombiner(selectedProjectBackgroundAlpha);

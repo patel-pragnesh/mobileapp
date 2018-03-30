@@ -15,6 +15,7 @@ using Toggl.Foundation.MvvmCross.Combiners;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
+using Toggl.Daneel.Presentation.Transition;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -31,6 +32,7 @@ namespace Toggl.Daneel.ViewControllers
         {
             base.ViewDidLoad();
 
+            setupDismissingByTappingOnBackground();
             prepareViews();
 
             var durationCombiner = new DurationValueCombiner();
@@ -193,6 +195,11 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.DescriptionLimitExceeded)
                       .WithConversion(new BoolToConstantValueConverter<nfloat>(0.5f, 1));
 
+            bindingSet.Bind(BillableView)
+                      .For(v => v.BindVisibility())
+                      .To(vm => vm.IsBillableAvailable)
+                      .WithConversion(visibilityConverter);
+
             bindingSet.Apply();
         }
 
@@ -255,6 +262,15 @@ namespace Toggl.Daneel.ViewControllers
         {
             var topOffset = (textView.Bounds.Height - textView.ContentSize.Height) / 2;
             textView.ContentInset = new UIEdgeInsets(topOffset, 0, 0, 0);
+        }
+
+        private void setupDismissingByTappingOnBackground()
+        {
+            if (PresentationController is ModalPresentationController modalPresentationController)
+            {
+                var tapToDismiss = new UITapGestureRecognizer(() => ViewModel.CloseCommand.Execute());
+                modalPresentationController.AdditionalContentView.AddGestureRecognizer(tapToDismiss);
+            }
         }
     }
 }

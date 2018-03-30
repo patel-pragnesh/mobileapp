@@ -53,15 +53,15 @@ namespace Toggl.Foundation {
             }
         }
         
-        public static string OnboardingLogPageCopy {
+        public static string OnboardingMostUsedPageCopy {
             get {
-                return ResourceManager.GetString("OnboardingLogPageCopy", resourceCulture);
+                return ResourceManager.GetString("OnboardingMostUsedPageCopy", resourceCulture);
             }
         }
         
-        public static string OnboardingSummaryPageCopy {
+        public static string OnboardingReportsPageCopy {
             get {
-                return ResourceManager.GetString("OnboardingSummaryPageCopy", resourceCulture);
+                return ResourceManager.GetString("OnboardingReportsPageCopy", resourceCulture);
             }
         }
         
@@ -140,22 +140,6 @@ namespace Toggl.Foundation {
         public static string GenericSignUpError {
             get {
                 return ResourceManager.GetString("GenericSignUpError", resourceCulture);
-            }
-        }
-        
-        public static string EmailIsAlreadyUsedError
-        {
-            get
-            {
-                return ResourceManager.GetString("EmailIsAlreadyUsedError", resourceCulture);
-            }
-        }
-        
-        public static string TryLoggingInInstead
-        {
-            get
-            {
-                return ResourceManager.GetString("TryLoggingInInstead", resourceCulture);
             }
         }
         
@@ -609,12 +593,6 @@ namespace Toggl.Foundation {
             }
         }
         
-        public static string TimeEntrySuggestion {
-            get {
-                return ResourceManager.GetString("TimeEntrySuggestion", resourceCulture);
-            }
-        }
-        
         public static string NoEmailErrorTitle {
             get {
                 return ResourceManager.GetString("NoEmailErrorTitle", resourceCulture);
@@ -651,6 +629,12 @@ namespace Toggl.Foundation {
             }
         }
         
+        public static string DiscardEditingChanges {
+            get {
+                return ResourceManager.GetString("DiscardEditingChanges", resourceCulture);
+            }
+        }
+
         public static string DurationFormatClassic {
             get {
                 return ResourceManager.GetString("DurationFormatClassic", resourceCulture);
@@ -666,6 +650,48 @@ namespace Toggl.Foundation {
         public static string DurationFormatDecimal {
             get {
                 return ResourceManager.GetString("DurationFormatDecimal", resourceCulture);
+            }
+        }
+        
+        public static string ContinueLastEntry {
+            get {
+                return ResourceManager.GetString("ContinueLastEntry", resourceCulture);
+            }
+        }
+        
+        public static string TapToRetry {
+            get {
+                return ResourceManager.GetString("TapToRetry", resourceCulture);
+            }
+        }
+        
+        public static string TimeEntrySuggestion {
+            get {
+                return ResourceManager.GetString("TimeEntrySuggestion", resourceCulture);
+            }
+        }
+        
+        public static string EmailIsAlreadyUsedError {
+            get {
+                return ResourceManager.GetString("EmailIsAlreadyUsedError", resourceCulture);
+            }
+        }
+        
+        public static string TryLoggingInInstead {
+            get {
+                return ResourceManager.GetString("TryLoggingInInstead", resourceCulture);
+            }
+        }
+        
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        public static string Done {
+            get {
+                return ResourceManager.GetString("Done", resourceCulture);
             }
         }
     }

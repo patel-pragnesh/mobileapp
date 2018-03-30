@@ -4,7 +4,9 @@ namespace Toggl.Foundation.Reports
 {
     public sealed class ProjectSummaryReport
     {
-        public double TotalSeconds { get; }
+        private const float textDrawingThreshold = 0.1f;
+        
+        public float TotalSeconds { get; }
 
         public float BillablePercentage { get; }
 
@@ -16,8 +18,11 @@ namespace Toggl.Foundation.Reports
             var billableSeconds = segments.Select(x => x.BillableSeconds).Sum();
 
             Segments = segments;
-            TotalSeconds = totalSeconds;
+            TotalSeconds = (float)totalSeconds;
             BillablePercentage = (float)(totalSeconds > 0 ? (100.0f / totalSeconds) * billableSeconds : 0);
         }
+
+        public static bool ShouldDraw(float percent)
+            => percent > textDrawingThreshold;
     }
 }

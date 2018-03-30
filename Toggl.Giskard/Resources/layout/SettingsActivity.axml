@@ -225,6 +225,50 @@
                 android:background="@color/separator"
                 android:layout_height="0.5dp"
                 android:layout_width="match_parent" />
+            <View
+                android:layout_height="0.5dp"
+                android:layout_marginTop="24dp"
+                android:layout_width="match_parent"
+                android:background="@color/separator"/>
+            <FrameLayout
+                local:MvxBind="Click ToggleManualModeCommand"
+                android:clickable="true"
+                android:layout_height="48dp"
+                android:layout_width="match_parent"
+                android:background="?attr/selectableItemBackground">
+                <TextView
+                    android:textSize="15sp"
+                    android:paddingLeft="16dp"
+                    android:textAllCaps="false"
+                    android:gravity="center_vertical"
+                    android:text="@string/ManualMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@android:color/black"/>
+                <Switch
+                    local:MvxBind="Checked IsManualModeEnabled"
+                    android:clickable="false"
+                    android:layout_marginRight="18dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:thumbTint="@color/switchTint"
+                    android:layout_gravity="center_vertical|right"/>
+            </FrameLayout>
+            <View
+                android:layout_height="0.5dp"
+                android:layout_width="match_parent"
+                android:background="@color/separator"/>
+            
+            <TextView
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ManualModeExplanation"/>
+            
             <TextView
                 android:textSize="12sp"
                 android:paddingLeft="16dp"
@@ -296,6 +340,7 @@
                     android:layout_gravity="center_vertical|right" />
             </FrameLayout>
             <View
+                android:layout_marginTop="16dp"
                 android:background="@color/separator"
                 android:layout_height="0.5dp"
                 android:layout_width="match_parent" />
@@ -323,6 +368,12 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <ImageView
+            local:MvxBind="Click BackCommand"
+            android:layout_gravity="start"
+            android:src="@drawable/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp" />
         <ImageView
             android:src="@drawable/settings_light"
             android:layout_width="24dp"

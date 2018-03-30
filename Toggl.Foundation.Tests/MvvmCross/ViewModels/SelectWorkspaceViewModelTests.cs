@@ -20,7 +20,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class SelectWorkspaceViewModelTest : BaseViewModelTests<SelectWorkspaceViewModel>
         {
             protected override SelectWorkspaceViewModel CreateViewModel()
-                => new SelectWorkspaceViewModel(DataSource, NavigationService);
+                => new SelectWorkspaceViewModel(InteractorFactory, NavigationService);
 
             protected List<IDatabaseWorkspace> GenerateWorkspaceList() =>
                 Enumerable.Range(0, 10).Select(i =>
@@ -36,13 +36,13 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             [Theory, LogIfTooSlow]
             [ClassData(typeof(TwoParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useDataSource, bool useNavigationService)
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useInteractorFactory, bool useNavigationService)
             {
-                var dataSource = useDataSource ? DataSource : null;
+                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
                 var navigationService = useNavigationService ? NavigationService : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new SelectWorkspaceViewModel(dataSource, navigationService);
+                    () => new SelectWorkspaceViewModel(interactorFactory, navigationService);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -54,7 +54,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public ThePrepareMethod()
             {
                 var workspaces = GenerateWorkspaceList();
-                DataSource.Workspaces.GetAll().Returns(Observable.Return(workspaces));
+                InteractorFactory.GetAllWorkspaces().Execute().Returns(Observable.Return(workspaces));
             }
 
             [Fact, LogIfTooSlow]
@@ -98,7 +98,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public async Task AddsAllWorkspacesToTheListOfSuggestions()
             {
                 var workspaces = GenerateWorkspaceList();
-                DataSource.Workspaces.GetAll().Returns(Observable.Return(workspaces));
+                InteractorFactory.GetAllWorkspaces().Execute().Returns(Observable.Return(workspaces));
 
                 await ViewModel.Initialize();
 
@@ -171,7 +171,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public async Task FiltersTheSuggestionsWhenItChanges()
             {
                 var workspaces = GenerateWorkspaceList();
-                DataSource.Workspaces.GetAll().Returns(Observable.Return(workspaces));
+                InteractorFactory.GetAllWorkspaces().Execute().Returns(Observable.Return(workspaces));
                 await ViewModel.Initialize();
 
                 ViewModel.Text = "0";

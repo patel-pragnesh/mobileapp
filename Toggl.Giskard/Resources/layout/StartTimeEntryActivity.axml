@@ -46,13 +46,14 @@
     </RelativeLayout>
     <RelativeLayout
         android:elevation="2dp"
-        android:background="@android:color/white"
+        android:background="@color/blueToolbarBackground"
         android:layout_width="match_parent"
         android:layout_height="@dimen/expandedToolbarHeight">
         <ImageView
             local:MvxBind="Click BackCommand"
             android:clickable="true"
-            android:src="@drawable/arrow_back"
+            android:src="@drawable/close"
+            android:tint="@android:color/white"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -68,10 +69,11 @@
             android:letterSpacing="-0.01"
             android:lineSpacingExtra="5sp"
             android:scrollHorizontally="true"
-            android:textColor="@android:color/black"
-            android:background="@android:color/white"
+            android:textColor="@android:color/white"
+            android:textCursorDrawable="@null"
+            android:background="@color/blueToolbarBackground"
             android:hint="@string/StartTimeEntryHint"
-            android:textColorHint="@color/defaultText"
+            android:textColorHint="@color/blueBackgroundTextHintColor"
             android:inputType="textNoSuggestions|textVisiblePassword"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
@@ -80,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true" />
         <ImageView
-            local:MvxBind="Click ToggleBillableCommand; DrawableId BillableDrawable(IsBillable); Visibility Visibility(IsBillableAvailable), CommandParameter=true"
+            local:MvxBind="Click ToggleBillableCommand; DrawableId BillableDrawable(IsBillable); Visibility Visibility(IsBillableAvailable)"
             android:id="@+id/StartTimeEntryToolbarBillable"
             android:background="@drawable/billable"
             android:layout_width="24dp"
@@ -96,6 +98,7 @@
             android:layout_height="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="16dp"
+            android:layout_alignWithParentIfMissing="true"
             android:layout_toLeftOf="@+id/StartTimeEntryToolbarBillable" />
         <ImageView
             local:MvxBind="Click ToggleProjectSuggestionsCommand; DrawableId ProjectDrawable(IsSuggestingProjects)"

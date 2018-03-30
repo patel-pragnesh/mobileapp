@@ -22,21 +22,26 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class SelectProjectViewModelTest : BaseViewModelTests<SelectProjectViewModel>
         {
             protected override SelectProjectViewModel CreateViewModel()
-            => new SelectProjectViewModel(DataSource, NavigationService, DialogService);
+            => new SelectProjectViewModel(DataSource, InteractorFactory, NavigationService, DialogService);
         }
 
         public sealed class TheConstructor : SelectProjectViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(ThreeParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useDataSource, bool useNavigationService, bool useDialogService)
+            [ClassData(typeof(FourParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(
+                bool useDataSource, 
+                bool useInteractorFactory,
+                bool useNavigationService, 
+                bool useDialogService)
             {
                 var dataSource = useDataSource ? DataSource : null;
-                var navigationService = useNavigationService ? NavigationService : null;
                 var dialogService = useDialogService ? DialogService : null;
+                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
+                var navigationService = useNavigationService ? NavigationService : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new SelectProjectViewModel(dataSource, navigationService, dialogService);
+                    () => new SelectProjectViewModel(dataSource, interactorFactory, navigationService, dialogService);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();

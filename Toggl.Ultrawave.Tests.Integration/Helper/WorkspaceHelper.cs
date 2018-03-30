@@ -32,7 +32,7 @@ namespace Toggl.Ultrawave.Tests.Integration.Helper
         {
             var json = $"{{\"pricing_plan_id\":{(int)plan}}}";
 
-            await makeRequest($"https://toggl.space/api/v9/workspaces/{workspaceId}/subscriptions", HttpMethod.Post, user, json);
+            await makeRequest($"https://toggl.space/api/v9/workspaces/{workspaceId}/subscription", HttpMethod.Post, user, json);
         }
 
         public static async Task<List<int>> GetAllAvailablePricingPlans(IUser user)
@@ -53,7 +53,15 @@ namespace Toggl.Ultrawave.Tests.Integration.Helper
             using (var client = new HttpClient())
             {
                 var response = await client.SendAsync(requestMessage);
-                return await response.Content.ReadAsStringAsync();
+                var data = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                    return data;
+
+                throw ApiExceptions.For(
+                    new Request(json, requestMessage.RequestUri, new HttpHeader[0], requestMessage.Method),
+                    new Response(data, false, response.Content?.Headers?.ContentType?.MediaType, response.Headers,
+                        response.StatusCode));
             }
         }
     }

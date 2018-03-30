@@ -28,21 +28,14 @@ namespace Toggl.Giskard.Activities
             var toolbar = FindViewById<Toolbar>(Resource.Id.Toolbar);
 
             SetSupportActionBar(toolbar);
-            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            SupportActionBar.SetDisplayShowHomeEnabled(true);
-
-            toolbar.NavigationClick += navigationClick;
+            SupportActionBar.SetDisplayShowHomeEnabled(false);
+            SupportActionBar.SetDisplayShowTitleEnabled(false);
         }
 
         public override void Finish()
         {
             base.Finish();
             OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
-        }
-
-        private void navigationClick(object sender, Toolbar.NavigationClickEventArgs e)
-        {
-            ViewModel.BackCommand.Execute();
         }
     }
 }

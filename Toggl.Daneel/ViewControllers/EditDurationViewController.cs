@@ -13,6 +13,7 @@ using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
 using static Toggl.Daneel.Extensions.FontExtensions;
+using Toggl.Daneel.Converters;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -38,6 +39,7 @@ namespace Toggl.Daneel.ViewControllers
             var durationCombiner = new DurationValueCombiner();
             var timeCombiner = new DateTimeOffsetTimeFormatValueCombiner(TimeZoneInfo.Local);
             var dateCombiner = new DateTimeOffsetDateFormatValueCombiner(TimeZoneInfo.Local, useLongFormat: false);
+            var timeFormatToLocaleConverter = new TimeFormatToLocaleValueConverter();
             var inverseBoolConverter = new BoolToConstantValueConverter<bool>(false, true);
             var editedTimeLabelColorConverter = new BoolToConstantValueConverter<UIColor>(
                 Color.EditDuration.EditedTime.ToNativeColor(),
@@ -133,6 +135,11 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(DatePicker)
                       .For(v => v.MinimumDate)
                       .To(vm => vm.MinimumDateTime);
+
+            bindingSet.Bind(DatePicker)
+                      .For(v => v.Locale)
+                      .To(vm => vm.TimeFormat)
+                      .WithConversion(timeFormatToLocaleConverter);
 
             //The wheel
             bindingSet.Bind(DurationInput)

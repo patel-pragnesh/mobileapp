@@ -4,13 +4,18 @@ using MvvmCross.Platform;
 using Foundation;
 using Toggl.Foundation.Services;
 using UIKit;
+using MvvmCross.Core.Navigation;
+using Toggl.Foundation.Shortcuts;
+using Toggl.Foundation.Analytics;
 
 namespace Toggl.Daneel
 {
-    [Register("AppDelegate")]
+    [Register(nameof(AppDelegate))]
     public sealed class AppDelegate : MvxApplicationDelegate
     {
+        private IAnalyticsService analyticsService;
         private IBackgroundService backgroundService;
+        private IMvxNavigationService navigationService;
 
         public override UIWindow Window { get; set; }
 
@@ -21,7 +26,9 @@ namespace Toggl.Daneel
             var setup = new Setup(this, Window);
             setup.Initialize();
 
+            analyticsService = Mvx.Resolve<IAnalyticsService>();
             backgroundService = Mvx.Resolve<IBackgroundService>();
+            navigationService = Mvx.Resolve<IMvxNavigationService>();
 
             var startup = Mvx.Resolve<IMvxAppStart>();
             startup.Start();
@@ -62,6 +69,13 @@ namespace Toggl.Daneel
         {
             base.DidEnterBackground(application);
             backgroundService.EnterBackground();
+        }
+
+        public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler)
+        {
+            analyticsService.TrackAppShortcut(shortcutItem.LocalizedTitle);
+            var url = shortcutItem.UserInfo[nameof(ApplicationShortcut.Url)].ToString();
+            navigationService.Navigate(url);
         }
     }
 }

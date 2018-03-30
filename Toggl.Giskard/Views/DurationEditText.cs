@@ -12,6 +12,7 @@ using MvvmCross.Platform.Converters;
 using MvvmCross.Platform.Core;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Converters;
+using Toggl.Giskard.Extensions;
 
 namespace Toggl.Giskard.Views
 {
@@ -122,7 +123,7 @@ namespace Toggl.Giskard.Views
         {
             if (actionCode == ImeAction.Done)
             {
-                removeFocus();
+                this.RemoveFocus();
                 DurationChanged.Raise(this);
             }
         }
@@ -141,14 +142,6 @@ namespace Toggl.Giskard.Views
             }
 
             moveCursorToEnd();
-        }
-
-        private void removeFocus() 
-        {
-            ClearFocus();
-
-            var service = (InputMethodManager)Context.GetSystemService(Context.InputMethodService);
-            service.HideSoftInputFromWindow(WindowToken, 0);
         }
 
         private void onDeleteEntered()

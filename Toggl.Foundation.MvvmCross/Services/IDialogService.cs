@@ -18,6 +18,7 @@ namespace Toggl.Foundation.MvvmCross.Services
     public enum ActionType
     {
         DiscardNewTimeEntry,
+        DiscardEditingChanges,
         DeleteExistingTimeEntry
     }
 }

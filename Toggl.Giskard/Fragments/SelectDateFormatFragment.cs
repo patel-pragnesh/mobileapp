@@ -13,7 +13,7 @@ using Toggl.Giskard.Extensions;
 namespace Toggl.Giskard.Fragments
 {
     [MvxDialogFragmentPresentation(AddToBackStack = true)]
-    public class SelectDateFormatFragment : MvxDialogFragment<SelectDateFormatViewModel>
+    public sealed class SelectDateFormatFragment : MvxDialogFragment<SelectDateFormatViewModel>
     {
         public SelectDateFormatFragment() { }
 

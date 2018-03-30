@@ -13,6 +13,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="OnboardingView">
             <connections>
+                <outlet property="BackgroundImage" destination="uQ9-8C-BGz" id="5UG-H9-p72"/>
                 <outlet property="FirstPageLabel" destination="0bW-s1-SME" id="name-outlet-0bW-s1-SME"/>
                 <outlet property="JumbotronLabel" destination="BAk-8t-LBQ" id="name-outlet-BAk-8t-LBQ"/>
                 <outlet property="LastPageItems" destination="YG4-AY-v9P" id="name-outlet-YG4-AY-v9P"/>
@@ -35,6 +36,9 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bgNoiseBlue" translatesAutoresizingMaskIntoConstraints="NO" id="uQ9-8C-BGz">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hCB-nj-krh">
                     <rect key="frame" x="52" y="69" width="216" height="363"/>
                     <color key="backgroundColor" red="0.054901960784313725" green="0.58823529411764708" blue="0.83529411764705885" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -83,7 +87,7 @@ START TRACKING</string>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                             <state key="normal" title="Log in">
-                                <color key="titleColor" red="0.88627450980392153" green="0.019607843137254902" blue="0.019607843137254902" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="titleColor" red="0.023529411764705882" green="0.66666666666666663" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
                             </state>
                             <userDefinedRuntimeAttributes>
                                 <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -228,11 +232,14 @@ START TRACKING</string>
             <constraints>
                 <constraint firstItem="dSK-f7-Uvp" firstAttribute="bottom" secondItem="QOR-SE-Mpp" secondAttribute="bottom" id="0mR-Ja-1lj"/>
                 <constraint firstItem="1ic-Bm-3e0" firstAttribute="top" secondItem="dSK-f7-Uvp" secondAttribute="top" id="1No-up-h7o"/>
+                <constraint firstAttribute="bottom" secondItem="uQ9-8C-BGz" secondAttribute="bottom" id="3F8-uh-mRB"/>
                 <constraint firstItem="KBd-Lu-7wr" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="8at-kn-IWJ"/>
                 <constraint firstItem="YG4-AY-v9P" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="BKa-11-b6O"/>
+                <constraint firstItem="dSK-f7-Uvp" firstAttribute="trailing" secondItem="uQ9-8C-BGz" secondAttribute="trailing" id="Cxo-jg-U6F"/>
                 <constraint firstItem="YG4-AY-v9P" firstAttribute="bottom" secondItem="dSK-f7-Uvp" secondAttribute="bottom" id="DZb-jp-cih"/>
                 <constraint firstItem="hCB-nj-krh" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="52" id="EJV-EX-9IS"/>
                 <constraint firstItem="hCB-nj-krh" firstAttribute="top" secondItem="dSK-f7-Uvp" secondAttribute="top" constant="49" id="IKT-GH-bEe"/>
+                <constraint firstItem="uQ9-8C-BGz" firstAttribute="leading" secondItem="dSK-f7-Uvp" secondAttribute="leading" id="IVH-uq-cle"/>
                 <constraint firstItem="cBN-Dd-JYx" firstAttribute="trailing" secondItem="hCB-nj-krh" secondAttribute="trailing" constant="-13" id="Jny-ou-xWA"/>
                 <constraint firstItem="3BO-Ic-74A" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="PUe-xm-GKw"/>
                 <constraint firstItem="crr-oI-9sA" firstAttribute="top" secondItem="hCB-nj-krh" secondAttribute="bottom" constant="50" id="Q1S-pS-El3"/>
@@ -249,6 +256,7 @@ START TRACKING</string>
                 <constraint firstItem="cBN-Dd-JYx" firstAttribute="top" secondItem="hCB-nj-krh" secondAttribute="top" constant="22" id="r4b-51-ugG"/>
                 <constraint firstItem="cBN-Dd-JYx" firstAttribute="centerX" secondItem="hCB-nj-krh" secondAttribute="centerX" id="rlh-YM-CTY"/>
                 <constraint firstItem="KBd-Lu-7wr" firstAttribute="centerY" secondItem="crr-oI-9sA" secondAttribute="centerY" id="rnk-Pw-fds"/>
+                <constraint firstItem="uQ9-8C-BGz" firstAttribute="top" secondItem="2" secondAttribute="top" id="ulR-Jh-Eag"/>
                 <constraint firstItem="YG4-AY-v9P" firstAttribute="trailing" secondItem="2" secondAttribute="trailing" id="vIA-XJ-6i1"/>
                 <constraint firstAttribute="trailing" secondItem="3BO-Ic-74A" secondAttribute="trailing" id="vKM-LW-ljA"/>
                 <constraint firstAttribute="trailing" secondItem="1ic-Bm-3e0" secondAttribute="trailing" id="wNz-bj-mls"/>
@@ -259,6 +267,7 @@ START TRACKING</string>
         </view>
     </objects>
     <resources>
+        <image name="bgNoiseBlue" width="320" height="568"/>
         <image name="notebook" width="95" height="85"/>
         <image name="togglCronometer" width="126" height="140"/>
         <image name="togglLogoWhite" width="111" height="35"/>

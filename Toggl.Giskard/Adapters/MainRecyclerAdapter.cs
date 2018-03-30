@@ -94,5 +94,12 @@ namespace Toggl.Giskard.Adapters
             if (timeEntry == null) return;
             TimeEntriesLogViewModel.ContinueTimeEntryCommand.ExecuteAsync(timeEntry);
         }
+
+        internal void DeleteTimeEntry(int viewPosition)
+        {
+            var timeEntry = GetItem(viewPosition) as TimeEntryViewModel;
+            if (timeEntry == null) return;
+            TimeEntriesLogViewModel.DeleteCommand.ExecuteAsync(timeEntry);
+        }
     }
 }

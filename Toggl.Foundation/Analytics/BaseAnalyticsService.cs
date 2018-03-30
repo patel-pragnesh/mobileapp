@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Toggl.Foundation.Shortcuts;
 
 namespace Toggl.Foundation.Analytics
 {
@@ -21,6 +22,9 @@ namespace Toggl.Foundation.Analytics
         private const string passwordManagerButtonClicked = "PasswordManagerButtonClicked";
         private const string passwordManagerContainsValidEmail = "PasswordManagerContainsValidEmail";
         private const string passwordManagerContainsValidPassword = "PasswordManagerContainsValidPassword";
+
+        private const string appShortcutEventName = "ApplicationShortcut";
+        private const string appShortcutParameter = "ApplicationShortcutType";
 
         public void TrackOnboardingSkipEvent(string pageName)
         {
@@ -75,6 +79,11 @@ namespace Toggl.Foundation.Analytics
         public void TrackSyncError(Exception exception)
         {
             NativeTrackException(exception);
+        }
+
+        public void TrackAppShortcut(string shortcut)
+        {
+            track(appShortcutEventName, appShortcutParameter, shortcut);
         }
 
         private void track(string eventName)

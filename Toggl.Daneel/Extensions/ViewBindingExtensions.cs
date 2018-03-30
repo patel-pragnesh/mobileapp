@@ -24,6 +24,9 @@ namespace Toggl.Daneel.Extensions
         public static string BindDateTimeOffset(this UIDatePicker self)
             => DatePickerDateTimeOffsetTargetBinding.BindingName;
 
+        public static string BindAnimatedImage(this UIImageView self)
+            => ImageViewAnimatedImageTargetBinding.BindingName;
+
         public static string BindAnimatedConstant(this NSLayoutConstraint self)
             => LayoutConstraintAnimatedConstantTargetBinding.BindingName;
 
@@ -65,5 +68,8 @@ namespace Toggl.Daneel.Extensions
 
         public static string BindAnimatedVisibility(this UIView self)
             => ViewAnimatedVisibilityTargetBinding.BindingName;
+
+        public static string BindVisibilityWithFade(this UIView self)
+            => ViewVisibilityWithFadeTargetBinding.BindingName;
     }
 }

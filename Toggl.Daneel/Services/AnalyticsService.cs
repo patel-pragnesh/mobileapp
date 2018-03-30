@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Firebase.Analytics;
 using Foundation;
 using Toggl.Foundation.Analytics;
 using FirebaseAnalytics = Firebase.Analytics.Analytics;
@@ -21,10 +20,8 @@ namespace Toggl.Daneel.Services
         {
             AppCenterAnalytics.TrackEvent(eventName, trimLongParameters(parameters));
 
-            FirebaseAnalytics.LogEvent(new NSString(eventName), NSDictionary<NSString, NSObject>.FromObjectsAndKeys(
-                parameters.Values.ToArray(),
-                parameters.Keys.ToArray()
-            ));
+            var convertedDictionary = convertDictionary(parameters);
+            FirebaseAnalytics.LogEvent(new NSString(eventName), convertedDictionary);
         }
 
         protected override void NativeTrackException(Exception exception)
@@ -34,6 +31,17 @@ namespace Toggl.Daneel.Services
                 [exceptionTypeParameter] = exception.GetType().FullName,
                 [exceptionMessageParameter] = exception.Message
             });
+        }
+
+        private NSDictionary<NSString, NSObject> convertDictionary(Dictionary<string, string> parameters)
+        {
+            if (parameters.Count == 0)
+                return new NSDictionary<NSString, NSObject>();
+
+            return NSDictionary<NSString, NSObject>.FromObjectsAndKeys(
+                parameters.Values.ToArray(),
+                parameters.Keys.ToArray()
+            );
         }
 
         private Dictionary<string, string> trimLongParameters(Dictionary<string, string> parameters)

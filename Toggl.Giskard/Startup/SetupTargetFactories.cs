@@ -1,9 +1,10 @@
-﻿﻿using Android.Views;
+﻿using Android.Views;
 using MvvmCross.Binding.Bindings.Target.Construction;
 using Toggl.Giskard.Bindings;
 using Toggl.Giskard.Views;
 using Android.Widget;
 using Android.Support.Design.Widget;
+using Android.Support.V4.View;
 
 namespace Toggl.Giskard
 {
@@ -39,11 +40,6 @@ namespace Toggl.Giskard
                 view => new EditTextFocusTargetBinding(view)
             );
 
-            registry.RegisterCustomBindingFactory<ImageView>(
-                ImageViewVerticalFlipTargetBinding.BindingName,
-                view => new ImageViewVerticalFlipTargetBinding(view)
-            );
-
             registry.RegisterCustomBindingFactory<EditText>(
                 EditTextTextFieldInfoTargetBinding.BindingName,
                 view => new EditTextTextFieldInfoTargetBinding(view)
@@ -52,6 +48,16 @@ namespace Toggl.Giskard
             registry.RegisterCustomBindingFactory<FloatingActionButton>(
                 FabVisibilityTargetBinding.BindingName,
                 view => new FabVisibilityTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<ImageView>(
+                ImageViewVerticalFlipTargetBinding.BindingName,
+                view => new ImageViewVerticalFlipTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<TextView>(
+                TextViewFontWeightTargetBinding.BindingName,
+                view => new TextViewFontWeightTargetBinding(view)
             );
 
             registry.RegisterCustomBindingFactory<TextView>(
@@ -64,14 +70,14 @@ namespace Toggl.Giskard
                 view => new ViewMarginTargetBinding(view)
             );
 
-            registry.RegisterCustomBindingFactory<FloatingActionButton>(
-                FabVisibilityTargetBinding.BindingName,
-                view => new FabVisibilityTargetBinding(view)
+            registry.RegisterCustomBindingFactory<ViewPager>(
+                ViewPagerCurrentPageTargetBinding.BindingName,
+                view => new ViewPagerCurrentPageTargetBinding(view)
             );
 
-            registry.RegisterCustomBindingFactory<TextView>(
-                TextViewFontWeightTargetBinding.BindingName,
-                view => new TextViewFontWeightTargetBinding(view)
+            registry.RegisterCustomBindingFactory<View>(
+                ViewWidthPercentageTargetBinding.BindingName,
+                view => new ViewWidthPercentageTargetBinding(view)
             );
         }
     }

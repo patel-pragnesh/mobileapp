@@ -198,8 +198,17 @@ namespace Toggl.PrimeRadiant.Realm
             {
                 long originalRivalId = getId(rival);
                 (TModel fixedEntity, TModel fixedRival) = resolver.FixRivals(entity, rival, realm.All<TRealmEntity>());
-                entity.SetPropertiesFrom(fixedEntity, realm);
-                rival.SetPropertiesFrom(fixedRival, realm);
+
+                if (entity.Equals(fixedEntity) == false)
+                {
+                    entity.SetPropertiesFrom(fixedEntity, realm);
+                }
+
+                if (rival.Equals(fixedRival) == false)
+                {
+                    rival.SetPropertiesFrom(fixedRival, realm);
+                }
+
                 results.Add(new UpdateResult<TModel>(originalRivalId, rival));
             }
         }

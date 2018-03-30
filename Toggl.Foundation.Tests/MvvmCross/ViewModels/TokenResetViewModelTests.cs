@@ -28,22 +28,24 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected ILoginManager LoginManager { get; } = Substitute.For<ILoginManager>();
 
             protected override TokenResetViewModel CreateViewModel()
-                => new TokenResetViewModel(LoginManager, DataSource, DialogService, NavigationService);
+                => new TokenResetViewModel(LoginManager, DataSource, DialogService, NavigationService, UserPreferences, OnboardingStorage);
         }
 
         public sealed class TheConstructor : TokenResetViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(FourParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool userLoginManager, bool userNavigationService, bool useDataSource, bool useDialogService)
+            [ClassData(typeof(SixParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool userLoginManager, bool userNavigationService, bool useDataSource, bool useDialogService, bool useUserPreferences, bool useOnboardingStorage)
             {
                 var loginManager = userLoginManager ? LoginManager : null;
                 var navigationService = userNavigationService ? NavigationService : null;
                 var dataSource = useDataSource ? DataSource : null;
                 var dialogService = useDialogService ? DialogService : null;
+                var userPreferences = useUserPreferences ? UserPreferences : null;
+                var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new TokenResetViewModel(loginManager, dataSource, dialogService, navigationService);
+                    () => new TokenResetViewModel(loginManager, dataSource, dialogService, navigationService, userPreferences, onboardingStorage);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -161,6 +163,22 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.SignOutCommand.Execute();
 
                 DataSource.Received().Logout();
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ResetsOnboarding()
+            {
+                ViewModel.SignOutCommand.Execute();
+
+                OnboardingStorage.Received().Reset();
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ResetsUserPreferences()
+            {
+                ViewModel.SignOutCommand.Execute();
+
+                UserPreferences.Received().Reset();
             }
 
             [Fact, LogIfTooSlow]

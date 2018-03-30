@@ -1,47 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:local="http://schemas.android.com/apk/res-auto"
-    android:background="@color/defaultBackground"
+<RelativeLayout xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:fitsSystemWindows="true"
     android:animateLayoutChanges="true"
+    android:background="@color/defaultBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <android.support.v7.widget.Toolbar
         android:id="@+id/LoginToolbar"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         android:elevation="4dp"
         android:minHeight="?attr/actionBarSize"
         android:background="@color/lightToolbarBackground"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <View
+        android:id="@+id/LoginInputControlAnchor"
+        android:layout_height="30dp"
+        android:layout_marginTop="104dp"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/LoginToolbar" />
     <EditText
         android:id="@+id/LoginEmailTextField"
         local:MvxBind="Text EmailToString(Email); Visibility Visibility(EmailFieldVisible); Focus IsEmailFocused"
-        android:inputType="textEmailAddress"
         android:lines="1"
         android:maxLines="1"
+        android:textSize="24sp"
         android:focusable="true"
         android:singleLine="true"
         android:paddingLeft="16dp"
         android:hint="@string/EmailAddress"
         android:focusableInTouchMode="true"
+        android:inputType="textEmailAddress"
         android:textColor="@color/defaultEditText"
         android:textColorHint="@color/placeholderText"
         android:background="@android:color/transparent"
         android:layout_height="30dp"
         android:layout_marginTop="104dp"
+        android:layout_marginRight="50dp"
         android:layout_width="match_parent"
         android:layout_below="@id/LoginToolbar" />
     <EditText
         android:id="@+id/LoginPasswordTextField"
         local:MvxBind="Text PasswordToString(Password); Visibility Visibility(IsPasswordPage); Focus IsPasswordPage"
-        android:inputType="textPassword"
         android:lines="1"
         android:maxLines="1"
         android:hint="Password"
+        android:textSize="24sp"
         android:focusable="true"
         android:singleLine="true"
         android:paddingLeft="16dp"
+        android:inputType="textPassword"
         android:focusableInTouchMode="true"
         android:textColor="@color/defaultEditText"
         android:textColorHint="@color/placeholderText"
@@ -52,7 +61,8 @@
         android:layout_width="match_parent"
         android:layout_below="@id/LoginToolbar" />
     <TextView
-        local:MvxBind="Text InfoText"
+        android:id="@+id/InfoTextField"
+        local:MvxBind="Text InfoText; TextColor LoginInfoTextColor(IsErrorText)"
         android:textSize="12dp"
         android:textStyle="normal"
         android:lineSpacingExtra="6sp"
@@ -62,7 +72,31 @@
         android:layout_marginRight="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/LoginPasswordTextField" />
+        android:layout_below="@id/LoginInputControlAnchor" />
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/LoginGoogleLogin"
+        local:MvxBind="Click GoogleLoginCommand; Visibility Visibility(IsLogin)"
+        android:scaleType="fitStart"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true" />
+    <TextView
+        local:MvxBind="Click ChangeSignUpToLoginCommand; Visibility Visibility(TryLoggingInInsteadOfSignup)"
+        android:textSize="12sp"
+        android:textStyle="normal"
+        android:lineSpacingExtra="6sp"
+        android:textColor="@color/defaultText"
+        android:text="@string/TryLoggingInInstead"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/InfoTextField" />
     <TextView
         android:id="@+id/LoginGoogleSignUp"
         local:MvxBind="Click GoogleLoginCommand; Visibility Visibility(IsSignUp)"
@@ -80,21 +114,20 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true" />
     <TextView
-        android:id="@+id/LoginGoogleLogin"
-        local:MvxBind="Click GoogleLoginCommand; Visibility Visibility(IsLogin)"
+        android:id="@+id/LoginForgotPasswordLabel"
+        local:MvxBind="Click ForgotPasswordCommand; Visibility Visibility(ShowForgotPassword)"
         android:textSize="14sp"
-        android:gravity="bottom"
         android:clickable="true"
         android:textStyle="normal"
-        android:lineSpacingExtra="6sp"
-        android:text="Login with Google"
+        android:textAllCaps="true"
+        android:text="@string/ForgotPassword"
+        android:fontFamily="sans-serif-medium"
         android:textColor="@color/defaultText"
+        android:layout_marginTop="8dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="17dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_below="@id/InfoTextField" />
     <TextView
         android:id="@+id/LoginTermsOfServiceLabel"
         local:MvxBind="Click OpenTermsOfServiceCommand"
@@ -104,7 +137,7 @@
         android:text="@string/TermsOfService"
         android:textColor="@color/defaultEditText"
         android:layout_marginLeft="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/LoginGoogleSignUp" />
@@ -116,7 +149,7 @@
         android:fontFamily="sans-serif"
         android:textColor="@color/defaultEditText"
         android:layout_marginLeft="4dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/LoginGoogleSignUp"
@@ -130,7 +163,7 @@
         android:text="@string/PrivacyPolicy"
         android:textColor="@color/defaultEditText"
         android:layout_marginLeft="4dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/LoginGoogleSignUp"
@@ -169,5 +202,5 @@
         android:layout_height="30dp"
         android:layout_marginRight="20dp"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/LoginPasswordTextField" />
+        android:layout_alignTop="@id/LoginInputControlAnchor" />
 </RelativeLayout>

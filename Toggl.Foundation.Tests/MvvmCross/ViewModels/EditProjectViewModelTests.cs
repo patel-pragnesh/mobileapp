@@ -31,7 +31,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             protected override EditProjectViewModel CreateViewModel()
-                => new EditProjectViewModel(DataSource, DialogService, NavigationService);
+                => new EditProjectViewModel(DataSource, DialogService, InteractorFactory, NavigationService);
         }
 
         public abstract class EditProjectWithSpecificNameViewModelTest : EditProjectViewModelTest
@@ -52,13 +52,15 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 defaultWorkspace.Id.Returns(WorkspaceId);
                 defaultWorkspace.Name.Returns(Guid.NewGuid().ToString());
 
-                DataSource.Workspaces
-                          .GetDefault()
-                          .Returns(Observable.Return(defaultWorkspace));
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
+                    .Returns(Observable.Return(defaultWorkspace));
 
-                DataSource.Workspaces
-                          .WorkspaceHasFeature(Arg.Is(WorkspaceId), Arg.Is(WorkspaceFeatureId.Pro))
-                          .Returns(Observable.Return(false));
+                InteractorFactory
+                    .AreCustomColorsEnabledForWorkspace(WorkspaceId)
+                    .Execute()
+                    .Returns(Observable.Return(false));
 
                 DataSource.Projects
                           .GetAll(Arg.Any<ProjectPredicate>())
@@ -78,8 +80,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     workspace.Name.Returns(Guid.NewGuid().ToString());
                     workspaces.Add(workspace);
 
-                    DataSource.Workspaces
-                        .GetById(Arg.Is(workspaceId))
+                    InteractorFactory
+                        .GetWorkspaceById(workspaceId)
+                        .Execute()
                         .Returns(Observable.Return(workspace));
 
                     for (long projectId = 0; projectId < 3; projectId++)
@@ -100,13 +103,15 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 var defaultWorkspace = workspaces[0];
 
-                DataSource.Workspaces
-                          .GetDefault()
-                          .Returns(Observable.Return(defaultWorkspace));
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
+                    .Returns(Observable.Return(defaultWorkspace));
 
-                DataSource.Workspaces
-                          .WorkspaceHasFeature(Arg.Any<long>(), Arg.Is(WorkspaceFeatureId.Pro))
-                          .Returns(Observable.Return(false));
+                InteractorFactory
+                    .AreCustomColorsEnabledForWorkspace(Arg.Any<long>())
+                    .Execute()
+                    .Returns(Observable.Return(false));
 
                 DataSource.Projects
                           .GetAll(Arg.Any<ProjectPredicate>())
@@ -139,15 +144,20 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheConstructor : EditProjectViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(ThreeParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useDataSource, bool useDialogService, bool useNavigationService)
+            [ClassData(typeof(FourParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(
+                bool useDataSource,
+                bool useDialogService,
+                bool useInteractorFactory,
+                bool useNavigationService)
             {
                 var dataSource = useDataSource ? DataSource : null;
                 var dialogService = useDialogService ? DialogService : null;
+                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
                 var navigationService = useNavigationService ? NavigationService : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new EditProjectViewModel(dataSource, dialogService, navigationService);
+                    () => new EditProjectViewModel(dataSource, dialogService, interactorFactory, navigationService);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -308,8 +318,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             public TheInitializeMethod()
             {
-                DataSource.Workspaces
-                    .GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
 
                 Workspace.Id.Returns(WorkspaceId);
@@ -380,20 +391,24 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             public TheDoneCommand()
             {
-                DataSource.Workspaces
-                    .WorkspaceHasFeature(WorkspaceId, WorkspaceFeatureId.Pro)
+                InteractorFactory
+                    .AreCustomColorsEnabledForWorkspace(WorkspaceId)
+                    .Execute()
                     .Returns(Observable.Return(false));
 
-                DataSource.Workspaces
-                    .WorkspaceHasFeature(proWorkspaceId, WorkspaceFeatureId.Pro)
+                InteractorFactory
+                    .AreCustomColorsEnabledForWorkspace(proWorkspaceId)
+                    .Execute()
                     .Returns(Observable.Return(true));
 
-                DataSource.Workspaces
-                    .GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
 
-                DataSource.Workspaces
-                    .GetById(Arg.Any<long>())
+                InteractorFactory
+                    .GetWorkspaceById(Arg.Any<long>())
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
 
                 DataSource.Projects
@@ -450,37 +465,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Close(ViewModel, projectId);
             }
 
-            [Fact, LogIfTooSlow]
-            public async Task SetsBillableToNullIfTheWorkspaceIfNotPro()
-            {
-                Workspace.Id.Returns(WorkspaceId);
-                ViewModel.Prepare("Some name");
-
-                await ViewModel.DoneCommand.ExecuteAsync();
-
-                await DataSource.Projects.Received().Create(
-                    Arg.Is<CreateProjectDTO>(dto => dto.Billable == null)
-                );
-            }
-
-            [Theory, LogIfTooSlow]
-            [InlineData(true)]
-            [InlineData(false)]
-            public async Task SetsBillableToTheValueOfTheProjectsBillableByDefaultPropertyIfTheWorkspaceIsPro(
-                bool billableByDefault)
-            {
-                Workspace.Id.Returns(proWorkspaceId);
-                Workspace.ProjectsBillableByDefault.Returns(billableByDefault);
-                ViewModel.Prepare("Some name");
-                await ViewModel.Initialize();
-
-                await ViewModel.DoneCommand.ExecuteAsync();
-
-                await DataSource.Projects.Received().Create(
-                    Arg.Is<CreateProjectDTO>(dto => dto.Billable == billableByDefault)
-                );
-            }
-
             [Theory, LogIfTooSlow]
             [InlineData("   abcde", "abcde")]
             [InlineData("abcde     ", "abcde")]
@@ -510,7 +494,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     defaultWorkspace.Id.Returns(defaultWorkspaceId);
                     var selectedWorkspace = Substitute.For<IDatabaseWorkspace>();
                     selectedWorkspace.Id.Returns(selectedWorkspaceId);
-                    DataSource.Workspaces.GetDefault().Returns(Observable.Return(defaultWorkspace));
+                    InteractorFactory
+                        .GetDefaultWorkspace()
+                        .Execute()
+                        .Returns(Observable.Return(defaultWorkspace));
                     NavigationService
                        .Navigate<SelectWorkspaceViewModel, WorkspaceParameters, long>(Arg.Any<WorkspaceParameters>())
                        .Returns(Task.FromResult(selectedWorkspaceId));
@@ -633,10 +620,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 workspace.Name.Returns(workspaceName);
                 defaultWorkspace.Id.Returns(defaultWorkspaceId);
 
-                DataSource.Workspaces.GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(defaultWorkspace));
 
-                DataSource.Workspaces.GetById(workspaceId)
+                InteractorFactory
+                    .GetWorkspaceById(workspaceId)
+                    .Execute()
                     .Returns(Observable.Return(workspace));
 
                 ViewModel.Prepare();
@@ -684,7 +675,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 NavigationService
                     .Navigate<SelectWorkspaceViewModel, WorkspaceParameters, long>(Arg.Any<WorkspaceParameters>())
                     .Returns(Task.FromResult(workspaceId));
-                DataSource.Workspaces.WorkspaceHasFeature(workspaceId, WorkspaceFeatureId.Pro)
+                InteractorFactory.AreCustomColorsEnabledForWorkspace(workspaceId).Execute()
                     .Returns(Observable.Return(false));
                 await ViewModel.PickColorCommand.ExecuteAsync();
 
@@ -710,8 +701,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task PassesTheCurrentWorkspaceToTheViewModel()
             {
-                DataSource.Workspaces
-                    .GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
                 Workspace.Id.Returns(WorkspaceId);
                 ViewModel.Prepare("Some name");
@@ -728,8 +720,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task PassesTheCurrentCliendIdToTheViewModel()
             {
-                DataSource.Workspaces
-                    .GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
                 Workspace.Id.Returns(WorkspaceId);
                 ViewModel.Prepare("Some name");
@@ -754,8 +747,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 NavigationService
                     .Navigate<SelectClientViewModel, SelectClientParameters, long?>(Arg.Any<SelectClientParameters>())
                     .Returns(Task.FromResult(expectedId));
-                DataSource.Workspaces
-                    .GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
                 DataSource.Clients.GetById(expectedId.Value).Returns(Observable.Return(client));
                 Workspace.Id.Returns(WorkspaceId);
@@ -777,8 +771,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 NavigationService
                     .Navigate<SelectClientViewModel, SelectClientParameters, long?>(Arg.Any<SelectClientParameters>())
                     .Returns(Task.FromResult(expectedId));
-                DataSource.Workspaces
-                    .GetDefault()
+                InteractorFactory
+                    .GetDefaultWorkspace()
+                    .Execute()
                     .Returns(Observable.Return(Workspace));
                 DataSource.Clients.GetById(expectedId.Value).Returns(Observable.Return(client));
                 Workspace.Id.Returns(WorkspaceId);

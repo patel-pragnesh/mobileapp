@@ -21,27 +21,36 @@ namespace Toggl.Foundation.Tests.MvvmCross
         public class TheRegisterServicesMethod : BaseMvvmCrossTests
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(FiveParameterConstructorTestData))]
+            [ClassData(typeof(EightParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheParametersIsNull(
                 bool useFoundation,
                 bool useDialogService,
                 bool useBrowserService,
                 bool useKeyValueStorage,
-                bool useNavigationService)
+                bool useNavigationService,
+                bool useAccessRestrictionStorage,
+                bool useUserPreferences,
+                bool useOnboardingStorage)
             {
                 var foundation = useFoundation ? new Foundation() : null;
                 var dialogService = useDialogService ? Substitute.For<IDialogService>() : null;
                 var browserService = useBrowserService ? Substitute.For<IBrowserService>() : null;
                 var keyValueStorage = useKeyValueStorage ? Substitute.For<IKeyValueStorage>() : null;
                 var navigationService = useNavigationService ? Substitute.For<IMvxNavigationService>() : null;
-
+                var accessRestrictionStorage = useAccessRestrictionStorage ? Substitute.For<IAccessRestrictionStorage>() : null;
+                var userPreferences = useUserPreferences ? Substitute.For<IUserPreferences>() : null;
+                var onboardingStorage = useOnboardingStorage ? Substitute.For<IOnboardingStorage>() : null;
 
                 Action tryingToConstructWithEmptyParameters =
                     () => foundation.RegisterServices(
                             dialogService,
                             browserService,
                             keyValueStorage,
-                            navigationService);
+                            accessRestrictionStorage,
+                            userPreferences,
+                            onboardingStorage,
+                            navigationService
+                        );
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -55,17 +64,18 @@ namespace Toggl.Foundation.Tests.MvvmCross
             {
                 var version = "1.0";
                 var now = DateTimeOffset.Now;
+                var scheduler = Substitute.For<IScheduler>();
                 var apiFactory = Substitute.For<IApiFactory>();
                 var database = Substitute.For<ITogglDatabase>();
                 var timeService = Substitute.For<ITimeService>();
-                var scheduler = Substitute.For<IScheduler>();
                 var analyticsService = Substitute.For<IAnalyticsService>();
                 var googleService = Substitute.For<IGoogleService>();
                 var backgroundService = Substitute.For<IBackgroundService>();
                 var keyValueStorage = Substitute.For<IKeyValueStorage>();
                 var apiErrorHandlingService = Substitute.For<IApiErrorHandlingService>();
                 var applicationShortcutCreator = Substitute.For<IApplicationShortcutCreator>();
-                var settingsService = new SettingsStorage(Version.Parse(version), keyValueStorage);
+                var onboardingStorage = Substitute.For<IOnboardingStorage>();
+                var accessRestrictionStorage = Substitute.For<IAccessRestrictionStorage>();
                 var foundationMvvmCross = new FoundationMvvmCross(
                     apiFactory,
                     database,
@@ -75,15 +85,17 @@ namespace Toggl.Foundation.Tests.MvvmCross
                     googleService,
                     applicationShortcutCreator,
                     backgroundService,
-                    settingsService,
+                    onboardingStorage,
+                    accessRestrictionStorage,
                     NavigationService,
                     apiErrorHandlingService);
                 timeService.CurrentDateTime.Returns(now);
-                keyValueStorage.GetString("LastAccessDate").Returns(now.AddDays(-60).ToString());
+                onboardingStorage.GetLastOpened().Returns(now.AddDays(-60).ToString());
 
                 foundationMvvmCross.RevokeNewUserIfNeeded();
 
-                keyValueStorage.Received().SetBool("IsNewUser", false);
+                onboardingStorage.Received().SetLastOpened(now);
+                onboardingStorage.Received().SetIsNewUser(false);
             }
         }
     }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
@@ -11,6 +10,7 @@ using PropertyChanged;
 using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.Parameters;
@@ -29,8 +29,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         : MvxViewModel<SelectProjectParameter, SelectProjectParameter>
     {
         private readonly ITogglDataSource dataSource;
-        private readonly IMvxNavigationService navigationService;
         private readonly IDialogService dialogService;
+        private readonly IInteractorFactory interactorFactory;
+        private readonly IMvxNavigationService navigationService;
         private readonly Subject<string> infoSubject = new Subject<string>();
 
         private long? taskId;
@@ -85,15 +86,20 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             = new MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>>();
 
         public SelectProjectViewModel(
-            ITogglDataSource dataSource, IMvxNavigationService navigationService, IDialogService dialogService)
+            ITogglDataSource dataSource, 
+            IInteractorFactory interactorFactory,
+            IMvxNavigationService navigationService, 
+            IDialogService dialogService)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
-            Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(dialogService, nameof(dialogService));
+            Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
+            Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
 
             this.dataSource = dataSource;
-            this.navigationService = navigationService;
             this.dialogService = dialogService;
+            this.interactorFactory = interactorFactory;
+            this.navigationService = navigationService;
 
             CloseCommand = new MvxAsyncCommand(close);
             CreateProjectCommand = new MvxAsyncCommand(createProject);
@@ -112,13 +118,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            dataSource.Workspaces
-                      .GetAll()
-                      .Subscribe(workspaces =>
-                      {
-                          allWorkspaces = workspaces.ToList();
-                          UseGrouping = allWorkspaces.Count > 1;
-                      });
+            var workspaces = await interactorFactory.GetAllWorkspaces().Execute();
+            allWorkspaces = workspaces.ToList();
+            UseGrouping = allWorkspaces.Count > 1;
 
             dataSource.Projects
                       .GetAll()
@@ -135,8 +137,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private IEnumerable<ProjectSuggestion> setSelectedProject(IEnumerable<ProjectSuggestion> suggestions)
         {
-            suggestions.ForEach(s => s.Selected = s.ProjectId == projectId);
-            return suggestions;
+            return suggestions.Select(s =>
+            {
+                s.Selected = s.ProjectId == projectId;
+                return s;
+            });
         }
 
         private void OnTextChanged()

@@ -26,6 +26,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private DurationFormat durationFormat;
 
+        private EditMode editMode;
+
         [DependsOn(nameof(IsRunning))]
         public DurationFormat DurationFormat => IsRunning ? DurationFormat.Improved : durationFormat;
 
@@ -51,29 +53,44 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        [DependsOn(nameof(IsEditingStartTime), nameof(IsEditingStopTime))]
         public bool IsEditingTime => IsEditingStopTime || IsEditingStartTime;
 
-        public bool IsEditingStartTime { get; private set; }
+        public bool IsEditingStartTime => editMode == EditMode.StartTime;
 
-        public bool IsEditingStopTime { get; private set; }
+        public bool IsEditingStopTime => editMode == EditMode.EndTime;
 
         public DateTimeOffset EditedTime
         {
-            get => IsEditingStartTime ? StartTime : StopTime;
+            get
+            {
+                switch (editMode)
+                {
+                    case EditMode.StartTime:
+                        return StartTime;
+
+                    case EditMode.EndTime:
+                        return StopTime;
+
+                    default:
+                        return default(DateTimeOffset);
+                }
+            }
+
             set
             {
-                if (IsEditingTime == false) return;
+                if (!IsEditingTime) return;
 
-                value = value.Clamp(MinimumDateTime, MaximumDateTime);
+                var valueInRange = value.Clamp(MinimumDateTime, MaximumDateTime);
 
-                if (IsEditingStartTime)
+                switch (editMode)
                 {
-                    StartTime = value;
-                }
-                else
-                {
-                    StopTime = value;
+                    case EditMode.StartTime:
+                        StartTime = valueInRange;
+                        break;
+
+                    case EditMode.EndTime:
+                        StopTime = valueInRange;
+                        break;
                 }
             }
         }
@@ -141,6 +158,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             preferencesDisposable = dataSource.Preferences.Current
                 .Subscribe(onPreferencesChanged);
+
+            editMode = EditMode.None;
         }
 
         private Task close()
@@ -154,20 +173,22 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void editStartTime()
         {
-            if (IsEditingStartTime == false)
+            if (IsEditingStartTime)
             {
-                MinimumDateTime = StopTime.AddHours(-MaxTimeEntryDurationInHours).LocalDateTime;
-                MaximumDateTime = StopTime.LocalDateTime;
-
-                IsEditingStartTime = true;
-                IsEditingStopTime = false;
-
-                EditedTime = StartTime;
+                editMode = EditMode.None;
             }
             else
             {
-                IsEditingStartTime = false;
+                MinimumDateTime = MinimumStartTime.LocalDateTime;
+                MaximumDateTime = MaximumStartTime.LocalDateTime;
+
+                editMode = EditMode.StartTime;
             }
+
+            RaisePropertyChanged(nameof(IsEditingStartTime));
+            RaisePropertyChanged(nameof(IsEditingStopTime));
+            RaisePropertyChanged(nameof(IsEditingTime));
+            RaisePropertyChanged(nameof(EditedTime));
         }
 
         private void editStopTime()
@@ -179,26 +200,31 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 IsRunning = false;
             }
 
-            if (IsEditingStopTime == false)
+            if (IsEditingStopTime)
             {
-                MinimumDateTime = StartTime.LocalDateTime;
-                MaximumDateTime = StartTime.AddHours(MaxTimeEntryDurationInHours).LocalDateTime;
-
-                IsEditingStopTime = true;
-                IsEditingStartTime = false;
-
-                EditedTime = StopTime;
+                editMode = EditMode.None;
             }
             else
             {
-                IsEditingStopTime = false;
+                MinimumDateTime = MinimumStopTime.LocalDateTime;
+                MaximumDateTime = MaximumStopTime.LocalDateTime;
+
+                editMode = EditMode.EndTime;
             }
+
+            RaisePropertyChanged(nameof(IsEditingStartTime));
+            RaisePropertyChanged(nameof(IsEditingStopTime));
+            RaisePropertyChanged(nameof(IsEditingTime));
+            RaisePropertyChanged(nameof(EditedTime));
         }
 
         private void stopEditingTime()
         {
-            IsEditingStopTime = false;
-            IsEditingStartTime = false;
+            editMode = EditMode.None;
+
+            RaisePropertyChanged(nameof(IsEditingStartTime));
+            RaisePropertyChanged(nameof(IsEditingStopTime));
+            RaisePropertyChanged(nameof(IsEditingTime));
         }
 
         private void onDurationChanged(TimeSpan changedDuration)
@@ -216,6 +242,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             TimeFormat = preferences.TimeOfDayFormat;
 
             RaisePropertyChanged(nameof(DurationFormat));
+        }
+
+        private enum EditMode
+        {
+            None,
+            StartTime,
+            EndTime
         }
     }
 }

@@ -6,6 +6,20 @@
     android:background="@android:color/white"
     android:layout_height="48dp"
     android:layout_width="match_parent">
+    <View
+        android:id="@+id/SelectProjectActivitySelectionToken"
+        local:MvxBind="Visibility Visibility(Selected, true); DrawableColor TransparentColor(ProjectColor, 12)"
+        android:background="@drawable/roundedRectangle"
+        android:layout_marginTop="-3dp"
+        android:layout_marginLeft="-6dp"
+        android:layout_marginRight="-6dp"
+        android:layout_marginBottom="-3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/SelectProjectActivityProjectCellProjectName"
+        android:layout_alignLeft="@id/SelectProjectActivityProjectCellProjectName"
+        android:layout_alignRight="@id/SelectProjectActivityProjectCellProjectName"
+        android:layout_alignBottom="@id/SelectProjectActivityProjectCellProjectName" />
     <TextView
         android:id="@+id/SelectProjectActivityProjectCellProjectName"
         local:MvxBind="Text ProjectName; TextColor RGBA(ProjectColor); Visibility Visibility(ProjectName)"
@@ -15,7 +29,7 @@
         android:textSize="15sp"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/defaultText"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="22dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -28,7 +42,7 @@
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/defaultText"
         tools:text="A big long client that spans a lot"
-        android:layout_marginLeft="4dp"
+        android:layout_marginLeft="12dp"
         android:layout_marginRight="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +53,6 @@
         android:visibility="visible"
         android:background="@drawable/TransparentToWhiteGradient"
         android:layout_width="128dp"
-        android:layout_marginRight="16dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true" />
     <ImageView

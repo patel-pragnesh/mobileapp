@@ -34,6 +34,30 @@ namespace Toggl.Multivac.Extensions
         public static bool None<T>(this IEnumerable<T> collection)
            => !collection.Any();
 
+        public static TItem MaxBy<TItem, TProperty>(this IEnumerable<TItem> collection, Func<TItem, TProperty> keySelector)
+            where TProperty : IComparable<TProperty>
+        {
+            Ensure.Argument.IsNotNull(collection, nameof(collection));
+
+            if (!collection.Any())
+                throw new InvalidOperationException("The collection is empty");
+
+            var maxItem = collection.First();
+            var maxKey = keySelector(maxItem);
+
+            foreach (var item in collection)
+            {
+                var key = keySelector(item);
+                if (key.CompareTo(maxKey) > 0)
+                {
+                    maxKey = key;
+                    maxItem = item;
+                }
+            }
+
+            return maxItem;
+        }
+
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> collection)
             => new HashSet<T>(collection);
     }

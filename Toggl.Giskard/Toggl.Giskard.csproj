@@ -31,8 +31,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidSupportedAbis>arm64-v8a;armeabi;armeabi-v7a;x86</AndroidSupportedAbis>
-<AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
-<EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
@@ -41,7 +41,8 @@
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidSupportedAbis>armeabi-v7a;armeabi;x86_64;x86;arm64-v8a</AndroidSupportedAbis>
     <OutputPath>..\bin</OutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>../giskard.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>{KEYSTORE_PASSWORD}</AndroidSigningStorePass>
@@ -53,7 +54,8 @@
     <OutputPath>bin\Release.PlayStore</OutputPath>
     <DefineConstants>USE_ANALYTICS;USE_PRODUCTION_API</DefineConstants>
     <WarningLevel>4</WarningLevel>
-    <AndroidLinkSkip></AndroidLinkSkip>
+    <AndroidLinkSkip>
+    </AndroidLinkSkip>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
     <AndroidSupportedAbis>armeabi-v7a;armeabi;arm64-v8a;x86_64</AndroidSupportedAbis>
@@ -325,6 +327,25 @@
     <Compile Include="TemplateSelectors\SelectDurationFormatTemplateSelector.cs" />
     <Compile Include="Views\MainRecyclerViewSuggestionsViewHolder.cs" />
     <Compile Include="Views\MainRecyclerViewTouchCallback.cs" />
+    <Compile Include="Converters\TransparentColorValueConverter.cs" />
+    <Compile Include="Adapters\ReportsRecyclerAdapter.cs" />
+    <Compile Include="Extensions\ViewExtensions.cs" />
+    <Compile Include="TemplateSelectors\ReportsTemplateSelector.cs" />
+    <Compile Include="Activities\ReportsActivity.cs" />
+    <Compile Include="Views\ReportsRecyclerView.cs" />
+    <Compile Include="Converters\ReportPercentageLabelValueConverter.cs" />
+    <Compile Include="Converters\ReportTimeSpanLabelValueConverter.cs" />
+    <Compile Include="Bindings\ViewWidthPercentageTargetBinding.cs" />
+    <Compile Include="Views\PieChartView.cs" />
+    <Compile Include="Views\ReportsRecyclerViewHolder.cs" />
+    <Compile Include="Startup\TogglBindingBuilder.cs" />
+    <Compile Include="Fragments\ReportsCalendarFragment.cs" />
+    <Compile Include="Views\ReportsLinearLayout.cs" />
+    <Compile Include="Adapters\CalendarRecyclerAdapter.cs" />
+    <Compile Include="Views\CalendarRecyclerView.cs" />
+    <Compile Include="TemplateSelectors\CalendarTemplateSelector.cs" />
+    <Compile Include="Adapters\CalendarPagerAdapter.cs" />
+    <Compile Include="Bindings\ViewPagerCurrentPageTargetBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
@@ -348,14 +369,25 @@
     <AndroidResource Include="Resources\layout\SelectBeginningOfWeekFragmentCell.axml" />
     <AndroidResource Include="Resources\layout\SelectDurationFormatFragment.axml" />
     <AndroidResource Include="Resources\layout\SelectDurationFormatFragmentCell.axml" />
-  </ItemGroup>
-  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\RoundedRectangle.xml" />
+    <AndroidResource Include="Resources\layout\ReportsActivity.axml" />
+    <AndroidResource Include="Resources\layout\ReportsActivityHeader.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\logo.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\logo.png" />
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\mipmap-hdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-mdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-xhdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher.png" />
+    <AndroidResource Include="Resources\drawable-hdpi\reports_total_chart.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\reports_total_chart.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\reports_total_chart.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\reports_total_chart.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\reports_total_chart.png" />
     <AndroidResource Include="Resources\mipmap-anydpi-v26\ic_launcher.xml" />
     <AndroidResource Include="Resources\drawable-hdpi\ic_launcher.png" />
     <AndroidResource Include="Resources\drawable-mdpi\ic_launcher.png" />
@@ -572,7 +604,7 @@
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityWorkspaceHeader.axml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityNoEntityCell.axml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityEmptyCell.axml" />
-    <AndroidResource Include="Resources\layout\EditLayout.axml" />
+    <AndroidResource Include="Resources\layout\EditActivity.axml" />
     <AndroidResource Include="Resources\values\Dimen.xml" />
     <AndroidResource Include="Resources\layout\EditProjectActivity.axml" />
     <AndroidResource Include="Resources\layout\SelectTagsActivityCell.axml" />
@@ -584,6 +616,10 @@
     <AndroidResource Include="Resources\layout\SelectClientActivityCell.axml" />
     <AndroidResource Include="Resources\layout\SelectWorkspaceFragment.axml" />
     <AndroidResource Include="Resources\layout\SelectWorkspaceFragmentCell.axml" />
+    <AndroidResource Include="Resources\layout\ReportsActivityItem.axml" />
+    <AndroidResource Include="Resources\layout\ReportsCalendarFragment.axml" />
+    <AndroidResource Include="Resources\layout\ReportsCalendarFragmentDayCell.axml" />
+    <AndroidResource Include="Resources\layout\ReportsCalendarFragmentPage.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">
@@ -616,6 +652,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProguardConfiguration Include="ProGuard.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable-hdpi\add_white.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\add_white.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\add_white.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\add_white.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\add_white.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <Import Project="..\packages\Fody.2.2.0\build\netstandard1.2\Fody.targets" Condition="Exists('..\packages\Fody.2.2.0\build\netstandard1.2\Fody.targets')" />

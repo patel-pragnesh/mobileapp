@@ -9,7 +9,6 @@ using MvvmCross.Binding.iOS.Views;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Plugins.Color.iOS;
 using Toggl.Daneel.Views;
-using Toggl.Daneel.Views.Log;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.Helper;
@@ -23,18 +22,13 @@ namespace Toggl.Daneel.ViewSources
           IUITableViewDataSource
     {
         private const int bottomPadding = 64;
-        private const int emptyStateCellCount = 3;
         private const int spaceBetweenSections = 20;
 
         private const string cellIdentifier = nameof(TimeEntriesLogViewCell);
         private const string headerCellIdentifier = nameof(TimeEntriesLogHeaderViewCell);
-        private const string emptyStateCellIdentifier = nameof(TimeEntriesLogEmptyStateViewCell);
 
         //Using the old API so that delete action would work on pre iOS 11 devices
         private readonly UITableViewRowAction deleteTableViewRowAction;
-
-        private bool shouldUseEmptyStateCells
-            => IsEmptyState && ItemsSource.Count() == 0;
 
         public bool IsEmptyState { get; set; }
 
@@ -49,7 +43,6 @@ namespace Toggl.Daneel.ViewSources
         {
             tableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
             tableView.RegisterNibForCellReuse(TimeEntriesLogViewCell.Nib, cellIdentifier);
-            tableView.RegisterNibForCellReuse(TimeEntriesLogEmptyStateViewCell.Nib, emptyStateCellIdentifier);
             tableView.RegisterNibForHeaderFooterViewReuse(TimeEntriesLogHeaderViewCell.Nib, headerCellIdentifier);
 
             deleteTableViewRowAction = UITableViewRowAction.Create(
@@ -73,9 +66,6 @@ namespace Toggl.Daneel.ViewSources
             if (cell is TimeEntriesLogViewCell logCell)
                 logCell.ContinueTimeEntryCommand = ContinueTimeEntryCommand;
 
-            if (cell is TimeEntriesLogEmptyStateViewCell)
-                cell.SelectionStyle = UITableViewCellSelectionStyle.None;
-
             return cell;
         }
 
@@ -90,40 +80,13 @@ namespace Toggl.Daneel.ViewSources
 
         public override bool ShouldScrollToTop(UIScrollView scrollView) => true;
 
-        public override nint NumberOfSections(UITableView tableView)
-        {
-            if (shouldUseEmptyStateCells)
-                return 1;
-
-            return base.NumberOfSections(tableView);
-        }
-
-        public override nint RowsInSection(UITableView tableview, nint section)
-        {
-            if (shouldUseEmptyStateCells)
-                return emptyStateCellCount;
-
-            return base.RowsInSection(tableview, section);
-        }
-
         public new object GetItemAt(NSIndexPath indexPath)
-        {
-            if (shouldUseEmptyStateCells)
-                return null;
-
-            return base.GetItemAt(indexPath);
-        }
-
+            => base.GetItemAt(indexPath);
         public new UITableViewCell GetOrCreateCellFor(UITableView tableView, NSIndexPath indexPath, object item)
             => tableView.DequeueReusableCell(cellIdentifierForItem(item), indexPath);
 
         public override UITableViewRowAction[] EditActionsForRow(UITableView tableView, NSIndexPath indexPath)
-        {
-            var item = GetItemAt(indexPath);
-            if (item == null)
-                return new UITableViewRowAction[0];
-            return new[] { deleteTableViewRowAction };
-        }
+            => new[] { deleteTableViewRowAction };
 
         public override UISwipeActionsConfiguration GetLeadingSwipeActionsConfiguration(UITableView tableView, NSIndexPath indexPath)
         {
@@ -138,14 +101,6 @@ namespace Toggl.Daneel.ViewSources
                 .FromActions(new[] { continueSwipeActionFor((TimeEntryViewModel)item) });
         }
 
-        protected override void OnSectionAdded(NSIndexSet indexToAdd)
-        {
-            if (IsEmptyState)
-                TableView.ReloadSections(indexToAdd, UITableViewRowAnimation.Automatic);
-            else
-                TableView.InsertSections(indexToAdd, UITableViewRowAnimation.Automatic);
-        }
-
         public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
         {
             var item = GetItemAt(indexPath);
@@ -157,12 +112,7 @@ namespace Toggl.Daneel.ViewSources
         }
 
         public override bool ShouldHighlightRow(UITableView tableView, NSIndexPath rowIndexPath)
-        {
-            if (shouldUseEmptyStateCells)
-                return false;
-
-            return true;
-        }
+            => true;
 
         private void handleDeleteTableViewRowAction(UITableViewRowAction _, NSIndexPath indexPath)
         {
@@ -187,13 +137,10 @@ namespace Toggl.Daneel.ViewSources
 
         private string cellIdentifierForItem(object item)
         {
-            if (item == null)
-                return emptyStateCellIdentifier;
-
             if (item is TimeEntryViewModel)
                 return cellIdentifier;
 
-            throw new ArgumentException($"Unexpected item type. Must be either null or of type {nameof(TimeEntryViewModel)}");
+            throw new ArgumentException($"Unexpected item type. Must be of type {nameof(TimeEntryViewModel)}");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using CoreGraphics;
+﻿using System;
+using CoreGraphics;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
@@ -9,6 +10,8 @@ using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Combiners;
 using Toggl.Daneel.Extensions;
+using Toggl.Daneel.Onboarding;
+using Toggl.Daneel.Onboarding.MainView;
 using Toggl.Daneel.Suggestions;
 using Toggl.Daneel.Views;
 using Toggl.Daneel.ViewSources;
@@ -16,6 +19,7 @@ using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
+using Toggl.PrimeRadiant.Extensions;
 using UIKit;
 using static Toggl.Foundation.MvvmCross.Helper.Animation;
 
@@ -37,8 +41,10 @@ namespace Toggl.Daneel.ViewControllers
         private readonly UIButton reportsButton = new UIButton(new CGRect(0, 0, 40, 40));
         private readonly UIButton settingsButton = new UIButton(new CGRect(0, 0, 40, 40));
         private readonly UIImageView titleImage = new UIImageView(UIImage.FromBundle("togglLogo"));
+        private readonly TimeEntriesEmptyLogView emptyStateView = TimeEntriesEmptyLogView.Create();
 
         private bool viewInitialized;
+        private IDisposable onboardingDisposable;
 
         public MainViewController()
             : base(nameof(MainViewController), null)
@@ -50,6 +56,7 @@ namespace Toggl.Daneel.ViewControllers
             base.ViewDidLoad();
 
             prepareViews();
+            prepareOnboarding();
 
             var source = new MainTableViewSource(TimeEntriesLogTableView);
             var suggestionsView = new SuggestionsView();
@@ -88,10 +95,6 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(source)
                       .For(v => v.SyncProgress)
                       .To(vm => vm.SyncingProgress);
-
-            bindingSet.Bind(source)
-                      .For(v => v.IsEmptyState)
-                      .To(vm => vm.ShouldShowEmptyState);
 
             bindingSet.Bind(TimeEntriesLogTableView)
                       .For(v => v.TableFooterView)
@@ -143,6 +146,11 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(spiderBroView)
                       .For(v => v.BindSpiderVisibility())
                       .To(vm => vm.ShouldShowWelcomeBack);
+
+            bindingSet.Bind(emptyStateView)
+                      .For(v => v.BindVisibility())
+                      .To(vm => vm.ShouldShowEmptyState)
+                      .WithConversion(visibilityConverter);
 
             //Text
             bindingSet.Bind(CurrentTimeEntryDescriptionLabel).To(vm => vm.CurrentTimeEntryDescription);
@@ -203,6 +211,7 @@ namespace Toggl.Daneel.ViewControllers
 
             if (!disposing) return;
             spiderBroView.Dispose();
+            onboardingDisposable.Dispose();
         }
 
         public override void ViewDidLayoutSubviews()
@@ -241,6 +250,9 @@ namespace Toggl.Daneel.ViewControllers
             RunningEntryDescriptionFadeView.FadeRight = true;
 
             prepareSpiderViews();
+            prepareEmptyStateView();
+
+            TopConstraint.AdaptForIos10(NavigationController.NavigationBar);
         }
 
         private void showTimeEntryCard()
@@ -313,6 +325,31 @@ namespace Toggl.Daneel.ViewControllers
             spiderBroView.WidthAnchor.ConstraintEqualTo(spiderContainerView.WidthAnchor).Active = true;
             spiderBroView.BottomAnchor.ConstraintEqualTo(spiderContainerView.BottomAnchor).Active = true;
             spiderBroView.CenterXAnchor.ConstraintEqualTo(spiderContainerView.CenterXAnchor).Active = true;
+        }
+
+        private void prepareEmptyStateView()
+        {
+            emptyStateView.BackgroundColor = UIColor.Clear;
+            emptyStateView.TranslatesAutoresizingMaskIntoConstraints = false;
+
+            TimeEntriesLogTableView.AddSubview(emptyStateView);
+
+            emptyStateView.WidthAnchor.ConstraintEqualTo(TimeEntriesLogTableView.WidthAnchor).Active = true;
+            emptyStateView.HeightAnchor.ConstraintEqualTo(TimeEntriesLogTableView.HeightAnchor).Active = true;
+            emptyStateView.CenterYAnchor.ConstraintEqualTo(TimeEntriesLogTableView.CenterYAnchor).Active = true;
+            emptyStateView.TopAnchor.ConstraintEqualTo(TimeEntriesLogTableView.TopAnchor).Active = true;
+        }
+
+        private void prepareOnboarding()
+        {
+            var onboardingStorage = ViewModel.OnboardingStorage;
+
+            var step = new StartTimeEntryOnboardingStep(onboardingStorage).ToDismissable(nameof(StartTimeEntryOnboardingStep), onboardingStorage);
+
+            var tapOnStartButtonBubble = new UITapGestureRecognizer(() => step.Dismiss());
+            StartTimeEntryOnboardingBubbleView.AddGestureRecognizer(tapOnStartButtonBubble);
+
+            onboardingDisposable = step.ManageVisibilityOf(StartTimeEntryOnboardingBubbleView);
         }
 
         internal void Reload()

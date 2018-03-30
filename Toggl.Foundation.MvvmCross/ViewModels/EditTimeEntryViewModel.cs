@@ -8,6 +8,7 @@ using MvvmCross.Core.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.DTOs;
+using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;
@@ -25,23 +26,42 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly ITimeService timeService;
         private readonly ITogglDataSource dataSource;
         private readonly IDialogService dialogService;
+        private readonly IInteractorFactory interactorFactory;
         private readonly IMvxNavigationService navigationService;
 
         private readonly HashSet<long> tagIds = new HashSet<long>();
-
         private IDisposable deleteDisposable;
         private IDisposable tickingDisposable;
         private IDisposable confirmDisposable;
         private IDisposable preferencesDisposable;
+
+        private IDatabaseTimeEntry originalTimeEntry;
 
         private long? projectId;
         private long? taskId;
         private long workspaceId;
         private DurationFormat durationFormat;
 
+        private bool isDirty
+            => originalTimeEntry.Description != Description
+               || originalTimeEntry.WorkspaceId != workspaceId
+               || originalTimeEntry.ProjectId != projectId
+               || originalTimeEntry.TaskId != taskId
+               || originalTimeEntry.Start != StartTime
+               || originalTimeEntry.TagIds.SequenceEqual(tagIds) == false
+               || originalTimeEntry.Duration.HasValue != !IsTimeEntryRunning
+               || (originalTimeEntry.Duration.HasValue
+                   && originalTimeEntry.Duration != (long)Duration.TotalSeconds)
+               || originalTimeEntry.Billable != Billable;
+
         public long Id { get; set; }
 
         public string Description { get; set; }
+
+        [DependsOn(nameof(IsEditingDescription))]
+        public string ConfirmButtonText => IsEditingDescription ? Resources.Done : Resources.Save;
+
+        public bool IsEditingDescription { get; set; }
 
         [DependsOn(nameof(Description))]
         public int DescriptionRemainingLength
@@ -58,6 +78,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public string Client { get; set; }
 
         public string Task { get; set; }
+
+        public bool IsBillableAvailable { get; private set; }
 
         [DependsOn(nameof(StartTime), nameof(StopTime))]
         public TimeSpan Duration
@@ -151,24 +173,27 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public IMvxCommand ToggleBillableCommand { get; }
 
         public EditTimeEntryViewModel(
-            ITogglDataSource dataSource,
-            IMvxNavigationService navigationService,
             ITimeService timeService,
+            ITogglDataSource dataSource,
+            IInteractorFactory interactorFactory,
+            IMvxNavigationService navigationService,
             IDialogService dialogService)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
-            Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
             Ensure.Argument.IsNotNull(dialogService, nameof(dialogService));
+            Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
+            Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
 
             this.dataSource = dataSource;
-            this.navigationService = navigationService;
             this.timeService = timeService;
             this.dialogService = dialogService;
+            this.interactorFactory = interactorFactory;
+            this.navigationService = navigationService;
 
             DeleteCommand = new MvxAsyncCommand(delete);
             ConfirmCommand = new MvxCommand(confirm);
-            CloseCommand = new MvxAsyncCommand(close);
+            CloseCommand = new MvxAsyncCommand(closeWithConfirmation);
             EditDurationCommand = new MvxAsyncCommand(editDuration);
             StopCommand = new MvxCommand(stopTimeEntry, () => IsTimeEntryRunning);
 
@@ -190,6 +215,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public override async Task Initialize()
         {
             var timeEntry = await dataSource.TimeEntries.GetById(Id);
+            originalTimeEntry = timeEntry;
 
             Description = timeEntry.Description;
             StartTime = timeEntry.Start;
@@ -204,6 +230,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             SyncErrorMessage = timeEntry.LastSyncErrorMessage;
             workspaceId = timeEntry.WorkspaceId;
             SyncErrorMessageVisible = !string.IsNullOrEmpty(SyncErrorMessage);
+            IsEditingDescription = true;
 
             onTags(timeEntry.Tags);
             foreach (var tagId in timeEntry.TagIds)
@@ -214,6 +241,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             preferencesDisposable = dataSource.Preferences.Current
                 .Subscribe(onPreferencesChanged);
+
+            await updateFeaturesAvailability();
         }
 
         private void subscribeToTimeServiceTicks()
@@ -237,12 +266,23 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private void onDeleteCompleted()
         {
             dataSource.SyncManager.PushSync();
-            close();
+            navigationService.Close(this);
         }
 
         private void onDeleteError(Exception exception) { }
 
         private void confirm()
+        {
+            if (IsEditingDescription)
+            {
+                IsEditingDescription = false;
+                return;
+            }
+
+            save();
+        }
+
+        private void save()
         {
             var dto = new EditTimeEntryDto
             {
@@ -261,6 +301,18 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                                           .Update(dto)
                                           .Do(_ => dataSource.SyncManager.PushSync())
                                           .Subscribe((Exception ex) => close(), () => close());
+        }
+
+        private async Task closeWithConfirmation()
+        {
+            if (isDirty)
+            {
+                var shouldDiscard = await dialogService.ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+                if (!shouldDiscard)
+                    return;
+            }
+
+            await close();
         }
 
         private Task close()
@@ -343,6 +395,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 Project = Task = Client = ProjectColor = "";
                 clearTagsIfNeeded(workspaceId, returnParameter.WorkspaceId);
                 workspaceId = returnParameter.WorkspaceId;
+                await updateFeaturesAvailability();
                 return;
             }
 
@@ -354,6 +407,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             workspaceId = project.WorkspaceId;
 
             Task = taskId.HasValue ? (await dataSource.Tasks.GetById(taskId.Value)).Name : "";
+
+            await updateFeaturesAvailability();
         }
 
         private async Task editDuration()
@@ -412,9 +467,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Billable = !Billable;
         }
 
-        private void clearTagsIfNeeded(long currenctWorkspaceId, long newWorkspaceId)
+        private void clearTagsIfNeeded(long currentWorkspaceId, long newWorkspaceId)
         {
-            if (currenctWorkspaceId == newWorkspaceId) return;
+            if (currentWorkspaceId == newWorkspaceId) return;
 
             Tags.Clear();
             tagIds.Clear();
@@ -438,6 +493,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             TimeFormat = preferences.TimeOfDayFormat;
 
             RaisePropertyChanged(nameof(DurationFormat));
+        }
+
+        private async Task updateFeaturesAvailability()
+        {
+            IsBillableAvailable = await interactorFactory.IsBillableAvailableForWorkspace(workspaceId).Execute();
         }
     }
 }

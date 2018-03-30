@@ -1,6 +1,8 @@
 ﻿using CoreGraphics;
 using MvvmCross.Binding.BindingContext;
+using MvvmCross.Binding.iOS;
 using MvvmCross.iOS.Views;
+using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Presentation.Attributes;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation.MvvmCross.Converters;
@@ -58,6 +60,11 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(SliderBackgroundView)
                       .For(v => v.Saturation)
                       .To(vm => vm.Saturation);
+
+            bindingSet.Bind(SaveButton)
+                      .For(v => v.BindVisibility())
+                      .To(vm => vm.AllowCustomColors)
+                      .WithConversion(new MvxVisibilityValueConverter());
 
             bindingSet.Bind(SliderView)
                       .For(v => v.Value)

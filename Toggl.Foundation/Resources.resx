@@ -16,13 +16,13 @@
         <value>Track your hours 
 with a single tap</value>
     </data>
-    <data name="OnboardingLogPageCopy">
-        <value>See your most used 
-time entries first</value>
+    <data name="OnboardingMostUsedPageCopy">
+        <value>Resume tracking
+what you do most often</value>
     </data>
-    <data name="OnboardingSummaryPageCopy">
-        <value>See a daily summary of
-your time usage</value>
+    <data name="OnboardingReportsPageCopy">
+        <value>Get an instant summary
+of your time with reports</value>
     </data>
     <data name="LoginTitle">
         <value>Log in</value>
@@ -63,12 +63,6 @@ Please try again.</value>
     </data>
     <data name="GenericSignUpError">
         <value>Sorry, we’re having trouble signing you up. Please try again.</value>
-    </data>
-    <data name="EmailIsAlreadyUsedError">
-      <value>User with this email already exists.</value>
-    </data>
-    <data name="TryLoggingInInstead">
-      <value>Try logging in instead.</value>
     </data>
     <data name="StartTimeEntryPlaceholder">
         <value>What are you working on?</value>
@@ -299,9 +293,6 @@ categorize your tracked time.</value>
     <data name="MostRecentEntry">
         <value>Most recent entry</value>
     </data>
-    <data name="TimeEntrySuggestion">
-        <value>Time entry suggestion</value>
-    </data>
     <data name="NoEmailErrorTitle">
         <value>Oops! Seems like your email
 account is not set up</value>
@@ -321,6 +312,9 @@ account is not set up</value>
     <data name="DiscardThisTimeEntry">
         <value>Discard this time entry?</value>
     </data>
+    <data name="DiscardEditingChanges">
+        <value>Discard changes?</value>
+    </data>
      <data name="DurationFormatClassic">
         <value>Classic (47:06 min)</value>
     </data>
@@ -329,5 +323,26 @@ account is not set up</value>
     </data>
      <data name="DurationFormatDecimal">
         <value>Decimal (0.79 h)</value>
+    </data>
+    <data name="ContinueLastEntry">
+        <value>Continue last entry</value>
+     </data>
+     <data name="TapToRetry">
+        <value>Tap to retry</value>
+    </data>
+    <data name="TimeEntrySuggestion">       
+        <value>Time entry suggestion</value>      
+    </data>
+    <data name="EmailIsAlreadyUsedError">       
+        <value>User with this email already exists.</value>     
+    </data>       
+    <data name="TryLoggingInInstead">     
+        <value>Try logging in instead.</value>      
+    </data>
+     <data name="Save">     
+        <value>Save</value>      
+    </data>
+     <data name="Done">     
+        <value>Done</value>      
     </data>
 </root>

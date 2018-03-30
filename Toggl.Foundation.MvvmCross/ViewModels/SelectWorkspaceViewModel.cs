@@ -4,18 +4,17 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
-using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
     [Preserve(AllMembers = true)]
     public sealed class SelectWorkspaceViewModel : MvxViewModel<WorkspaceParameters, long>
     {
-        private readonly ITogglDataSource dataSource;
+        private readonly IInteractorFactory interactorFactory;
         private readonly IMvxNavigationService navigationService;
 
         private long defaultWorkspaceId;
@@ -34,12 +33,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public MvxObservableCollection<SelectableWorkspaceViewModel> Suggestions { get; }
             = new MvxObservableCollection<SelectableWorkspaceViewModel>();
 
-        public SelectWorkspaceViewModel(ITogglDataSource dataSource, IMvxNavigationService navigationService)
+        public SelectWorkspaceViewModel(IInteractorFactory interactorFactory, IMvxNavigationService navigationService)
         {
-            Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
+            Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
 
-            this.dataSource = dataSource;
+            this.interactorFactory = interactorFactory;
             this.navigationService = navigationService;
 
             CloseCommand = new MvxAsyncCommand(close);
@@ -57,7 +56,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            var workspaces = await dataSource.Workspaces.GetAll();
+            var workspaces = await interactorFactory.GetAllWorkspaces().Execute();
 
             allWorkspaces = workspaces.Select(w => new SelectableWorkspaceViewModel(w, w.Id == defaultWorkspaceId));
             Suggestions.AddRange(allWorkspaces);

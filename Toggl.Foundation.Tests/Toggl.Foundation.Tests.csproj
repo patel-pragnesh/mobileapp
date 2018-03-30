@@ -29,4 +29,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interactors\TimeEntry\" />
+    <Folder Include="Interactors\Project\" />
+    <Folder Include="Interactors\Workspace\" />
+  </ItemGroup>
 </Project>

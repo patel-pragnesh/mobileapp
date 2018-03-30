@@ -1,4 +1,6 @@
 ﻿using System;
+using Toggl.Foundation.Shortcuts;
+
 namespace Toggl.Foundation.Analytics
 {
     public interface IAnalyticsService
@@ -20,5 +22,7 @@ namespace Toggl.Foundation.Analytics
         void TrackStartedTimeEntry(TimeEntryStartOrigin origin);
 
         void TrackSyncError(Exception exception);
+
+        void TrackAppShortcut(string shortcut);
     }
 }

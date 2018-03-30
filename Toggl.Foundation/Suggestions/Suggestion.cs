@@ -38,6 +38,7 @@ namespace Toggl.Foundation.Suggestions
         {
             TaskId = timeEntry.TaskId;
             ProjectId = timeEntry.ProjectId;
+            IsBillable = timeEntry.Billable;
             Description = timeEntry.Description;
             WorkspaceId = timeEntry.WorkspaceId;
 

@@ -70,6 +70,10 @@ namespace Toggl.Daneel.ViewControllers
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UILabel ThirdPageLabel { get; set; }
 
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIImageView BackgroundImage { get; set; }
+
         void ReleaseDesignerOutlets ()
         {
             if (FirstPageLabel != null) {
@@ -141,6 +145,11 @@ namespace Toggl.Daneel.ViewControllers
                 ThirdPageLabel.Dispose ();
                 ThirdPageLabel = null;
             }
+
+			if (BackgroundImage != null) {
+				BackgroundImage.Dispose ();
+				BackgroundImage = null;
+			}
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Toggl.Foundation.Login
                     .Select(User.Clean)
                     .SelectMany(database.User.Create)
                     .Select(dataSourceFromUser)
-                    .Do(_ => shortcutCreator.OnLogin());
+                    .Do(shortcutCreator.OnLogin);
         }
 
         public IObservable<ITogglDataSource> LoginWithGoogle()
@@ -72,7 +72,7 @@ namespace Toggl.Foundation.Login
                 .Select(User.Clean)
                 .SelectMany(database.User.Create)
                 .Select(dataSourceFromUser)
-                .Do(_ => shortcutCreator.OnLogin());
+                .Do(shortcutCreator.OnLogin);
 
         public IObservable<ITogglDataSource> SignUp(Email email, Password password)
         {
@@ -87,7 +87,7 @@ namespace Toggl.Foundation.Login
                     .Select(User.Clean)
                     .SelectMany(database.User.Create)
                     .Select(dataSourceFromUser)
-                    .Do(_ => shortcutCreator.OnLogin());
+                    .Do(shortcutCreator.OnLogin);
         }
 
         public IObservable<ITogglDataSource> SignUpWithGoogle()
@@ -98,7 +98,7 @@ namespace Toggl.Foundation.Login
                 .Select(User.Clean)
                 .SelectMany(database.User.Create)
                 .Select(dataSourceFromUser)
-                .Do(_ => shortcutCreator.OnLogin());
+                .Do(shortcutCreator.OnLogin);
 
         public IObservable<string> ResetPassword(Email email)
         {
@@ -114,7 +114,7 @@ namespace Toggl.Foundation.Login
                 .Single()
                 .Select(dataSourceFromUser)
                 .Catch(Observable.Return<ITogglDataSource>(null))
-                .Do(_ => shortcutCreator.OnLogin())
+                .Do(shortcutCreator.OnLogin)
                 .Wait();
 
         public IObservable<ITogglDataSource> RefreshToken(Password password)
@@ -131,7 +131,7 @@ namespace Toggl.Foundation.Login
                 .Select(User.Clean)
                 .SelectMany(database.User.Update)
                 .Select(dataSourceFromUser)
-                .Do(_ => shortcutCreator.OnLogin());
+                .Do(shortcutCreator.OnLogin);
         }
 
         private ITogglDataSource dataSourceFromUser(IUser user)

@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using Toggl.Multivac.Models;
+﻿using Toggl.Foundation.DataSources;
 
 namespace Toggl.Foundation.Shortcuts
 {
     public interface IApplicationShortcutCreator
     {
-        void OnLogin();
+        void OnLogin(ITogglDataSource dataSource);
         void OnLogout();
-        void OnTimeEntryStarted(ITimeEntry timeEntry);
     }
 }

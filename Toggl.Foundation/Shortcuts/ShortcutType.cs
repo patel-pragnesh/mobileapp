@@ -3,7 +3,8 @@
     public enum ShortcutType
     {
         Reports,
+        StopTimeEntry,
         StartTimeEntry,
-        TimeEntrySuggestion
+        ContinueLastTimeEntry
     }
 }

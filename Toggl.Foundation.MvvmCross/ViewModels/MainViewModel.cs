@@ -8,31 +8,38 @@ using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Platform;
 using PropertyChanged;
+using Toggl.Foundation;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.Parameters;
+using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
+using Toggl.Foundation.Shortcuts;
 using Toggl.Foundation.Sync;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 
+[assembly: MvxNavigation(typeof(MainViewModel), ApplicationUrls.Main.Regex)]
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
     [Preserve(AllMembers = true)]
     public sealed class MainViewModel : MvxViewModel
     {
-        private readonly TimeSpan currentTimeEntryDueTime = TimeSpan.FromMilliseconds(50);
-
         private bool isStopButtonEnabled = false;
+        private string urlNavigationAction;
 
         private CompositeDisposable disposeBag = new CompositeDisposable();
 
+        private readonly IScheduler scheduler;
         private readonly ITimeService timeService;
         private readonly ITogglDataSource dataSource;
         private readonly IUserPreferences userPreferences;
         private readonly IOnboardingStorage onboardingStorage;
+        private readonly IInteractorFactory interactorFactory;
         private readonly IMvxNavigationService navigationService;
-        private readonly IScheduler scheduler;
+        private readonly TimeSpan currentTimeEntryDueTime = TimeSpan.FromMilliseconds(50);
 
         public TimeSpan CurrentTimeEntryElapsedTime { get; private set; } = TimeSpan.Zero;
 
@@ -59,6 +66,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             string.IsNullOrEmpty(CurrentTimeEntryDescription)
             && string.IsNullOrEmpty(CurrentTimeEntryProject);
 
+        public bool ShouldShowTimeEntriesLog
+            => !TimeEntriesLogViewModel.IsEmpty;
+
         public bool ShouldShowEmptyState
             => SuggestionsViewModel.IsEmpty
             && TimeEntriesLogViewModel.IsEmpty
@@ -77,6 +87,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public SuggestionsViewModel SuggestionsViewModel { get; } = Mvx.IocConstruct<SuggestionsViewModel>();
 
+        public IOnboardingStorage OnboardingStorage => onboardingStorage;
+
         public IMvxAsyncCommand StartTimeEntryCommand { get; }
 
         public IMvxAsyncCommand StopTimeEntryCommand { get; }
@@ -92,26 +104,29 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public IMvxCommand ToggleManualMode { get; }
 
         public MainViewModel(
+            IScheduler scheduler,
             ITogglDataSource dataSource,
             ITimeService timeService,
-            IOnboardingStorage onboardingStorage,
-            IMvxNavigationService navigationService,
             IUserPreferences userPreferences,
-            IScheduler scheduler)
+            IOnboardingStorage onboardingStorage,
+            IInteractorFactory interactorFactory,
+            IMvxNavigationService navigationService)
         {
+            Ensure.Argument.IsNotNull(scheduler, nameof(scheduler));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
+            Ensure.Argument.IsNotNull(userPreferences, nameof(userPreferences));
+            Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
-            Ensure.Argument.IsNotNull(userPreferences, nameof(userPreferences));
-            Ensure.Argument.IsNotNull(scheduler, nameof(scheduler));
 
+            this.scheduler = scheduler;
             this.dataSource = dataSource;
             this.timeService = timeService;
+            this.userPreferences = userPreferences;
+            this.interactorFactory = interactorFactory;
             this.navigationService = navigationService;
             this.onboardingStorage = onboardingStorage;
-            this.userPreferences = userPreferences;
-            this.scheduler = scheduler;
 
             RefreshCommand = new MvxCommand(refresh);
             OpenReportsCommand = new MvxAsyncCommand(openReports);
@@ -119,6 +134,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             EditTimeEntryCommand = new MvxAsyncCommand(editTimeEntry, () => CurrentTimeEntryId.HasValue);
             StopTimeEntryCommand = new MvxAsyncCommand(stopTimeEntry, () => isStopButtonEnabled);
             StartTimeEntryCommand = new MvxAsyncCommand(startTimeEntry, () => CurrentTimeEntryId.HasValue == false);
+        }
+
+        public void Init(string action)
+        {
+            urlNavigationAction = action;
         }
 
         public override async Task Initialize()
@@ -149,8 +169,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .TimeEntryUpdated
                 .Select(te => te.Id)
                 .Merge(dataSource.TimeEntries.TimeEntryDeleted)
-                .Subscribe(_ =>
+                .Subscribe((long _) =>
                 {
+                    RaisePropertyChanged(nameof(ShouldShowTimeEntriesLog));
                     RaisePropertyChanged(nameof(ShouldShowWelcomeBack));
                     RaisePropertyChanged(nameof(ShouldShowEmptyState));
                 });
@@ -159,6 +180,22 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             disposeBag.Add(syncManagerDisposable);
             disposeBag.Add(isEmptyChangedDisposable);
             disposeBag.Add(currentlyRunningTimeEntryDisposable);
+
+            switch (urlNavigationAction)
+            {
+                case ApplicationUrls.Main.Action.Continue:
+                    await continueMostRecentEntry();
+                    break;
+
+                case ApplicationUrls.Main.Action.Stop:
+                    await stopTimeEntry();
+                    break;
+            }
+        }
+
+        private async Task continueMostRecentEntry()
+        {
+            await interactorFactory.ContinueMostRecentTimeEntry().Execute();
         }
 
         public override void ViewAppearing()
@@ -213,6 +250,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private Task startTimeEntry()
         {
+            OnboardingStorage.StartButtonWasTapped();
+
             var parameter = IsInManualMode
                 ? StartTimeEntryParameters.ForManualMode(timeService.CurrentDateTime)
                 : StartTimeEntryParameters.ForTimerMode(timeService.CurrentDateTime); 

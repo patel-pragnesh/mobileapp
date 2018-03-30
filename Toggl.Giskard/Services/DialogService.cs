@@ -46,9 +46,11 @@ namespace Toggl.Giskard.Services
             switch (type)
             {
                 case ActionType.DiscardNewTimeEntry:
-                    return Confirm(null, Resources.DiscardThisTimeEntry, Resources.Delete, Resources.Cancel);
+                    return Confirm(null, Resources.DiscardThisTimeEntry, Resources.Discard, Resources.Cancel);
+                case ActionType.DiscardEditingChanges:
+                    return Confirm(null, Resources.DiscardEditingChanges, Resources.Discard, Resources.ContinueEditing);
                 case ActionType.DeleteExistingTimeEntry:
-                    return Confirm(null, Resources.DeleteThisTimeEntry, Resources.Discard, Resources.Cancel);
+                    return Confirm(null, Resources.DeleteThisTimeEntry, Resources.Delete, Resources.Cancel);
             }
 
             throw new ArgumentOutOfRangeException(nameof(type));

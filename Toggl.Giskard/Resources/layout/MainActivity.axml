@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/MainCoordinatorLayout"
     android:background="@color/lightGray"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <toggl.giskard.views.MainRecyclerView
-        local:MvxBind="ItemsSource TimeEntriesLogViewModel.TimeEntries; SuggestionsViewModel SuggestionsViewModel; TimeEntriesLogViewModel TimeEntriesLogViewModel"
-        local:MvxTemplateSelector="@string/MainTemplateSelector"
-        android:scrollbars="vertical"
+    <mvvmcross.droid.support.v4.MvxSwipeRefreshLayout
+        local:MvxBind="RefreshCommand RefreshCommand; Refreshing ShowSyncIndicator"
+        android:id="@+id/MainSwipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize" />
+        android:layout_marginTop="?attr/actionBarSize">
+        <toggl.giskard.views.MainRecyclerView
+            local:MvxBind="ItemsSource TimeEntriesLogViewModel.TimeEntries; SuggestionsViewModel SuggestionsViewModel; TimeEntriesLogViewModel TimeEntriesLogViewModel"
+            local:MvxTemplateSelector="@string/MainTemplateSelector"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </mvvmcross.droid.support.v4.MvxSwipeRefreshLayout>
     <include
         layout="@layout/MainRunningTimeEntry" />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/MainPlayButton"
-        local:MvxBind="Click StartTimeEntryCommand;"
+        local:MvxBind="Click StartTimeEntryCommand; DrawableId ManualModeEnabledDrawable(IsInManualMode)"
         local:backgroundTint="@color/playButtonGreen"
         local:elevation="4dp"
         android:src="@drawable/play_white"
@@ -32,12 +39,24 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <ImageView
+            android:layout_gravity="start"
+            android:src="@drawable/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp" />
         <Button
             local:MvxBind="Click OpenSettingsCommand"
             android:background="@drawable/settings_dark"
             android:layout_gravity="end"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <Button
+            local:MvxBind="Click OpenReportsCommand"
+            android:background="@drawable/reports_dark"
+            android:layout_gravity="end"
+            android:layout_marginLeft="16dp"
             android:layout_width="24dp"
             android:layout_height="24dp" />
         <ImageView

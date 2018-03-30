@@ -1,6 +1,8 @@
 ﻿using Android.Graphics;
 using Android.Support.V4.Graphics;
+using MvvmCross.Plugins.Color.Droid;
 using Toggl.Foundation.MvvmCross.Converters;
+using static Toggl.Foundation.MvvmCross.Helper.Color;
 
 // Use this file to register overrides of BoolToConstantValueConverter.
 // They are all single line classes, but an override is needed to avoid using the Fluent syntax.
@@ -38,7 +40,24 @@ namespace Toggl.Giskard.Converters
 
     public sealed class CreateProjectButtonColorValueConverter : BoolToConstantValueConverter<Color>
     {
-        public CreateProjectButtonColorValueConverter() 
+        public CreateProjectButtonColorValueConverter()
             : base(Color.ParseColor("#328fff"), new Color(ColorUtils.SetAlphaComponent(Color.ParseColor("#328fff").ToArgb(), 127))) { }
+    }
+
+    public sealed class ReportsChartColorValueConverter : BoolToConstantValueConverter<Color>
+    {
+        public ReportsChartColorValueConverter()
+            : base(Reports.Disabled.ToAndroidColor(), Reports.TotalTimeActivated.ToAndroidColor()) { }
+    }
+
+    public sealed class LoginInfoTextColorValueConverter : BoolToConstantValueConverter<Color>
+    {
+        public LoginInfoTextColorValueConverter()
+            : base(Color.ParseColor("#e20505"), Color.ParseColor("#5e5b5b")) { }
+    }
+    
+    public sealed class ManualModeEnabledDrawableValueConverter : BoolToConstantValueConverter<int>
+    {
+        public ManualModeEnabledDrawableValueConverter() : base(Resource.Drawable.add_white, Resource.Drawable.play_white) { }
     }
 }

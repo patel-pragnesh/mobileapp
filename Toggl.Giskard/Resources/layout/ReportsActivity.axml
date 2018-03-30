@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:animateLayoutChanges="true"
+    android:background="@color/lightGray"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.toggl.giskard.ReportsLinearLayout
+        android:id="@+id/ReportsActivityMainContainer"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+        <FrameLayout
+            android:id="@+id/ReportsCalendarContainer"
+            android:background="@color/toolbarBlack"
+            android:layout_height="400dp"
+            android:layout_marginTop="-400dp"
+            android:layout_width="match_parent" />
+        <toggl.giskard.views.ReportsRecyclerView
+            android:id="@+id/ReportsActivityRecyclerView"
+            local:MvxBind="ViewModel .; ItemsSource Segments"
+            local:MvxTemplateSelector="@string/ReportsTemplateSelector"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.toggl.giskard.ReportsLinearLayout>
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/Toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/toolbarBlack"
+        local:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            local:MvxBind="Click BackCommand"
+            android:background="@drawable/logo_icon"
+            android:layout_gravity="start"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp" />
+        <TextView
+            local:MvxBind="Text CurrentDateRangeString; Click ToggleCalendarCommand"
+            tools:text="Last week"
+            android:textSize="19sp"
+            android:gravity="center"
+            android:letterSpacing="-0.01"
+            android:lineSpacingExtra="5sp"
+            android:textColor="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start|center_vertical" />
+        <Button
+            local:MvxBind="Click OpenSettingsCommand"
+            android:background="@drawable/settings_dark"
+            android:layout_gravity="end"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+        <ImageView
+            android:src="@drawable/timer_light"
+            android:layout_gravity="end"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+    </android.support.v7.widget.Toolbar>
+</android.support.design.widget.CoordinatorLayout>

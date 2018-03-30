@@ -274,6 +274,53 @@ namespace Toggl.Ultrawave.Tests.Integration
             }
         }
 
+        public class TheSignUpWithGoogleMethod : EndpointTestBase
+        {
+            private readonly ITogglApi unauthenticatedTogglApi;
+
+            public TheSignUpWithGoogleMethod()
+            {
+                unauthenticatedTogglApi = TogglApiWith(Credentials.None);
+            }
+
+            [Fact, LogTestInfo]
+            public void ThrowsIfTheGoogleTokenIsNull()
+            {
+                Action signingUp = () => unauthenticatedTogglApi
+                    .User
+                    .SignUpWithGoogle(null)
+                    .Wait();
+
+                signingUp.ShouldThrow<ArgumentException>();
+            }
+
+            [Theory, LogTestInfo]
+            [InlineData("")]
+            [InlineData("x.y.z")]
+            [InlineData("asdkjasdkhjdsadhkda")]
+            public void FailsWhenTheGoogleTokenIsParameterARandomString(string notAToken)
+            {
+                Action signUp = () => unauthenticatedTogglApi
+                    .User
+                    .SignUpWithGoogle(notAToken)
+                    .Wait();
+
+                signUp.ShouldThrow<BadRequestException>();
+            }
+
+            public void FailsWHenTheGoogleTokenParameterIsAnInvalidJWT()
+            {
+                var jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ";
+
+                Action signUp = () => unauthenticatedTogglApi
+                    .User
+                    .SignUpWithGoogle(jwt)
+                    .Wait();
+
+                signUp.ShouldThrow<BadRequestException>();
+            }
+        }
+
         public sealed class TheUpdateMethod : AuthenticatedPutEndpointBaseTests<IUser>
         {
             [Fact, LogTestInfo]

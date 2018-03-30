@@ -17,17 +17,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     public sealed class OnboardingViewModel : MvxViewModel
     {
         public const int TrackPage = 0;
-        public const int LogPage = 1;
-        public const int SummaryPage = 2;
+        public const int MostUsedPage = 1;
+        public const int ReportsPage = 2;
         public const int LoginPage = 3;
 
         private static readonly string[] pageNames =
         {
             nameof(TrackPage),
-            nameof(LogPage),
-            #if DEBUG
-            nameof(SummaryPage),
-            #endif
+            nameof(MostUsedPage),
+            nameof(ReportsPage),
             nameof(LoginPage)
         };
 
@@ -35,9 +33,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             (Color.Onboarding.TrackPageBackgroundColor, Color.Onboarding.TrackPageBorderColor),
             (Color.Onboarding.LogPageBackgroundColor, Color.Onboarding.LogPageBorderColor),
-            #if DEBUG
-            (Color.Onboarding.SummaryPageBackgroundColor, Color.Onboarding.SummaryPageBorderColor),
-            #endif
+            (Color.Onboarding.ReportsPageBackgroundColor, Color.Onboarding.ReportsPageBorderColor),
             (Color.Onboarding.LoginPageBackgroundColor, MvxColors.Transparent)
         };
 
@@ -67,10 +63,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public bool IsTrackPage => CurrentPage == TrackPage;
 
         [DependsOn(nameof(CurrentPage))]
-        public bool IsLogPage => CurrentPage == LogPage;
+        public bool IsMostUsedPage => CurrentPage == MostUsedPage;
 
         [DependsOn(nameof(CurrentPage))]
-        public bool IsSummaryPage => CurrentPage == SummaryPage;
+        public bool IsSummaryPage => CurrentPage == ReportsPage;
 
         [DependsOn(nameof(CurrentPage))]
         public bool IsFirstPage => CurrentPage == 0;

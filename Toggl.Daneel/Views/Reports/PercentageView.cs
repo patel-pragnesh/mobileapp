@@ -11,8 +11,8 @@ namespace Toggl.Daneel.Views.Reports
     [Register(nameof(PercentageView))]
     public sealed class PercentageView : UIView
     {
-        private static readonly UIColor disabledColor = Color.Reports.Disabled.ToNativeColor();
-        private static readonly UIColor activeColor = Color.Reports.PercentageDisabled.ToNativeColor();
+        private static readonly UIColor disabledColor = Color.Reports.PercentageDisabled.ToNativeColor();
+        private static readonly UIColor activeColor = Color.Reports.PercentageActivatedBackground.ToNativeColor();
 
         private readonly CALayer percentageFilledLayer = new CALayer();
 

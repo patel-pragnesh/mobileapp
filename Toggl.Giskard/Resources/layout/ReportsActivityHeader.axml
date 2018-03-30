@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <android.support.v7.widget.CardView
+        local:cardBackgroundColor="@android:color/white"
+        android:elevation="2dp"
+        android:layout_height="114dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="24dp"
+        android:layout_width="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/ReportsSummaryTotalLabel"
+                android:textSize="12sp"
+                android:text="@string/Total"
+                android:letterSpacing="0.04"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/reportsLabelColor"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/ReportsSummaryTotal"
+                local:MvxBind="TextFormatted ReportTimeSpanLabel(TotalTime)"
+                android:textSize="24sp"
+                tools:text="104:23:12"
+                tools:textColor="#1ad180"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ReportsSummaryTotalLabel"
+                android:layout_alignStart="@+id/ReportsSummaryTotalLabel" />
+            <ImageView
+                local:MvxBind="DrawableColor ReportsChartColor(TotalTimeIsZero)"
+                android:scaleType="fitStart"
+                android:src="@drawable/reports_total_chart"
+                android:layout_height="22dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/ReportsSummaryTotal"
+                android:layout_alignEnd="@+id/ReportsSummaryCenterView" />
+            <View
+                android:id="@+id/ReportsSummaryCenterView"
+                android:layout_centerHorizontal="true"
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent" />
+            <TextView
+                android:id="@+id/ReportsSummaryBillableLabel"
+                android:textSize="12sp"
+                android:letterSpacing="0.04"
+                android:text="@string/Billable"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/reportsLabelColor"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ReportsSummaryCenterView" />
+            <TextView
+                android:id="@+id/ReportsSummaryBillable"
+                local:MvxBind="TextFormatted ReportPercentageLabel(BillablePercentage)"
+                tools:text="86%"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif"
+                android:textStyle="normal"
+                android:textColor="#328fff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ReportsSummaryBillableLabel"
+                android:layout_alignStart="@+id/ReportsSummaryBillableLabel" />
+            <FrameLayout
+                android:background="#1E328FFF"
+                android:layout_height="6dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginRight="12dp"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/ReportsSummaryBillable"
+                android:layout_alignStart="@+id/ReportsSummaryBillable">
+                <View
+                    local:MvxBind="WidthPercentage BillablePercentage"
+                    android:background="#328FFF"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent" />
+            </FrameLayout>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+    <android.support.v7.widget.CardView
+        local:cardBackgroundColor="@android:color/white"
+        android:elevation="2dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <toggl.giskard.views.PieChartView
+                local:MvxBind="Segments Segments"
+                tools:background="#1e1e1e"
+                android:layout_marginTop="24dp"
+                android:layout_marginLeft="36dp"
+                android:layout_marginRight="36dp"
+                android:layout_marginBottom="24dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

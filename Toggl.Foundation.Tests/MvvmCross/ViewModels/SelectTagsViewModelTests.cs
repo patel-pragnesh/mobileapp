@@ -310,7 +310,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(Observable.Return(tags));
                 DataSource.AutocompleteProvider.Returns(autocompleteProvider);
                 var targetWorkspace = workspaces[1];
-                DataSource.Workspaces.GetById(Arg.Is(targetWorkspace.Id))
+                InteractorFactory.GetWorkspaceById(targetWorkspace.Id).Execute()
                     .Returns(Observable.Return(targetWorkspace));
                 var tagIds = tags.Select(tag => tag.TagId).ToArray();
 
@@ -334,7 +334,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         arg => arg.SuggestionType == AutocompleteSuggestionType.Tags))
                     .Returns(Observable.Return(tagSuggestions));
                 DataSource.AutocompleteProvider.Returns(autocompleteProvider);
-                DataSource.Workspaces.GetById(Arg.Is(workspace.Id))
+                InteractorFactory.GetWorkspaceById(workspace.Id).Execute()
                     .Returns(Observable.Return(workspace));
 
                 ViewModel.Prepare((tagIds, workspace.Id));
@@ -359,7 +359,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(Observable.Return(shuffledTags));
 
                 DataSource.AutocompleteProvider.Returns(autocompleteProvider);
-                DataSource.Workspaces.GetById(Arg.Is(workspace.Id))
+                InteractorFactory.GetWorkspaceById(workspace.Id).Execute()
                     .Returns(Observable.Return(workspace));
 
                 ViewModel.Prepare((selectedTagIds, workspace.Id));
@@ -396,7 +396,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         arg => arg.Text == queryText && arg.SuggestionType == AutocompleteSuggestionType.Tags))
                     .Returns(Observable.Return(newSuggestions));
                 DataSource.AutocompleteProvider.Returns(autocompleteProvider);
-                DataSource.Workspaces.GetById(Arg.Is(workspace.Id))
+                InteractorFactory.GetWorkspaceById(workspace.Id).Execute()
                     .Returns(Observable.Return(workspace));
                 ViewModel.Prepare((oldTagIds, workspace.Id));
                 await ViewModel.Initialize();

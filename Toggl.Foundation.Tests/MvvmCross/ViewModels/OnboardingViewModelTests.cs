@@ -64,8 +64,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             [Theory, LogIfTooSlow]
             [InlineData(OnboardingViewModel.TrackPage)]
-            [InlineData(OnboardingViewModel.LogPage)]
-            [InlineData(OnboardingViewModel.SummaryPage)]
+            [InlineData(OnboardingViewModel.MostUsedPage)]
+            [InlineData(OnboardingViewModel.ReportsPage)]
             [InlineData(OnboardingViewModel.LoginPage)]
             public void OnlyReturnsTrueForTheFirstPage(int page)
             {
@@ -80,8 +80,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             [Theory, LogIfTooSlow]
             [InlineData(OnboardingViewModel.TrackPage)]
-            [InlineData(OnboardingViewModel.LogPage)]
-            [InlineData(OnboardingViewModel.SummaryPage)]
+            [InlineData(OnboardingViewModel.MostUsedPage)]
+            [InlineData(OnboardingViewModel.ReportsPage)]
             [InlineData(OnboardingViewModel.LoginPage)]
             public void OnlyReturnsTrueInThePageWhoseIndexEqualsToTheNumberOfPagesMinusOne(int page)
             {
@@ -104,8 +104,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             [Theory, LogIfTooSlow]
             [InlineData(OnboardingViewModel.TrackPage, nameof(OnboardingViewModel.TrackPage))]
-            [InlineData(OnboardingViewModel.LogPage, nameof(OnboardingViewModel.LogPage))]
-            [InlineData(OnboardingViewModel.SummaryPage, nameof(OnboardingViewModel.SummaryPage))]
+            [InlineData(OnboardingViewModel.MostUsedPage, nameof(OnboardingViewModel.MostUsedPage))]
+            [InlineData(OnboardingViewModel.ReportsPage, nameof(OnboardingViewModel.ReportsPage))]
             public void CallsTheAnalyticsServiceIndicatingTheCurrentPage(int page, string expectedPageName)
             {
                 ViewModel.CurrentPage = page;
@@ -125,7 +125,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 ViewModel.NextCommand.Execute();
 
-                ViewModel.CurrentPage.Should().Be(OnboardingViewModel.LogPage);
+                ViewModel.CurrentPage.Should().Be(OnboardingViewModel.MostUsedPage);
             }
 
             [Fact, LogIfTooSlow]
@@ -142,7 +142,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void ReturnsToThePreviousPage()
             {
-                ViewModel.CurrentPage = OnboardingViewModel.LogPage;
+                ViewModel.CurrentPage = OnboardingViewModel.MostUsedPage;
 
                 ViewModel.PreviousCommand.Execute();
 

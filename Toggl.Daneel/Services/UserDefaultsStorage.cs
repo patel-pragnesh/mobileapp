@@ -1,4 +1,6 @@
-﻿using Foundation;
+﻿using System;
+using System.Linq;
+using Foundation;
 using Toggl.PrimeRadiant.Settings;
 
 namespace Toggl.Daneel.Services
@@ -19,6 +21,25 @@ namespace Toggl.Daneel.Services
         public void SetString(string key, string value)
         {
             NSUserDefaults.StandardUserDefaults.SetString(value, key);
+        }
+
+        public void Remove(string key)
+        {
+            NSUserDefaults.StandardUserDefaults.RemoveObject(key);
+        }
+
+        public void RemoveAllWithPrefix(string prefix)
+        {
+            var keys = NSUserDefaults.StandardUserDefaults
+                .ToDictionary()
+                .Keys
+                .Select(key => key.ToString())
+                .Where(key => key.StartsWith(prefix, StringComparison.Ordinal));
+
+            foreach (var key in keys)
+            {
+                Remove(key);
+            }
         }
     }
 }

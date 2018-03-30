@@ -54,7 +54,7 @@
         android:layout_above="@id/MainRunningTimeEntryDescription" />
     <View
         android:id="@+id/MainRunningTimeEntryProjectDot"
-        local:MvxBind="DrawableColor CurrentTimeEntryProjectColor; Visibility Visibility(HasProject)"
+        local:MvxBind="DrawableColor ARGB(CurrentTimeEntryProjectColor); Visibility Visibility(HasProject)"
         android:background="@drawable/SmallDot"
         android:layout_width="4dp"
         android:layout_height="4dp"

@@ -51,10 +51,22 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.IsNameAlreadyTaken)
                       .WithConversion(heightConverter);
             
+            bindingSet.Bind(PrivateProjectSwitch)
+                      .For(v => v.BindValueChanged())
+                      .To(vm => vm.TogglePrivateProjectCommand);
+
+            bindingSet.Bind(PrivateProjectSwitchContainer)
+                      .For(v => v.BindTap())
+                      .To(vm => vm.TogglePrivateProjectCommand);
+
             //State
             bindingSet.Bind(NameTextField).To(vm => vm.Name);
             bindingSet.Bind(WorkspaceLabel).To(vm => vm.WorkspaceName);
-            bindingSet.Bind(PrivateProjectSwitch).To(vm => vm.IsPrivate);
+
+            bindingSet.Bind(PrivateProjectSwitch)
+                      .For(v => v.BindAnimatedOn())
+                      .To(vm => vm.IsPrivate);
+
             bindingSet.Bind(ColorCircleView)
                       .For(v => v.BackgroundColor)
                       .To(vm => vm.Color)

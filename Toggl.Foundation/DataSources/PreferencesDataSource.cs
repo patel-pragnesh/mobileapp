@@ -15,31 +15,37 @@ namespace Toggl.Foundation.DataSources
 {
     public sealed class PreferencesDataSource : IPreferencesSource
     {
-        private readonly ISingleObjectStorage<IDatabasePreferences> databaseStorage;
+        private readonly ISingleObjectStorage<IDatabasePreferences> storage;
         private readonly ISubject<IDatabasePreferences> currentPreferencesSubject;
+
+        private IDisposable initializationDisposable;
     
         public IObservable<IDatabasePreferences> Current { get; }
 
-        public PreferencesDataSource(ISingleObjectStorage<IDatabasePreferences> databaseStorage)
+        public PreferencesDataSource(ISingleObjectStorage<IDatabasePreferences> storage)
         {
-            Ensure.Argument.IsNotNull(databaseStorage, nameof(databaseStorage));
+            Ensure.Argument.IsNotNull(storage, nameof(storage));
 
-            this.databaseStorage = databaseStorage;
+            this.storage = storage;
 
-            currentPreferencesSubject = new ReplaySubject<IDatabasePreferences>(1);
+            currentPreferencesSubject = new BehaviorSubject<IDatabasePreferences>(Preferences.DefaultPreferences);
 
             Current = currentPreferencesSubject.AsObservable();
-            Get().Do(currentPreferencesSubject.OnNext);
+
+            // right after login/signup the database does not contain the preferences and retreiving
+            // it will fail we can ignore this error because it will be immediately fetched and until
+            // then the default preferences will be used
+            initializationDisposable = Get().Subscribe(currentPreferencesSubject.OnNext, (Exception _) => { });
         }
 
         public IObservable<IDatabasePreferences> Get()
-            => databaseStorage.Single().Select(Preferences.From);
+            => storage.Single().Select(Preferences.From);
 
         public IObservable<IDatabasePreferences> Update(EditPreferencesDTO dto)
-            => databaseStorage
+            => storage
                 .Single()
                 .Select(preferences => updatedPreferences(preferences, dto))
-                .SelectMany(databaseStorage.Update)
+                .SelectMany(storage.Update)
                 .Select(Preferences.From)
                 .Do(currentPreferencesSubject.OnNext);
 
@@ -47,19 +53,19 @@ namespace Toggl.Foundation.DataSources
             IEnumerable<(long Id, IDatabasePreferences Entity)> entities,
             Func<IDatabasePreferences, IDatabasePreferences, ConflictResolutionMode> conflictResolution,
             IRivalsResolver<IDatabasePreferences> rivalsResolver = null)
-            => databaseStorage.BatchUpdate(entities, conflictResolution, rivalsResolver)
+            => storage.BatchUpdate(entities, conflictResolution, rivalsResolver)
                 .Do(processConflictResultionResult);
 
         public IObservable<IDatabasePreferences> GetById(long id)
-            => databaseStorage.GetById(id);
+            => storage.GetById(id);
 
         public IObservable<IDatabasePreferences> Create(IDatabasePreferences entity)
-            => databaseStorage.Create(entity)
+            => storage.Create(entity)
                 .Select(Preferences.From)
                 .Do(currentPreferencesSubject.OnNext);
 
         public IObservable<IDatabasePreferences> Update(long id, IDatabasePreferences entity)
-            => databaseStorage.Update(id, entity)
+            => storage.Update(id, entity)
                 .Select(Preferences.From)
                 .Do(currentPreferencesSubject.OnNext);
 
@@ -69,10 +75,10 @@ namespace Toggl.Foundation.DataSources
         }
 
         public IObservable<IEnumerable<IDatabasePreferences>> GetAll()
-            => databaseStorage.GetAll().Select(preferences => preferences.Select(Preferences.From));
+            => storage.GetAll().Select(preferences => preferences.Select(Preferences.From));
 
         public IObservable<IEnumerable<IDatabasePreferences>> GetAll(Func<IDatabasePreferences, bool> predicate)
-            => databaseStorage.GetAll(predicate).Select(preferences => preferences.Select(Preferences.From));
+            => storage.GetAll(predicate).Select(preferences => preferences.Select(Preferences.From));
 
         private void processConflictResultionResult(IEnumerable<IConflictResolutionResult<IDatabasePreferences>> batchResult)
         {

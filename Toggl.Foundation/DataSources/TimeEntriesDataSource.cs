@@ -21,11 +21,11 @@ namespace Toggl.Foundation.DataSources
 
         private readonly IIdProvider idProvider;
         private readonly ITimeService timeService;
+        private readonly TimeEntryRivalsResolver rivalsResolver;
         private readonly IRepository<IDatabaseTimeEntry> repository;
+        private readonly Subject<long> timeEntryDeletedSubject = new Subject<long>();
         private readonly Subject<IDatabaseTimeEntry> timeEntryCreatedSubject = new Subject<IDatabaseTimeEntry>();
         private readonly Subject<(long Id, IDatabaseTimeEntry Entity)> timeEntryUpdatedSubject = new Subject<(long, IDatabaseTimeEntry)>();
-        private readonly Subject<long> timeEntryDeletedSubject = new Subject<long>();
-        private readonly TimeEntryRivalsResolver rivalsResolver;
         private readonly Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode> alwaysCreate = (a, b) => ConflictResolutionMode.Create;
 
         public IObservable<bool> IsEmpty { get; }
@@ -112,12 +112,13 @@ namespace Toggl.Foundation.DataSources
             => repository
                 .UpdateWithConflictResolution(entity.Id, entity, alwaysCreate, rivalsResolver)
                 .Select(result => ((CreateResult<IDatabaseTimeEntry>)result).Entity)
+                .Select(TimeEntry.From)
                 .Do(timeEntryCreatedSubject.OnNext);
 
         public IObservable<IDatabaseTimeEntry> Update(long id, IDatabaseTimeEntry entity)
             => repository.Update(id, entity)
                 .Do(updatedEntity => maybeUpdateCurrentlyRunningTimeEntryId(id, updatedEntity))
-                .Do(updatedEntity => timeEntryUpdatedSubject.OnNext((id, updatedEntity)));
+                .Do(updatedEntity => timeEntryUpdatedSubject.OnNext((id, TimeEntry.From(updatedEntity))));
 
         public IObservable<IEnumerable<IConflictResolutionResult<IDatabaseTimeEntry>>> BatchUpdate(
             IEnumerable<(long Id, IDatabaseTimeEntry Entity)> entities,
@@ -138,11 +139,11 @@ namespace Toggl.Foundation.DataSources
                     return;
 
                 case CreateResult<IDatabaseTimeEntry> c:
-                    timeEntryCreatedSubject.OnNext(c.Entity);
+                    timeEntryCreatedSubject.OnNext(TimeEntry.From(c.Entity));
                     return;
 
                 case UpdateResult<IDatabaseTimeEntry> u:
-                    timeEntryUpdatedSubject.OnNext((u.OriginalId, u.Entity));
+                    timeEntryUpdatedSubject.OnNext((u.OriginalId, TimeEntry.From(u.Entity)));
                     return;
             }
         }

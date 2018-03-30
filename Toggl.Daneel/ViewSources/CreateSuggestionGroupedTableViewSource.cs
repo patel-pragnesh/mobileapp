@@ -22,11 +22,10 @@ namespace Toggl.Daneel.ViewSources
             get => suggestCreation;
             set
             {
-                if (suggestCreation != value)
-                {
-                    suggestCreation = value;
-                    ReloadTableData();
-                }
+                if (suggestCreation == value) return;
+
+                suggestCreation = value;
+                ReloadTableData();
             }
         }
 
@@ -53,7 +52,7 @@ namespace Toggl.Daneel.ViewSources
 
         public override nint RowsInSection(UITableView tableview, nint section)
         {
-            if (!SuggestCreation) 
+            if (!SuggestCreation)
                 return base.RowsInSection(tableview, section);
 
             if (section == 0) return 1;

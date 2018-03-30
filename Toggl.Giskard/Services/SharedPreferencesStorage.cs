@@ -1,4 +1,6 @@
-﻿using Android.Content;
+﻿using System;
+using System.Linq;
+using Android.Content;
 using Toggl.PrimeRadiant.Settings;
 
 namespace Toggl.Giskard.Services
@@ -29,6 +31,28 @@ namespace Toggl.Giskard.Services
         {
             var editor = sharedPreferences.Edit();
             editor.PutString(key, value);
+            editor.Commit();
+        }
+
+        public void Remove(string key)
+        {
+            var editor = sharedPreferences.Edit();
+            editor.Remove(key);
+            editor.Commit();
+        }
+
+        public void RemoveAllWithPrefix(string prefix)
+        {
+            var keys = sharedPreferences.All.Keys
+                .Where(key => key.StartsWith(prefix, StringComparison.Ordinal));
+
+            var editor = sharedPreferences.Edit();
+
+            foreach (var key in keys)
+            {
+                editor.Remove(key);
+            }
+
             editor.Commit();
         }
     }

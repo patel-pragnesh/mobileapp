@@ -23,4 +23,8 @@
     <color name="switchTint">#328FFF</color>
     <color name="launcherBackgroundColor">#FFFF</color>
     <color name="checkboxTint">#328FFF</color>
+    <color name="reportsLabelColor">#757575</color>
+    <color name="blueToolbarBackground">#2196f3</color>
+    <color name="blueStatusBarBackground">#559fec</color>
+    <color name="blueBackgroundTextHintColor">#b9d9f7</color>
 </resources>

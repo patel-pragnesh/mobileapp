@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using CoreGraphics;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.iOS.Views;
 using Toggl.Daneel.Converters;
@@ -9,7 +8,7 @@ using Toggl.Daneel.Views.Reports;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Converters;
-using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
+using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
 
 namespace Toggl.Daneel.ViewControllers
@@ -19,17 +18,6 @@ namespace Toggl.Daneel.ViewControllers
     {
         private const int estimatedQuickSelectShortcutHeight = 32;
         private const int estimatedQuickSelectShortcutWidth = 90;
-
-        private readonly string[] dayHeaders =
-        {
-            Resources.SundayInitial,
-            Resources.MondayInitial,
-            Resources.TuesdayInitial,
-            Resources.WednesdayInitial,
-            Resources.ThursdayInitial,
-            Resources.FridayInitial,
-            Resources.SaturdayInitial
-        };
 
         private bool calendarInitialized;
 
@@ -70,7 +58,7 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(CurrentYearLabel).To(vm => vm.CurrentMonth.Year);
             bindingSet.Bind(CurrentMonthLabel)
                       .To(vm => vm.CurrentMonth.Month)
-                      .WithConversion(new IntToMonthNameConverter());
+                      .WithConversion(new IntToMonthNameValueConverter());
 
             bindingSet.Apply();
         }
@@ -113,17 +101,14 @@ namespace Toggl.Daneel.ViewControllers
 
         private void setupDayHeaders()
         {
-            DayHeader0.Text = dayHeaderFor(0);
-            DayHeader1.Text = dayHeaderFor(1);
-            DayHeader2.Text = dayHeaderFor(2);
-            DayHeader3.Text = dayHeaderFor(3);
-            DayHeader4.Text = dayHeaderFor(4);
-            DayHeader5.Text = dayHeaderFor(5);
-            DayHeader6.Text = dayHeaderFor(6);
+            DayHeader0.Text = ViewModel.DayHeaderFor(0);
+            DayHeader1.Text = ViewModel.DayHeaderFor(1);
+            DayHeader2.Text = ViewModel.DayHeaderFor(2);
+            DayHeader3.Text = ViewModel.DayHeaderFor(3);
+            DayHeader4.Text = ViewModel.DayHeaderFor(4);
+            DayHeader5.Text = ViewModel.DayHeaderFor(5);
+            DayHeader6.Text = ViewModel.DayHeaderFor(6);
         }
-
-        private string dayHeaderFor(int index)
-            => dayHeaders[(index + (int)ViewModel.BeginningOfWeek + 7) % 7];
     }
 }
 

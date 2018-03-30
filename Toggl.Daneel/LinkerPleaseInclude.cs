@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Input;
 using Foundation;
+using Google.SignIn;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS.Target;
 using MvvmCross.iOS.Views;
@@ -32,6 +33,12 @@ namespace Toggl.Daneel
         {
             uiButton.TouchUpInside += (s, e) =>
                                       uiButton.SetTitle(uiButton.Title(UIControlState.Normal), UIControlState.Normal);
+        }
+
+        public void Include(SignInButton button)
+        {
+            button = new SignInButton();
+            button = new SignInButton(null);
         }
 
         public void Include(UIBarButtonItem barButton)

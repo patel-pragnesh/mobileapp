@@ -5,6 +5,7 @@
         Timer,
         Manual,
         Continue,
-        Suggestion
+        Suggestion,
+        ContinueMostRecent
     }
 }

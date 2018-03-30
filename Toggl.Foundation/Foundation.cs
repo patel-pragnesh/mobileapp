@@ -55,7 +55,7 @@ namespace Toggl.Foundation
             Ensure.Argument.IsNotNull(platformConstants, nameof(platformConstants));
             Ensure.Argument.IsNotNull(suggestionProviderContainer, nameof(suggestionProviderContainer));
 
-            var userAgent = new UserAgent(clientName, version);
+            var userAgent = new UserAgent(clientName, version.ToString());
 
             var foundation = new Foundation
             {

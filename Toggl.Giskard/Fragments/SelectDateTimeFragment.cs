@@ -11,7 +11,7 @@ using Toggl.Foundation.MvvmCross.ViewModels;
 namespace Toggl.Giskard.Fragments
 {
     [MvxDialogFragmentPresentation(AddToBackStack = true)]
-    public class SelectDateTimeFragment : MvxDialogFragment<SelectDateTimeViewModel>
+    public sealed class SelectDateTimeFragment : MvxDialogFragment<SelectDateTimeViewModel>
     {
         private DateTimeOffset dateTime;
 

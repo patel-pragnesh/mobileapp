@@ -2,13 +2,23 @@
 {
     public static class ApplicationUrls
     {
-        public static string Reports = "toggl://reports";
+        public const string Reports = "toggl://reports";
 
-        public static string StartTimeEntry = "toggl://start";
+        public const string StartTimeEntry = "toggl://start";
 
-        public static string ContinueTimeEntryEntry(long id) => $"toggl://continue?id={id}";
+        public static class Main
+        {
+            public static class Action
+            {
+                public const string Stop = "stop";
+                public const string Continue = "continue";
+            }
 
-        public static string StartTimeEntryWith(string description, long workspaceId, long? projectId, long? taskId)
-            => $"toggl://start?description={description}&workspaceId={workspaceId}&projectId={projectId}&taskId={taskId}";
+            public const string Regex = @"toggl://main\?action=(?<action>.+)";
+
+            public static readonly string StopTimeEntry = $"toggl://main?action={Action.Stop}";
+
+            public static readonly string ContinueLastEntry = $"toggl://main?action={Action.Continue}";
+        }
     }
 }

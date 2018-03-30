@@ -241,7 +241,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/Toolbar"
         android:minHeight="?attr/actionBarSize"
-        android:background="@android:color/white"
+        android:background="@color/blueToolbarBackground"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         local:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
         android:layout_width="match_parent"

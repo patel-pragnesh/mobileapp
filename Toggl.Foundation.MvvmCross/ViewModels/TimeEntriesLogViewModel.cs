@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -7,7 +8,6 @@ using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation.DataSources;
-using Toggl.Foundation.DTOs;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
@@ -21,6 +21,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     [Preserve(AllMembers = true)]
     public sealed class TimeEntriesLogViewModel : MvxViewModel
     {
+        private static readonly TimeSpan timeEntryCreationBufferDuration = TimeSpan.FromMilliseconds(100);
         private readonly CompositeDisposable disposeBag = new CompositeDisposable();
 
         private readonly ITimeService timeService;
@@ -76,22 +77,23 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            IsWelcome = onboardingStorage.IsNewUser();
+            IsWelcome = await onboardingStorage.IsNewUser.FirstAsync();
 
-            await reset();
+            await fetchSectionedTimeEntries();
 
             var deleteDisposable =
                 dataSource.TimeEntries.TimeEntryDeleted
-                          .Subscribe(safeRemoveTimeEntry);
+                    .Subscribe(safeRemoveTimeEntry);
 
             var updateDisposable =
                 dataSource.TimeEntries.TimeEntryUpdated
-                          .Subscribe(onTimeEntryUpdated);
+                    .Subscribe(onTimeEntryUpdated);
 
             var createDisposable =
                 dataSource.TimeEntries.TimeEntryCreated
                     .Where(isNotRunning)
-                    .Subscribe(safeInsertTimeEntry);
+                    .Buffer(timeEntryCreationBufferDuration)
+                    .Subscribe(safeInsertTimeEntries);
 
             var midnightDisposable =
                 timeService.MidnightObservable
@@ -108,30 +110,23 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             disposeBag.Add(preferencesDisposable);
         }
 
-        private async Task reset()
+        private async Task fetchSectionedTimeEntries()
         {
-            TimeEntries.Clear();
-
             var timeEntries = await dataSource.TimeEntries.GetAll();
+            if (timeEntries == null) 
+            {
+                TimeEntries.Clear();
+                return;
+            }
 
-            if (timeEntries == null) return;
-
-            timeEntries
+            var groupedEntries = timeEntries
                 .Where(isNotRunning)
                 .OrderByDescending(te => te.Start)
                 .Select(te => new TimeEntryViewModel(te, durationFormat))
                 .GroupBy(te => te.StartTime.LocalDateTime.Date)
-                .Select(grouping => new TimeEntryViewModelCollection(grouping.Key, grouping, durationFormat))
-                .ForEach(addTimeEntries);
-        }
+                .Select(grouping => new TimeEntryViewModelCollection(grouping.Key, grouping, durationFormat));
 
-        private void addTimeEntries(TimeEntryViewModelCollection collection)
-        {
-            IsWelcome = false;
-
-            TimeEntries.Add(collection);
-
-            RaisePropertyChanged(nameof(IsEmpty));
+            TimeEntries.ReplaceWith(groupedEntries);
         }
 
         private void onTimeEntryUpdated((long Id, IDatabaseTimeEntry Entity) tuple)
@@ -160,30 +155,52 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     return;
                 }
 
-                safeInsertTimeEntry(timeEntry);
+                safeInsertTimeEntries(new[] { timeEntry });
             }
         }
 
-        private void safeInsertTimeEntry(IDatabaseTimeEntry timeEntry)
+        private void safeInsertTimeEntries(IEnumerable<IDatabaseTimeEntry> timeEntries)
         {
+            if (!timeEntries.Any()) return;
+
             IsWelcome = false;
 
-            var indexDate = timeEntry.Start.LocalDateTime.Date;
-            var timeEntryViewModel = new TimeEntryViewModel(timeEntry, durationFormat);
+            var groupsToInsert = timeEntries.GroupBy(te => te.Start.LocalDateTime.Date);
 
-            var collectionIndex = TimeEntries.IndexOf(x => x.Date == indexDate);
-            if (collectionIndex >= 0)
+            foreach (var group in groupsToInsert)
             {
-                TimeEntries.InsertInChildCollection(collectionIndex, timeEntryViewModel);
-                return;
+                var indexDate = group.Key;
+                var collectionIndex = TimeEntries.IndexOf(x => x.Date.LocalDateTime == indexDate);
+                var groupExists = collectionIndex >= 0;
+                if (groupExists)
+                {
+                    insertTimeEntriesInGroup(group, collectionIndex);
+                }
+                else
+                {
+                    insertNewTimeEntryGroup(group, indexDate);
+                }
             }
 
-            var newCollection = new TimeEntryViewModelCollection(indexDate, new[] { timeEntryViewModel }, durationFormat);
+            RaisePropertyChanged(nameof(IsEmpty));
+        }
+
+        private void insertTimeEntriesInGroup(IGrouping<DateTime, IDatabaseTimeEntry> group, int collectionIndex)
+        {
+            foreach (var timeEntry in group)
+            {
+                var timeEntryViewModel = new TimeEntryViewModel(timeEntry, durationFormat);
+                TimeEntries.InsertInChildCollection(collectionIndex, timeEntryViewModel);
+            }
+        }
+
+        private void insertNewTimeEntryGroup(IGrouping<DateTime, IDatabaseTimeEntry> group, DateTime indexDate)
+        {
+            var timeEntriesToAdd = group.Select(te => new TimeEntryViewModel(te, durationFormat)).ToArray();
+            var newCollection = new TimeEntryViewModelCollection(indexDate, timeEntriesToAdd, durationFormat);
             var foundIndex = TimeEntries.IndexOf(TimeEntries.FirstOrDefault(x => x.Date < indexDate));
             var indexToInsert = foundIndex == -1 ? TimeEntries.Count : foundIndex;
             TimeEntries.Insert(indexToInsert, newCollection);
-
-            RaisePropertyChanged(nameof(IsEmpty));
         }
 
         private void safeRemoveTimeEntry(long id)

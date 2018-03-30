@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -10,14 +9,18 @@ using FluentAssertions;
 using FsCheck.Xunit;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
+using Toggl.Foundation.Interactors;
+using Toggl.Foundation.Models;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Suggestions;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Tests.Generators;
+using Toggl.Foundation.Tests.Mocks;
 using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 using Xunit;
+using ThreadingTask = System.Threading.Tasks.Task;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -33,7 +36,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             protected override MainViewModel CreateViewModel()
             {
-                var vm = new MainViewModel(DataSource, TimeService, OnboardingStorage, NavigationService, UserPreferences, Scheduler);
+                var vm = new MainViewModel(Scheduler, DataSource, TimeService, UserPreferences, OnboardingStorage, InteractorFactory, NavigationService);
                 vm.Prepare();
                 return vm;
             }
@@ -51,23 +54,26 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheConstructor : MainViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(SixParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useDataSource,
-                                                        bool useTimeService,
-                                                        bool useOnboardingStorage,
-                                                        bool useNavigationService,
-                                                        bool useUserPreferences,
-                                                        bool useScheduler)
+            [ClassData(typeof(SevenParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(
+                bool useScheduler,
+                bool useDataSource,
+                bool useTimeService,
+                bool useUserPreferences,
+                bool useOnboardingStorage,
+                bool useInteractorFactory,
+                bool useNavigationService)
             {
+                var scheduler = useScheduler ? Scheduler : null;
                 var dataSource = useDataSource ? DataSource : null;
                 var timeService = useTimeService ? TimeService : null;
-                var navigationService = useNavigationService ? NavigationService : null;
-                var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
                 var userPreferences = useUserPreferences ? UserPreferences : null;
-                var scheduler = useScheduler ? Scheduler : null;
+                var navigationService = useNavigationService ? NavigationService : null;
+                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
+                var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new MainViewModel(dataSource, timeService, onboardingStorage, navigationService, userPreferences, scheduler);
+                    () => new MainViewModel(scheduler, dataSource, timeService, userPreferences, onboardingStorage, interactorFactory, navigationService);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -122,7 +128,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task NavigatesToTheStartTimeEntryViewModel()
+            public async ThreadingTask NavigatesToTheStartTimeEntryViewModel()
             {
                 await ViewModel.StartTimeEntryCommand.ExecuteAsync();
 
@@ -131,7 +137,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task NavigatesToTheStartTimeEntryViewModelWhenInManualMode()
+            public async ThreadingTask NavigatesToTheStartTimeEntryViewModelWhenInManualMode()
             {
                 ViewModel.IsInManualMode = true;
                 await ViewModel.StartTimeEntryCommand.ExecuteAsync();
@@ -208,7 +214,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CannotBeExecutedWhenThereIsARunningTimeEntry()
+            public async ThreadingTask CannotBeExecutedWhenThereIsARunningTimeEntry()
             {
                 var timeEntry = Substitute.For<IDatabaseTimeEntry>();
                 var observable = Observable.Return(timeEntry);
@@ -225,7 +231,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheOpenSettingsCommand : MainViewModelTest
         {
             [Fact, LogIfTooSlow]
-            public async Task NavigatesToTheSettingsViewModel()
+            public async ThreadingTask NavigatesToTheSettingsViewModel()
             {
                 await ViewModel.OpenSettingsCommand.ExecuteAsync();
 
@@ -236,7 +242,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheOpenReportsCommand : MainViewModelTest
         {
             [Fact, LogIfTooSlow]
-            public async Task NavigatesToTheReportsViewModel()
+            public async ThreadingTask NavigatesToTheReportsViewModel()
             {
                 const long workspaceId = 10;
                 var user = Substitute.For<IDatabaseUser>();
@@ -249,7 +255,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
         }
 
-        public sealed class TheStopTimeEntryCommand : MainViewModelTest
+        public class TheStopTimeEntryCommand : MainViewModelTest
         {
             private ISubject<IDatabaseTimeEntry> subject;
 
@@ -265,7 +271,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CallsTheStopMethodOnTheDataSource()
+            public async ThreadingTask CallsTheStopMethodOnTheDataSource()
             {
                 var date = DateTimeOffset.UtcNow;
                 TimeService.CurrentDateTime.Returns(date);
@@ -276,7 +282,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task SetsTheElapsedTimeToZero()
+            public async ThreadingTask SetsTheElapsedTimeToZero()
             {
                 await ViewModel.StopTimeEntryCommand.ExecuteAsync();
 
@@ -284,7 +290,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task InitiatesPushSync()
+            public async ThreadingTask InitiatesPushSync()
             {
                 await ViewModel.StopTimeEntryCommand.ExecuteAsync();
 
@@ -292,7 +298,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task DoesNotInitiatePushSyncWhenSavingFails()
+            public async ThreadingTask DoesNotInitiatePushSyncWhenSavingFails()
             {
                 DataSource.TimeEntries.Stop(Arg.Any<DateTimeOffset>())
                     .Returns(Observable.Throw<IDatabaseTimeEntry>(new Exception()));
@@ -304,18 +310,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CannotBeExecutedTwiceInARowInFastSuccession()
+            public async ThreadingTask CannotBeExecutedTwiceInARowInFastSuccession()
             {
                 var taskA = ViewModel.StopTimeEntryCommand.ExecuteAsync();
                 var taskB = ViewModel.StopTimeEntryCommand.ExecuteAsync();
 
-                Task.WaitAll(taskA, taskB);
+                ThreadingTask.WaitAll(taskA, taskB);
 
                 await DataSource.TimeEntries.Received(1).Stop(Arg.Any<DateTimeOffset>());
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CannotBeExecutedTwiceInARow()
+            public async ThreadingTask CannotBeExecutedTwiceInARow()
             {
                 await ViewModel.StopTimeEntryCommand.ExecuteAsync();
                 subject.OnNext(null);
@@ -325,7 +331,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CannotBeExecutedWhenNoTimeEntryIsRunning()
+            public async ThreadingTask CannotBeExecutedWhenNoTimeEntryIsRunning()
             {
                 subject.OnNext(null);
                 Scheduler.AdvanceBy(TimeSpan.FromMilliseconds(50).Ticks);
@@ -336,7 +342,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CanBeExecutedForTheSecondTimeIfAnotherTimeEntryIsStartedInTheMeantime()
+            public async ThreadingTask CanBeExecutedForTheSecondTimeIfAnotherTimeEntryIsStartedInTheMeantime()
             {
                 var secondTimeEntry = Substitute.For<IDatabaseTimeEntry>();
 
@@ -352,7 +358,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheEditTimeEntryCommand : MainViewModelTest
         {
             [Fact, LogIfTooSlow]
-            public async Task NavigatesToTheEditTimeEntryViewModel()
+            public async ThreadingTask NavigatesToTheEditTimeEntryViewModel()
             {
                 var timeEntry = Substitute.For<IDatabaseTimeEntry>();
                 var observable = Observable.Return(timeEntry);
@@ -381,7 +387,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task CannotBeExecutedWhenThereIsNoRunningTimeEntry()
+            public async ThreadingTask CannotBeExecutedWhenThereIsNoRunningTimeEntry()
             {
                 var observable = Observable.Return<IDatabaseTimeEntry>(null);
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(observable);
@@ -410,7 +416,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected string Client = "Some client";
             protected string ProjectColor = "0000AF";
 
-            private async Task prepare()
+            private async ThreadingTask prepare()
             {
                 var timeEntry = Substitute.For<IDatabaseTimeEntry>();
                 timeEntry.Id.Returns(TimeEntryId);
@@ -428,7 +434,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task IsSet()
+            public async ThreadingTask IsSet()
             {
                 await prepare();
 
@@ -436,7 +442,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task IsUnset()
+            public async ThreadingTask IsUnset()
             {
                 await prepare();
                 currentTimeEntrySubject.OnNext(null);
@@ -506,7 +512,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData(0)]
             [InlineData(1)]
             [InlineData(28)]
-            public async Task ReturnsTheSameValueAsTimeEntriesLogViewModel(
+            public async ThreadingTask ReturnsTheSameValueAsTimeEntriesLogViewModel(
                 int timeEntryCount)
             {
                 var timeEntries = Enumerable
@@ -576,14 +582,15 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             protected void PrepareIsWelcome(bool isWelcome)
             {
-                OnboardingStorage.IsNewUser().Returns(isWelcome);
+                var observable = Observable.Return(isWelcome);
+                OnboardingStorage.IsNewUser.Returns(observable);
             }
         }
 
         public sealed class TheShouldShowEmptyStateProperty : InitialStateTest
         {
-            [Fact]
-            public async Task ReturnsTrueWhenThereAreNoSuggestionsAndNoTimeEntriesAndIsWelcome()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsTrueWhenThereAreNoSuggestionsAndNoTimeEntriesAndIsWelcome()
             {
                 PrepareIsWelcome(true);
                 await ViewModel.Initialize();
@@ -591,8 +598,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ShouldShowEmptyState.Should().BeTrue();
             }
 
-            [Fact]
-            public async Task ReturnsFalseWhenThereAreSomeSuggestions()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsFalseWhenThereAreSomeSuggestions()
             {
                 PrepareSuggestion();
 
@@ -601,8 +608,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ShouldShowEmptyState.Should().BeFalse();
             }
 
-            [Fact]
-            public async Task ReturnsFalseWhenThereAreSomeTimeEntries()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsFalseWhenThereAreSomeTimeEntries()
             {
                 PrepareTimeEntry();
                 
@@ -611,8 +618,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ShouldShowEmptyState.Should().BeFalse();
             }
 
-            [Fact]
-            public async Task ReturnsFalseWhenIsNotWelcome()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsFalseWhenIsNotWelcome()
             {
                 PrepareIsWelcome(false);
                 await ViewModel.Initialize();
@@ -623,8 +630,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheShouldShowWelcomeBackProperty : InitialStateTest
         {
-            [Fact]
-            public async Task ReturnsTrueWhenThereAreNoSuggestionsAndNoTimeEntriesAndIsNotWelcome()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsTrueWhenThereAreNoSuggestionsAndNoTimeEntriesAndIsNotWelcome()
             {
                 PrepareIsWelcome(false);
                 await ViewModel.Initialize();
@@ -632,8 +639,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ShouldShowWelcomeBack.Should().BeTrue();
             }
 
-            [Fact]
-            public async Task ReturnsFalseWhenThereAreSomeSuggestions()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsFalseWhenThereAreSomeSuggestions()
             {
                 PrepareSuggestion();
                 await ViewModel.Initialize();
@@ -641,8 +648,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ShouldShowWelcomeBack.Should().BeFalse();
             }
 
-            [Fact]
-            public async Task ReturnsFalseWhenThereAreSomeTimeEntries()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsFalseWhenThereAreSomeTimeEntries()
             {
                 PrepareTimeEntry();
                 await ViewModel.Initialize();
@@ -650,13 +657,62 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ShouldShowWelcomeBack.Should().BeFalse();
             }
 
-            [Fact]
-            public async Task ReturnsFalseWhenIsWelcome()
+            [Fact, LogIfTooSlow]
+            public async ThreadingTask ReturnsFalseWhenIsWelcome()
             {
                 PrepareIsWelcome(true);
                 await ViewModel.Initialize();
 
                 ViewModel.ShouldShowWelcomeBack.Should().BeFalse();
+            }
+        }
+
+        public sealed class TheInitializeMethod
+        {
+            public sealed class WhenNavigationActionIsStop : MainViewModelTest
+            {
+                [Fact, LogIfTooSlow]
+                public async ThreadingTask StopsTheCurrentEntry()
+                {
+                    ViewModel.Init(ApplicationUrls.Main.Action.Stop);
+                    await ViewModel.Initialize();
+
+                    await DataSource.TimeEntries.Received().Stop(TimeService.CurrentDateTime);
+                }
+
+                [Fact, LogIfTooSlow]
+                public async ThreadingTask StartsPushSync()
+                {
+                    ViewModel.Init(ApplicationUrls.Main.Action.Stop);
+                    await ViewModel.Initialize();
+
+                    await DataSource.SyncManager.Received().PushSync();
+                }
+            }
+
+            public sealed class WhenNavigationActionIsContinue : MainViewModelTest
+            {
+                [Fact, LogIfTooSlow]
+                public async ThreadingTask GetsTheContinueMostRecentTimeEntryInteractor()
+                {
+                    ViewModel.Init(ApplicationUrls.Main.Action.Continue);
+
+                    await ViewModel.Initialize();
+
+                    InteractorFactory.Received().ContinueMostRecentTimeEntry();
+                }
+
+                [Fact, LogIfTooSlow]
+                public async ThreadingTask ExecutesTheContinueMostRecentTimeEntryInteractor()
+                {
+                    var interactor = Substitute.For<IInteractor<IObservable<IDatabaseTimeEntry>>>();
+                    InteractorFactory.ContinueMostRecentTimeEntry().Returns(interactor);
+                    ViewModel.Init(ApplicationUrls.Main.Action.Continue);
+
+                    await ViewModel.Initialize();
+
+                    await interactor.Received().Execute();
+                }
             }
         }
     }

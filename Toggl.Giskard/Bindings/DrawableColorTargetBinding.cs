@@ -6,10 +6,11 @@ using MvvmCross.Binding.Droid.Target;
 using Toggl.Giskard.Extensions;
 using MvvmCross.Plugins.Color.Droid;
 using MvvmCross.Platform.UI;
+using Android.Graphics;
 
 namespace Toggl.Giskard.Bindings
 {
-    public sealed class DrawableColorTargetBinding : MvxAndroidTargetBinding<View, string>
+    public sealed class DrawableColorTargetBinding : MvxAndroidTargetBinding<View, Color>
     {
         public const string BindingName = "DrawableColor";
 
@@ -17,13 +18,13 @@ namespace Toggl.Giskard.Bindings
         {
         }
 
-        public override MvxBindingMode DefaultMode => MvxBindingMode.Default;
+        public override MvxBindingMode DefaultMode => MvxBindingMode.OneWay;
 
-        protected override void SetValueImpl(View target, string value)
+        protected override void SetValueImpl(View target, Color value)
         {
             if (target?.Background is GradientDrawable drawable)
             {
-                drawable.SetColor(MvxColorExtensions.ToAndroidColor(MvxColor.ParseHexString(value)));
+                drawable.SetColor(value.ToArgb());
                 drawable.InvalidateSelf();
             }
         }

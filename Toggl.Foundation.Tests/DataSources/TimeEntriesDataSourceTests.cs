@@ -24,7 +24,7 @@ namespace Toggl.Foundation.Tests.DataSources
 {
     public sealed class TimeEntriesDataSourceTests
     {
-        public abstract class TimeEntryDataSourceTest : InteractorAwareTests
+        public abstract class TimeEntryDataSourceTest : BaseInteractorTests
         {
             protected const long ProjectId = 10;
 

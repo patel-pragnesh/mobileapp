@@ -13,19 +13,10 @@ namespace Toggl.Daneel.ViewControllers
 	partial class SettingsViewController
 	{
 		[Outlet]
-		UIKit.UISwitch AddMobileTagSwitch { get; set; }
-
-		[Outlet]
-		UIKit.UIView AddMobileTagView { get; set; }
-
-		[Outlet]
 		UIKit.UILabel BeginningOfWeekLabel { get; set; }
 
 		[Outlet]
 		UIKit.UIView BeginningOfWeekView { get; set; }
-
-		[Outlet]
-		UIKit.UIView ControlsContainerView { get; set; }
 
 		[Outlet]
 		UIKit.UILabel DateFormatLabel { get; set; }
@@ -49,13 +40,7 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView FeedbackView { get; set; }
 
 		[Outlet]
-		UIKit.UIView FormatSettingsSection { get; set; }
-
-		[Outlet]
 		UIKit.UILabel FormatSettingsTitle { get; set; }
-
-		[Outlet]
-		UIKit.UIView HelpView { get; set; }
 
 		[Outlet]
 		Toggl.Daneel.Views.ActivityIndicatorView LoggingOutActivityIndicatorView { get; set; }
@@ -77,7 +62,7 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView LogoutContainerView { get; set; }
 
 		[Outlet]
-		UIKit.NSLayoutConstraint LogoutTopConstraint { get; set; }
+		UIKit.NSLayoutConstraint LogoutVerticalOffsetConstraint { get; set; }
 
 		[Outlet]
 		UIKit.UISwitch ManualModeSwitch { get; set; }
@@ -86,13 +71,7 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView ManualModeView { get; set; }
 
 		[Outlet]
-		UIKit.UILabel PlanLabel { get; set; }
-
-		[Outlet]
-		UIKit.UIView RateView { get; set; }
-
-		[Outlet]
-		UIKit.UIView SubscriptionView { get; set; }
+		UIKit.UIScrollView ScrollView { get; set; }
 
 		[Outlet]
 		UIKit.UIImageView SyncedIcon { get; set; }
@@ -125,12 +104,6 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView TwentyFourHourClockView { get; set; }
 
 		[Outlet]
-		UIKit.UIView UpdateView { get; set; }
-
-		[Outlet]
-		UIKit.UILabel VersionLabel { get; set; }
-
-		[Outlet]
 		UIKit.UILabel WorkspaceLabel { get; set; }
 
 		[Outlet]
@@ -138,16 +111,6 @@ namespace Toggl.Daneel.ViewControllers
 		
 		void ReleaseDesignerOutlets ()
 		{
-			if (AddMobileTagSwitch != null) {
-				AddMobileTagSwitch.Dispose ();
-				AddMobileTagSwitch = null;
-			}
-
-			if (AddMobileTagView != null) {
-				AddMobileTagView.Dispose ();
-				AddMobileTagView = null;
-			}
-
 			if (BeginningOfWeekLabel != null) {
 				BeginningOfWeekLabel.Dispose ();
 				BeginningOfWeekLabel = null;
@@ -156,11 +119,6 @@ namespace Toggl.Daneel.ViewControllers
 			if (BeginningOfWeekView != null) {
 				BeginningOfWeekView.Dispose ();
 				BeginningOfWeekView = null;
-			}
-
-			if (ControlsContainerView != null) {
-				ControlsContainerView.Dispose ();
-				ControlsContainerView = null;
 			}
 
 			if (DateFormatLabel != null) {
@@ -198,19 +156,9 @@ namespace Toggl.Daneel.ViewControllers
 				FeedbackView = null;
 			}
 
-			if (FormatSettingsSection != null) {
-				FormatSettingsSection.Dispose ();
-				FormatSettingsSection = null;
-			}
-
 			if (FormatSettingsTitle != null) {
 				FormatSettingsTitle.Dispose ();
 				FormatSettingsTitle = null;
-			}
-
-			if (HelpView != null) {
-				HelpView.Dispose ();
-				HelpView = null;
 			}
 
 			if (LoggingOutActivityIndicatorView != null) {
@@ -238,14 +186,9 @@ namespace Toggl.Daneel.ViewControllers
 				LogoutButton = null;
 			}
 
-			if (LogoutContainerView != null) {
-				LogoutContainerView.Dispose ();
-				LogoutContainerView = null;
-			}
-
-			if (LogoutTopConstraint != null) {
-				LogoutTopConstraint.Dispose ();
-				LogoutTopConstraint = null;
+			if (LogoutVerticalOffsetConstraint != null) {
+				LogoutVerticalOffsetConstraint.Dispose ();
+				LogoutVerticalOffsetConstraint = null;
 			}
 
 			if (ManualModeSwitch != null) {
@@ -256,21 +199,6 @@ namespace Toggl.Daneel.ViewControllers
 			if (ManualModeView != null) {
 				ManualModeView.Dispose ();
 				ManualModeView = null;
-			}
-
-			if (PlanLabel != null) {
-				PlanLabel.Dispose ();
-				PlanLabel = null;
-			}
-
-			if (RateView != null) {
-				RateView.Dispose ();
-				RateView = null;
-			}
-
-			if (SubscriptionView != null) {
-				SubscriptionView.Dispose ();
-				SubscriptionView = null;
 			}
 
 			if (SyncedIcon != null) {
@@ -323,16 +251,6 @@ namespace Toggl.Daneel.ViewControllers
 				TwentyFourHourClockView = null;
 			}
 
-			if (UpdateView != null) {
-				UpdateView.Dispose ();
-				UpdateView = null;
-			}
-
-			if (VersionLabel != null) {
-				VersionLabel.Dispose ();
-				VersionLabel = null;
-			}
-
 			if (WorkspaceLabel != null) {
 				WorkspaceLabel.Dispose ();
 				WorkspaceLabel = null;
@@ -341,6 +259,16 @@ namespace Toggl.Daneel.ViewControllers
 			if (WorkspaceView != null) {
 				WorkspaceView.Dispose ();
 				WorkspaceView = null;
+			}
+
+			if (LogoutContainerView != null) {
+				LogoutContainerView.Dispose ();
+				LogoutContainerView = null;
+			}
+
+			if (ScrollView != null) {
+				ScrollView.Dispose ();
+				ScrollView = null;
 			}
 		}
 	}

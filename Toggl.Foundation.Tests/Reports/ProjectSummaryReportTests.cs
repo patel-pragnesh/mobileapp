@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
@@ -20,7 +19,7 @@ namespace Toggl.Foundation.Tests.Reports
                     .ToArray();
                 var totalTrackedSeconds = segments.Select(s => s.TrackedTime.TotalSeconds).Sum();
                 var billableSeconds = segments.Select(s => s.BillableSeconds).Sum();
-                float expectedBillablePercentage = 
+                float expectedBillablePercentage =
                     (float)(totalTrackedSeconds > 0 ? (100.0f / totalTrackedSeconds) * billableSeconds : 0);
 
                 var report = new ProjectSummaryReport(segments);
@@ -35,7 +34,7 @@ namespace Toggl.Foundation.Tests.Reports
                 var segments = actualDurations
                     .Select((index, duration) => getSegmentFromDurationAndIndex(index, duration))
                     .ToArray();
-                var expectedDuration = segments.Select(s => s.TrackedTime.TotalSeconds).Sum();
+                var expectedDuration = (float)segments.Select(s => s.TrackedTime.TotalSeconds).Sum();
 
                 var report = new ProjectSummaryReport(segments);
 

@@ -138,6 +138,21 @@ namespace Toggl.Daneel.Presentation
 
         }
 
+        public override void Show(MvxViewModelRequest request)
+        {
+            var navigationController = UIApplication.SharedApplication.KeyWindow?.RootViewController as TogglNavigationController;
+            var topViewController = navigationController == null
+                ? null
+                : getPresentedViewController(navigationController.TopViewController) as MvxViewController;
+            
+            //Don't show the same view twice
+            if (topViewController != null
+                && topViewController.ViewModel.GetType() == request.ViewModelType)
+                return;
+                
+            base.Show(request);
+        }
+
         public override void Close(IMvxViewModel viewModel)
         {
             if (viewModel is LoginViewModel)
@@ -199,12 +214,12 @@ namespace Toggl.Daneel.Presentation
         }
 
         public UIViewController TopViewController
-            => getPresentationController(MasterNavigationController);
+            => getPresentedViewController(MasterNavigationController);
 
-        private UIViewController getPresentationController(UIViewController current)
+        private UIViewController getPresentedViewController(UIViewController current)
             => current.PresentedViewController == null || current.PresentedViewController.IsBeingDismissed
             ? current
-            : getPresentationController(current.PresentedViewController);
+            : getPresentedViewController(current.PresentedViewController);
 
 
         private T findViewController<T>()

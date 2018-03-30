@@ -130,7 +130,7 @@ namespace Toggl.Giskard.Adapters
                     var collection = Collection;
                     if (collection == null) return 0;
 
-                    var itemCount = collection.Aggregate(collection.Count, (acc, g) => acc + g.Count);
+                    var itemCount = collection.Count + collection.Sum(g => g.Count);
                     cachedItemCount = itemCount;
                 }
 

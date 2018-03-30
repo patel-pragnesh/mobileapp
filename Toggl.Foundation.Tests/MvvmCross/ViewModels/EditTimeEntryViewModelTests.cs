@@ -39,7 +39,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .SetStart(now.AddHours(-2))
                     .SetAt(now.AddHours(-2))
                     .SetWorkspaceId(11)
-                    .SetUserId(12);
+                    .SetUserId(12)
+                    .SetProjectId(13)
+                    .SetTaskId(14);
 
                 if (!isRunning)
                     te = te.SetDuration((long)Duration.TotalSeconds);
@@ -53,23 +55,28 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             protected override EditTimeEntryViewModel CreateViewModel()
-                => new EditTimeEntryViewModel(DataSource, NavigationService, TimeService, DialogService);
+                => new EditTimeEntryViewModel(TimeService, DataSource, InteractorFactory, NavigationService, DialogService);
         }
 
         public sealed class TheConstructor : EditTimeEntryViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(FourParameterConstructorTestData))]
+            [ClassData(typeof(FiveParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
-                bool useDataSource, bool useNavigationService, bool useTimeService, bool useDialogService)
+                bool useDataSource,
+                bool useNavigationService,
+                bool useTimeService,
+                bool useInteractorFactory,
+                bool useDialogService)
             {
                 var dataSource = useDataSource ? DataSource : null;
-                var navigationService = useNavigationService ? NavigationService : null;
                 var timeService = useTimeService ? TimeService : null;
                 var dialogService = useDialogService ? DialogService : null;
+                var navigationService = useNavigationService ? NavigationService : null;
+                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new EditTimeEntryViewModel(dataSource, navigationService, timeService, dialogService);
+                    () => new EditTimeEntryViewModel(timeService, dataSource, interactorFactory, navigationService, dialogService);
 
                 tryingToConstructWithEmptyParameters.ShouldThrow<ArgumentNullException>();
             }
@@ -77,12 +84,166 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheCloseCommand : EditTimeEntryViewModelTest
         {
+            public TheCloseCommand()
+            {
+                ConfigureEditedTimeEntry(DateTimeOffset.Now, true);
+
+                var te = Substitute.For<IDatabaseTimeEntry>();
+                var project = Substitute.For<IDatabaseProject>();
+                var task = Substitute.For<IDatabaseTask>();
+
+                project.Id.Returns(TheTimeEntry.ProjectId.Value);
+                task.Id.Returns(TheTimeEntry.TaskId.Value);
+
+                te.Description.Returns(TheTimeEntry.Description);
+                te.Start.Returns(TheTimeEntry.Start);
+                te.WorkspaceId.Returns(TheTimeEntry.WorkspaceId);
+                te.UserId.Returns(TheTimeEntry.UserId);
+                te.Project.Returns(project);
+                te.ProjectId.Returns(TheTimeEntry.ProjectId.Value);
+                te.Task.Returns(task);
+                te.TaskId.Returns(TheTimeEntry.TaskId.Value);
+
+                var observable = Observable.Return(te);
+                DataSource.TimeEntries.GetById(Arg.Is(Id)).Returns(observable);
+
+                ViewModel.Prepare(Id);
+                ViewModel.Initialize().Wait();
+            }
+
             [Fact, LogIfTooSlow]
-            public async Task ClosesTheViewModel()
+            public async Task ClosesTheViewModelIfNothingChanged()
             {
                 await ViewModel.CloseCommand.ExecuteAsync();
 
                 await NavigationService.Received().Close(Arg.Is(ViewModel));
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfDescriptionChanges()
+            {
+                ViewModel.Description = "Something Else";
+
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfProjectChanges()
+            {
+                var selectProjectParameter = SelectProjectParameter.WithIds(TheTimeEntry.ProjectId + 1, TheTimeEntry.TaskId, TheTimeEntry.WorkspaceId);
+                NavigationService
+                    .Navigate<SelectProjectViewModel, SelectProjectParameter, SelectProjectParameter>(
+                        Arg.Any<SelectProjectParameter>())
+                    .Returns(selectProjectParameter);
+
+                await ViewModel.SelectProjectCommand.ExecuteAsync();
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfTaskChanges()
+            {
+                var selectProjectParameter = SelectProjectParameter.WithIds(TheTimeEntry.ProjectId, TheTimeEntry.TaskId + 1, TheTimeEntry.WorkspaceId);
+                NavigationService
+                    .Navigate<SelectProjectViewModel, SelectProjectParameter, SelectProjectParameter>(
+                        Arg.Any<SelectProjectParameter>())
+                    .Returns(selectProjectParameter);
+
+                await ViewModel.SelectProjectCommand.ExecuteAsync();
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfWorkspaceChanges()
+            {
+                var selectProjectParameter = SelectProjectParameter.WithIds(TheTimeEntry.ProjectId, TheTimeEntry.TaskId, TheTimeEntry.WorkspaceId + 1);
+                NavigationService
+                    .Navigate<SelectProjectViewModel, SelectProjectParameter, SelectProjectParameter>(
+                        Arg.Any<SelectProjectParameter>())
+                    .Returns(selectProjectParameter);
+
+                await ViewModel.SelectProjectCommand.ExecuteAsync();
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfTheStartTimeChanges()
+            {
+                var newStartTime = TheTimeEntry.Start.AddHours(1);
+                NavigationService
+                    .Navigate<SelectDateTimeViewModel, DateTimePickerParameters, DateTimeOffset>(
+                        Arg.Any<DateTimePickerParameters>())
+                    .Returns(newStartTime);
+
+                await ViewModel.SelectStartTimeCommand.ExecuteAsync();
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfTheDurationChanges()
+            {
+                ViewModel.StopCommand.Execute();
+
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfTheBillableFlagChanges()
+            {
+                ViewModel.Billable = !ViewModel.Billable;
+
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ShowsTheConfirmationDialogIfTagsChange()
+            {
+                var newTags = new long[] { 1, 2, 3 };
+                NavigationService
+                    .Navigate<SelectTagsViewModel, (long[], long), long[]>(
+                        Arg.Any<(long[], long)>())
+                    .Returns(newTags);
+
+                await ViewModel.SelectTagsCommand.ExecuteAsync();
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await DialogService.Received().ConfirmDestructiveAction(ActionType.DiscardEditingChanges);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ClosesTheViewIfUserClicksOnTheDiscardButton()
+            {
+                DialogService.ConfirmDestructiveAction(ActionType.DiscardEditingChanges).Returns(true);
+
+                ViewModel.Billable = !ViewModel.Billable;
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await NavigationService.Received().Close(ViewModel);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task DoesNotCloseTheViewIfUserClicksOnTheContinueEditingButton()
+            {
+                DialogService.ConfirmDestructiveAction(ActionType.DiscardEditingChanges).Returns(false);
+
+                ViewModel.Billable = !ViewModel.Billable;
+                await ViewModel.CloseCommand.ExecuteAsync();
+
+                await NavigationService.DidNotReceive().Close(ViewModel);
             }
         }
 
@@ -253,6 +414,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task InitiatesPushSync()
             {
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.SyncManager.Received().PushSync();
@@ -264,6 +426,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 DataSource.TimeEntries.Update(Arg.Any<EditTimeEntryDto>())
                     .Returns(Observable.Throw<IDatabaseTimeEntry>(new Exception()));
 
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.SyncManager.DidNotReceive().PushSync();
@@ -292,6 +455,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(parameter);
                 await ViewModel.SelectProjectCommand.ExecuteAsync();
 
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.TimeEntries.Received().Update(
@@ -321,6 +485,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(SelectProjectParameter.WithIds(newProjectId, null, workspaceId));
                 await ViewModel.SelectProjectCommand.ExecuteAsync();
 
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.TimeEntries.Received().Update(
@@ -328,7 +493,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public async Task UpdatewWorkspaceIdIfNoProjectWasSelected()
+            public async Task UpdatesWorkspaceIdIfNoProjectWasSelected()
             {
                 var oldWorkspaceId = 11;
                 var newWorkspaceId = 21;
@@ -345,10 +510,45 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(SelectProjectParameter.WithIds(null, null, newWorkspaceId));
                 await ViewModel.SelectProjectCommand.ExecuteAsync();
 
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.TimeEntries.Received().Update(
                     Arg.Is<EditTimeEntryDto>(dto => dto.WorkspaceId == newWorkspaceId));
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task InvertsTheFlagIfDescriptionWasBeingEdited()
+            {
+                var timeEntry = Substitute.For<IDatabaseTimeEntry>();
+                timeEntry.Id.Returns(1);
+                DataSource.TimeEntries.GetById(Arg.Is(timeEntry.Id))
+                  .Returns(Observable.Return(timeEntry));
+                ViewModel.Prepare(timeEntry.Id);
+                await ViewModel.Initialize();
+
+                ViewModel.IsEditingDescription = true;
+                ViewModel.ConfirmCommand.Execute();
+
+                ViewModel.IsEditingDescription.Should().Be(false);
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task DidNotCallUpdateIfDescriptionWasBeingEdited()
+            {
+                var timeEntry = Substitute.For<IDatabaseTimeEntry>();
+                timeEntry.Id.Returns(1);
+                DataSource.TimeEntries.GetById(Arg.Is(timeEntry.Id))
+                  .Returns(Observable.Return(timeEntry));
+                ViewModel.Prepare(timeEntry.Id);
+                await ViewModel.Initialize();
+
+                ViewModel.IsEditingDescription = true;
+                ViewModel.ConfirmCommand.Execute();
+
+                ViewModel.IsEditingDescription.Should().Be(false);
+
+                await DataSource.TimeEntries.DidNotReceive().Update(Arg.Any<EditTimeEntryDto>());
             }
 
             [Theory, LogIfTooSlow]
@@ -362,6 +562,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 ViewModel.Description = description;
 
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.TimeEntries.Received().Update(Arg.Is<EditTimeEntryDto>(dto =>
@@ -380,6 +581,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 ViewModel.Description = description;
 
+                ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
                 await DataSource.TimeEntries.Received().Update(Arg.Is<EditTimeEntryDto>(dto =>
@@ -579,6 +781,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 viewModel.Prepare(id);
                 viewModel.Initialize().Wait();
+                viewModel.IsEditingDescription = false;
                 viewModel.ConfirmCommand.Execute();
 
                 DataSource.TimeEntries.Received().Update(Arg.Is<EditTimeEntryDto>(
@@ -841,7 +1044,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 DataSource.TimeEntries.GetById(Arg.Is(timeEntry.Id))
                     .Returns(Observable.Return(timeEntry));
-                
+
                 ViewModel.Prepare(timeEntry.Id);
                 await ViewModel.Initialize();
             }
@@ -888,7 +1091,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         (builder, _) => builder.Append(character))
                     .ToString();
         }
-    
+
         public sealed class TheSelectStartDateCommand : EditTimeEntryViewModelTest
         {
             [Fact]

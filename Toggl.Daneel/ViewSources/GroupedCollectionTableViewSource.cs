@@ -7,7 +7,6 @@ using Foundation;
 using MvvmCross.Binding.ExtensionMethods;
 using MvvmCross.Binding.iOS.Views;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Platform.WeakSubscription;
 using Toggl.Daneel.Views.Interfaces;
 using Toggl.Foundation.MvvmCross.Collections;
 using UIKit;
@@ -20,6 +19,7 @@ namespace Toggl.Daneel.ViewSources
     {
         private readonly string cellIdentifier;
         private readonly string headerCellIdentifier;
+        private readonly object animationLock = new object();
         private readonly List<IDisposable> disposables = new List<IDisposable>();
 
         protected IEnumerable<MvxObservableCollection<TItem>> GroupedItems
@@ -133,7 +133,7 @@ namespace Toggl.Daneel.ViewSources
 
         protected override void CollectionChangedOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            InvokeOnMainThread(() => 
+            InvokeOnMainThread(() =>
             {
                 if (!UseAnimations)
                 {
@@ -141,21 +141,8 @@ namespace Toggl.Daneel.ViewSources
                     return;
                 }
 
-                try
-                {
-                    animateSectionChangesIfPossible(args);
-                }
-                catch
-                {
-                    ReloadTableData();
-                }
-
+                animateSectionChangesIfPossible(args);
             });
-        }
-
-        protected virtual void OnSectionRemoved(NSIndexSet indexToRemove)
-        {
-            TableView.DeleteSections(indexToRemove, UITableViewRowAnimation.Automatic);
         }
 
         protected void OnChildCollectionChanged(object sender, ChildCollectionChangedEventArgs args)
@@ -168,63 +155,91 @@ namespace Toggl.Daneel.ViewSources
                     return;
                 }
 
-                try
-                {
-                    animateRowChangesIfPossible(args);
-                }
-                catch
-                {
-                    ReloadTableData();
-                }
+                animateRowChangesIfPossible(args);
             });
         }
 
         private void animateSectionChangesIfPossible(NotifyCollectionChangedEventArgs args)
         {
-            switch (args.Action)
+            lock (animationLock)
             {
-                case NotifyCollectionChangedAction.Add:
-                    OnSectionAdded(NSIndexSet.FromIndex(args.NewStartingIndex));
-                    break;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        var indexToAdd = NSIndexSet.FromIndex(args.NewStartingIndex);
+                        TableView.BeginUpdates();
+                        TableView.InsertSections(indexToAdd, UITableViewRowAnimation.Automatic);
+                        TableView.EndUpdates();
+                        break;
 
-                case NotifyCollectionChangedAction.Remove:
-                    var indexToRemove = NSIndexSet.FromIndex(args.OldStartingIndex);
-                    TableView.DeleteSections(indexToRemove, UITableViewRowAnimation.Automatic);
-                    break;
+                    case NotifyCollectionChangedAction.Remove:
+                        var indexToRemove = NSIndexSet.FromIndex(args.OldStartingIndex);
+                        TableView.BeginUpdates();
+                        TableView.DeleteSections(indexToRemove, UITableViewRowAnimation.Automatic);
+                        TableView.EndUpdates();
+                        break;
+
+                    case NotifyCollectionChangedAction.Move when args.NewItems.Count == 1 && args.OldItems.Count == 1:
+                        TableView.BeginUpdates();
+                        TableView.MoveSection(args.OldStartingIndex, args.NewStartingIndex);
+                        TableView.EndUpdates();
+                        break;
+
+                    case NotifyCollectionChangedAction.Replace when args.NewItems.Count == args.OldItems.Count:
+                        var indexSet = NSIndexSet.FromIndex(args.NewStartingIndex);
+
+                        TableView.BeginUpdates();
+                        TableView.ReloadSections(indexSet, ReplaceAnimation);
+                        TableView.EndUpdates();
+                        break;
+
+                    default:
+                        TableView.ReloadData();
+                        break;
+                }
             }
-        }
-
-        protected virtual void OnSectionAdded(NSIndexSet indexToAdd)
-        {
-            TableView.InsertSections(indexToAdd, UITableViewRowAnimation.Automatic);
         }
 
         private void animateRowChangesIfPossible(ChildCollectionChangedEventArgs args)
         {
-            switch (args.Action)
+            lock (animationLock)
             {
-                case NotifyCollectionChangedAction.Add:
-                    var indexPathsToAdd = args.Indexes
-                        .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
-                        .ToArray();
-                    TableView.InsertRows(indexPathsToAdd, AddAnimation);
-                    break;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        var indexPathsToAdd = args.Indexes
+                            .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
+                            .ToArray();
 
-                case NotifyCollectionChangedAction.Remove:
-                    var indexPathsToRemove = args.Indexes
-                        .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
-                        .ToArray();
+                        TableView.BeginUpdates();
+                        TableView.InsertRows(indexPathsToAdd, AddAnimation);
+                        TableView.EndUpdates();
+                        break;
 
-                    TableView.DeleteRows(indexPathsToRemove, RemoveAnimation);
-                    break;
+                    case NotifyCollectionChangedAction.Remove:
+                        var indexPathsToRemove = args.Indexes
+                            .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
+                            .ToArray();
 
-                case NotifyCollectionChangedAction.Replace:
-                    var indexPathsToUpdate = args.Indexes
-                        .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
-                        .ToArray();
+                        TableView.BeginUpdates();
+                        TableView.DeleteRows(indexPathsToRemove, RemoveAnimation);
+                        TableView.EndUpdates();
+                        break;
 
-                    TableView.ReloadRows(indexPathsToUpdate, ReplaceAnimation);
-                    break;
+                    case NotifyCollectionChangedAction.Replace:
+                        var indexPathsToUpdate = args.Indexes
+                            .Select(row => NSIndexPath.FromRowSection(row, args.CollectionIndex))
+                            .ToArray();
+
+                        TableView.BeginUpdates();
+                        TableView.ReloadRows(indexPathsToUpdate, ReplaceAnimation);
+                        TableView.EndUpdates();
+                        break;
+
+                    default:
+                        TableView.ReloadData();
+                        break;
+                }
             }
         }
 

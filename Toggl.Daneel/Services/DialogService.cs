@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Services;
@@ -51,8 +52,7 @@ namespace Toggl.Daneel.Services
                 preferredStyle: UIAlertControllerStyle.ActionSheet
             );
 
-            var confirmText = type == ActionType.DiscardNewTimeEntry ? Resources.Discard : Resources.Delete;
-            var cancelText = type == ActionType.DiscardNewTimeEntry ? Resources.ContinueEditing : Resources.Cancel; 
+            var (confirmText, cancelText) = selectTextByType(type);
 
             var cancelAction = UIAlertAction.Create(cancelText, UIAlertActionStyle.Cancel, _ => tcs.SetResult(false));
             actionSheet.AddAction(cancelAction);
@@ -84,6 +84,21 @@ namespace Toggl.Daneel.Services
                 .PresentViewController(alert, true, null);
 
             return tcs.Task;
+        }
+
+        private (string, string) selectTextByType(ActionType type)
+        {
+            switch (type)
+            {
+                case ActionType.DiscardNewTimeEntry:
+                    return (Resources.Discard, Resources.Cancel);
+                case ActionType.DiscardEditingChanges:
+                    return (Resources.Discard, Resources.ContinueEditing);
+                case ActionType.DeleteExistingTimeEntry:
+                    return (Resources.Delete, Resources.Cancel);
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(type));
         }
     }
 }

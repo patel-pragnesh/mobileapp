@@ -7,6 +7,7 @@ using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Login;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;
+using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave.Exceptions;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -18,6 +19,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly ITogglDataSource dataSource;
         private readonly IDialogService dialogService;
         private readonly IMvxNavigationService navigationService;
+        private readonly IUserPreferences userPreferences;
+        private readonly IOnboardingStorage onboardingStorage;
 
         private bool needsSync;
 
@@ -45,17 +48,23 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             ILoginManager loginManager,
             ITogglDataSource dataSource,
             IDialogService dialogService,
-            IMvxNavigationService navigationService)
+            IMvxNavigationService navigationService,
+            IUserPreferences userPreferences,
+            IOnboardingStorage onboardingStorage)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(loginManager, nameof(loginManager));
             Ensure.Argument.IsNotNull(dialogService, nameof(dialogService));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
+            Ensure.Argument.IsNotNull(userPreferences, nameof(userPreferences));
+            Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
 
             this.dataSource = dataSource;
             this.loginManager = loginManager;
             this.dialogService = dialogService;
             this.navigationService = navigationService;
+            this.userPreferences = userPreferences;
+            this.onboardingStorage = onboardingStorage;
 
             DoneCommand = new MvxCommand(done);
             SignOutCommand = new MvxAsyncCommand(signout);
@@ -85,6 +94,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             if (!shouldLogout) return;
 
+            userPreferences.Reset();
+            onboardingStorage.Reset();
             await dataSource.Logout();
             await navigationService.Navigate<OnboardingViewModel>();
         }

@@ -2,7 +2,6 @@
 using System.Linq;
 using Foundation;
 using Toggl.Foundation.Shortcuts;
-using Toggl.Foundation.Suggestions;
 using UIKit;
 
 namespace Toggl.Daneel
@@ -12,14 +11,10 @@ namespace Toggl.Daneel
         private readonly IReadOnlyDictionary<ShortcutType, UIApplicationShortcutIcon> icons = new Dictionary<ShortcutType, UIApplicationShortcutIcon>
         {
             { ShortcutType.Reports, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Time) },
+            { ShortcutType.StopTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Pause) },
             { ShortcutType.StartTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) },
-            { ShortcutType.TimeEntrySuggestion, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) },
+            { ShortcutType.ContinueLastTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) }
         };
-
-        public ApplicationShortcutCreator(ISuggestionProviderContainer suggestionProviderContainer)
-            : base(suggestionProviderContainer)
-        {
-        }
 
         protected override void ClearAllShortCuts()
         {
@@ -31,9 +26,6 @@ namespace Toggl.Daneel
 
         protected override void SetShortcuts(IEnumerable<ApplicationShortcut> shortcuts)
         {
-            //Temporary disable application shortcuts (until handling is implemented)
-            return;
-
             UIApplication.SharedApplication.InvokeOnMainThread(() =>
             {
                 UIApplication.SharedApplication.ShortcutItems = shortcuts
@@ -52,6 +44,6 @@ namespace Toggl.Daneel
             );
 
         private NSDictionary<NSString, NSObject> userInfoFor(ApplicationShortcut shortcut)
-            => new NSDictionary<NSString, NSObject>(new NSString("url"), new NSString(shortcut.Url));
+            => new NSDictionary<NSString, NSObject>(new NSString(nameof(shortcut.Url)), new NSString(shortcut.Url));
     }
 }

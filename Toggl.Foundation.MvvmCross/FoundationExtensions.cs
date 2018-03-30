@@ -31,11 +31,13 @@ namespace Toggl.Foundation.MvvmCross
 
         internal IGoogleService GoogleService { get; }
 
-        internal SettingsStorage SettingsStorage { get; }
-
         internal IMvxNavigationService NavigationService { get; }
 
         internal IApiErrorHandlingService ApiErrorHandlingService { get; }
+
+        internal IOnboardingStorage OnboardingStorage { get; }
+
+        internal IAccessRestrictionStorage AccessRestrictionStorage { get; }
 
         internal IBackgroundService BackgroundService { get; }
 
@@ -50,7 +52,8 @@ namespace Toggl.Foundation.MvvmCross
             IGoogleService googleService,
             IApplicationShortcutCreator shortcutCreator,
             IBackgroundService backgroundService,
-            SettingsStorage settingsStorage,
+            IOnboardingStorage onboardingStorage,
+            IAccessRestrictionStorage accessRestrictionStorage,
             IMvxNavigationService navigationService,
             IApiErrorHandlingService apiErrorHandlingService)
         {
@@ -62,7 +65,8 @@ namespace Toggl.Foundation.MvvmCross
             GoogleService = googleService;
             ShortcutCreator = shortcutCreator;
             BackgroundService = backgroundService;
-            SettingsStorage = settingsStorage;
+            OnboardingStorage = onboardingStorage;
+            AccessRestrictionStorage = accessRestrictionStorage;
             NavigationService = navigationService;
             ApiErrorHandlingService = apiErrorHandlingService;
         }
@@ -77,6 +81,9 @@ namespace Toggl.Foundation.MvvmCross
             IDialogService dialogService,
             IBrowserService browserService,
             IKeyValueStorage keyValueStorage,
+            IAccessRestrictionStorage accessRestrictionStorage,
+            IUserPreferences userPreferences,
+            IOnboardingStorage onboardingStorage,
             IMvxNavigationService navigationService,
             IPasswordManagerService passwordManagerService = null)
         {
@@ -84,15 +91,18 @@ namespace Toggl.Foundation.MvvmCross
             Ensure.Argument.IsNotNull(dialogService, nameof(dialogService));
             Ensure.Argument.IsNotNull(browserService, nameof(browserService));
             Ensure.Argument.IsNotNull(keyValueStorage, nameof(keyValueStorage));
+            Ensure.Argument.IsNotNull(accessRestrictionStorage, nameof(accessRestrictionStorage));
+            Ensure.Argument.IsNotNull(userPreferences, nameof(userPreferences));
+            Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
 
             var timeService = self.TimeService;
 
-            var settingsStorage = new SettingsStorage(self.Version, keyValueStorage);
-            var apiErrorHandlingService = new ApiErrorHandlingService(navigationService, settingsStorage);
+            var apiErrorHandlingService = new ApiErrorHandlingService(navigationService, accessRestrictionStorage);
 
             Mvx.RegisterSingleton(self.BackgroundService);
             Mvx.RegisterSingleton(dialogService);
+            Mvx.RegisterSingleton(self.Database);
             Mvx.RegisterSingleton(browserService);
             Mvx.RegisterSingleton(self.UserAgent);
             Mvx.RegisterSingleton(self.TimeService);
@@ -104,9 +114,9 @@ namespace Toggl.Foundation.MvvmCross
             Mvx.RegisterSingleton(self.PlatformConstants);
             Mvx.RegisterSingleton(self.Database.IdProvider);
             Mvx.RegisterSingleton(self.SuggestionProviderContainer);
-            Mvx.RegisterSingleton<IUserPreferences>(settingsStorage);
-            Mvx.RegisterSingleton<IOnboardingStorage>(settingsStorage);
-            Mvx.RegisterSingleton<IAccessRestrictionStorage>(settingsStorage);
+            Mvx.RegisterSingleton(userPreferences);
+            Mvx.RegisterSingleton(onboardingStorage);
+            Mvx.RegisterSingleton(accessRestrictionStorage);
             Mvx.RegisterSingleton<IApiErrorHandlingService>(apiErrorHandlingService);
             Mvx.RegisterSingleton(passwordManagerService ?? new StubPasswordManagerService());
 
@@ -121,7 +131,8 @@ namespace Toggl.Foundation.MvvmCross
                 self.GoogleService,
                 self.ShortcutCreator,
                 self.BackgroundService,
-                settingsStorage,
+                onboardingStorage,
+                accessRestrictionStorage,
                 navigationService,
                 apiErrorHandlingService);
         }
@@ -129,15 +140,15 @@ namespace Toggl.Foundation.MvvmCross
         public static FoundationMvvmCross RevokeNewUserIfNeeded(this FoundationMvvmCross self)
         {
             var now = self.TimeService.CurrentDateTime;
-            var lastUsed = self.SettingsStorage.GetLastOpened();
-            self.SettingsStorage.SetLastOpened(now);
+            var lastUsed = self.OnboardingStorage.GetLastOpened();
+            self.OnboardingStorage.SetLastOpened(now);
             if (lastUsed == null) return self;
 
             var lastUsedDate = DateTimeOffset.Parse(lastUsed);
             var offset = now - lastUsedDate;
             if (offset < TimeSpan.FromDays(newUserThreshold)) return self;
 
-            self.SettingsStorage.SetIsNewUser(false);
+            self.OnboardingStorage.SetIsNewUser(false);
             return self;
         }
 
@@ -147,13 +158,13 @@ namespace Toggl.Foundation.MvvmCross
                 TogglSyncManager.CreateSyncManager(self.Database, api, dataSource, self.TimeService, self.AnalyticsService, retryDelayLimit, scheduler);
 
             ITogglDataSource createDataSource(ITogglApi api)
-            => new TogglDataSource(api, self.Database, self.TimeService, self.ApiErrorHandlingService, self.BackgroundService, createSyncManager(api), TimeSpan.FromMinutes(5), self.ShortcutCreator)
+                => new TogglDataSource(api, self.Database, self.TimeService, self.ApiErrorHandlingService, self.BackgroundService, createSyncManager(api), TimeSpan.FromMinutes(5), self.ShortcutCreator)
                     .RegisterServices();
 
             var loginManager =
-                new LoginManager(self.ApiFactory, self.Database, self.GoogleService, self.ShortcutCreator, self.SettingsStorage, createDataSource);
+                new LoginManager(self.ApiFactory, self.Database, self.GoogleService, self.ShortcutCreator, self.AccessRestrictionStorage, createDataSource);
 
-            app.Initialize(loginManager, self.NavigationService, self.SettingsStorage);
+            app.Initialize(loginManager, self.NavigationService, self.AccessRestrictionStorage);
         }
     }
 }

@@ -2,6 +2,7 @@
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MvvmCross.Droid.Support.V7.AppCompat;
@@ -19,7 +20,7 @@ namespace Toggl.Giskard.Activities
     {
         protected override void OnCreate(Bundle bundle)
         {
-            this.ChangeStatusBarColor(Color.White, true);
+            this.ChangeStatusBarColor(new Color(ContextCompat.GetColor(this, Resource.Color.blueStatusBarBackground)));
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.SelectTagsActivity);

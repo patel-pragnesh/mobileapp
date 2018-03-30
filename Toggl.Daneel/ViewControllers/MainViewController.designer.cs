@@ -40,11 +40,17 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIButton StartTimeEntryButton { get; set; }
 
 		[Outlet]
+		UIKit.UIView StartTimeEntryOnboardingBubbleView { get; set; }
+
+		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		UIKit.UIButton StopTimeEntryButton { get; set; }
 
 		[Outlet]
 		UIKit.UITableView TimeEntriesLogTableView { get; set; }
+
+		[Outlet]
+		UIKit.NSLayoutConstraint TopConstraint { get; set; }
 
 		[Outlet]
 		UIKit.UIView TopSeparator { get; set; }
@@ -54,6 +60,11 @@ namespace Toggl.Daneel.ViewControllers
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (TopConstraint != null) {
+				TopConstraint.Dispose ();
+				TopConstraint = null;
+			}
+
 			if (CurrentTimeEntryCard != null) {
 				CurrentTimeEntryCard.Dispose ();
 				CurrentTimeEntryCard = null;
@@ -107,6 +118,11 @@ namespace Toggl.Daneel.ViewControllers
 			if (WelcomeBackView != null) {
 				WelcomeBackView.Dispose ();
 				WelcomeBackView = null;
+			}
+
+			if (StartTimeEntryOnboardingBubbleView != null) {
+				StartTimeEntryOnboardingBubbleView.Dispose ();
+				StartTimeEntryOnboardingBubbleView = null;
 			}
 		}
 	}

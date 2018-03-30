@@ -70,6 +70,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(InfoText))]
         public bool HasInfoText => !string.IsNullOrEmpty(InfoText);
 
+        [DependsOn(nameof(InfoText))]
+        public bool IsErrorText { get; private set; }
+
         public int CurrentPage { get; private set; } = EmailPage;
 
         public bool IsLoading { get; private set; } = false;
@@ -229,6 +232,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void validatePassword()
         {
+            IsErrorText = true;
+
             InfoText = Password.IsValid
                 ? String.Empty
                 : Resources.SignUpPasswordRequirements;
@@ -249,12 +254,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             IsLoading = false;
             CurrentPage = PasswordPage;
+            IsErrorText = false;
             InfoText = Resources.PasswordResetSuccess;
         }
 
         private void onPasswordResetError(Exception exception)
         {
             IsLoading = false;
+
+            IsErrorText = true;
 
             switch (exception)
             {
@@ -285,7 +293,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 CurrentPage = pageBeforeForgotPasswordPage;
             else
                 CurrentPage--;
-            
+
             InfoText = "";
             tryLoggingInInstead = false;
             RaisePropertyChanged(nameof(TryLoggingInInsteadOfSignup));
@@ -370,7 +378,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             if (apiErrorHandlingService.TryHandleDeprecationError(exception))
                 return;
-                
+
+            IsErrorText = true;
+
             switch (exception)
             {
                 case UnauthorizedException forbidden:
@@ -403,6 +413,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             pageBeforeForgotPasswordPage = CurrentPage;
             CurrentPage = ForgotPasswordPage;
+            IsErrorText = false;
             InfoText = Email.IsValid ? "" : Resources.PasswordResetExplanation;
         }
 

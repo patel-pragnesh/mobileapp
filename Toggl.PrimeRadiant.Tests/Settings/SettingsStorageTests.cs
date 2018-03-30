@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
@@ -48,6 +49,21 @@ namespace Toggl.PrimeRadiant.Tests.Settings
                 public void SetString(string key, string value)
                 {
                     strings[key] = value;
+                }
+
+                public void Remove(string key)
+                {
+                }
+
+                public void RemoveAllWithPrefix(string prefix)
+                {
+                    var keys = bools.Keys.Where(key => key.StartsWith(prefix, StringComparison.Ordinal));
+                    foreach (var key in keys)
+                        bools.Remove(key);
+
+                    keys = strings.Keys.Where(key => key.StartsWith(prefix, StringComparison.Ordinal));
+                    foreach (var key in keys)
+                        strings.Remove(key);
                 }
             }
         }

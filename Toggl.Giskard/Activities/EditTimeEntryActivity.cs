@@ -1,10 +1,14 @@
 ﻿using System;
 using Android.App;
+using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
+using Android.Views;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
+using Toggl.Giskard.Extensions;
 using Toggl.Giskard.Fragments;
 using Toggl.Giskard.Views;
 using static Android.Support.V7.Widget.Toolbar;
@@ -14,34 +18,27 @@ namespace Toggl.Giskard.Activities
 {
     [MvxActivityPresentation]
     [Activity(Theme = "@style/AppTheme")]
-    public class EditTimeEntryActivity : MvxAppCompatActivity<EditTimeEntryViewModel>
+    public sealed class EditTimeEntryActivity : MvxAppCompatActivity<EditTimeEntryViewModel>
     {
         protected override void OnCreate(Bundle bundle)
         {
+            this.ChangeStatusBarColor(new Color(ContextCompat.GetColor(this, Resource.Color.blueStatusBarBackground)));
+            
             base.OnCreate(bundle);
-            SetContentView(Resource.Layout.EditLayout);
+            SetContentView(Resource.Layout.EditActivity);
 
             OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
-
-            setupToolbar();
         }
 
-        private void setupToolbar()
+        public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
         {
-            var toolbar = FindViewById<Toolbar>(Resource.Id.Toolbar);
+            if (keyCode == Keycode.Back)
+            {
+                ViewModel.CloseCommand.ExecuteAsync();
+                return true;
+            }
 
-            toolbar.Title = Resources.GetString(Resource.String.Edit);
-
-            SetSupportActionBar(toolbar);
-            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            SupportActionBar.SetDisplayShowHomeEnabled(true);
-
-            toolbar.NavigationClick += onNavigateBack;
-        }
-
-        private void onNavigateBack(object sender, NavigationClickEventArgs e)
-        {
-            ViewModel.CloseCommand.Execute();
+            return base.OnKeyDown(keyCode, e);
         }
     }
 }

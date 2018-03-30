@@ -1,14 +1,12 @@
-﻿using System;
-using System.Globalization;
-using Foundation;
-using MvvmCross.Platform.Converters;
+﻿using Foundation;
 using MvvmCross.Plugins.Color.iOS;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Converters;
 using UIKit;
 
 namespace Toggl.Daneel.Converters
 {
-    public sealed class ReportPercentageLabelValueConverter : MvxValueConverter<float?, NSAttributedString>
+    public sealed class ReportPercentageLabelValueConverter : BaseReportPercentageLabelValueConverter<NSAttributedString>
     {
         private const int fontSize = 24;
 
@@ -27,14 +25,9 @@ namespace Toggl.Daneel.Converters
             ForegroundColor = disabledColor
         };
 
-        protected override NSAttributedString Convert(float? value, Type targetType, object parameter, CultureInfo culture)
+        protected override NSAttributedString GetFormattedString(string percentage, bool isDisabled)
         {
-            var isEmpty = value == null;
-            var actualValue = isEmpty ? 0 : value.Value;
-
-            var percentage = $"{actualValue.ToString("0.00")}%";
-
-            var attributes = isEmpty ? disabledAttributes : normalAttributes;
+            var attributes = isDisabled ? disabledAttributes : normalAttributes;
             return new NSAttributedString(percentage, attributes);
         }
     }

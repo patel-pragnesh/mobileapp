@@ -24,8 +24,8 @@ namespace Toggl.Foundation.Tests
                 bool useClientName,
                 bool useVersion,
                 bool useDatabase,
-                bool useTimeService,
                 bool useScheduler,
+                bool useTimeService,
                 bool useMailService,
                 bool useGoogleService,
                 bool useAnalyticsService,
@@ -35,9 +35,9 @@ namespace Toggl.Foundation.Tests
             {
                 var version = useVersion ? "1.0" : null;
                 var clientName = useClientName ? "Some Client" : null;
+                var scheduler = useScheduler ? Substitute.For<IScheduler>() : null;
                 var database = useDatabase ? Substitute.For<ITogglDatabase>() : null;
                 var timeService = useTimeService ? Substitute.For<ITimeService>() : null;
-                var scheduler = useScheduler ? Substitute.For<IScheduler>() : null;
                 var mailService = useMailService ? Substitute.For<IMailService>() : null;
                 var googleService = useGoogleService ? Substitute.For<IGoogleService>() : null;
                 var analyticsService = useAnalyticsService ? Substitute.For<IAnalyticsService>() : null;

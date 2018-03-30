@@ -87,7 +87,7 @@
                         <constraint firstAttribute="height" constant="68" id="u0i-Qv-oYj"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" spellCheckingType="no" keyboardType="twitter"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences" spellCheckingType="no" keyboardType="twitter"/>
                 </textView>
                 <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jGg-N9-yt7" customClass="AutocompleteTextViewPlaceholder">
                     <rect key="frame" x="21" y="51" width="333" height="31"/>
@@ -99,11 +99,11 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dU3-s1-ELa">
                     <rect key="frame" x="0.0" y="617" width="375" height="50"/>
                     <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2em-4m-f1y">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pCP-1d-aI1" userLabel="Separator">
                             <rect key="frame" x="0.0" y="0.0" width="375" height="1"/>
                             <color key="backgroundColor" red="0.90980392156862744" green="0.90980392156862744" blue="0.90980392156862744" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="1" id="f0l-XT-KBN"/>
+                                <constraint firstAttribute="height" constant="1" id="34C-N3-HnK"/>
                             </constraints>
                         </view>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qfx-lJ-emc">
@@ -128,7 +128,7 @@
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hya-nl-hcs">
                             <rect key="frame" x="325" y="0.0" width="50" height="50"/>
                             <accessibility key="accessibilityConfiguration" label="StartTimeEntryDone"/>
-                            <state key="normal" image="icDone"/>
+                            <state key="normal" image="doneGreen"/>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-15" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ibp-rp-GIs">
                             <rect key="frame" x="212" y="1" width="42" height="49"/>
@@ -154,19 +154,18 @@
                         <constraint firstItem="Ibp-rp-GIs" firstAttribute="centerY" secondItem="4Tp-xX-rFB" secondAttribute="centerY" id="9zz-eW-0vA"/>
                         <constraint firstItem="Dr2-ax-s3L" firstAttribute="width" secondItem="H7M-A1-mmK" secondAttribute="width" id="BRJ-2H-RJA"/>
                         <constraint firstItem="4Tp-xX-rFB" firstAttribute="centerY" secondItem="Xnc-Zt-xWV" secondAttribute="centerY" id="BcW-tb-Tk5"/>
-                        <constraint firstAttribute="trailing" secondItem="2em-4m-f1y" secondAttribute="trailing" id="HMI-6t-ddi"/>
+                        <constraint firstAttribute="trailing" secondItem="pCP-1d-aI1" secondAttribute="trailing" id="pbx-M2-rog"/>
                         <constraint firstAttribute="height" constant="50" id="I0s-0r-NeA"/>
                         <constraint firstItem="Xnc-Zt-xWV" firstAttribute="leading" secondItem="H7M-A1-mmK" secondAttribute="trailing" id="LML-We-R2J"/>
                         <constraint firstItem="H7M-A1-mmK" firstAttribute="width" secondItem="qfx-lJ-emc" secondAttribute="width" id="Lgi-ZT-Iqq"/>
                         <constraint firstItem="H7M-A1-mmK" firstAttribute="leading" secondItem="qfx-lJ-emc" secondAttribute="trailing" id="Ri0-zk-3nr"/>
                         <constraint firstItem="Xnc-Zt-xWV" firstAttribute="centerY" secondItem="H7M-A1-mmK" secondAttribute="centerY" id="Seh-3E-0rd"/>
-                        <constraint firstItem="2em-4m-f1y" firstAttribute="top" secondItem="dU3-s1-ELa" secondAttribute="top" id="T6W-gD-PS2"/>
+                        <constraint firstItem="pCP-1d-aI1" firstAttribute="top" secondItem="dU3-s1-ELa" secondAttribute="top" id="Dvx-Y9-Rfb"/>
                         <constraint firstItem="H7M-A1-mmK" firstAttribute="centerY" secondItem="qfx-lJ-emc" secondAttribute="centerY" id="TTW-fb-T8a"/>
-                        <constraint firstItem="Ibp-rp-GIs" firstAttribute="top" secondItem="2em-4m-f1y" secondAttribute="bottom" id="XO4-pe-uuD"/>
                         <constraint firstItem="Hya-nl-hcs" firstAttribute="height" secondItem="dU3-s1-ELa" secondAttribute="height" id="b12-fm-KQu"/>
                         <constraint firstAttribute="trailing" secondItem="Hya-nl-hcs" secondAttribute="trailing" id="c5E-bE-Rmf"/>
                         <constraint firstItem="qfx-lJ-emc" firstAttribute="centerY" secondItem="dU3-s1-ELa" secondAttribute="centerY" id="cAA-Z2-S3c"/>
-                        <constraint firstItem="2em-4m-f1y" firstAttribute="leading" secondItem="dU3-s1-ELa" secondAttribute="leading" id="cxV-jj-fOc"/>
+                        <constraint firstItem="pCP-1d-aI1" firstAttribute="leading" secondItem="dU3-s1-ELa" secondAttribute="leading" id="hfu-BO-LVO"/>
                         <constraint firstAttribute="bottom" secondItem="Ibp-rp-GIs" secondAttribute="bottom" id="dTf-AH-52C"/>
                         <constraint firstItem="Ibp-rp-GIs" firstAttribute="leading" secondItem="4Tp-xX-rFB" secondAttribute="trailing" id="jOB-tP-2X0"/>
                         <constraint firstItem="Dr2-ax-s3L" firstAttribute="centerY" secondItem="H7M-A1-mmK" secondAttribute="centerY" id="k6m-3j-g6W"/>
@@ -229,7 +228,7 @@
         <image name="icBillable" width="8" height="16"/>
         <image name="icClose" width="10" height="10"/>
         <image name="icDatetime" width="14" height="14"/>
-        <image name="icDone" width="16" height="12"/>
+        <image name="doneGreen" width="50" height="50"/>
         <image name="icProjects" width="16" height="12"/>
         <image name="icTags" width="14" height="13"/>
     </resources>

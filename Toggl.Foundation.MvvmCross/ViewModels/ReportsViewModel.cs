@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
+using Toggl.Foundation;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.MvvmCross.Parameters;
-using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
+using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Foundation.Reports;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Models;
 
+[assembly: MvxNavigation(typeof(ReportsViewModel), ApplicationUrls.Reports)]
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
     [Preserve(AllMembers = true)]
@@ -89,6 +91,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public override void Prepare(long parameter)
         {
             workspaceId = parameter;
+        }
+
+        public async override Task Initialize()
+        {
+            if (workspaceId == 0)
+                workspaceId = await dataSource
+                    .User
+                    .Current
+                    .Select(user => user.DefaultWorkspaceId);
 
             var currentDate = timeService.CurrentDateTime.Date;
             startDate = currentDate.AddDays(1 - (int)currentDate.DayOfWeek);

@@ -31,6 +31,9 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UISwitch PrivateProjectSwitch { get; set; }
 
 		[Outlet]
+		UIKit.UIView PrivateProjectSwitchContainer { get; set; }
+
+		[Outlet]
 		UIKit.NSLayoutConstraint ProjectNameUsedErrorTextHeight { get; set; }
 
 		[Outlet]
@@ -75,6 +78,16 @@ namespace Toggl.Daneel.ViewControllers
 			if (PrivateProjectSwitch != null) {
 				PrivateProjectSwitch.Dispose ();
 				PrivateProjectSwitch = null;
+			}
+
+			if (PrivateProjectSwitchContainer != null) {
+				PrivateProjectSwitchContainer.Dispose ();
+				PrivateProjectSwitchContainer = null;
+			}
+
+			if (ProjectNameUsedErrorTextHeight != null) {
+				ProjectNameUsedErrorTextHeight.Dispose ();
+				ProjectNameUsedErrorTextHeight = null;
 			}
 
 			if (ProjectNameUsedErrorView != null) {

@@ -9,5 +9,9 @@
         void SetBool(string key, bool value);
 
         void SetString(string key, string value);
+
+        void Remove(string key);
+
+        void RemoveAllWithPrefix(string prefix);
     }
 }
