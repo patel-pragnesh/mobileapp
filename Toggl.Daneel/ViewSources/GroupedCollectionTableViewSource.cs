@@ -24,7 +24,7 @@ namespace Toggl.Daneel.ViewSources
 
         private NestableObservableCollection<TCollection, TItem> observableCollection;
 
-        private List<TCollection> displayedGroupedItems = new List<TCollection>();
+        private readonly List<TCollection> displayedGroupedItems = new List<TCollection>();
 
         protected IReadOnlyCollection<TCollection> GroupedItems { get; }
 
