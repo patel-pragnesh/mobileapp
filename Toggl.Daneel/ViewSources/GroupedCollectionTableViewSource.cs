@@ -24,13 +24,13 @@ namespace Toggl.Daneel.ViewSources
 
         private NestableObservableCollection<TCollection, TItem> observableCollection;
 
-        private readonly IList<TCollection> internalCollection;
+        private List<TCollection> displayedGroupedItems = new List<TCollection>();
 
-        protected IList<TCollection> GroupedItems => internalCollection;
+        protected IReadOnlyCollection<TCollection> GroupedItems { get; }
 
         public override IEnumerable ItemsSource
         {
-            get => internalCollection;
+            get => displayedGroupedItems;
             set { throw new InvalidOperationException($"You must bind to the {nameof(ObservableCollection)} and not the {nameof(ItemsSource)}"); }
         }
 
@@ -47,7 +47,7 @@ namespace Toggl.Daneel.ViewSources
 
                 observableCollection = value;
                 cloneCollection();
-                base.ItemsSource = internalCollection;
+                base.ItemsSource = displayedGroupedItems;
 
                 if (observableCollection != null)
                 {
@@ -63,9 +63,9 @@ namespace Toggl.Daneel.ViewSources
             this.cellIdentifier = cellIdentifier;
             this.headerCellIdentifier = headerCellIdentifier;
 
-            internalCollection = new List<TCollection>();
-
             UseAnimations = true;
+
+            GroupedItems = displayedGroupedItems.AsReadOnly();
         }
 
         public override UIView GetViewForHeader(UITableView tableView, nint section)
@@ -102,10 +102,10 @@ namespace Toggl.Daneel.ViewSources
             => GetGroupAt(section).Count();
 
         protected virtual IEnumerable<TItem> GetGroupAt(nint section)
-            => internalCollection.ElementAtOrDefault((int)section) ?? new TCollection();
+            => displayedGroupedItems.ElementAtOrDefault((int)section) ?? new TCollection();
 
         protected override object GetItemAt(NSIndexPath indexPath)
-            => internalCollection.ElementAtOrDefault(indexPath.Section)?.ElementAtOrDefault((int)indexPath.Item);
+            => displayedGroupedItems.ElementAtOrDefault(indexPath.Section)?.ElementAtOrDefault((int)indexPath.Item);
 
         public override void HeaderViewDisplayingEnded(UITableView tableView, UIView headerView, nint section)
         {
@@ -187,23 +187,23 @@ namespace Toggl.Daneel.ViewSources
                         var addedSection = new TCollection();
                         addedSection.AddRange(observableCollection[args.NewStartingIndex]);
 
-                        internalCollection.Insert(args.NewStartingIndex, addedSection);
+                        displayedGroupedItems.Insert(args.NewStartingIndex, addedSection);
                         TableView.InsertSections(indexToAdd, UITableViewRowAnimation.Automatic);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
                         var indexToRemove = NSIndexSet.FromIndex(args.OldStartingIndex);
-                        internalCollection.RemoveAt(args.OldStartingIndex);
+                        displayedGroupedItems.RemoveAt(args.OldStartingIndex);
                         TableView.DeleteSections(indexToRemove, UITableViewRowAnimation.Automatic);
                         break;
 
                     case NotifyCollectionChangedAction.Move when args.NewItems.Count == 1 && args.OldItems.Count == 1:
-                        internalCollection.RemoveAt(args.OldStartingIndex);
+                        displayedGroupedItems.RemoveAt(args.OldStartingIndex);
 
                         var movedSection = new TCollection();
                         movedSection.AddRange(observableCollection[args.NewStartingIndex]);
 
-                        internalCollection.Insert(args.NewStartingIndex, movedSection);
+                        displayedGroupedItems.Insert(args.NewStartingIndex, movedSection);
                         TableView.MoveSection(args.OldStartingIndex, args.NewStartingIndex);
                         break;
 
@@ -213,7 +213,7 @@ namespace Toggl.Daneel.ViewSources
                         var replacedSection = new TCollection();
                         replacedSection.AddRange(observableCollection[args.NewStartingIndex]);
 
-                        internalCollection[args.NewStartingIndex] = replacedSection;
+                        displayedGroupedItems[args.NewStartingIndex] = replacedSection;
                         TableView.ReloadSections(indexSet, ReplaceAnimation);
                         break;
 
@@ -241,7 +241,7 @@ namespace Toggl.Daneel.ViewSources
                             .ToArray();
 
                         foreach (var indexPath in indexPathsToAdd)
-                            internalCollection[indexPath.Section].Insert(indexPath.Row, observableCollection[indexPath.Section][indexPath.Row]);
+                            displayedGroupedItems[indexPath.Section].Insert(indexPath.Row, observableCollection[indexPath.Section][indexPath.Row]);
 
                         TableView.InsertRows(indexPathsToAdd, AddAnimation);
                         break;
@@ -252,7 +252,7 @@ namespace Toggl.Daneel.ViewSources
                             .ToArray();
 
                         foreach (var indexPath in indexPathsToRemove)
-                            internalCollection[indexPath.Section].RemoveAt(indexPath.Row);
+                            displayedGroupedItems[indexPath.Section].RemoveAt(indexPath.Row);
 
                         TableView.DeleteRows(indexPathsToRemove, RemoveAnimation);
                         break;
@@ -263,7 +263,7 @@ namespace Toggl.Daneel.ViewSources
                             .ToArray();
 
                         foreach (var indexPath in indexPathsToUpdate)
-                            internalCollection[indexPath.Section][indexPath.Row] = observableCollection[indexPath.Section][indexPath.Row];
+                            displayedGroupedItems[indexPath.Section][indexPath.Row] = observableCollection[indexPath.Section][indexPath.Row];
 
                         TableView.ReloadRows(indexPathsToUpdate, ReplaceAnimation);
                         break;
@@ -280,11 +280,8 @@ namespace Toggl.Daneel.ViewSources
 
         private void cloneCollection()
         {
-            internalCollection.Clear();
-            foreach (var section in observableCollection)
-            {
-                internalCollection.Add(CloneCollection(section));
-            }
+            displayedGroupedItems.Clear();
+            displayedGroupedItems.AddRange(observableCollection.Select(CloneCollection));
         }
 
         protected override void Dispose(bool disposing)
