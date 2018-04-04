@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
 using MvvmCross.Core.ViewModels;
-using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 
 namespace Toggl.Foundation.MvvmCross.Collections
@@ -12,6 +11,11 @@ namespace Toggl.Foundation.MvvmCross.Collections
         private readonly Func<TItem, Func<TItem, bool>> innerCollectionOrderFunction;
 
         public event EventHandler<ChildCollectionChangedEventArgs> OnChildCollectionChanged;
+
+        public NestableObservableCollection()
+            : this(a => b => true)
+        {
+        }
 
         public NestableObservableCollection(Func<TItem, Func<TItem, bool>> innerCollectionOrderFunction)
         {

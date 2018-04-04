@@ -135,8 +135,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public TimeSpan? Duration { get; private set; }
 
-        public MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>> Suggestions { get; }
-            = new MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>>();
+        public NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion> Suggestions { get; }
+            = new NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion>();
 
         public IMvxAsyncCommand BackCommand { get; }
 

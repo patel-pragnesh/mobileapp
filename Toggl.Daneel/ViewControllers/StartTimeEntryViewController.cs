@@ -48,7 +48,9 @@ namespace Toggl.Daneel.ViewControllers
             var bindingSet = this.CreateBindingSet<StartTimeEntryViewController, StartTimeEntryViewModel>();
 
             //TableView
-            bindingSet.Bind(source).To(vm => vm.Suggestions);
+            bindingSet.Bind(source)
+                      .For(v => v.AnimatableCollection)
+                      .To(vm => vm.Suggestions);
 
             bindingSet.Bind(source)
                       .For(v => v.UseGrouping)
