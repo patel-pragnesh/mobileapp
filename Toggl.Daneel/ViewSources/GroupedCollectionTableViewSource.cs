@@ -24,9 +24,9 @@ namespace Toggl.Daneel.ViewSources
 
         private NestableObservableCollection<TCollection, TItem> observableCollection;
 
-        private IList<TCollection> internalCollection;
+        private readonly IList<TCollection> internalCollection;
 
-        public IList<TCollection> GroupedItems => internalCollection;
+        protected IList<TCollection> GroupedItems => internalCollection;
 
         public override IEnumerable ItemsSource
         {
@@ -280,7 +280,7 @@ namespace Toggl.Daneel.ViewSources
 
         private void cloneCollection()
         {
-            internalCollection = new List<TCollection>();
+            internalCollection.Clear();
             foreach (var section in observableCollection)
             {
                 internalCollection.Add(CloneCollection(section));
