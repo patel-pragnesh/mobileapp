@@ -31,7 +31,7 @@ namespace Toggl.Daneel.ViewSources
         public override IEnumerable ItemsSource
         {
             get => internalCollection;
-            set { }
+            set { throw new InvalidOperationException($"You must bind to the {nameof(ObservableCollection)} and not the {nameof(ItemsSource)}"); }
         }
 
         public NestableObservableCollection<TCollection, TItem> ObservableCollection
