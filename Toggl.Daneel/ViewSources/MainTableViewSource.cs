@@ -21,16 +21,16 @@ namespace Toggl.Daneel.ViewSources
             set => timeEntriesLogViewSource.ContinueTimeEntryCommand = value;
         }
 
-        public NestableObservableCollection<TimeEntryViewModelCollection, TimeEntryViewModel> AnimatableCollection
+        public NestableObservableCollection<TimeEntryViewModelCollection, TimeEntryViewModel> ObservableCollection
         {
-            get => timeEntriesLogViewSource.AnimatableCollection;
-            set => timeEntriesLogViewSource.AnimatableCollection = value;
+            get => timeEntriesLogViewSource.ObservableCollection;
+            set => timeEntriesLogViewSource.ObservableCollection = value;
         }
 
         public override IEnumerable ItemsSource
         {
             get => timeEntriesLogViewSource.ItemsSource;
-            set { throw new InvalidOperationException($"You must bind to the {nameof(AnimatableCollection)} and not the {nameof(ItemsSource)}"); }
+            set { throw new InvalidOperationException($"You must bind to the {nameof(ObservableCollection)} and not the {nameof(ItemsSource)}"); }
         }
 
         public SyncProgress SyncProgress

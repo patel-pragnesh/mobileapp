@@ -22,7 +22,7 @@ namespace Toggl.Daneel.ViewSources
         private readonly object animationLock = new object();
         private readonly List<IDisposable> disposables = new List<IDisposable>();
 
-        private NestableObservableCollection<TCollection, TItem> animatableCollection;
+        private NestableObservableCollection<TCollection, TItem> observableCollection;
 
         private IList<TCollection> internalCollection;
 
@@ -34,25 +34,25 @@ namespace Toggl.Daneel.ViewSources
             set { }
         }
 
-        public NestableObservableCollection<TCollection, TItem> AnimatableCollection
+        public NestableObservableCollection<TCollection, TItem> ObservableCollection
         {
-            get => animatableCollection;
+            get => observableCollection;
             set
             {
-                if (animatableCollection != null)
+                if (observableCollection != null)
                 {
-                    animatableCollection.CollectionChanged -= OnCollectionChanged;
-                    animatableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
+                    observableCollection.CollectionChanged -= OnCollectionChanged;
+                    observableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
                 }
 
-                animatableCollection = value;
+                observableCollection = value;
                 cloneCollection();
                 base.ItemsSource = internalCollection;
 
-                if (animatableCollection != null)
+                if (observableCollection != null)
                 {
-                    animatableCollection.CollectionChanged += OnCollectionChanged;
-                    animatableCollection.OnChildCollectionChanged += OnChildCollectionChanged;
+                    observableCollection.CollectionChanged += OnCollectionChanged;
+                    observableCollection.OnChildCollectionChanged += OnChildCollectionChanged;
                 }
             }
         }
@@ -185,7 +185,7 @@ namespace Toggl.Daneel.ViewSources
                         var indexToAdd = NSIndexSet.FromIndex(args.NewStartingIndex);
 
                         var addedSection = new TCollection();
-                        addedSection.AddRange(animatableCollection[args.NewStartingIndex]);
+                        addedSection.AddRange(observableCollection[args.NewStartingIndex]);
 
                         internalCollection.Insert(args.NewStartingIndex, addedSection);
                         TableView.InsertSections(indexToAdd, UITableViewRowAnimation.Automatic);
@@ -201,7 +201,7 @@ namespace Toggl.Daneel.ViewSources
                         internalCollection.RemoveAt(args.OldStartingIndex);
 
                         var movedSection = new TCollection();
-                        movedSection.AddRange(animatableCollection[args.NewStartingIndex]);
+                        movedSection.AddRange(observableCollection[args.NewStartingIndex]);
 
                         internalCollection.Insert(args.NewStartingIndex, movedSection);
                         TableView.MoveSection(args.OldStartingIndex, args.NewStartingIndex);
@@ -211,7 +211,7 @@ namespace Toggl.Daneel.ViewSources
                         var indexSet = NSIndexSet.FromIndex(args.NewStartingIndex);
 
                         var replacedSection = new TCollection();
-                        replacedSection.AddRange(animatableCollection[args.NewStartingIndex]);
+                        replacedSection.AddRange(observableCollection[args.NewStartingIndex]);
 
                         internalCollection[args.NewStartingIndex] = replacedSection;
                         TableView.ReloadSections(indexSet, ReplaceAnimation);
@@ -241,7 +241,7 @@ namespace Toggl.Daneel.ViewSources
                             .ToArray();
 
                         foreach (var indexPath in indexPathsToAdd)
-                            internalCollection[indexPath.Section].Insert(indexPath.Row, animatableCollection[indexPath.Section][indexPath.Row]);
+                            internalCollection[indexPath.Section].Insert(indexPath.Row, observableCollection[indexPath.Section][indexPath.Row]);
 
                         TableView.InsertRows(indexPathsToAdd, AddAnimation);
                         break;
@@ -263,7 +263,7 @@ namespace Toggl.Daneel.ViewSources
                             .ToArray();
 
                         foreach (var indexPath in indexPathsToUpdate)
-                            internalCollection[indexPath.Section][indexPath.Row] = animatableCollection[indexPath.Section][indexPath.Row];
+                            internalCollection[indexPath.Section][indexPath.Row] = observableCollection[indexPath.Section][indexPath.Row];
 
                         TableView.ReloadRows(indexPathsToUpdate, ReplaceAnimation);
                         break;
@@ -281,7 +281,7 @@ namespace Toggl.Daneel.ViewSources
         private void cloneCollection()
         {
             internalCollection = new List<TCollection>();
-            foreach (var animatableSection in animatableCollection)
+            foreach (var animatableSection in observableCollection)
             {
                 var section = new TCollection();
                 section.AddRange(animatableSection);
@@ -293,9 +293,9 @@ namespace Toggl.Daneel.ViewSources
         {
             base.Dispose(disposing);
 
-            if (!disposing || AnimatableCollection == null) return;
+            if (!disposing || ObservableCollection == null) return;
 
-            AnimatableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
+            ObservableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
         }
     }
 }

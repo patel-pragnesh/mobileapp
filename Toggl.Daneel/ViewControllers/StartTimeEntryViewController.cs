@@ -49,7 +49,7 @@ namespace Toggl.Daneel.ViewControllers
 
             //TableView
             bindingSet.Bind(source)
-                      .For(v => v.AnimatableCollection)
+                      .For(v => v.ObservableCollection)
                       .To(vm => vm.Suggestions);
 
             bindingSet.Bind(source)
