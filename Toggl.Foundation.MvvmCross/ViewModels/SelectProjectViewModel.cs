@@ -64,8 +64,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxAsyncCommand<AutocompleteSuggestion> SelectProjectCommand { get; }
 
-        public MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>> Suggestions { get; }
-            = new MvxObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>>();
+        public NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion> Suggestions { get; }
+            = new NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion>();
 
         public SelectProjectViewModel(
             ITogglDataSource dataSource, IMvxNavigationService navigationService, IDialogService dialogService)

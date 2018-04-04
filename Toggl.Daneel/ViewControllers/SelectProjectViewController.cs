@@ -38,7 +38,10 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.IsEmpty);
 
             //Table view
-            bindingSet.Bind(source).To(vm => vm.Suggestions);
+            bindingSet.Bind(source)
+                      .For(v => v.ObservableCollection)
+                      .To(vm => vm.Suggestions);
+
             bindingSet.Bind(source)
                       .For(v => v.CreateCommand)
                       .To(vm => vm.CreateProjectCommand);
