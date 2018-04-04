@@ -8,6 +8,7 @@ using Toggl.Daneel.Views;
 using Toggl.Daneel.Views.StartTimeEntry;
 using Toggl.Foundation;
 using Toggl.Foundation.Autocomplete.Suggestions;
+using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.Helper;
 using UIKit;
 
@@ -219,5 +220,8 @@ namespace Toggl.Daneel.ViewSources
 
             throw new InvalidOperationException("This method should not be called, when there is no info message to be shown");
         }
+
+        protected override WorkspaceGroupedCollection<AutocompleteSuggestion> CloneCollection(WorkspaceGroupedCollection<AutocompleteSuggestion> collection)
+            => new WorkspaceGroupedCollection<AutocompleteSuggestion>(collection.WorkspaceName, collection.WorkspaceId, collection);
     }
 }

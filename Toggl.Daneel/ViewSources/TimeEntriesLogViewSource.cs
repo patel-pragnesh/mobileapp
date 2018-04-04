@@ -142,5 +142,8 @@ namespace Toggl.Daneel.ViewSources
 
             throw new ArgumentException($"Unexpected item type. Must be of type {nameof(TimeEntryViewModel)}");
         }
+
+        protected override TimeEntryViewModelCollection CloneCollection(TimeEntryViewModelCollection collection)
+            => new TimeEntryViewModelCollection(collection.Date.LocalDateTime.Date, collection, collection.DurationFormat);
     }
 }

@@ -281,11 +281,9 @@ namespace Toggl.Daneel.ViewSources
         private void cloneCollection()
         {
             internalCollection = new List<TCollection>();
-            foreach (var animatableSection in observableCollection)
+            foreach (var section in observableCollection)
             {
-                var section = new TCollection();
-                section.AddRange(animatableSection);
-                internalCollection.Add(section);
+                internalCollection.Add(CloneCollection(section));
             }
         }
 
@@ -297,5 +295,7 @@ namespace Toggl.Daneel.ViewSources
 
             ObservableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
         }
+
+        protected abstract TCollection CloneCollection(TCollection collection);
     }
 }
