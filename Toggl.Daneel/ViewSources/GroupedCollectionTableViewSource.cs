@@ -145,31 +145,32 @@ namespace Toggl.Daneel.ViewSources
 
         protected void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            InvokeOnMainThread(() =>
-            {
-                if (!UseAnimations)
-                {
-                    cloneCollection();
-                    ReloadTableData();
-                    return;
-                }
-
-                animateSectionChangesIfPossible(args);
-            });
+            tryAnimateOnMainThread(() => animateSectionChangesIfPossible(args));
         }
 
         protected void OnChildCollectionChanged(object sender, ChildCollectionChangedEventArgs args)
+        {
+            tryAnimateOnMainThread(() => animateRowChangesIfPossible(args));
+        }
+
+        private void tryAnimateOnMainThread(Action animate)
         {
             InvokeOnMainThread(() =>
             {
                 if (!UseAnimations)
                 {
-                    cloneCollection();
-                    ReloadTableData();
+                    reloadTable();
                     return;
                 }
 
-                animateRowChangesIfPossible(args);
+                try
+                {
+                    animate();
+                }
+                catch
+                {
+                    reloadTable();
+                }
             });
         }
 
