@@ -290,6 +290,7 @@ namespace Toggl.Daneel.ViewSources
 
             if (!disposing || ObservableCollection == null) return;
 
+            ObservableCollection.CollectionChanged -= OnCollectionChanged;
             ObservableCollection.OnChildCollectionChanged -= OnChildCollectionChanged;
         }
 
