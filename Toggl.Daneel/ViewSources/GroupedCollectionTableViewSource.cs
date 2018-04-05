@@ -182,38 +182,33 @@ namespace Toggl.Daneel.ViewSources
                 switch (args.Action)
                 {
                     case NotifyCollectionChangedAction.Add:
-                        var indexToAdd = NSIndexSet.FromIndex(args.NewStartingIndex);
-
-                        var addedSection = new TCollection();
-                        addedSection.AddRange(observableCollection[args.NewStartingIndex]);
-
+                        var addedSection = CloneCollection(observableCollection[args.NewStartingIndex]);
                         displayedGroupedItems.Insert(args.NewStartingIndex, addedSection);
+
+                        var indexToAdd = NSIndexSet.FromIndex(args.NewStartingIndex);
                         TableView.InsertSections(indexToAdd, UITableViewRowAnimation.Automatic);
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        var indexToRemove = NSIndexSet.FromIndex(args.OldStartingIndex);
                         displayedGroupedItems.RemoveAt(args.OldStartingIndex);
+
+                        var indexToRemove = NSIndexSet.FromIndex(args.OldStartingIndex);
                         TableView.DeleteSections(indexToRemove, UITableViewRowAnimation.Automatic);
                         break;
 
                     case NotifyCollectionChangedAction.Move when args.NewItems.Count == 1 && args.OldItems.Count == 1:
+                        var movedSection = CloneCollection(observableCollection[args.NewStartingIndex]);
                         displayedGroupedItems.RemoveAt(args.OldStartingIndex);
-
-                        var movedSection = new TCollection();
-                        movedSection.AddRange(observableCollection[args.NewStartingIndex]);
-
                         displayedGroupedItems.Insert(args.NewStartingIndex, movedSection);
+
                         TableView.MoveSection(args.OldStartingIndex, args.NewStartingIndex);
                         break;
 
                     case NotifyCollectionChangedAction.Replace when args.NewItems.Count == args.OldItems.Count:
-                        var indexSet = NSIndexSet.FromIndex(args.NewStartingIndex);
-
-                        var replacedSection = new TCollection();
-                        replacedSection.AddRange(observableCollection[args.NewStartingIndex]);
-
+                        var replacedSection = CloneCollection(observableCollection[args.NewStartingIndex]);
                         displayedGroupedItems[args.NewStartingIndex] = replacedSection;
+
+                        var indexSet = NSIndexSet.FromIndex(args.NewStartingIndex);
                         TableView.ReloadSections(indexSet, ReplaceAnimation);
                         break;
 
