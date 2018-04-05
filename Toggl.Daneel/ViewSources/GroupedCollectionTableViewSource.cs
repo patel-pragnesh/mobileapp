@@ -30,7 +30,7 @@ namespace Toggl.Daneel.ViewSources
 
         public override IEnumerable ItemsSource
         {
-            get => displayedGroupedItems;
+            get => GroupedItems;
             set { throw new InvalidOperationException($"You must bind to the {nameof(ObservableCollection)} and not the {nameof(ItemsSource)}"); }
         }
 
@@ -47,7 +47,7 @@ namespace Toggl.Daneel.ViewSources
 
                 observableCollection = value;
                 cloneCollection();
-                base.ItemsSource = displayedGroupedItems;
+                base.ItemsSource = GroupedItems;
 
                 if (observableCollection != null)
                 {
