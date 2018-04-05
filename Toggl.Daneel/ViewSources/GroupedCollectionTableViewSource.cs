@@ -213,8 +213,7 @@ namespace Toggl.Daneel.ViewSources
                         break;
 
                     default:
-                        cloneCollection();
-                        TableView.ReloadData();
+                        reloadTable();
                         break;
                 }
 
@@ -264,13 +263,18 @@ namespace Toggl.Daneel.ViewSources
                         break;
 
                     default:
-                        cloneCollection();
-                        TableView.ReloadData();
+                        reloadTable();
                         break;
                 }
 
                 TableView.EndUpdates();
             }
+        }
+
+        private void reloadTable()
+        {
+            cloneCollection();
+            ReloadTableData();
         }
 
         private void cloneCollection()
