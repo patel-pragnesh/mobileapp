@@ -19,10 +19,12 @@ namespace Toggl.Giskard.Extensions
 
         public static void RemoveFocus(this View view) 
         {
-            view.ClearFocus();
+            view.Post(() => { 
+                view.ClearFocus();
 
-            var service = (InputMethodManager)view.Context.GetSystemService(Context.InputMethodService);
-            service.HideSoftInputFromWindow(view.WindowToken, 0);
+                var service = (InputMethodManager)view.Context.GetSystemService(Context.InputMethodService);
+                service.HideSoftInputFromWindow(view.WindowToken, 0);
+            });
         }
     }
 }
