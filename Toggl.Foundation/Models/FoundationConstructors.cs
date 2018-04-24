@@ -65,7 +65,6 @@ namespace Toggl.Foundation.Models
 
         private Preferences(IPreferences entity, SyncStatus syncStatus, string lastSyncErrorMessage, bool isDeleted = false)
         {
-            Id = entity.Id;
             TimeOfDayFormat = entity.TimeOfDayFormat;
             DateFormat = entity.DateFormat;
             DurationFormat = entity.DurationFormat;
@@ -172,7 +171,7 @@ namespace Toggl.Foundation.Models
             WorkspaceId = entity.WorkspaceId;
             Name = entity.Name;
             At = entity.At;
-            DeletedAt = entity.DeletedAt;
+            ServerDeletedAt = entity.ServerDeletedAt;
             SyncStatus = syncStatus;
             LastSyncErrorMessage = lastSyncErrorMessage;
             IsDeleted = isDeleted;

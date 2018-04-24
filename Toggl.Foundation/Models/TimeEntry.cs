@@ -34,7 +34,7 @@ namespace Toggl.Foundation.Models
             public List<long> TagIds { get; private set; }
                 = new List<long>();
 
-            public DateTimeOffset? At { get; private set; }
+            public DateTimeOffset At { get; private set; }
 
             public DateTimeOffset? ServerDeletedAt { get; private set; }
 
@@ -174,7 +174,7 @@ namespace Toggl.Foundation.Models
         {
             Id = builder.Id;
             Duration = builder.Duration;
-            At = builder.At.Value;
+            At = builder.At;
             Start = builder.Start;
             TagIds = builder.TagIds;
             TaskId = builder.TaskId;

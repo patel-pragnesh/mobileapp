@@ -117,7 +117,6 @@ namespace Toggl.Foundation.Models
 
         private Preferences(Builder builder)
         {
-            Id = fakeId;
             DateFormat = builder.DateFormat;
             TimeOfDayFormat = builder.TimeOfDayFormat;
             DurationFormat = builder.DurationFormat;
