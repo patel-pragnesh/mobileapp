@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
@@ -8,6 +9,10 @@ namespace Toggl.Foundation.Tests.Mocks
 {
     public sealed class MockWorkspaceFeatureCollection : IDatabaseWorkspaceFeatureCollection
     {
+        public long Id => WorkspaceId;
+
+        public DateTimeOffset At => DateTimeOffset.Now;
+
         public IDatabaseWorkspace Workspace { get; set; }
 
         public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures { get; set; }

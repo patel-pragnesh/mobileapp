@@ -77,7 +77,7 @@ namespace Toggl.Foundation.Tests.Sync.States
         }
 
         internal abstract class TheStartMethod<TModel, TApiModel> : BasePushEntityStateTests<TModel, TApiModel>, TheStartMethodHelper
-            where TModel : class, IBaseModel, IDatabaseSyncable, TApiModel
+            where TModel : class, IIdentifiable, IDatabaseSyncable, TApiModel
             where TApiModel : class
         {
             private ITogglApi api;

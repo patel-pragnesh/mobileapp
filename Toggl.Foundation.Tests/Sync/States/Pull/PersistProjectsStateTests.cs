@@ -65,13 +65,13 @@ namespace Toggl.Foundation.Tests.Sync.States
 
             protected override IDatabaseProject Clean(IProject entity) => Models.Project.Clean(entity);
 
-            protected override List<IProject> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? at)
+            protected override List<IProject> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at)
                 => new List<IProject>
                 {
-                    new Project { At = at?.AddDays(-1) ?? Now, Name = Guid.NewGuid().ToString() },
-                    new Project { At = at?.AddDays(-3) ?? Now, Name = Guid.NewGuid().ToString() },
-                    new Project { At = at ?? Now, ServerDeletedAt = at, Name = Guid.NewGuid().ToString() },
-                    new Project { At = at?.AddDays(-2) ?? Now, Name = Guid.NewGuid().ToString() }
+                    new Project { At = at.AddDays(-1), Name = Guid.NewGuid().ToString() },
+                    new Project { At = at.AddDays(-3), Name = Guid.NewGuid().ToString() },
+                    new Project { At = at, ServerDeletedAt = at, Name = Guid.NewGuid().ToString() },
+                    new Project { At = at.AddDays(-2), Name = Guid.NewGuid().ToString() }
                 };
 
             protected override Func<IDatabaseProject, bool> ArePersistedAndClean(List<IProject> entities)

@@ -12,7 +12,7 @@ using Toggl.Ultrawave.Exceptions;
 namespace Toggl.Foundation.Tests.Sync.States
 {
     public abstract class BasePushEntityStateTests<TModel, TApiModel>
-        where TModel : class, IBaseModel, IDatabaseSyncable, TApiModel
+        where TModel : class, IIdentifiable, IDatabaseSyncable, TApiModel
     {
         private ITogglApi api;
         private IRepository<TModel> repository;

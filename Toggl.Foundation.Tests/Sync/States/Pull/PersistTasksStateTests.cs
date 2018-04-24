@@ -65,13 +65,13 @@ namespace Toggl.Foundation.Tests.Sync.States
 
             protected override IDatabaseTask Clean(ITask entity) => Models.Task.Clean(entity);
 
-            protected override List<ITask> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? at)
+            protected override List<ITask> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at)
                 => new List<ITask>
                 {
-                    new Task { At = at?.AddDays(-1) ?? Now, Name = Guid.NewGuid().ToString() },
-                    new Task { At = at?.AddDays(-3) ?? Now, Name = Guid.NewGuid().ToString() },
-                    new Task { At = at ?? Now, Name = Guid.NewGuid().ToString() },
-                    new Task { At = at?.AddDays(-2) ?? Now, Name = Guid.NewGuid().ToString() }
+                    new Task { At = at.AddDays(-1), Name = Guid.NewGuid().ToString() },
+                    new Task { At = at.AddDays(-3), Name = Guid.NewGuid().ToString() },
+                    new Task { At = at, Name = Guid.NewGuid().ToString() },
+                    new Task { At = at.AddDays(-2), Name = Guid.NewGuid().ToString() }
                 };
 
             protected override Func<IDatabaseTask, bool> ArePersistedAndClean(List<ITask> tasks)

@@ -68,7 +68,7 @@ namespace Toggl.Foundation.Tests.Sync.States
         }
 
         internal abstract class TheStartMethod<TModel> : IStartMethodTestHelper
-            where TModel : class, IBaseModel, IDatabaseSyncable
+            where TModel : class, IIdentifiable, IDatabaseSyncable
         {
             private IRepository<TModel> repository;
 

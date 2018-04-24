@@ -60,7 +60,7 @@ namespace Toggl.Foundation.Tests.Sync.States
                 Observable.Return(new List<ITask>()),
                 Observable.Return(entity?.First()));
 
-            protected override List<IPreferences> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? at)
+            protected override List<IPreferences> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at)
                 => new List<IPreferences>
                 {
                     Substitute.For<IPreferences>()

@@ -70,17 +70,14 @@ namespace Toggl.Foundation.Tests.Sync.States
                     Observable.Return(new List<ITask>()),
                     Observable.Return(Substitute.For<IPreferences>()));
 
-            protected override List<ITimeEntry> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? maybeAt)
-            {
-                var at = maybeAt ?? Now;
-                return new List<ITimeEntry>
+            protected override List<ITimeEntry> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at)
+                => new List<ITimeEntry>
                 {
                     new TimeEntry { At = at.AddDays(-1), Description = Guid.NewGuid().ToString() },
                     new TimeEntry { At = at.AddDays(-3), Description = Guid.NewGuid().ToString() },
                     new TimeEntry { At = at, ServerDeletedAt = at, Description = Guid.NewGuid().ToString() },
                     new TimeEntry { At = at.AddDays(-2), Description = Guid.NewGuid().ToString() }
                 };
-            }
 
             protected override bool IsDeletedOnServer(ITimeEntry entry) => entry.ServerDeletedAt.HasValue;
 

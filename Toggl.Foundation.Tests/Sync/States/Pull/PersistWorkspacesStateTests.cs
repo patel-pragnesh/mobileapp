@@ -26,7 +26,7 @@ namespace Toggl.Foundation.Tests.Sync.States
                 => new PersistWorkspacesState(repository, sinceParameterRepository);
 
             protected override List<IWorkspace> CreateListWithOneItem(DateTimeOffset? at = null)
-                => new List<IWorkspace> { new Workspace { At = at, Name = Guid.NewGuid().ToString() } };
+                => new List<IWorkspace> { new Workspace { At = at ?? DateTimeOffset.Now, Name = Guid.NewGuid().ToString() } };
 
             protected override FetchObservables CreateObservablesWhichFetchesTwice()
                 => CreateFetchObservables(
@@ -61,13 +61,13 @@ namespace Toggl.Foundation.Tests.Sync.States
                 Observable.Return(new List<ITask>()),
                 Observable.Return(Substitute.For<IPreferences>()));
 
-            protected override List<IWorkspace> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? at)
+            protected override List<IWorkspace> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at)
                 => new List<IWorkspace>
                 {
-                    new Workspace { At = at?.AddDays(-1), Name = Guid.NewGuid().ToString() },
-                    new Workspace { At = at?.AddDays(-3), Name = Guid.NewGuid().ToString() },
+                    new Workspace { At = at.AddDays(-1), Name = Guid.NewGuid().ToString() },
+                    new Workspace { At = at.AddDays(-3), Name = Guid.NewGuid().ToString() },
                     new Workspace { At = at, ServerDeletedAt = at, Name = Guid.NewGuid().ToString() },
-                    new Workspace { At = at?.AddDays(-2), Name = Guid.NewGuid().ToString() }
+                    new Workspace { At = at.AddDays(-2), Name = Guid.NewGuid().ToString() }
                 };
 
             protected override bool IsDeletedOnServer(IWorkspace entity) => entity.ServerDeletedAt.HasValue;

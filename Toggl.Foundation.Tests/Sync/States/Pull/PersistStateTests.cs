@@ -111,6 +111,7 @@ namespace Toggl.Foundation.Tests.Sync.States
         }
 
         internal abstract class TheStartMethod<TState, TInterface, TDatabaseInterface> : ITheStartMethodHelper
+            where TInterface : IIdentifiable, ISyncable
             where TDatabaseInterface : class, TInterface
             where TState : BasePersistState<TInterface, TDatabaseInterface>
         {
@@ -329,7 +330,7 @@ namespace Toggl.Foundation.Tests.Sync.States
 
             protected abstract List<TInterface> CreateListWithOneItem(DateTimeOffset? at = null);
 
-            protected abstract List<TInterface> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? at);
+            protected abstract List<TInterface> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at);
 
             protected abstract FetchObservables CreateObservablesWhichFetchesTwice();
 

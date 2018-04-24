@@ -61,21 +61,18 @@ namespace Toggl.Foundation.Tests.Sync.States
                     Observable.Return(new List<ITask>()),
                     Observable.Return(Substitute.For<IPreferences>()));
 
-            protected override bool IsDeletedOnServer(ITag entity) => entity.DeletedAt.HasValue;
+            protected override bool IsDeletedOnServer(ITag entity) => entity.ServerDeletedAt.HasValue;
 
             protected override IDatabaseTag Clean(ITag entity) => Models.Tag.Clean(entity);
 
-            protected override List<ITag> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset? maybeAt)
-            {
-                var at = maybeAt ?? Now;
-                return new List<ITag>
+            protected override List<ITag> CreateComplexListWhereTheLastUpdateEntityIsDeleted(DateTimeOffset at)
+                => new List<ITag>
                 {
                     new Tag { At = at.AddDays(-1), Name = Guid.NewGuid().ToString() },
                     new Tag { At = at.AddDays(-3), Name = Guid.NewGuid().ToString() },
-                    new Tag { At = at, Name = Guid.NewGuid().ToString(), DeletedAt = at.AddDays(-1) },
+                    new Tag { At = at, Name = Guid.NewGuid().ToString(), ServerDeletedAt = at.AddDays(-1) },
                     new Tag { At = at.AddDays(-2), Name = Guid.NewGuid().ToString() }
                 };
-            }   
 
             protected override Func<IDatabaseTag, bool> ArePersistedAndClean(List<ITag> entities)
                 => persisted => persisted.SyncStatus == SyncStatus.InSync && entities.Any(te => te.Name == persisted.Name);
