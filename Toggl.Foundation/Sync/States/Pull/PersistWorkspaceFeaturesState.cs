@@ -11,15 +11,12 @@ namespace Toggl.Foundation.Sync.States
     internal sealed class PersistWorkspacesFeaturesState : BasePersistState<IWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection>
     {
         public PersistWorkspacesFeaturesState(IRepository<IDatabaseWorkspaceFeatureCollection> repository, ISinceParameterRepository sinceParameterRepository)
-            : base(repository, sinceParameterRepository, Resolver.ForWorkspaceFeatures())
+            : base(repository, WorkspaceFeatureCollection.From, sinceParameterRepository, Resolver.ForWorkspaceFeatures())
         {
         }
 
         protected override IObservable<IEnumerable<IWorkspaceFeatureCollection>> FetchObservable(FetchObservables fetch)
             => fetch.WorkspaceFeatures;
-
-        protected override IDatabaseWorkspaceFeatureCollection ConvertToDatabaseEntity(IWorkspaceFeatureCollection entity)
-            => WorkspaceFeatureCollection.From(entity);
 
         protected override ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated)
             => old;

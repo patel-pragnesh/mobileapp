@@ -111,7 +111,7 @@ namespace Toggl.Foundation.Tests.Sync.States
         }
 
         internal abstract class TheStartMethod<TState, TInterface, TDatabaseInterface> : ITheStartMethodHelper
-            where TInterface : IIdentifiable, ISyncable
+            where TInterface : IIdentifiable
             where TDatabaseInterface : class, TInterface
             where TState : BasePersistState<TInterface, TDatabaseInterface>
         {

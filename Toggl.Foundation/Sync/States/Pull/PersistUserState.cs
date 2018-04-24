@@ -12,12 +12,9 @@ namespace Toggl.Foundation.Sync.States
     internal sealed class PersistUserState : BasePersistState<IUser, IDatabaseUser>
     {
         public PersistUserState(IRepository<IDatabaseUser> repository, ISinceParameterRepository sinceParameterRepository)
-            : base(repository, sinceParameterRepository, Resolver.ForUser())
+            : base(repository, User.Clean, sinceParameterRepository, Resolver.ForUser())
         {
         }
-
-        protected override IDatabaseUser ConvertToDatabaseEntity(IUser entity)
-            => User.Clean(entity);
 
         protected override IObservable<IEnumerable<IUser>> FetchObservable(FetchObservables fetch)
             => fetch.User.Select(user

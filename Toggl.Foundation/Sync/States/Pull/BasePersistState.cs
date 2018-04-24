@@ -11,10 +11,12 @@ using Toggl.Multivac.Models;
 namespace Toggl.Foundation.Sync.States
 {
     internal abstract class BasePersistState<TInterface, TDatabaseInterface>
-        where TInterface : IIdentifiable, ISyncable
+        where TInterface : IIdentifiable
         where TDatabaseInterface : TInterface
     {
         private readonly IRepository<TDatabaseInterface> repository;
+
+        private readonly Func<TInterface, TDatabaseInterface> convertToDatabaseEntity;
 
         private readonly ISinceParameterRepository sinceParameterRepository;
 
@@ -28,11 +30,13 @@ namespace Toggl.Foundation.Sync.States
 
         protected BasePersistState(
             IRepository<TDatabaseInterface> repository,
+            Func<TInterface, TDatabaseInterface> convertToDatabaseEntity,
             ISinceParameterRepository sinceParameterRepository,
             IConflictResolver<TDatabaseInterface> conflictResolver,
             IRivalsResolver<TDatabaseInterface> rivalsResolver = null)
         {
             this.repository = repository;
+            this.convertToDatabaseEntity = convertToDatabaseEntity;
             this.sinceParameterRepository = sinceParameterRepository;
             this.conflictResolver = conflictResolver;
             this.rivalsResolver = rivalsResolver;
@@ -44,16 +48,25 @@ namespace Toggl.Foundation.Sync.States
             return FetchObservable(fetch)
                 .SingleAsync()
                 .Select(entities => entities ?? new List<TInterface>())
-                .Select(entities => entities.Select(ConvertToDatabaseEntity).ToList())
+                .Select(entities => entities.Select(convertToDatabaseEntity).ToList())
                 .SelectMany(databaseEntities =>
                     repository.BatchUpdate(databaseEntities.Select(entity => (entity.Id, entity)), conflictResolver.Resolve, rivalsResolver)
                         .IgnoreElements()
                         .OfType<List<TDatabaseInterface>>()
                         .Concat(Observable.Return(databaseEntities)))
-                .Select(databaseEntities => LastUpdated(since, databaseEntities))
-                .Select(lastUpdated => UpdateSinceParameters(since, lastUpdated))
-                .Do(sinceParameterRepository.Set)
-                .Select(sinceParameters => new FetchObservables(fetch, sinceParameters))
+                .Select(databaseEntities => databaseEntities.OfType<ISyncable>().ToList())
+                .Select(listOfSyncable =>
+                {
+                    if (listOfSyncable.Count > 0)
+                    {
+                        var lastUpdatedDate = lastUpdated(listOfSyncable);
+                        var sinceParameters = UpdateSinceParameters(since, lastUpdatedDate);
+                        sinceParameterRepository.Set(sinceParameters);
+                        fetch = new FetchObservables(fetch, sinceParameters);
+                    }
+
+                    return fetch;
+                })
                 .Select(FinishedPersisting.Transition)
                 .Catch((Exception exception) => processError(exception));
         }
@@ -66,12 +79,10 @@ namespace Toggl.Foundation.Sync.States
         private bool shouldRethrow(Exception e)
             => e is ApiException == false || e is ApiDeprecatedException || e is ClientDeprecatedException || e is UnauthorizedException;
 
-        protected abstract IObservable<IEnumerable<TInterface>> FetchObservable(FetchObservables fetch);
-
-        protected abstract TDatabaseInterface ConvertToDatabaseEntity(TInterface entity);
-
-        protected DateTimeOffset? LastUpdated(ISinceParameters old, IEnumerable<TDatabaseInterface> entities)
+        private DateTimeOffset? lastUpdated(IEnumerable<ISyncable> entities)
             => entities.Select(p => p?.At).Where(d => d.HasValue).DefaultIfEmpty(DateTimeOffset.Now).Max();
+
+        protected abstract IObservable<IEnumerable<TInterface>> FetchObservable(FetchObservables fetch);
 
         protected abstract ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated);
     }

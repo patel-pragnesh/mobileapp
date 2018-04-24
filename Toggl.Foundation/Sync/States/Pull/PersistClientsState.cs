@@ -12,15 +12,12 @@ namespace Toggl.Foundation.Sync.States
     internal sealed class PersistClientsState : BasePersistState<IClient, IDatabaseClient>
     {
         public PersistClientsState(IRepository<IDatabaseClient> repository, ISinceParameterRepository sinceParameterRepository)
-            : base(repository, sinceParameterRepository, Resolver.ForClients())
+            : base(repository, Client.Clean, sinceParameterRepository, Resolver.ForClients())
         {
         }
 
         protected override IObservable<IEnumerable<IClient>> FetchObservable(FetchObservables fetch)
             => fetch.Clients;
-
-        protected override IDatabaseClient ConvertToDatabaseEntity(IClient entity)
-            => Client.Clean(entity);
 
         protected override ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated)
             => new SinceParameters(old, clients: lastUpdated);

@@ -13,7 +13,7 @@ namespace Toggl.Foundation.Sync.States
     internal sealed class PersistPreferencesState : BasePersistState<IPreferences, IDatabasePreferences>
     {
         public PersistPreferencesState(IRepository<IDatabasePreferences> repository, ISinceParameterRepository sinceParameterRepository)
-            : base(repository, sinceParameterRepository, Resolver.ForPreferences())
+            : base(repository, Preferences.Clean, sinceParameterRepository, Resolver.ForPreferences())
         {
         }
 
@@ -22,9 +22,6 @@ namespace Toggl.Foundation.Sync.States
                 => preferences == null
                     ? new IPreferences[0]
                     : new[] { preferences });
-
-        protected override IDatabasePreferences ConvertToDatabaseEntity(IPreferences entity)
-            => Preferences.Clean(entity);
 
         protected override ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated)
             => old;
