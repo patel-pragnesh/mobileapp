@@ -46,10 +46,10 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
         }
 
         [Property]
-        public void DeleteWhenTheIncomingDataHasSomeServerDeletedAt(DateTimeOffset existing, DateTimeOffset incoming, DateTimeOffset ServerDeletedAt)
+        public void DeleteWhenTheIncomingDataHasSomeServerDeletedAt(DateTimeOffset existing, DateTimeOffset incoming, DateTimeOffset serverDeletedAt)
         {
             var existingEntity = new TestModel(existing);
-            var incomingEntity = new TestModel(incoming, ServerDeletedAt);
+            var incomingEntity = new TestModel(incoming, serverDeletedAt);
 
             var mode = resolver.Resolve(existingEntity, incomingEntity);
 
@@ -57,10 +57,10 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
         }
 
         [Property]
-        public void DeleteWhenTheIncomingDataHasSomeServerDeletedAtEvenWhenLocalEntityIsDirty(DateTimeOffset existing, DateTimeOffset incoming, DateTimeOffset ServerDeletedAt)
+        public void DeleteWhenTheIncomingDataHasSomeServerDeletedAtEvenWhenLocalEntityIsDirty(DateTimeOffset existing, DateTimeOffset incoming, DateTimeOffset serverDeletedAt)
         {
             var existingEntity = new TestModel(existing, syncStatus: SyncStatus.SyncNeeded);
-            var incomingEntity = new TestModel(incoming, ServerDeletedAt);
+            var incomingEntity = new TestModel(incoming, serverDeletedAt);
 
             var mode = resolver.Resolve(existingEntity, incomingEntity);
 
@@ -68,9 +68,9 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
         }
 
         [Property]
-        public void IgnoreWhenTheIncomingDataHasSomeServerDeletedAtButThereIsNoExistingEntity(DateTimeOffset incoming, DateTimeOffset ServerDeletedAt)
+        public void IgnoreWhenTheIncomingDataHasSomeServerDeletedAtButThereIsNoExistingEntity(DateTimeOffset incoming, DateTimeOffset serverDeletedAt)
         {
-            var incomingEntity = new TestModel(incoming, ServerDeletedAt);
+            var incomingEntity = new TestModel(incoming, serverDeletedAt);
 
             var mode = resolver.Resolve(null, incomingEntity);
 
