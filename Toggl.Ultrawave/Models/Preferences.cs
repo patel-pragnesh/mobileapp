@@ -14,9 +14,6 @@ namespace Toggl.Ultrawave.Models
         [JsonIgnore]
         public long Id => fakeId;
 
-        [JsonIgnore]
-        public DateTimeOffset At => DateTimeOffset.Now;
-
         [JsonProperty("timeofday_format")]
         [JsonConverter(typeof(TimeFormatConverter))]
         public TimeFormat TimeOfDayFormat { get; set; }
