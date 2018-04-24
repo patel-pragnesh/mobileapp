@@ -1,5 +1,4 @@
 ﻿using System;
-using Toggl.Foundation.Sync.ConflictResolution.Selectors;
 using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Sync.ConflictResolution

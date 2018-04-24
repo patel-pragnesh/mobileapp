@@ -4,7 +4,6 @@ using Xunit;
 using FluentAssertions;
 using Toggl.Foundation.Sync.ConflictResolution;
 using Toggl.PrimeRadiant;
-using Toggl.Foundation.Sync.ConflictResolution.Selectors;
 using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Tests.Sync.ConflictResolution
@@ -158,18 +157,6 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
                 ServerDeletedAt = deleted;
                 SyncStatus = syncStatus;
             }
-        }
-
-        private sealed class TestModelSelector : ISyncSelector<TestModel>
-        {
-            public DateTimeOffset LastModified(TestModel model)
-                => model.At;
-
-            public bool IsInSync(TestModel model)
-                => model.SyncStatus == SyncStatus.InSync;
-
-            public bool IsDeleted(TestModel model)
-                => model.ServerDeletedAt.HasValue;
         }
 
         private TimeSpan randomTimeSpan(int seed, double max)
