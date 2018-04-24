@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Realms;
@@ -61,12 +62,24 @@ namespace Toggl.PrimeRadiant.Realm
         private RealmConfiguration createRealmConfiguration()
             => new RealmConfiguration
             {
-                SchemaVersion = 2,
+                SchemaVersion = 3,
                 MigrationCallback = (migration, oldSchemaVersion) =>
                 {
                     if (oldSchemaVersion < 2)
                     {
                         // nothing needs explicit updating when updating form schema 0 to 1 and from 1 to 2
+                    }
+
+                    if (oldSchemaVersion < 3)
+                    {
+                        var newTags = migration.NewRealm.All<RealmTag>();
+                        var oldTags = migration.OldRealm.All("RealmTag");
+                        for (var i = 0; i < newTags.Count(); i++)
+                        {
+                            var oldTag = oldTags.ElementAt(i);
+                            var newTag = newTags.ElementAt(i);
+                            newTag.ServerDeletedAt = oldTag.DeletedAt;
+                        }
                     }
                 }
             };
