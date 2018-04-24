@@ -169,29 +169,15 @@ namespace Toggl.Foundation.Tests.Sync.States
 
             public void DoesNotUpdateSinceParametersWhenNothingIsFetched()
             {
-                var oldSinceParameters = new SinceParameters(
-                    null,
-                    workspaces: at,
-                    clients: at.AddDays(1),
-                    projects: at.AddDays(2),
-                    tags: at.AddDays(3),
-                    tasks: at.AddDays(4),
-                    timeEntries: at.AddDays(5)
-                );
+                var oldSinceParameters = new SinceParameters(null);
                 var observables = CreateObservables(oldSinceParameters);
 
                 state.Start(observables).SingleAsync().Wait();
 
-                sinceParameterRepository.Received().Set(Arg.Is<ISinceParameters>(
-                    newSinceParameters =>
-                        newSinceParameters.Workspaces == oldSinceParameters.Workspaces
-                        && newSinceParameters.Projects == oldSinceParameters.Projects
-                        && newSinceParameters.Clients == oldSinceParameters.Clients
-                        && newSinceParameters.Tags == oldSinceParameters.Tags
-                        && newSinceParameters.Tasks == oldSinceParameters.Tasks));
+                sinceParameterRepository.DidNotReceive().Set(Arg.Any<ISinceParameters>());
             }
 
-            public void UpdatesSinceParametersOfTheFetchedEntity()
+            public virtual void UpdatesSinceParametersOfTheFetchedEntity()
             {
                 var oldAt = new DateTimeOffset(2017, 09, 01, 12, 34, 56, TimeSpan.Zero);
                 var newAt = new DateTimeOffset(2017, 10, 01, 12, 34, 56, TimeSpan.Zero);
@@ -218,7 +204,7 @@ namespace Toggl.Foundation.Tests.Sync.States
                 assertBatchUpdateWasCalled(new List<TInterface>());
             }
 
-            public void SelectsTheLatestAtValue()
+            public virtual void SelectsTheLatestAtValue()
             {
                 var oldSinceParameters = new SinceParameters(null);
                 var entities = CreateComplexListWhereTheLastUpdateEntityIsDeleted(at);

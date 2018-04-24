@@ -41,6 +41,12 @@ namespace Toggl.Foundation.Tests.DataSources
 
         public sealed class TheCreateMethod : TagsDataSourceTest
         {
+            public TheCreateMethod()
+            {
+                var now = new DateTimeOffset(2018, 04, 24, 12, 23, 34, TimeSpan.Zero);
+                TimeService.CurrentDateTime.Returns(now);
+            }
+
             [Property]
             public void CreatesTagWithIdFromIdProvider(long nextId)
             {

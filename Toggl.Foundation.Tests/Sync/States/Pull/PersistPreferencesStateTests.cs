@@ -21,6 +21,10 @@ namespace Toggl.Foundation.Tests.Sync.States
         private sealed class TheStartMethod
             : TheStartMethod<PersistPreferencesState, IPreferences, IDatabasePreferences>
         {
+            public override void SelectsTheLatestAtValue() { } // skip this test
+
+            public override void UpdatesSinceParametersOfTheFetchedEntity() { } // skip this test
+
             protected override PersistPreferencesState CreateState(IRepository<IDatabasePreferences> repository, ISinceParameterRepository sinceParameterRepository)
                 => new PersistPreferencesState(repository, sinceParameterRepository);
 
