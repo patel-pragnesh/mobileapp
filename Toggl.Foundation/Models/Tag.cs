@@ -46,9 +46,9 @@ namespace Toggl.Foundation.Models
                 return this;
             }
 
-            public Builder SetServerDeletedAt(DateTimeOffset? ServerDeletedAt)
+            public Builder SetServerDeletedAt(DateTimeOffset? serverDeletedAt)
             {
-                ServerDeletedAt = ServerDeletedAt;
+                ServerDeletedAt = serverDeletedAt;
                 return this;
             }
 
@@ -72,7 +72,7 @@ namespace Toggl.Foundation.Models
                 if (string.IsNullOrEmpty(Name))
                     throw new InvalidOperationException(string.Format(errorMessage, nameof(Name)));
 
-                if (At == null)
+                if (At == default(DateTimeOffset))
                     throw new InvalidOperationException(string.Format(errorMessage, nameof(At)));
             }
         }
