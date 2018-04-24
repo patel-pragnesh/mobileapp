@@ -1,11 +1,15 @@
 ﻿using Realms;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Models;
+using System;
 
 namespace Toggl.PrimeRadiant.Realm
 {
     internal partial class RealmPreferences : RealmObject, IDatabasePreferences
     {
+        [Ignored]
+        public DateTimeOffset At => DateTimeOffset.Now;
+
         [Ignored]
         public TimeFormat TimeOfDayFormat
         {

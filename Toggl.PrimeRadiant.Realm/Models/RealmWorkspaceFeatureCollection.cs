@@ -4,11 +4,18 @@ using Realms;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant.Models;
+using System;
 
 namespace Toggl.PrimeRadiant.Realm
 {
     internal partial class RealmWorkspaceFeatureCollection : RealmObject, IDatabaseWorkspaceFeatureCollection
     {
+        [Ignored]
+        public long Id => WorkspaceId;
+
+        [Ignored]
+        public DateTimeOffset At => DateTimeOffset.Now;
+
         [Ignored]
         public RealmWorkspace RealmWorkspace
         {

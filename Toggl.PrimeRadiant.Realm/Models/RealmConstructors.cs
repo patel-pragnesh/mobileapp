@@ -172,7 +172,7 @@ namespace Toggl.PrimeRadiant.Realm
             RealmWorkspace = skipWorkspaceFetch ? null : realm.All<RealmWorkspace>().Single(x => x.Id == entity.WorkspaceId || x.OriginalId == entity.WorkspaceId);
             Name = entity.Name;
             At = entity.At;
-            DeletedAt = entity.DeletedAt;
+            ServerDeletedAt = entity.ServerDeletedAt;
         }
     }
 
