@@ -3,6 +3,7 @@ using Newtonsoft.Json.Converters;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Serialization.Converters;
+using System;
 
 namespace Toggl.Ultrawave.Models
 {
@@ -12,6 +13,9 @@ namespace Toggl.Ultrawave.Models
 
         [JsonIgnore]
         public long Id => fakeId;
+
+        [JsonIgnore]
+        public DateTimeOffset At => DateTimeOffset.Now;
 
         [JsonProperty("timeofday_format")]
         [JsonConverter(typeof(TimeFormatConverter))]

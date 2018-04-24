@@ -4,11 +4,20 @@ using Newtonsoft.Json;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Serialization.Converters;
+using System;
 
 namespace Toggl.Ultrawave.Models
 {
     internal sealed partial class WorkspaceFeatureCollection : IWorkspaceFeatureCollection
     {
+        private const long fakeId = 0;
+
+        [JsonIgnore]
+        public long Id => fakeId;
+
+        [JsonIgnore]
+        public DateTimeOffset At => DateTimeOffset.Now;
+
         public long WorkspaceId { get; set; }
 
         [JsonConverter(typeof(ConcreteListTypeConverter<WorkspaceFeature, IWorkspaceFeature>))]
