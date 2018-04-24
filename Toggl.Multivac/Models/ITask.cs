@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface ITask : IBaseModel
+    public interface ITask : IIdentifiable, ISyncable
     {
         string Name { get; }
 
@@ -15,8 +15,6 @@ namespace Toggl.Multivac.Models
         long EstimatedSeconds { get; }
 
         bool Active { get; }
-
-        DateTimeOffset At { get; }
 
         long TrackedSeconds { get; }
     }

@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IUser : IBaseModel
+    public interface IUser : IIdentifiable, ISyncable
     {
         string ApiToken { get; }
 
@@ -17,7 +17,5 @@ namespace Toggl.Multivac.Models
         string Language { get; }
 
         string ImageUrl { get; }
-
-        DateTimeOffset At { get; }
     }
 }
