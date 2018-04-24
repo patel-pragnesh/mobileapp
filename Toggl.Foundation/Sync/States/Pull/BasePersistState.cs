@@ -6,10 +6,12 @@ using Toggl.Foundation.Sync.ConflictResolution;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 using Toggl.Ultrawave.Exceptions;
+using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Sync.States
 {
     internal abstract class BasePersistState<TInterface, TDatabaseInterface>
+        where TInterface : IIdentifiable, ISyncable
         where TDatabaseInterface : TInterface
     {
         private readonly IRepository<TDatabaseInterface> repository;
@@ -44,7 +46,7 @@ namespace Toggl.Foundation.Sync.States
                 .Select(entities => entities ?? new List<TInterface>())
                 .Select(entities => entities.Select(ConvertToDatabaseEntity).ToList())
                 .SelectMany(databaseEntities =>
-                    repository.BatchUpdate(databaseEntities.Select(entity => (GetId(entity), entity)), conflictResolver.Resolve, rivalsResolver)
+                    repository.BatchUpdate(databaseEntities.Select(entity => (entity.Id, entity)), conflictResolver.Resolve, rivalsResolver)
                         .IgnoreElements()
                         .OfType<List<TDatabaseInterface>>()
                         .Concat(Observable.Return(databaseEntities)))
@@ -64,13 +66,12 @@ namespace Toggl.Foundation.Sync.States
         private bool shouldRethrow(Exception e)
             => e is ApiException == false || e is ApiDeprecatedException || e is ClientDeprecatedException || e is UnauthorizedException;
 
-        protected abstract long GetId(TDatabaseInterface entity);
-
         protected abstract IObservable<IEnumerable<TInterface>> FetchObservable(FetchObservables fetch);
 
         protected abstract TDatabaseInterface ConvertToDatabaseEntity(TInterface entity);
 
-        protected abstract DateTimeOffset? LastUpdated(ISinceParameters old, IEnumerable<TDatabaseInterface> entities);
+        protected DateTimeOffset? LastUpdated(ISinceParameters old, IEnumerable<TDatabaseInterface> entities)
+            => entities.Select(p => p?.At).Where(d => d.HasValue).DefaultIfEmpty(DateTimeOffset.Now).Max();
 
         protected abstract ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated);
     }

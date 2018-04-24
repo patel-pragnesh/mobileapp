@@ -8,7 +8,7 @@ using Toggl.PrimeRadiant;
 namespace Toggl.Foundation.Sync.States
 {
     internal abstract class BasePushState<TModel>
-        where TModel : class, IBaseModel, IDatabaseSyncable
+        where TModel : class, IIdentifiable, IDatabaseSyncable
     {
         private readonly IRepository<TModel> repository;
 

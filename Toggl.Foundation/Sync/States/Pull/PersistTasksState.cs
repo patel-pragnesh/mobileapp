@@ -16,16 +16,11 @@ namespace Toggl.Foundation.Sync.States
         {
         }
 
-        protected override long GetId(IDatabaseTask entity) => entity.Id;
-
         protected override IObservable<IEnumerable<ITask>> FetchObservable(FetchObservables fetch)
             => fetch.Tasks;
 
         protected override IDatabaseTask ConvertToDatabaseEntity(ITask entity)
             => Task.Clean(entity);
-
-        protected override DateTimeOffset? LastUpdated(ISinceParameters old, IEnumerable<IDatabaseTask> entities)
-            => entities.Select(p => p?.At).Where(d => d.HasValue).DefaultIfEmpty(old.Tasks).Max();
 
         protected override ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated)
             => new SinceParameters(old, tasks: lastUpdated);

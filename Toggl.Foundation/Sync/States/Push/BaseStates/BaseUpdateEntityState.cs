@@ -7,7 +7,7 @@ using Toggl.Ultrawave;
 namespace Toggl.Foundation.Sync.States
 {
     internal abstract class BaseUpdateEntityState<TModel> : BasePushEntityState<TModel>
-        where TModel : class, IBaseModel, IDatabaseSyncable
+        where TModel : class, IIdentifiable, IDatabaseSyncable
     {
         public StateResult<TModel> EntityChanged { get; } = new StateResult<TModel>();
         public StateResult<TModel> UpdatingSucceeded { get; } = new StateResult<TModel>();

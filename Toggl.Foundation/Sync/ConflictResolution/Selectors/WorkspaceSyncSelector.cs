@@ -7,7 +7,7 @@ namespace Toggl.Foundation.Sync.ConflictResolution.Selectors
     internal sealed class WorkspaceSyncSelector : ISyncSelector<IDatabaseWorkspace>
     {
         public DateTimeOffset LastModified(IDatabaseWorkspace model)
-            => model.At ?? DateTimeOffset.Now;
+            => model.At;
 
         public bool IsInSync(IDatabaseWorkspace model)
             => model.SyncStatus == SyncStatus.InSync;

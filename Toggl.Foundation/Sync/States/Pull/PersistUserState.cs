@@ -25,12 +25,6 @@ namespace Toggl.Foundation.Sync.States
                     ? new User[0]
                     : new[] { user });
 
-        protected override long GetId(IDatabaseUser entity)
-            => entity.Id;
-
-        protected override DateTimeOffset? LastUpdated(ISinceParameters old, IEnumerable<IDatabaseUser> entities)
-            => null;
-
         protected override ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated)
             => old;
     }

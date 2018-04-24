@@ -13,6 +13,6 @@ namespace Toggl.Foundation.Sync.ConflictResolution.Selectors
             => model.SyncStatus == SyncStatus.InSync;
 
         public bool IsDeleted(IDatabaseTag model)
-            => model.DeletedAt.HasValue;
+            => model.ServerDeletedAt.HasValue;
     }
 }

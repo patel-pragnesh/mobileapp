@@ -8,7 +8,7 @@ using Toggl.Ultrawave.Exceptions;
 namespace Toggl.Foundation.Sync.States
 {
     internal abstract class BaseCreateEntityState<TModel> : BasePushEntityState<TModel>
-        where TModel : class, IBaseModel, IDatabaseSyncable
+        where TModel : class, IIdentifiable, IDatabaseSyncable
     {
         public StateResult<TModel> CreatingFinished { get; } = new StateResult<TModel>();
 

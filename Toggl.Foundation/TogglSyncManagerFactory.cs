@@ -279,7 +279,7 @@ namespace Toggl.Foundation
             BaseUnsyncableEntityState<T> markUnsyncable,
             CheckServerStatusState checkServerStatus,
             ResetAPIDelayState finished)
-            where T : class, IBaseModel, IDatabaseSyncable
+            where T : class, IIdentifiable, IDatabaseSyncable
         {
             transitions.ConfigureTransition(entryPoint, push.Start);
             transitions.ConfigureTransition(push.PushEntity, pushOne.Start);
@@ -327,7 +327,7 @@ namespace Toggl.Foundation
             BaseUnsyncableEntityState<T> markUnsyncable,
             CheckServerStatusState checkServerStatus,
             ResetAPIDelayState finished)
-            where T : class, IBaseModel, IDatabaseSyncable
+            where T : class, IIdentifiable, IDatabaseSyncable
         {
             transitions.ConfigureTransition(entryPoint, push.Start);
             transitions.ConfigureTransition(push.PushEntity, pushOne.Start);
@@ -364,7 +364,7 @@ namespace Toggl.Foundation
             BaseUnsyncableEntityState<T> markUnsyncable,
             CheckServerStatusState checkServerStatus,
             ResetAPIDelayState finished)
-            where T : class, IBaseModel, IDatabaseSyncable
+            where T : class, IIdentifiable, IDatabaseSyncable
         {
             transitions.ConfigureTransition(entryPoint, push.Start);
             transitions.ConfigureTransition(push.PushEntity, pushOne.Start);

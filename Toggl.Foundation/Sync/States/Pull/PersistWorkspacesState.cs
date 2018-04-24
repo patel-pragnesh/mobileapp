@@ -16,16 +16,11 @@ namespace Toggl.Foundation.Sync.States
         {
         }
 
-        protected override long GetId(IDatabaseWorkspace entity) => entity.Id;
-
         protected override IObservable<IEnumerable<IWorkspace>> FetchObservable(FetchObservables fetch)
             => fetch.Workspaces;
 
         protected override IDatabaseWorkspace ConvertToDatabaseEntity(IWorkspace entity)
             => Workspace.Clean(entity);
-
-        protected override DateTimeOffset? LastUpdated(ISinceParameters old, IEnumerable<IDatabaseWorkspace> entities)
-            => entities.Select(p => p?.At).Where(d => d.HasValue).DefaultIfEmpty(old.Workspaces).Max();
 
         protected override ISinceParameters UpdateSinceParameters(ISinceParameters old, DateTimeOffset? lastUpdated)
             => new SinceParameters(old, workspaces: lastUpdated);
