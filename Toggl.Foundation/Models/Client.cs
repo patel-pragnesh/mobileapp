@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Toggl.PrimeRadiant;
 
 namespace Toggl.Foundation.Models
@@ -19,7 +20,15 @@ namespace Toggl.Foundation.Models
 
             public long? WorkspaceId { get; private set; }
 
-            public DateTimeOffset At { get; private set; }
+            [JsonProperty("at")]
+            public DateTimeOffset? DirtyAt
+            {
+                get => At;
+                set => At = value ?? DateTimeOffset.UtcNow;
+            }
+
+            [JsonIgnore]
+            public DateTimeOffset At { get; set; }
 
             public DateTimeOffset? ServerDeletedAt { get; private set; }
 
