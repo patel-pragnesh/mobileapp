@@ -43,33 +43,37 @@ namespace Toggl.Foundation.Sync.States
         }
 
         public IObservable<ITransition> Start(FetchObservables fetch)
-        {
-            var since = fetch.SinceParameters;
-            return FetchObservable(fetch)
+            => FetchObservable(fetch)
                 .SingleAsync()
-                .Select(entities => entities ?? new List<TInterface>())
-                .Select(entities => entities.Select(convertToDatabaseEntity).ToList())
-                .SelectMany(databaseEntities =>
-                    repository.BatchUpdate(databaseEntities.Select(entity => (entity.Id, entity)), conflictResolver.Resolve, rivalsResolver)
-                        .IgnoreElements()
-                        .OfType<List<TDatabaseInterface>>()
-                        .Concat(Observable.Return(databaseEntities)))
-                .Select(databaseEntities => databaseEntities.OfType<ISyncable>().ToList())
-                .Select(listOfSyncable =>
-                {
-                    if (listOfSyncable.Count > 0)
-                    {
-                        var lastUpdatedDate = lastUpdated(listOfSyncable);
-                        var sinceParameters = UpdateSinceParameters(since, lastUpdatedDate);
-                        sinceParameterRepository.Set(sinceParameters);
-                        fetch = new FetchObservables(fetch, sinceParameters);
-                    }
-
-                    return fetch;
-                })
+                .Select(listOfDatabaseEntities)
+                .SelectMany(batchUpdate)
+                .Select(updateFetchObservable(fetch))
                 .Select(FinishedPersisting.Transition)
                 .Catch((Exception exception) => processError(exception));
-        }
+
+        private IList<TDatabaseInterface> listOfDatabaseEntities(IEnumerable<TInterface> entities)
+            => entities?.Select(convertToDatabaseEntity).ToList() ?? new List<TDatabaseInterface>();
+
+        private IObservable<IList<ISyncable>> batchUpdate(IEnumerable<TDatabaseInterface> databaseEntities)
+            => repository.BatchUpdate(databaseEntities.Select(entity => (entity.Id, entity)), conflictResolver.Resolve, rivalsResolver)
+                .IgnoreElements()
+                .OfType<IList<ISyncable>>()
+                .Concat(Observable.Return(databaseEntities.OfType<ISyncable>().ToList()));
+
+        private Func<IList<ISyncable>, FetchObservables> updateFetchObservable(FetchObservables fetch)
+            => (IList<ISyncable> listOfSyncable) =>
+            {
+                if (listOfSyncable.Count == 0)
+                    return fetch;
+
+                var lastUpdatedDate = lastUpdated(listOfSyncable);
+                var sinceParameters = UpdateSinceParameters(fetch.SinceParameters, lastUpdatedDate);
+                sinceParameterRepository.Set(sinceParameters);
+                return new FetchObservables(fetch, sinceParameters);
+            };
+
+        private DateTimeOffset? lastUpdated(IEnumerable<ISyncable> entities)
+            => entities.Select(p => p?.At).Where(d => d.HasValue).DefaultIfEmpty(DateTimeOffset.Now).Max();
 
         private IObservable<ITransition> processError(Exception exception)
             => shouldRethrow(exception)
@@ -78,9 +82,6 @@ namespace Toggl.Foundation.Sync.States
 
         private bool shouldRethrow(Exception e)
             => e is ApiException == false || e is ApiDeprecatedException || e is ClientDeprecatedException || e is UnauthorizedException;
-
-        private DateTimeOffset? lastUpdated(IEnumerable<ISyncable> entities)
-            => entities.Select(p => p?.At).Where(d => d.HasValue).DefaultIfEmpty(DateTimeOffset.Now).Max();
 
         protected abstract IObservable<IEnumerable<TInterface>> FetchObservable(FetchObservables fetch);
 
