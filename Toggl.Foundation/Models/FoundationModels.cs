@@ -271,8 +271,6 @@ namespace Toggl.Foundation.Models
     {
         public long Id => WorkspaceId;
 
-        public DateTimeOffset At => DateTimeOffset.Now;
-
         public long WorkspaceId { get; }
 
         public IEnumerable<IWorkspaceFeature> Features { get; }

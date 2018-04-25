@@ -14,9 +14,6 @@ namespace Toggl.PrimeRadiant.Realm
         public long Id => WorkspaceId;
 
         [Ignored]
-        public DateTimeOffset At => DateTimeOffset.Now;
-
-        [Ignored]
         public RealmWorkspace RealmWorkspace
         {
             get => RealmWorkspaceInternal;

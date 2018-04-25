@@ -8,9 +8,6 @@ namespace Toggl.PrimeRadiant.Realm
     internal partial class RealmPreferences : RealmObject, IDatabasePreferences
     {
         [Ignored]
-        public DateTimeOffset At => DateTimeOffset.Now;
-
-        [Ignored]
         public TimeFormat TimeOfDayFormat
         {
             get => TimeFormat.FromLocalizedTimeFormat(TimeOfDayFormatString);
