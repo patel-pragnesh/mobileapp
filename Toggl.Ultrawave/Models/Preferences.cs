@@ -3,7 +3,6 @@ using Newtonsoft.Json.Converters;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Serialization.Converters;
-using System;
 
 namespace Toggl.Ultrawave.Models
 {
