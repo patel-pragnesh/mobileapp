@@ -1,0 +1,13 @@
+workspaces:
+- `POST /workspaces` - returns `at` - ✅
+- `GET /me/workspaces` - returns `at` - ✅
+- `GET /workspaces/{wid}` - returns `at` - ✅
+- `PUT /workspaces/{wid}` - returns `at` - ✅
+
+clients:
+- `GET /me/clients` - returns `at` - ✅
+- `POST /workspaces/{wid}/clients` - returns `at` - ✅
+
+tags:
+- `GET /me/tags` - returns `at` - ✅
+- 

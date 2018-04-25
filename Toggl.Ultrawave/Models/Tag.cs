@@ -23,7 +23,7 @@ namespace Toggl.Ultrawave.Models
             Id = id;
             WorkspaceId = workspaceId;
             Name = name;
-            At = at ?? new DateTimeOffset(DateTime.UtcNow);
+            At = at ?? DateTimeOffset.UtcNow;
             ServerDeletedAt = serverDeletedAt;
         }
     }
