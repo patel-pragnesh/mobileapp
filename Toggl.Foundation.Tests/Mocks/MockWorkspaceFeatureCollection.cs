@@ -11,8 +11,6 @@ namespace Toggl.Foundation.Tests.Mocks
     {
         public long Id => WorkspaceId;
 
-        public DateTimeOffset At => DateTimeOffset.Now;
-
         public IDatabaseWorkspace Workspace { get; set; }
 
         public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures { get; set; }

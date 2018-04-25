@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IWorkspaceFeatureCollection : IIdentifiable, ISyncable
+    public interface IWorkspaceFeatureCollection : IIdentifiable
     {
         long WorkspaceId { get; }
 

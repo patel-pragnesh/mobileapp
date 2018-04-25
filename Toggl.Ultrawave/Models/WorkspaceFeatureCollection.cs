@@ -15,9 +15,6 @@ namespace Toggl.Ultrawave.Models
         [JsonIgnore]
         public long Id => fakeId;
 
-        [JsonIgnore]
-        public DateTimeOffset At => DateTimeOffset.Now;
-
         public long WorkspaceId { get; set; }
 
         [JsonConverter(typeof(ConcreteListTypeConverter<WorkspaceFeature, IWorkspaceFeature>))]
