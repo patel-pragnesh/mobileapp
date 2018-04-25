@@ -22,6 +22,10 @@ namespace Toggl.Foundation.Tests.Sync.States
         private sealed class TheStartMethod
             : TheStartMethod<PersistWorkspacesFeaturesState, IWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection>
         {
+            public override void SelectsTheLatestAtValue() { } // skip this test
+
+            public override void UpdatesSinceParametersOfTheFetchedEntity() { } // skip this test
+
             protected override PersistWorkspacesFeaturesState CreateState(IRepository<IDatabaseWorkspaceFeatureCollection> repository, ISinceParameterRepository sinceParameterRepository)
                 => new PersistWorkspacesFeaturesState(repository, sinceParameterRepository);
 
