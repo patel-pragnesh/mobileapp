@@ -4,39 +4,53 @@ namespace Toggl.Foundation.Sync
 {
     internal sealed class SyncStateQueue : ISyncStateQueue
     {
+        private readonly object queueLock = new object();
+
         private bool pulledLast;
         private bool pullSyncQueued;
         private bool pushSyncQueued;
         
         public void QueuePushSync()
         {
-            pushSyncQueued = true;
+            lock (queueLock)
+            {
+                pushSyncQueued = true;
+            }
         }
 
         public void QueuePullSync()
         {
-            pullSyncQueued = true;
+            lock (queueLock)
+            {
+                pullSyncQueued = true;
+            }
         }
 
         public SyncState Dequeue()
         {
-            if (pulledLast)
-                return push();
+            lock (queueLock)
+            {
+                if (pulledLast)
+                    return push();
 
-            if (pullSyncQueued)
-                return pull();
+                if (pullSyncQueued)
+                    return pull();
 
-            if (pushSyncQueued)
-                return push();
+                if (pushSyncQueued)
+                    return push();
 
-            return sleep();
+                return sleep();
+            }
         }
 
         public void Clear()
         {
-            pulledLast = false;
-            pullSyncQueued = false;
-            pushSyncQueued = false;
+            lock (queueLock)
+            {
+                pulledLast = false;
+                pullSyncQueued = false;
+                pushSyncQueued = false;
+            }
         }
 
         private SyncState pull()

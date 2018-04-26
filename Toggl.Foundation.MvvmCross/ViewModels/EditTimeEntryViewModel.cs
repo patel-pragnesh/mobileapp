@@ -264,7 +264,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void onDeleteCompleted()
         {
-            dataSource.SyncManager.PushSync();
+            dataSource.SyncManager.StartPushSync();
             navigationService.Close(this);
         }
 
@@ -298,7 +298,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             confirmDisposable = dataSource.TimeEntries
                                           .Update(dto)
-                                          .Do(_ => dataSource.SyncManager.PushSync())
+                                          .Do(_ => dataSource.SyncManager.StartPushSync())
                                           .Subscribe((Exception ex) => close(), () => close());
         }
 

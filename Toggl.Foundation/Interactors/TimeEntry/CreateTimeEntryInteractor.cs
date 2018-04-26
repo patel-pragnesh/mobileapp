@@ -63,7 +63,7 @@ namespace Toggl.Foundation.Interactors
             => dataSource.User.Current
                 .Select(userFromPrototype)
                 .SelectMany(dataSource.TimeEntries.Create)
-                .Do(_ => dataSource.SyncManager.PushSync())
+                .Do(_ => dataSource.SyncManager.StartPushSync())
                 .Do(_ => analyticsService.TrackStartedTimeEntry(origin));
 
         private TimeEntry userFromPrototype(IDatabaseUser user)

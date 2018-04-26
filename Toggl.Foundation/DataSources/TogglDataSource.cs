@@ -93,9 +93,9 @@ namespace Toggl.Foundation.DataSources
 
             signalDisposable = backgroundService.AppResumedFromBackground
                 .Where(timeInBackground => timeInBackground >= minimumTimeInBackgroundForFullSync)
-                .Subscribe((TimeSpan _) => SyncManager.ForceFullSync());
+                .Subscribe((TimeSpan _) => SyncManager.StartFullSync());
 
-            return SyncManager.ForceFullSync()
+            return SyncManager.StartFullSync()
                 .Select(_ => Unit.Default);
         }
 

@@ -388,7 +388,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 await ViewModel.PickWorkspaceCommand.ExecuteAsync();
 
-                await DataSource.SyncManager.Received().PushSync();
+                await DataSource.SyncManager.Received().StartPushSync();
             }
         }
 
@@ -688,7 +688,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 await ViewModel.SelectDateFormatCommand.ExecuteAsync();
 
-                await DataSource.SyncManager.Received().PushSync();
+                await DataSource.SyncManager.Received().StartPushSync();
             }
         }
 
@@ -735,7 +735,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 await ViewModel.ToggleUseTwentyFourHourClockCommand.ExecuteAsync();
 
-                await DataSource.SyncManager.Received().PushSync();
+                await DataSource.SyncManager.Received().StartPushSync();
             }
         }
 
@@ -795,7 +795,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 await ViewModel.SelectDurationFormatCommand.ExecuteAsync();
 
-                await syncManager.Received().PushSync();
+                await syncManager.Received().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -880,7 +880,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 await ViewModel.SelectBeginningOfWeekCommand.ExecuteAsync();
 
-                await syncManager.Received().PushSync();
+                await syncManager.Received().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]

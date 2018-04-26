@@ -234,7 +234,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void refresh()
         {
-            dataSource.SyncManager.ForceFullSync();
+            dataSource.SyncManager.StartFullSync();
         }
 
         private Task openSettings()
@@ -264,7 +264,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTimeEntryCommand.RaiseCanExecuteChanged();
 
             await dataSource.TimeEntries.Stop(timeService.CurrentDateTime)
-                .Do(_ => dataSource.SyncManager.PushSync());
+                .Do(_ => dataSource.SyncManager.StartPushSync());
 
             CurrentTimeEntryElapsedTime = TimeSpan.Zero;
         }

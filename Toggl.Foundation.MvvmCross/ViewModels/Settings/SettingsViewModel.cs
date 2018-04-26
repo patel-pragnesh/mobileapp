@@ -233,7 +233,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             WorkspaceName = workspace.Name;
 
             await dataSource.User.UpdateWorkspace(workspaceId);
-            dataSource.SyncManager.PushSync();
+            dataSource.SyncManager.StartPushSync();
         }
 
         private async Task submitFeedback()
@@ -364,7 +364,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             var newUser = await dataSource.User.Update(userDto);
             BeginningOfWeek = newUser.BeginningOfWeek;
 
-            dataSource.SyncManager.PushSync();
+            dataSource.SyncManager.StartPushSync();
         }
 
         private Task openAboutPage()
@@ -386,7 +386,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private async Task<IDatabasePreferences> updatePreferences(EditPreferencesDTO preferencesDto)
         {
             var newPreferences = await dataSource.Preferences.Update(preferencesDto);
-            dataSource.SyncManager.PushSync();
+            dataSource.SyncManager.StartPushSync();
             return newPreferences;
         }
     }

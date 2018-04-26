@@ -42,7 +42,7 @@ namespace Toggl.Foundation.Interactors
                 .Select(timeEntries => timeEntries.MaxBy(te => te.Start))
                 .Select(newTimeEntry)
                 .SelectMany(dataSource.TimeEntries.Create)
-                .Do(_ => dataSource.SyncManager.PushSync())
+                .Do(_ => dataSource.SyncManager.StartPushSync())
                 .Do(_ => analyticsService.TrackStartedTimeEntry(TimeEntryStartOrigin.ContinueMostRecent));
 
         private IDatabaseTimeEntry newTimeEntry(IDatabaseTimeEntry timeEntry)

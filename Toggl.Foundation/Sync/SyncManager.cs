@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Extensions;
+using Toggl.Foundation.Sync.States;
 using Toggl.Multivac;
-using Toggl.Multivac.Extensions;
 using Toggl.Ultrawave.Exceptions;
 using static Toggl.Foundation.Sync.SyncState;
 
@@ -11,112 +14,123 @@ namespace Toggl.Foundation.Sync
 {
     public sealed class SyncManager : ISyncManager
     {
-        private readonly object stateLock = new object();
+        private readonly object freezingLock = new object();
+
         private readonly ISyncStateQueue queue;
-        private readonly IStateMachineOrchestrator orchestrator;
         private readonly IAnalyticsService analyticsService;
+        private readonly ISyncProgressManager syncProgressManager;
+        private readonly IState pullSyncEntryPoint;
+        private readonly IState pushSyncEntryPoint;
 
-        private bool isFrozen;
+        private readonly ISubject<bool> isFrozenSubject;
 
-        private readonly ISubject<SyncProgress> progress;
+        private readonly IObservable<Unit> abortObservable;
 
-        public bool IsRunningSync { get; private set; }
+        public IObservable<SyncProgress> ProgressObservable => syncProgressManager.Progress;
 
-        public SyncState State => orchestrator.State;
-        public IObservable<SyncProgress> ProgressObservable { get; }
+        public IObservable<bool> IsRunningSyncObservable => syncProgressManager.IsRunningSync;
 
         public SyncManager(
             ISyncStateQueue queue,
-            IStateMachineOrchestrator orchestrator,
-            IAnalyticsService analyticsService)
+            IAnalyticsService analyticsService,
+            ISyncProgressManager syncProgressManager,
+            IState pullSyncEntryPoint,
+            IState pushSyncEntryPoint)
         {
             Ensure.Argument.IsNotNull(queue, nameof(queue));
-            Ensure.Argument.IsNotNull(orchestrator, nameof(orchestrator));
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
+            Ensure.Argument.IsNotNull(syncProgressManager, nameof(syncProgressManager));
+            Ensure.Argument.IsNotNull(pullSyncEntryPoint, nameof(pullSyncEntryPoint));
+            Ensure.Argument.IsNotNull(pushSyncEntryPoint, nameof(pushSyncEntryPoint));
 
             this.queue = queue;
-            this.orchestrator = orchestrator;
             this.analyticsService = analyticsService;
+            this.syncProgressManager = syncProgressManager;
+            this.pullSyncEntryPoint = pullSyncEntryPoint;
+            this.pushSyncEntryPoint = pushSyncEntryPoint;
 
-            progress = new BehaviorSubject<SyncProgress>(SyncProgress.Unknown);
-            ProgressObservable = progress.AsObservable();
-
-            orchestrator.SyncCompleteObservable.Subscribe(syncOperationCompleted);
-            isFrozen = false;
+            isFrozenSubject = new BehaviorSubject<bool>(false);
+            abortObservable = isFrozenSubject.AsObservable().Select(_ => Unit.Default);
         }
 
-        public IObservable<SyncState> PushSync()
+        public void StartPushSync()
         {
-            lock (stateLock)
-            {
-                queue.QueuePushSync();
-                return startSyncIfNeededAndObserve();
-            }
+            queue.QueuePushSync();
+            syncIfNeeded().ConfigureAwait(false);
         }
 
-        public IObservable<SyncState> ForceFullSync()
+        public void StartFullSync()
         {
-            lock (stateLock)
-            {
-                queue.QueuePullSync();
-                return startSyncIfNeededAndObserve();
-            }
+            queue.QueuePullSync();
+            syncIfNeeded().ConfigureAwait(false);
         }
 
-        public IObservable<SyncState> Freeze()
+        public void Freeze()
         {
-            lock (stateLock)
+            isFrozenSubject.OnNext(true);
+        }
+
+        private async Task syncIfNeeded()
+        {
+            var isFrozen = await isFrozenSubject.FirstAsync();
+            var isRunningSync = await IsRunningSyncObservable.FirstAsync();
+
+            if (isRunningSync || isFrozen) return;
+
+            await sync();
+        }
+
+        private async Task sync()
+        {
+            syncProgressManager.ReportStart();
+
+            var entryPoint = chooseNextEntryPoint();
+            while (entryPoint != null && await isFrozenSubject.FirstAsync() == false)
             {
-                if (isFrozen == false)
+                try
                 {
-                    isFrozen = true;
-                    orchestrator.Freeze();
+                    await entryPoint.RunUntilReachingDeadEnd(abortObservable);
                 }
-
-                return IsRunningSync
-                    ? syncStatesUntilAndIncludingSleep().LastAsync()
-                    : Observable.Return(Sleep);
-            }
-        }
-
-        private void syncOperationCompleted(SyncResult result)
-        {
-            lock (stateLock)
-            {
-                IsRunningSync = false;
-
-                if (result is Success)
+                catch (Exception exception)
                 {
-                    startSyncIfNeeded();
-                    if (IsRunningSync == false)
-                    {
-                        progress.OnNext(SyncProgress.Synced);
-                    }
+                    processError(exception);
                     return;
                 }
 
-                if (result is Error error)
-                {
-                    processError(error.Exception);
-                    return;
-                }
+                entryPoint = chooseNextEntryPoint();
+            }
 
-                throw new ArgumentException(nameof(result));
+            syncProgressManager.ReportFinishing();
+        }
+
+        private IState chooseNextEntryPoint()
+        {
+            var state = queue.Dequeue();
+
+            switch (state)
+            {
+                case Pull:
+                    return pullSyncEntryPoint;
+
+                case Push:
+                    return pushSyncEntryPoint;
+
+                default:
+                    return null;
             }
         }
 
         private void processError(Exception error)
         {
             queue.Clear();
-            orchestrator.Start(Sleep);
 
             if (error is OfflineException)
             {
-                progress.OnNext(SyncProgress.OfflineModeDetected);
+                syncProgressManager.ReportOfflineMode();
             }
             else
             {
-                progress.OnNext(SyncProgress.Failed);
+                syncProgressManager.ReportFailure(error);
                 analyticsService.TrackSyncError(error);
             }
 
@@ -125,36 +139,7 @@ namespace Toggl.Foundation.Sync
                 || error is UnauthorizedException)
             {
                 Freeze();
-                progress.OnError(error);
             }
         }
-
-        private IObservable<SyncState> startSyncIfNeededAndObserve()
-        {
-            startSyncIfNeeded();
-
-            return syncStatesUntilAndIncludingSleep();
-        }
-
-        private void startSyncIfNeeded()
-        {
-            if (IsRunningSync) return;
-
-            var state = isFrozen ? Sleep : queue.Dequeue();
-            IsRunningSync = state != Sleep;
-
-            if (IsRunningSync && progress.FirstAsync().Wait() != SyncProgress.Syncing)
-            {
-                progress.OnNext(SyncProgress.Syncing);
-            }
-
-            orchestrator.Start(state);
-        }
-
-        private IObservable<SyncState> syncStatesUntilAndIncludingSleep()
-            => orchestrator.StateObservable
-                .TakeWhile(s => s != Sleep)
-                .Concat(Observable.Return(Sleep))
-                .ConnectedReplay();
     }
 }

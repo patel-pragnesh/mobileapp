@@ -243,7 +243,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await dataSource
                 .TimeEntries
                 .Delete(timeEntryViewModel.Id)
-                .Do(_ => dataSource.SyncManager.PushSync());
+                .Do(_ => dataSource.SyncManager.StartPushSync());
         }
 
         private async Task continueTimeEntry(TimeEntryViewModel timeEntryViewModel)

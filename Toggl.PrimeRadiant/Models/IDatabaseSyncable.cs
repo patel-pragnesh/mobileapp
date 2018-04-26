@@ -1,4 +1,6 @@
-﻿namespace Toggl.PrimeRadiant
+﻿using System;
+
+namespace Toggl.PrimeRadiant
 {
     public interface IDatabaseSyncable
     {
@@ -7,5 +9,7 @@
         string LastSyncErrorMessage { get; }
 
         bool IsDeleted { get; }
+
+        DateTimeOffset? At { get; }
     }
 }

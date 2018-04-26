@@ -33,7 +33,7 @@ namespace Toggl.Daneel.ViewSources
         private bool wasReleased;
         private bool needsRefresh;
         private bool shouldCalculateOnDeceleration;
-        private bool isSyncing => syncProgress == SyncProgress.Syncing;
+        private bool isSyncing => syncProgress == this.SyncProgress.Syncing;
         private int syncIndicatorLastShown;
         private bool shouldRefreshOnTap;
 
@@ -126,39 +126,39 @@ namespace Toggl.Daneel.ViewSources
 
             switch (SyncProgress)
             {
-                case SyncProgress.Unknown:
+                case this.SyncProgress.Unknown:
                     return;
 
-                case SyncProgress.Syncing:
-                    setSyncIndicatorTextAndBackground(
+                case this.SyncProgress.Syncing:
+					setSyncIndicatorTextAndBackground(
                         new NSAttributedString(Resources.Syncing),
-                        syncingColor);
-                    setActivityIndicatorVisible(true);
+						syncingColor);
+					setActivityIndicatorVisible(true);
                     break;
 
-                case SyncProgress.OfflineModeDetected:
-                    setSyncIndicatorTextAndBackground(
-                        Resources.Offline.EndingWithRefreshIcon(syncStateLabel.Font.CapHeight),
-                        offlineColor);
-                    dismissSyncBarButton.Hidden = false;
-                    setActivityIndicatorVisible(false);
-                    shouldRefreshOnTap = true;
+                case this.SyncProgress.OfflineModeDetected:
+					setSyncIndicatorTextAndBackground(
+						Resources.Offline.EndingWithRefreshIcon(syncStateLabel.Font.CapHeight),
+						offlineColor);
+					dismissSyncBarButton.Hidden = false;
+					setActivityIndicatorVisible(false);
+					shouldRefreshOnTap = true;
                     break;
 
-                case SyncProgress.Synced:
-                    setSyncIndicatorTextAndBackground(
-                        Resources.SyncCompleted.EndingWithTick(syncStateLabel.Font.CapHeight),
-                        syncCompletedColor);
+                case this.SyncProgress.Synced:
+					setSyncIndicatorTextAndBackground(
+						Resources.SyncCompleted.EndingWithTick(syncStateLabel.Font.CapHeight),
+						syncCompletedColor);
                     hideIndicator = true;
-                    setActivityIndicatorVisible(false);
+					setActivityIndicatorVisible(false);
                     break;
 
-                case SyncProgress.Failed:
-                    setSyncIndicatorTextAndBackground(
-                        Resources.SyncFailed.EndingWithRefreshIcon(syncStateLabel.Font.CapHeight),
-                        syncFailedColor);
-                    dismissSyncBarButton.Hidden = false;
-                    setActivityIndicatorVisible(false);
+                case this.SyncProgress.Failed:
+					setSyncIndicatorTextAndBackground(
+						Resources.SyncFailed.EndingWithRefreshIcon(syncStateLabel.Font.CapHeight),
+						syncFailedColor);
+					dismissSyncBarButton.Hidden = false;
+					setActivityIndicatorVisible(false);
                     break;
 
                 default:

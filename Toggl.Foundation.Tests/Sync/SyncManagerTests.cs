@@ -74,7 +74,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void AgainTellsQueueToStartSyncAfterCompletingPreviousFullSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
                 Queue.Dequeue().Returns(Sleep);
                 OrchestratorSyncComplete.OnNext(new Success(Pull));
                 Queue.ClearReceivedCalls();
@@ -88,7 +88,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void AgainTellsQueueToStartSyncAfterCompletingPreviousPushSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
                 Queue.Dequeue().Returns(Sleep);
                 OrchestratorSyncComplete.OnNext(new Success(Push));
                 Queue.ClearReceivedCalls();
@@ -107,13 +107,13 @@ namespace Toggl.Foundation.Tests.Sync
             [Fact, LogIfTooSlow]
             public async Task DoesNotQueueUntilOtherCallToPushSyncReturns()
             {
-                await ensureMethodIsThreadSafeWith(() => SyncManager.PushSync());
+                await ensureMethodIsThreadSafeWith(() => SyncManager.StartPushSync());
             }
 
             [Fact, LogIfTooSlow]
             public async Task DoesNotQueueUntilOtherCallToForceFullSyncReturns()
             {
-                await ensureMethodIsThreadSafeWith(() => SyncManager.ForceFullSync());
+                await ensureMethodIsThreadSafeWith(() => SyncManager.StartFullSync());
             }
 
             private async Task ensureMethodIsThreadSafeWith(Action otherMethod)
@@ -200,7 +200,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void TellsQueueToStartOrchestratorWhenAlreadyRunningFullSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
                 Queue.ClearReceivedCalls();
 
                 CallMethod();
@@ -212,7 +212,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void TellsQueueToStartOrchestratorWhenAlreadyRunningPushSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
                 Queue.ClearReceivedCalls();
 
                 CallMethod();
@@ -224,7 +224,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void TellsQueueToStartOrchestratorWhenInSecondPartOfMultiPhaseSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
                 OrchestratorSyncComplete.OnNext(new Success(Push));
                 Queue.ClearReceivedCalls();
 
@@ -274,7 +274,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void DoesNotTellQueueToStartOrchestratorWhenAlreadyRunningFullSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
                 Queue.ClearReceivedCalls();
 
                 CallMethod();
@@ -286,7 +286,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void DoesNotTellQueueToStartOrchestratorWhenAlreadyRunningPushSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
                 Queue.ClearReceivedCalls();
 
                 CallMethod();
@@ -298,7 +298,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void DoesNotTellQueueToStartOrchestratorWhenInSecondPartOfMultiPhaseSync()
             {
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
                 OrchestratorSyncComplete.OnNext(new Success(Push));
                 Queue.ClearReceivedCalls();
 
@@ -311,7 +311,7 @@ namespace Toggl.Foundation.Tests.Sync
         public sealed class ThePushSyncMethod : SyncMethodTests
         {
             protected override IObservable<SyncState> CallSyncMethod()
-                => SyncManager.PushSync();
+                => SyncManager.StartPushSync();
 
             [Fact, LogIfTooSlow]
             public void TellsQueueToStartSyncAfterQueingPush()
@@ -329,7 +329,7 @@ namespace Toggl.Foundation.Tests.Sync
         public sealed class TheForceFullSyncMethod : SyncMethodTests
         {
             protected override IObservable<SyncState> CallSyncMethod()
-                => SyncManager.ForceFullSync();
+                => SyncManager.StartFullSync();
 
             [Fact, LogIfTooSlow]
             public void TellsQueueToStartSyncAfterQueingPull()
@@ -384,7 +384,7 @@ namespace Toggl.Foundation.Tests.Sync
             {
                 SyncManager.Freeze();
                 
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
 
                 Orchestrator.Received(1).Start(Arg.Is(Sleep));
                 Orchestrator.DidNotReceive().Start(Arg.Is(Push));
@@ -396,7 +396,7 @@ namespace Toggl.Foundation.Tests.Sync
             {
                 SyncManager.Freeze();
 
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
 
                 Orchestrator.Received(1).Start(Arg.Is(Sleep));
                 Orchestrator.DidNotReceive().Start(Arg.Is(Push));
@@ -408,7 +408,7 @@ namespace Toggl.Foundation.Tests.Sync
             {
                 bool finished = false;
                 Queue.Dequeue().Returns(Pull);
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
 
                 var observable = SyncManager.Freeze().Subscribe(_ => finished = true);
                 OrchestratorStates.OnNext(Pull);
@@ -423,7 +423,7 @@ namespace Toggl.Foundation.Tests.Sync
             {
                 bool finished = false;
                 Queue.Dequeue().Returns(Push);
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
 
                 var observable = SyncManager.Freeze().Subscribe(_ => finished = true);
                 OrchestratorStates.OnNext(Push);
@@ -436,7 +436,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void CompletesWhenSleepStateOccursAfterFullSync()
             {
                 bool finished = false;
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
 
                 var observable = SyncManager.Freeze().Subscribe(_ => finished = true);
                 OrchestratorStates.OnNext(Pull);
@@ -451,7 +451,7 @@ namespace Toggl.Foundation.Tests.Sync
             public void CompletesWhenSleepStateOccursAfterPushSync()
             {
                 bool finished = false;
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
 
                 var observable = SyncManager.Freeze().Subscribe(_ => finished = true);
                 OrchestratorStates.OnNext(Push);
@@ -482,7 +482,7 @@ namespace Toggl.Foundation.Tests.Sync
                 SyncProgress? progressAfterPushing = null;
                 Queue.Dequeue().Returns(Push);
 
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
                 SyncManager.ProgressObservable.Subscribe(
                     progress => progressAfterPushing = progress);
 
@@ -496,7 +496,7 @@ namespace Toggl.Foundation.Tests.Sync
                 SyncProgress? progressAfterFullSync = null;
                 Queue.Dequeue().Returns(Pull);
 
-                SyncManager.ForceFullSync();
+                SyncManager.StartFullSync();
                 SyncManager.ProgressObservable.Subscribe(
                     progress => progressAfterFullSync = progress);
 
@@ -656,7 +656,7 @@ namespace Toggl.Foundation.Tests.Sync
                 Task.Run(() =>
                 {
                     startQueueing.WaitOne();
-                    SyncManager.ForceFullSync();
+                    SyncManager.StartFullSync();
                 });
 
                 Task.Run(() =>
@@ -706,7 +706,7 @@ namespace Toggl.Foundation.Tests.Sync
                 Orchestrator.ClearReceivedCalls();
                 Queue.When(q => q.QueuePushSync()).Do(_ => Queue.Dequeue().Returns(Push));
 
-                SyncManager.PushSync();
+                SyncManager.StartPushSync();
 
                 Orchestrator.Received().Start(Arg.Is(Push));
             }

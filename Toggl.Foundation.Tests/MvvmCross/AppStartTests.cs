@@ -85,7 +85,7 @@ namespace Toggl.Foundation.Tests.MvvmCross
 
                 await Task.Run(() => AppStart.Start());
 
-                await SyncManager.DidNotReceive().ForceFullSync();
+                await SyncManager.DidNotReceive().StartFullSync();
                 await NavigationService.Received().Navigate<TokenResetViewModel>();
             }
 

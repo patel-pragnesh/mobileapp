@@ -4,12 +4,11 @@ namespace Toggl.Foundation.Sync
 {
     public interface ISyncManager
     {
-        SyncState State { get; }
         IObservable<SyncProgress> ProgressObservable { get; }
-        bool IsRunningSync { get; }
+        IObservable<bool> IsRunningSyncObservable { get; }
 
-        IObservable<SyncState> PushSync();
-        IObservable<SyncState> ForceFullSync();
-        IObservable<SyncState> Freeze();
+        void StartPushSync();
+        void StartFullSync();
+        void Freeze();
     }
 }

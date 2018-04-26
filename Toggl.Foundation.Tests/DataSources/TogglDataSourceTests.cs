@@ -140,7 +140,7 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 DataSource.StartSyncing();
 
-                SyncManager.Received().ForceFullSync();
+                SyncManager.Received().StartFullSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -148,7 +148,7 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 bool emitted = false;
                 var forceFullSyncSubject = new Subject<SyncState>();
-                SyncManager.ForceFullSync().Returns(forceFullSyncSubject.AsObservable());
+                SyncManager.StartFullSync().Returns(forceFullSyncSubject.AsObservable());
 
                 var observable = DataSource.StartSyncing();
                 observable.Subscribe(_ => emitted = true);
@@ -162,7 +162,7 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 bool emitted = false;
                 var forceFullSyncSubject = new Subject<SyncState>();
-                SyncManager.ForceFullSync().Returns(forceFullSyncSubject.AsObservable());
+                SyncManager.StartFullSync().Returns(forceFullSyncSubject.AsObservable());
 
                 var observable = DataSource.StartSyncing();
                 observable.Subscribe(_ => emitted = true);
@@ -178,7 +178,7 @@ namespace Toggl.Foundation.Tests.DataSources
 
                 DataSource.StartSyncing();
 
-                SyncManager.Received(1).ForceFullSync();
+                SyncManager.Received(1).StartFullSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -190,7 +190,7 @@ namespace Toggl.Foundation.Tests.DataSources
                 DataSource.StartSyncing();
                 subject.OnNext(MinimumTimeInBackgroundForFullSync + TimeSpan.FromSeconds(1));
 
-                SyncManager.Received(2).ForceFullSync();
+                SyncManager.Received(2).StartFullSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -216,7 +216,7 @@ namespace Toggl.Foundation.Tests.DataSources
 
                 subject.OnNext(MinimumTimeInBackgroundForFullSync + TimeSpan.FromSeconds(1));
 
-                await SyncManager.DidNotReceive().ForceFullSync();
+                await SyncManager.DidNotReceive().StartFullSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -416,7 +416,7 @@ namespace Toggl.Foundation.Tests.DataSources
                 ProgressSubject.OnError(exception);
                 subject.OnNext(MinimumTimeInBackgroundForFullSync + TimeSpan.FromSeconds(1));
 
-                SyncManager.DidNotReceive().ForceFullSync();
+                SyncManager.DidNotReceive().StartFullSync();
             }
 
 

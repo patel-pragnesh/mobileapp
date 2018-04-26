@@ -49,5 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Analytics\" />
+    <Folder Include="Sync\States\Results\" />
   </ItemGroup>
 </Project>
