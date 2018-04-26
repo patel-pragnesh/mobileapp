@@ -55,14 +55,14 @@ namespace Toggl.Foundation.Sync.States
             => entities?.Where(entity => entity != null).Select(convertToDatabaseEntity).ToList()
                 ?? new List<TDatabaseInterface>();
 
-        private IObservable<IList<ISyncable>> batchUpdate(IEnumerable<TDatabaseInterface> databaseEntities)
+        private IObservable<IList<IHasLastChangedDate>> batchUpdate(IEnumerable<TDatabaseInterface> databaseEntities)
             => repository.BatchUpdate(databaseEntities.Select(entity => (entity.Id, entity)), conflictResolver.Resolve, rivalsResolver)
                 .IgnoreElements()
-                .OfType<IList<ISyncable>>()
-                .Concat(Observable.Return(databaseEntities.OfType<ISyncable>().ToList()));
+                .OfType<IList<IHasLastChangedDate>>()
+                .Concat(Observable.Return(databaseEntities.OfType<IHasLastChangedDate>().ToList()));
 
-        private Func<IList<ISyncable>, FetchObservables> updateFetchObservable(FetchObservables fetch)
-            => (IList<ISyncable> listOfSyncable) =>
+        private Func<IList<IHasLastChangedDate>, FetchObservables> updateFetchObservable(FetchObservables fetch)
+            => (IList<IHasLastChangedDate> listOfSyncable) =>
             {
                 if (listOfSyncable.Count == 0)
                     return fetch;

@@ -7,7 +7,7 @@ using Toggl.Multivac.Models;
 namespace Toggl.Foundation.Sync.ConflictResolution
 {
     internal sealed class PreferNewer<T> : IConflictResolver<T>
-        where T : class, ISyncable, IDatabaseSyncable
+        where T : class, IHasLastChangedDate, IDatabaseSyncable
     {
         public TimeSpan MarginOfError { get; }
 

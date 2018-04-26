@@ -141,7 +141,7 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
             mode.Should().Be(ConflictResolutionMode.Update);
         }
 
-        private sealed class TestModel : IDeletable, ISyncable, IDatabaseSyncable
+        private sealed class TestModel : IDeletable, IHasLastChangedDate, IDatabaseSyncable
         {
             private readonly DateTimeOffset now = new DateTimeOffset(2017, 01, 05, 12, 34, 56, TimeSpan.Zero);
 
