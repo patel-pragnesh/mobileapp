@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IUser : IIdentifiable, IHasLastChangedDate
+    public interface IUser : IIdentifiable, ILastChangeDatable
     {
         string ApiToken { get; }
 

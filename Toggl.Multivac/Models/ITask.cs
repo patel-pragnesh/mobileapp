@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface ITask : IIdentifiable, IHasLastChangedDate
+    public interface ITask : IIdentifiable, ILastChangeDatable
     {
         string Name { get; }
 

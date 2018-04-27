@@ -2,7 +2,7 @@ using System;
 
 namespace Toggl.Multivac.Models
 {
-    public interface IHasLastChangedDate
+    public interface ILastChangeDatable
     {
         DateTimeOffset At { get; }
     }
