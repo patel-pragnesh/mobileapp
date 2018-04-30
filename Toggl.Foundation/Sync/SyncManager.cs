@@ -13,7 +13,6 @@ namespace Toggl.Foundation.Sync
     {
         private readonly object stateLock = new object();
         private readonly ISyncStateQueue queue;
-        private readonly IStateMachineOrchestrator orchestrator;
         private readonly IAnalyticsService analyticsService;
 
         private bool isFrozen;
@@ -22,26 +21,22 @@ namespace Toggl.Foundation.Sync
 
         public bool IsRunningSync { get; private set; }
 
-        public SyncState State => orchestrator.State;
+        public SyncState State { get; }
         public IObservable<SyncProgress> ProgressObservable { get; }
 
         public SyncManager(
             ISyncStateQueue queue,
-            IStateMachineOrchestrator orchestrator,
             IAnalyticsService analyticsService)
         {
             Ensure.Argument.IsNotNull(queue, nameof(queue));
-            Ensure.Argument.IsNotNull(orchestrator, nameof(orchestrator));
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
 
             this.queue = queue;
-            this.orchestrator = orchestrator;
             this.analyticsService = analyticsService;
 
             progress = new BehaviorSubject<SyncProgress>(SyncProgress.Unknown);
             ProgressObservable = progress.AsObservable();
 
-            orchestrator.SyncCompleteObservable.Subscribe(syncOperationCompleted);
             isFrozen = false;
         }
 
@@ -70,7 +65,6 @@ namespace Toggl.Foundation.Sync
                 if (isFrozen == false)
                 {
                     isFrozen = true;
-                    orchestrator.Freeze();
                 }
 
                 return IsRunningSync
@@ -108,7 +102,6 @@ namespace Toggl.Foundation.Sync
         private void processError(Exception error)
         {
             queue.Clear();
-            orchestrator.Start(Sleep);
 
             if (error is OfflineException)
             {
@@ -147,14 +140,10 @@ namespace Toggl.Foundation.Sync
             {
                 progress.OnNext(SyncProgress.Syncing);
             }
-
-            orchestrator.Start(state);
         }
 
         private IObservable<SyncState> syncStatesUntilAndIncludingSleep()
-            => orchestrator.StateObservable
-                .TakeWhile(s => s != Sleep)
-                .Concat(Observable.Return(Sleep))
+            => Observable.Return(Sleep)
                 .ConnectedReplay();
     }
 }

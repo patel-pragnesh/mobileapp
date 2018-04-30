@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
+using Toggl.Foundation.Tests.Extensions;
 using Toggl.Foundation.Sync;
 using static Toggl.Foundation.Sync.SyncState;
 using Xunit;
