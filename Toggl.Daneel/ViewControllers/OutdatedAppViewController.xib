@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -54,10 +54,10 @@ Please update your app to continue.</string>
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X8x-ZH-j50">
-                    <rect key="frame" x="90" y="300" width="108" height="16"/>
+                    <rect key="frame" x="90" y="286" width="108" height="44"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="or" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4PV-6t-jjS">
-                            <rect key="frame" x="0.0" y="-1" width="14" height="17"/>
+                            <rect key="frame" x="0.0" y="13" width="14" height="17"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="14" id="uVq-s5-2Ag"/>
                             </constraints>
@@ -66,10 +66,10 @@ Please update your app to continue.</string>
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1426">
-                            <rect key="frame" x="18" y="0.0" width="90" height="16"/>
+                            <rect key="frame" x="18" y="0.0" width="90" height="44"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="90" id="618-ks-5fy"/>
-                                <constraint firstAttribute="height" constant="16" id="ULv-kH-tRS"/>
+                                <constraint firstAttribute="height" constant="44" id="ULv-kH-tRS"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                             <state key="normal" title="try toggl.com">
@@ -83,7 +83,7 @@ Please update your app to continue.</string>
                         <constraint firstItem="1426" firstAttribute="leading" secondItem="4PV-6t-jjS" secondAttribute="trailing" constant="4" id="15Y-vh-rNf"/>
                         <constraint firstItem="4PV-6t-jjS" firstAttribute="leading" secondItem="X8x-ZH-j50" secondAttribute="leading" id="74w-No-9et"/>
                         <constraint firstAttribute="width" constant="108" id="SBt-y9-QSb"/>
-                        <constraint firstAttribute="height" constant="16" id="nUb-4l-nH9"/>
+                        <constraint firstAttribute="height" constant="44" id="nUb-4l-nH9"/>
                         <constraint firstItem="4PV-6t-jjS" firstAttribute="centerY" secondItem="X8x-ZH-j50" secondAttribute="centerY" id="oAd-Ki-3SS"/>
                         <constraint firstItem="1426" firstAttribute="centerY" secondItem="X8x-ZH-j50" secondAttribute="centerY" id="tf2-5z-a8x"/>
                         <constraint firstAttribute="trailing" secondItem="1426" secondAttribute="trailing" id="vuF-hI-pef"/>
@@ -101,7 +101,7 @@ Please update your app to continue.</string>
             <constraints>
                 <constraint firstItem="1427" firstAttribute="top" secondItem="129" secondAttribute="bottom" constant="25" id="2U8-RV-fp4"/>
                 <constraint firstItem="1425" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="9ul-co-6Cd"/>
-                <constraint firstItem="X8x-ZH-j50" firstAttribute="top" secondItem="1425" secondAttribute="bottom" constant="24" id="DzE-Zu-ZJx"/>
+                <constraint firstItem="X8x-ZH-j50" firstAttribute="top" secondItem="1425" secondAttribute="bottom" constant="10" id="DzE-Zu-ZJx"/>
                 <constraint firstItem="1425" firstAttribute="top" secondItem="1428" secondAttribute="bottom" constant="24" id="H6W-zI-A8S"/>
                 <constraint firstItem="129" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="PHt-4W-vvV"/>
                 <constraint firstItem="129" firstAttribute="top" secondItem="2" secondAttribute="top" id="XW6-t1-rQh"/>

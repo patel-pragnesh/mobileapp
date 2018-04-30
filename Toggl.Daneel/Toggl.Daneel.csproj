@@ -67,6 +67,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <MtouchArch>ARMv7</MtouchArch>
+    <OutputPath>..\bin\Release</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.AdHoc|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -82,6 +83,18 @@
     <MtouchLink>Full</MtouchLink>
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.UITest|iPhoneSimulator' ">
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release.UITest</OutputPath>
+    <DefineConstants></DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchVerbosity></MtouchVerbosity>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>x86_64</MtouchArch>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.AppCenter, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -429,6 +442,10 @@
     <ImageAsset Include="Resources\Images.xcassets\doneGreen.imageset\doneGreen.png" />
     <ImageAsset Include="Resources\Images.xcassets\doneGreen.imageset\doneGreen%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\doneGreen.imageset\doneGreen%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\emojiRaisedHands.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\emojiRaisedHands.imageset\emoji1.png" />
+    <ImageAsset Include="Resources\Images.xcassets\emojiRaisedHands.imageset\emoji1%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\emojiRaisedHands.imageset\emoji1%403x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icCheckGrey.imageset\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\icCheckGrey.imageset\icCheckGrey.png" />
     <ImageAsset Include="Resources\Images.xcassets\icCheckGrey.imageset\icCheckGrey%402x.png" />
@@ -692,7 +709,6 @@
       <DependentUpon>SuggestionsEmptyViewCell.cs</DependentUpon>
     </Compile>
     <Compile Include="Views\Color\ValueSliderView.cs" />
-    <Compile Include="Views\EditTimeEntry\TextViewWithCharacterCounter.cs" />
     <Compile Include="Views\EntityCreation\ClientViewCell.cs" />
     <Compile Include="Views\EntityCreation\ClientViewCell.designer.cs">
       <DependentUpon>ClientViewCell.cs</DependentUpon>
@@ -841,8 +857,14 @@
     <Compile Include="Binding\ViewVisibilityWithFadeTargetBinding.cs" />
     <Compile Include="Binding\ImageViewAnimatedImageTargetBinding.cs" />
     <Compile Include="Onboarding\MainView\StartTimeEntryOnboardingStep.cs" />
+    <Compile Include="Onboarding\MainView\EditTimeEntryOnboardingStep.cs" />
+    <Compile Include="Onboarding\StartTimeEntryView\AddProjectOrTagOnboardingStep.cs" />
     <Compile Include="Onboarding\MainView\StopTimeEntryOnboardingStep.cs" />
     <Compile Include="Onboarding\CreationView\DisabledConfirmationButtonOnboardingStep.cs" />
+    <Compile Include="Onboarding\MainView\SwipeLeftOnboardingStep.cs" />
+    <Compile Include="Onboarding\MainView\SwipeRightOnboardingStep.cs" />
+    <Compile Include="Onboarding\EditView\CategorizeTimeUsingProjectsOnboardingStep.cs" />
+    <Compile Include="Extensions\TimeEntriesLogViewCellExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation.MvvmCross\Toggl.Foundation.MvvmCross.csproj">
@@ -892,7 +914,6 @@
     <Folder Include="Views\Log\" />
     <Folder Include="Views\Suggestions\" />
     <Folder Include="Views\Color\" />
-    <Folder Include="Views\EditTimeEntry\" />
     <Folder Include="Views\EntityCreation\" />
     <Folder Include="Resources\Images.xcassets\icIllustrationTagsSmall.imageset\" />
     <Folder Include="Resources\Images.xcassets\icIllustrationProjectsSmall.imageset\" />
@@ -901,7 +922,9 @@
     <Folder Include="ViewControllers\Settings\" />
     <Folder Include="Onboarding\" />
     <Folder Include="Onboarding\MainView\" />
+    <Folder Include="Onboarding\StartTimeEntryView\" />
     <Folder Include="Onboarding\CreationView\" />
+    <Folder Include="Onboarding\EditView\" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="GoogleService-Info.plist" />

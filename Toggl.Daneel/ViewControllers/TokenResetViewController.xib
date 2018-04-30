@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -43,29 +43,32 @@
                     </constraints>
                 </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8lc-P8-x4K">
-                    <rect key="frame" x="16" y="619" width="64" height="27"/>
+                    <rect key="frame" x="16" y="610" width="64" height="44"/>
                     <accessibility key="accessibilityConfiguration" label="LoginForgotPassword"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="mJg-R4-2Tx"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
                     <state key="normal" title="or Sign out">
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enter your password to log back in to your" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Dj-pA-An9">
-                    <rect key="frame" x="16" y="207" width="239" height="15"/>
+                    <rect key="frame" x="16" y="206.5" width="238.5" height="14.5"/>
                     <accessibility key="accessibilityConfiguration" label="LoginError"/>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="textColor" red="0.99121707677841187" green="0.99630099534988403" blue="0.99603599309921265" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="account:" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qsi-rG-Fqs">
-                    <rect key="frame" x="16" y="222" width="50" height="15"/>
+                    <rect key="frame" x="16" y="221" width="49.5" height="14.5"/>
                     <accessibility key="accessibilityConfiguration" label="LoginError"/>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="textColor" red="0.99121707680000004" green="0.99630099530000005" blue="0.99603599310000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="mail@toggl.com" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lyk-cD-col">
-                    <rect key="frame" x="68" y="222" width="91" height="15"/>
+                    <rect key="frame" x="67.5" y="221" width="91" height="14.5"/>
                     <accessibility key="accessibilityConfiguration" label="LoginError"/>
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <color key="textColor" red="0.99121707680000004" green="0.99630099530000005" blue="0.99603599310000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -80,7 +83,7 @@
                     </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your API token has been reset." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZKi-c4-YaU">
-                    <rect key="frame" x="16" y="192" width="184.5" height="15"/>
+                    <rect key="frame" x="16" y="192" width="184.5" height="14.5"/>
                     <accessibility key="accessibilityConfiguration" label="LoginError"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
                     <color key="textColor" red="0.99121707680000004" green="0.99630099530000005" blue="0.99603599310000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -90,7 +93,7 @@
                     <rect key="frame" x="16" y="192" width="319" height="128"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="TopLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Incorrect password. Please try again." lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z7h-iN-bA7">
-                            <rect key="frame" x="0.0" y="0.0" width="209.5" height="15"/>
+                            <rect key="frame" x="0.0" y="0.0" width="209.5" height="14.5"/>
                             <color key="backgroundColor" red="0.02242165245115757" green="0.6651427149772644" blue="0.96032613515853882" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <accessibility key="accessibilityConfiguration" label="LoginError"/>
                             <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="12"/>
@@ -121,7 +124,7 @@
                 <constraint firstItem="qsi-rG-Fqs" firstAttribute="leading" secondItem="3Dj-pA-An9" secondAttribute="leading" id="dYe-aH-UeP"/>
                 <constraint firstItem="ZKi-c4-YaU" firstAttribute="leading" secondItem="965-7g-Gu6" secondAttribute="leading" id="hf5-jx-lcX"/>
                 <constraint firstItem="l7S-as-iux" firstAttribute="centerY" secondItem="IEZ-w2-ebJ" secondAttribute="centerY" id="k2I-EZ-o9O"/>
-                <constraint firstAttribute="bottom" secondItem="8lc-P8-x4K" secondAttribute="bottom" constant="21" id="kx6-14-c06"/>
+                <constraint firstAttribute="bottom" secondItem="8lc-P8-x4K" secondAttribute="bottom" constant="13" id="kx6-14-c06"/>
                 <constraint firstItem="IEZ-w2-ebJ" firstAttribute="leading" secondItem="965-7g-Gu6" secondAttribute="trailing" id="oYa-Uw-eN6"/>
                 <constraint firstItem="8lc-P8-x4K" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="qSd-yq-jPH"/>
                 <constraint firstItem="ZKi-c4-YaU" firstAttribute="top" secondItem="965-7g-Gu6" secondAttribute="bottom" constant="9" id="w7j-d8-9WB"/>

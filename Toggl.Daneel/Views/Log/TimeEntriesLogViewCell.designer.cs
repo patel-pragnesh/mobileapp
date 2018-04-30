@@ -47,6 +47,9 @@ namespace Toggl.Daneel.Views
 		UIKit.UIImageView SyncErrorImageView { get; set; }
 
 		[Outlet]
+		UIKit.UIView TapToEditBubble { get; set; }
+
+		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		UIKit.UILabel TimeLabel { get; set; }
 
@@ -104,6 +107,11 @@ namespace Toggl.Daneel.Views
 			if (TimeLabel != null) {
 				TimeLabel.Dispose ();
 				TimeLabel = null;
+			}
+
+			if (TapToEditBubble != null) {
+				TapToEditBubble.Dispose ();
+				TapToEditBubble = null;
 			}
 
 			if (UnsyncedImageView != null) {

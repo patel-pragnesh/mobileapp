@@ -45,8 +45,6 @@ namespace Toggl.Foundation.MvvmCross
 
         public async void Start(object hint = null)
         {
-            Mvx.RegisterSingleton(loginManager);
-
             if (accessRestrictionStorage.IsApiOutdated() || accessRestrictionStorage.IsClientOutdated())
             {
                 await navigationService.Navigate<OnboardingViewModel>();

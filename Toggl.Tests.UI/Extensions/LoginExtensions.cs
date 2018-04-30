@@ -7,14 +7,18 @@ namespace Toggl.Tests.UI.Extensions
         public static void WaitForLoginScreen(this IApp app)
         {
             app.WaitForOnboardingScreen();
+            #if __IOS__
             app.SkipToLastOnboardingPage();
+            #endif
             app.OpenLoginFromOnboardingLastPage();
         }
 
         public static void WaitForSignUpScreen(this IApp app)
         {
             app.WaitForOnboardingScreen();
+            #if __IOS__
             app.SkipToLastOnboardingPage();
+            #endif
             app.OpenSignUpFromOnboardingLastPage();
         }
 
@@ -26,13 +30,13 @@ namespace Toggl.Tests.UI.Extensions
 
         public static void GoBackToOnboardingScreen(this IApp app)
         {
-            app.Tap(Login.BackButton);
+            app.PerformBack(Login.BackButton);
             app.WaitForElement(Onboarding.LoginButton);
         }
 
         public static void GoBackToEmailScreen(this IApp app)
         {
-            app.Tap(Login.BackButton);
+            app.PerformBack(Login.BackButton);
             app.WaitForElement(Login.EmailText);
         }
 

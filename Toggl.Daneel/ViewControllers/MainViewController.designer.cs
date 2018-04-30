@@ -50,6 +50,24 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView StopTimeEntryOnboardingBubbleView { get; set; }
 
 		[Outlet]
+		UIKit.UIView SwipeLeftBubbleView { get; set; }
+
+		[Outlet]
+		UIKit.NSLayoutConstraint SwipeLeftTopConstraint { get; set; }
+
+		[Outlet]
+		UIKit.UIView SwipeRightBubbleView { get; set; }
+
+		[Outlet]
+		UIKit.NSLayoutConstraint SwipeRightTopConstraint { get; set; }
+
+		[Outlet]
+		UIKit.UIView TapToEditBubbleView { get; set; }
+
+		[Outlet]
+		UIKit.NSLayoutConstraint TapToEditBubbleViewTopConstraint { get; set; }
+
+		[Outlet]
 		UIKit.UITableView TimeEntriesLogTableView { get; set; }
 
 		[Outlet]
@@ -103,14 +121,24 @@ namespace Toggl.Daneel.ViewControllers
 				StartTimeEntryOnboardingBubbleView = null;
 			}
 
-			if (StopTimeEntryOnboardingBubbleView != null) {
-				StopTimeEntryOnboardingBubbleView.Dispose ();
-				StopTimeEntryOnboardingBubbleView = null;
-			}
-
 			if (StopTimeEntryButton != null) {
 				StopTimeEntryButton.Dispose ();
 				StopTimeEntryButton = null;
+			}
+
+			if (TapToEditBubbleView != null) {
+				TapToEditBubbleView.Dispose ();
+				TapToEditBubbleView = null;
+			}
+
+			if (TapToEditBubbleViewTopConstraint != null) {
+				TapToEditBubbleViewTopConstraint.Dispose ();
+				TapToEditBubbleViewTopConstraint = null;
+			}
+
+			if (StopTimeEntryOnboardingBubbleView != null) {
+				StopTimeEntryOnboardingBubbleView.Dispose ();
+				StopTimeEntryOnboardingBubbleView = null;
 			}
 
 			if (TimeEntriesLogTableView != null) {
@@ -131,6 +159,26 @@ namespace Toggl.Daneel.ViewControllers
 			if (WelcomeBackView != null) {
 				WelcomeBackView.Dispose ();
 				WelcomeBackView = null;
+			}
+
+			if (SwipeRightBubbleView != null) {
+				SwipeRightBubbleView.Dispose ();
+				SwipeRightBubbleView = null;
+			}
+
+			if (SwipeLeftBubbleView != null) {
+				SwipeLeftBubbleView.Dispose ();
+				SwipeLeftBubbleView = null;
+			}
+
+			if (SwipeLeftTopConstraint != null) {
+				SwipeLeftTopConstraint.Dispose ();
+				SwipeLeftTopConstraint = null;
+			}
+
+			if (SwipeRightTopConstraint != null) {
+				SwipeRightTopConstraint.Dispose ();
+				SwipeRightTopConstraint = null;
 			}
 		}
 	}

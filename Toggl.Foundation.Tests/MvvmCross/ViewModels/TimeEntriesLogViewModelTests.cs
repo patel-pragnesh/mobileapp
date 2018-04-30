@@ -199,7 +199,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var newTimeEntry = NewTimeEntry.With((long)TimeSpan.FromHours(1).TotalSeconds);
 
                 TimeEntryCreatedSubject.OnNext(newTimeEntry);
-                await ThreadingTask.Delay(200);
 
                 ViewModel.TimeEntries.Any(c => c.Any(te => te.Id == 21)).Should().BeTrue();
                 ViewModel.TimeEntries.Aggregate(0, (acc, te) => acc + te.Count).Should().Be(InitialAmountOfTimeEntries + 1);
@@ -211,7 +210,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 await ViewModel.Initialize();
 
                 TimeEntryCreatedSubject.OnNext(NewTimeEntry);
-                await ThreadingTask.Delay(200);
 
                 ViewModel.TimeEntries.Any(c => c.Any(te => te.Id == 21)).Should().BeFalse();
                 ViewModel.TimeEntries.Aggregate(0, (acc, te) => acc + te.Count).Should().Be(InitialAmountOfTimeEntries);
@@ -225,7 +223,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 await ViewModel.Initialize();
 
                 TimeEntryCreatedSubject.OnNext(NewTimeEntry.With((long)TimeSpan.FromHours(1).TotalSeconds));
-                await ThreadingTask.Delay(200);
 
                 ViewModel.IsWelcome.Should().BeFalse();
             }
@@ -238,7 +235,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 await ViewModel.Initialize();
 
                 TimeEntryCreatedSubject.OnNext(NewTimeEntry.With((long)TimeSpan.FromHours(1).TotalSeconds));
-                await ThreadingTask.Delay(200);
 
                 OnboardingStorage.Received().SetIsNewUser(false);
             }

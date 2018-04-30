@@ -26,6 +26,9 @@ namespace Toggl.Foundation.Analytics
         private const string appShortcutEventName = "ApplicationShortcut";
         private const string appShortcutParameter = "ApplicationShortcutType";
 
+        private const string editEntrySelectProjectEventName = "EditEntrySelectProject";
+        private const string editEntrySelectTagEventName = "EditEntrySelectTag";
+
         public void TrackOnboardingSkipEvent(string pageName)
         {
             track(onboardingSkipEventName, pageParameter, pageName);
@@ -84,6 +87,16 @@ namespace Toggl.Foundation.Analytics
         public void TrackAppShortcut(string shortcut)
         {
             track(appShortcutEventName, appShortcutParameter, shortcut);
+        }
+
+        public void TrackEditOpensProjectSelector()
+        {
+            track(editEntrySelectProjectEventName);
+        }
+
+        public void TrackEditOpensTagSelector()
+        {
+            track(editEntrySelectTagEventName);
         }
 
         private void track(string eventName)

@@ -24,5 +24,8 @@ namespace Toggl.Foundation.Analytics
         void TrackSyncError(Exception exception);
 
         void TrackAppShortcut(string shortcut);
+
+        void TrackEditOpensProjectSelector();
+        void TrackEditOpensTagSelector();
     }
 }

@@ -34,20 +34,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         private void Setup()
         {
-            Ioc.RegisterSingleton(Api);
-            Ioc.RegisterSingleton(Database);
-            Ioc.RegisterSingleton(DataSource);
-            Ioc.RegisterSingleton(TimeService);
-            Ioc.RegisterSingleton(MailService);
-            Ioc.RegisterSingleton(DialogService);
-            Ioc.RegisterSingleton(LicenseProvider);
-            Ioc.RegisterSingleton(AnalyticsService);
-            Ioc.RegisterSingleton(InteractorFactory);
-            Ioc.RegisterSingleton(PlatformConstants);
-            Ioc.RegisterSingleton(OnboardingStorage);
-            Ioc.RegisterSingleton(NavigationService);
-            Ioc.RegisterSingleton(SuggestionProviderContainer);
-
             AdditionalSetup();
 
             ViewModel = CreateViewModel();

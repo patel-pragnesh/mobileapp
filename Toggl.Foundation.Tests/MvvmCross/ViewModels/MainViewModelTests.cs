@@ -36,7 +36,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             protected override MainViewModel CreateViewModel()
             {
-                var vm = new MainViewModel(Scheduler, DataSource, TimeService, UserPreferences, OnboardingStorage, InteractorFactory, NavigationService);
+                var vm = new MainViewModel(Scheduler, DataSource, TimeService, UserPreferences, OnboardingStorage, InteractorFactory, NavigationService, SuggestionProviderContainer);
                 vm.Prepare();
                 return vm;
             }
@@ -54,7 +54,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheConstructor : MainViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(SevenParameterConstructorTestData))]
+            [ClassData(typeof(EightParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool useScheduler,
                 bool useDataSource,
@@ -62,7 +62,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 bool useUserPreferences,
                 bool useOnboardingStorage,
                 bool useInteractorFactory,
-                bool useNavigationService)
+                bool useNavigationService,
+                bool useSuggestionProviderContainer)
             {
                 var scheduler = useScheduler ? Scheduler : null;
                 var dataSource = useDataSource ? DataSource : null;
@@ -71,9 +72,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var navigationService = useNavigationService ? NavigationService : null;
                 var interactorFactory = useInteractorFactory ? InteractorFactory : null;
                 var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
+                var suggestionProviderContainer = useSuggestionProviderContainer ? SuggestionProviderContainer : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new MainViewModel(scheduler, dataSource, timeService, userPreferences, onboardingStorage, interactorFactory, navigationService);
+                    () => new MainViewModel(scheduler, dataSource, timeService, userPreferences, onboardingStorage, interactorFactory, navigationService, suggestionProviderContainer);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -98,25 +100,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ViewAppearing();
 
                 ViewModel.IsInManualMode.Should().Be(isEnabled);
-            }
-        }
-
-        public sealed class TheViewAppearedMethod : MainViewModelTest
-        {
-            [Fact, LogIfTooSlow]
-            public void RequestsTheSuggestionsViewModel()
-            {
-                ViewModel.ViewAppeared();
-
-                NavigationService.Received().Navigate<SuggestionsViewModel>();
-            }
-
-            [Fact, LogIfTooSlow]
-            public void RequestsTheLogTimeEntriesViewModel()
-            {
-                ViewModel.ViewAppeared();
-
-                NavigationService.Received().Navigate<TimeEntriesLogViewModel>();
             }
         }
 

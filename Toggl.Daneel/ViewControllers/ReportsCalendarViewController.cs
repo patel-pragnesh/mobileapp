@@ -16,9 +16,6 @@ namespace Toggl.Daneel.ViewControllers
     [NestedPresentation]
     public partial class ReportsCalendarViewController : MvxViewController<ReportsCalendarViewModel>, IUICollectionViewDelegate
     {
-        private const int estimatedQuickSelectShortcutHeight = 32;
-        private const int estimatedQuickSelectShortcutWidth = 90;
-
         private bool calendarInitialized;
 
         public ReportsCalendarViewController()
@@ -35,7 +32,7 @@ namespace Toggl.Daneel.ViewControllers
             CalendarCollectionView.DataSource = calendarCollectionViewSource;
             CalendarCollectionView.CollectionViewLayout = calendarCollectionViewLayout;
 
-            var quickSelectCollectionViewSource = new ReportsCalendarQuickSelectCollectionViewSource(QuickSelectCollectionView, ReportsCalendarQuickSelectViewCell.Font);
+            var quickSelectCollectionViewSource = new ReportsCalendarQuickSelectCollectionViewSource(QuickSelectCollectionView);
             QuickSelectCollectionView.Source = quickSelectCollectionViewSource;
 
             setupDayHeaders();

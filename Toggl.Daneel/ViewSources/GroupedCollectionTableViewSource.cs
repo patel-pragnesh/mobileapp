@@ -109,7 +109,9 @@ namespace Toggl.Daneel.ViewSources
 
         public override void HeaderViewDisplayingEnded(UITableView tableView, UIView headerView, nint section)
         {
-            var firstVisible = TableView.IndexPathsForVisibleRows.First();
+            var firstVisible = TableView.IndexPathsForVisibleRows.FirstOrDefault();
+            if (firstVisible == null) return;
+
             if (firstVisible.Section != section + 1) return;
 
             var nextHeader = TableView.GetHeaderView(firstVisible.Section) as IHeaderViewCellWithHideableTopSeparator;
@@ -123,7 +125,9 @@ namespace Toggl.Daneel.ViewSources
             var headerViewCell = headerView as IHeaderViewCellWithHideableTopSeparator;
             if (headerViewCell == null) return;
 
-            var firstVisibleIndexPath = TableView.IndexPathsForVisibleRows.First();
+            var firstVisibleIndexPath = TableView.IndexPathsForVisibleRows.FirstOrDefault();
+            if (firstVisibleIndexPath == null) return;
+
             if (firstVisibleIndexPath.Section == section)
             {
                 var nextHeader = TableView.GetHeaderView(section + 1) as IHeaderViewCellWithHideableTopSeparator;

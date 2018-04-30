@@ -110,7 +110,8 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
         [Fact, LogIfTooSlow]
         public void DelaysTheTransitionAtMostByTheNextSlowDelayTimeFromTheRetryDelayServiceWhenInternalServerErrorOccurs()
         {
-            api.Status.IsAvailable().Returns(Observable.Throw<Unit>(new InternalServerErrorException(request, response)));
+            var observable = Observable.Throw<Unit>(new InternalServerErrorException(request, response));
+            api.Status.IsAvailable().Returns(observable);
             apiDelay.NextFastDelay().Returns(TimeSpan.FromSeconds(100));
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
             var hasCompleted = false;
@@ -126,7 +127,8 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
         [Fact, LogIfTooSlow]
         public void DelaysTheTransitionAtLeastByTheNextSlowDelayTimeFromTheRetryDelayServiceWhenInternalServerErrorOccurs()
         {
-            api.Status.IsAvailable().Returns(Observable.Throw<Unit>(new InternalServerErrorException(request, response)));
+            var observable = Observable.Throw<Unit>(new InternalServerErrorException(request, response));
+            api.Status.IsAvailable().Returns(observable);
             statusDelay.NextFastDelay().Returns(TimeSpan.FromSeconds(1));
             statusDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
             var hasCompleted = false;
@@ -190,7 +192,8 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
         [Fact, LogIfTooSlow]
         public void CompletesEvenThoughTheRetryDelayIsNotOverButTheCancellationObservableIsNotifiedOfNewValue()
         {
-            api.Status.IsAvailable().Returns(Observable.Throw<Unit>(new InternalServerErrorException(request, response)));
+            var observable = Observable.Throw<Unit>(new InternalServerErrorException(request, response));
+            api.Status.IsAvailable().Returns(observable);
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
 
             ITransition transition = null;

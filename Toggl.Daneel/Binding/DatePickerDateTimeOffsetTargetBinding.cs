@@ -16,10 +16,12 @@ namespace Toggl.Daneel.Binding
         public DatePickerDateTimeOffsetTargetBinding(UIDatePicker target) : base(target)
         {
             Target.ValueChanged += onValueChanged;
-        } 
-        
+        }
+
         protected override void SetValue(DateTimeOffset value)
-            => Target.Date = value.ToNSDate();
+        {
+            Target.SetDate(value.ToNSDate(), true);
+        }
 
         protected override void Dispose(bool isDisposing)
         {

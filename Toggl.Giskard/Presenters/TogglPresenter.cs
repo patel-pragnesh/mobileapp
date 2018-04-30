@@ -16,7 +16,8 @@ namespace Toggl.Giskard.Presenters
         {
             typeof(MainViewModel),
             typeof(OnboardingViewModel),
-            typeof(TokenResetViewModel)
+            typeof(TokenResetViewModel),
+            typeof(OutdatedAppViewModel)
         };
 
         public TogglPresenter(IEnumerable<Assembly> androidViewAssemblies)

@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
-using MvvmCross.Platform;
 using PropertyChanged;
 using Toggl.Foundation;
 using Toggl.Foundation.DataSources;
@@ -18,6 +17,8 @@ using Toggl.Foundation.Sync;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
+using System.Reactive;
+using Toggl.Foundation.Suggestions;
 
 [assembly: MvxNavigation(typeof(MainViewModel), ApplicationUrls.Main.Regex)]
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -64,6 +65,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             string.IsNullOrEmpty(CurrentTimeEntryDescription)
             && string.IsNullOrEmpty(CurrentTimeEntryProject);
 
+        public bool IsLogEmpty
+            => TimeEntriesLogViewModel.IsEmpty;
+
         public bool ShouldShowTimeEntriesLog
             => !TimeEntriesLogViewModel.IsEmpty;
 
@@ -77,15 +81,19 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             && TimeEntriesLogViewModel.IsEmpty
             && !IsWelcome;
 
+        public int TimeEntriesCount => TimeEntriesLogViewModel.TimeEntries?.Select(section => section.Count).Sum() ?? 0;
+
         public bool IsWelcome => TimeEntriesLogViewModel.IsWelcome;
 
         public bool IsInManualMode { get; set; } = false;
 
-        public TimeEntriesLogViewModel TimeEntriesLogViewModel { get; } = Mvx.IocConstruct<TimeEntriesLogViewModel>();
+        public TimeEntriesLogViewModel TimeEntriesLogViewModel { get; }
 
-        public SuggestionsViewModel SuggestionsViewModel { get; } = Mvx.IocConstruct<SuggestionsViewModel>();
+        public SuggestionsViewModel SuggestionsViewModel { get; }
 
         public IOnboardingStorage OnboardingStorage => onboardingStorage;
+
+        public IMvxNavigationService NavigationService => navigationService;
 
         public IMvxAsyncCommand StartTimeEntryCommand { get; }
 
@@ -108,7 +116,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IUserPreferences userPreferences,
             IOnboardingStorage onboardingStorage,
             IInteractorFactory interactorFactory,
-            IMvxNavigationService navigationService)
+            IMvxNavigationService navigationService,
+            ISuggestionProviderContainer suggestionProviders)
         {
             Ensure.Argument.IsNotNull(scheduler, nameof(scheduler));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
@@ -117,6 +126,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
+            Ensure.Argument.IsNotNull(suggestionProviders, nameof(suggestionProviders));
 
             this.scheduler = scheduler;
             this.dataSource = dataSource;
@@ -125,6 +135,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.interactorFactory = interactorFactory;
             this.navigationService = navigationService;
             this.onboardingStorage = onboardingStorage;
+
+            TimeEntriesLogViewModel = new TimeEntriesLogViewModel(timeService, dataSource, interactorFactory, onboardingStorage, navigationService);
+            SuggestionsViewModel = new SuggestionsViewModel(dataSource, interactorFactory, suggestionProviders);
 
             RefreshCommand = new MvxCommand(refresh);
             OpenReportsCommand = new MvxAsyncCommand(openReports);
@@ -162,16 +175,17 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .ProgressObservable
                 .Subscribe(progress => SyncingProgress = progress);
 
-            var isEmptyChangedDisposable = dataSource
-                .TimeEntries
-                .TimeEntryUpdated
-                .Select(te => te.Id)
-                .Merge(dataSource.TimeEntries.TimeEntryDeleted)
-                .Subscribe((long _) =>
+            var isEmptyChangedDisposable = Observable.Empty<Unit>()
+                .Merge(dataSource.TimeEntries.TimeEntryUpdated.Select(_ => Unit.Default))
+                .Merge(dataSource.TimeEntries.TimeEntryDeleted.Select(_ => Unit.Default))
+                .Merge(dataSource.TimeEntries.TimeEntryCreated.Select(_ => Unit.Default))
+                .Subscribe(_ =>
                 {
                     RaisePropertyChanged(nameof(ShouldShowTimeEntriesLog));
                     RaisePropertyChanged(nameof(ShouldShowWelcomeBack));
                     RaisePropertyChanged(nameof(ShouldShowEmptyState));
+                    RaisePropertyChanged(nameof(IsLogEmpty));
+                    RaisePropertyChanged(nameof(TimeEntriesCount));
                 });
 
             disposeBag.Add(tickDisposable);
@@ -206,8 +220,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public override void ViewAppeared()
         {
             base.ViewAppeared();
-            navigationService.Navigate<SuggestionsViewModel>();
-            navigationService.Navigate<TimeEntriesLogViewModel>();
 
             ChangePresentation(new CardVisibilityHint(CurrentTimeEntryId != null));
         }

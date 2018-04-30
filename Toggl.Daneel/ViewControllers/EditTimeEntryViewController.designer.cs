@@ -26,6 +26,9 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView BillableView { get; set; }
 
 		[Outlet]
+		UIKit.UIView CategorizeWithProjectsBubbleView { get; set; }
+
+		[Outlet]
 		UIKit.UIButton CloseButton { get; set; }
 
 		[Outlet]
@@ -41,7 +44,7 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.NSLayoutConstraint DeleteButtonBottomConstraint { get; set; }
 
 		[Outlet]
-		Toggl.Daneel.Views.TextViewWithCharacterCounter DescriptionTextView { get; set; }
+		Toggl.Daneel.Views.TextViewWithPlaceholder DescriptionTextView { get; set; }
 
 		[Outlet]
 		UIKit.UILabel DurationLabel { get; set; }
@@ -63,6 +66,9 @@ namespace Toggl.Daneel.ViewControllers
 
 		[Outlet]
 		UIKit.UILabel ProjectTaskClientLabel { get; set; }
+
+		[Outlet]
+		UIKit.UILabel RemainingCharacterCount { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
@@ -215,6 +221,16 @@ namespace Toggl.Daneel.ViewControllers
 			if (TagsTextView != null) {
 				TagsTextView.Dispose ();
 				TagsTextView = null;
+			}
+
+			if (CategorizeWithProjectsBubbleView != null) {
+				CategorizeWithProjectsBubbleView.Dispose ();
+				CategorizeWithProjectsBubbleView = null;
+			}
+
+			if (RemainingCharacterCount != null) {
+				RemainingCharacterCount.Dispose ();
+				RemainingCharacterCount = null;
 			}
 		}
 	}

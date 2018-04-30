@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Toggl.Ultrawave.Models;
 using Toggl.Ultrawave.Network;
+using Toggl.Ultrawave.Serialization;
 
 namespace Toggl.Ultrawave.Exceptions
 {
@@ -11,17 +13,17 @@ namespace Toggl.Ultrawave.Exceptions
 
         internal IResponse Response { get; }
 
+        public string LocalizedApiErrorMessage { get; }
+
         private readonly string message;
 
-        internal ApiException(IRequest request, IResponse response, string message)
+        internal ApiException(IRequest request, IResponse response, string defaultMessage)
         {
             Request = request;
             Response = response;
-            this.message = message;
+            LocalizedApiErrorMessage = getLocalizedMessageFromResponse(response);
+            this.message = defaultMessage;
         }
-
-        public string LocalizedApiErrorMessage
-            => Response.RawData;
 
         public override string ToString()
             => $"{GetType().Name} for request {Request.HttpMethod} {Request.Endpoint}: "
@@ -35,5 +37,23 @@ namespace Toggl.Ultrawave.Exceptions
             => String.Join(", ", headers.Select(pair => $"'{pair.Key}': [{String.Join(", ", pair.Value.Select(v => $"'{v}'").ToArray())}]").ToArray());
 
         public override string Message => ToString();
+
+        private string getLocalizedMessageFromResponse(IResponse response)
+        {
+            if (response.IsJson)
+            {
+                try
+                {
+                    var serializer = new JsonSerializer();
+                    var error = serializer.Deserialize<ResponseError>(response.RawData);
+                    return error.Message;
+                }
+                catch (DeserializationException<ResponseError>)
+                {
+                    return "";
+                }
+            }
+            return response.RawData;
+        }
     }
 }

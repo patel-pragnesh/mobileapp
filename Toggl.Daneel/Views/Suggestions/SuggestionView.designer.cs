@@ -19,6 +19,9 @@ namespace Toggl.Daneel
 		UIKit.UILabel DescriptionLabel { get; set; }
 
 		[Outlet]
+		UIKit.NSLayoutConstraint DescriptionTopDistanceConstraint { get; set; }
+
+		[Outlet]
 		Toggl.Daneel.Views.FadeView FadeView { get; set; }
 
 		[Outlet]
@@ -29,9 +32,19 @@ namespace Toggl.Daneel
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (ClientLabel != null) {
+				ClientLabel.Dispose ();
+				ClientLabel = null;
+			}
+
 			if (DescriptionLabel != null) {
 				DescriptionLabel.Dispose ();
 				DescriptionLabel = null;
+			}
+
+			if (FadeView != null) {
+				FadeView.Dispose ();
+				FadeView = null;
 			}
 
 			if (ProjectDot != null) {
@@ -44,14 +57,9 @@ namespace Toggl.Daneel
 				ProjectLabel = null;
 			}
 
-			if (ClientLabel != null) {
-				ClientLabel.Dispose ();
-				ClientLabel = null;
-			}
-
-			if (FadeView != null) {
-				FadeView.Dispose ();
-				FadeView = null;
+			if (DescriptionTopDistanceConstraint != null) {
+				DescriptionTopDistanceConstraint.Dispose ();
+				DescriptionTopDistanceConstraint = null;
 			}
 		}
 	}

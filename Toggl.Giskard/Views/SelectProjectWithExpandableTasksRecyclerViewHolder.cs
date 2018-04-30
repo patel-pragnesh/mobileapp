@@ -31,6 +31,12 @@ namespace Toggl.Giskard.Views
             }
         }
 
+        public SelectProjectWithExpandableTasksRecyclerViewHolder(View itemView, IMvxAndroidBindingContext context, int tasksExpansionButtonId)
+            : base(itemView, context)
+        {
+            ToggleTasksExpansionButtonId = tasksExpansionButtonId;
+        }
+
         public SelectProjectWithExpandableTasksRecyclerViewHolder(View itemView, IMvxAndroidBindingContext context)
             : base(itemView, context)
         {

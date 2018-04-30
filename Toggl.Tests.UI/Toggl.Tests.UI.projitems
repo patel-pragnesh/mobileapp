@@ -18,6 +18,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\MainExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\OnboardingExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StartTimeEntryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Attributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReplTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />

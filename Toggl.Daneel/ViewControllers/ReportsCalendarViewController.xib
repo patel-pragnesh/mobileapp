@@ -106,17 +106,17 @@
                     </collectionViewFlowLayout>
                 </collectionView>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" contentInsetAdjustmentBehavior="never" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="T1C-Ey-wjY">
-                    <rect key="frame" x="13" y="282" width="294" height="32"/>
+                    <rect key="frame" x="0.0" y="282" width="320" height="32"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="32" id="D1U-1Y-ogc"/>
                     </constraints>
                     <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
-                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="aht-yH-mh5">
+                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="12" minimumInteritemSpacing="12" id="aht-yH-mh5">
                         <size key="itemSize" width="50" height="32"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <inset key="sectionInset" minX="13" minY="0.0" maxX="13" maxY="0.0"/>
                     </collectionViewFlowLayout>
                 </collectionView>
             </subviews>
@@ -126,9 +126,9 @@
                 <constraint firstAttribute="bottom" secondItem="T1C-Ey-wjY" secondAttribute="bottom" constant="24" id="D5f-fW-Aob"/>
                 <constraint firstItem="i6E-PC-G3r" firstAttribute="top" secondItem="MDd-vl-ExG" secondAttribute="bottom" constant="11" id="Jkz-qC-ggl"/>
                 <constraint firstItem="MDd-vl-ExG" firstAttribute="top" secondItem="2" secondAttribute="top" id="LDM-ZK-Uut"/>
-                <constraint firstItem="T1C-Ey-wjY" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="13" id="M6l-O4-Pxt"/>
+                <constraint firstItem="T1C-Ey-wjY" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="M6l-O4-Pxt"/>
                 <constraint firstItem="T1C-Ey-wjY" firstAttribute="top" secondItem="Btd-Jn-XOm" secondAttribute="bottom" constant="24" id="OsD-NN-E6v"/>
-                <constraint firstAttribute="trailing" secondItem="T1C-Ey-wjY" secondAttribute="trailing" constant="13" id="W7V-sj-aE4"/>
+                <constraint firstAttribute="trailing" secondItem="T1C-Ey-wjY" secondAttribute="trailing" id="W7V-sj-aE4"/>
                 <constraint firstItem="Btd-Jn-XOm" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="13" id="jQN-ds-u9g"/>
                 <constraint firstItem="MDd-vl-ExG" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="xpU-5B-2bM"/>
                 <constraint firstAttribute="trailing" secondItem="Btd-Jn-XOm" secondAttribute="trailing" constant="13" id="y1H-Nl-vSH"/>

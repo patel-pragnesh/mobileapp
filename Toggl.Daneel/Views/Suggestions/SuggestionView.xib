@@ -79,6 +79,7 @@
             <connections>
                 <outlet property="ClientLabel" destination="PFj-I8-nFs" id="ycp-kC-xir"/>
                 <outlet property="DescriptionLabel" destination="D7P-XK-5vZ" id="JbQ-Hd-eIn"/>
+                <outlet property="DescriptionTopDistanceConstraint" destination="2fO-du-dnX" id="UVx-wV-EXk"/>
                 <outlet property="FadeView" destination="AgO-D8-qST" id="3pO-0p-Lss"/>
                 <outlet property="ProjectDot" destination="ztf-Qj-KY1" id="Ldz-o9-ewa"/>
                 <outlet property="ProjectLabel" destination="ebs-ES-eMx" id="NdZ-F3-vca"/>

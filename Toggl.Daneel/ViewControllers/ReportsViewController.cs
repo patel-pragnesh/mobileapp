@@ -1,4 +1,6 @@
-﻿using CoreGraphics;
+﻿using System;
+using CoreGraphics;
+using Foundation;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
 using MvvmCross.iOS.Views;
@@ -16,11 +18,15 @@ namespace Toggl.Daneel.ViewControllers
     [MvxChildPresentation]
     public sealed partial class ReportsViewController : MvxViewController<ReportsViewModel>
     {
-        private const int calendarHeight = 338;
+        private const string boundsKey = "bounds";
+
+        private nfloat calendarHeight => CalendarContainer.Bounds.Height;
 
         private UIButton titleButton;
 
         private ReportsTableViewSource source;
+
+        private IDisposable calendarSizeDisposable;
 
         internal UIView CalendarContainerView => CalendarContainer;
 
@@ -35,6 +41,8 @@ namespace Toggl.Daneel.ViewControllers
             base.ViewDidLoad();
 
             prepareViews();
+
+            calendarSizeDisposable = CalendarContainer.AddObserver(boundsKey, NSKeyValueObservingOptions.New, onCalendarSizeChanged);
 
             source = new ReportsTableViewSource(ReportsTableView);
             source.OnScroll += onReportsTableScrolled;
@@ -66,6 +74,9 @@ namespace Toggl.Daneel.ViewControllers
             if (!disposing) return;
 
             source.OnScroll -= onReportsTableScrolled;
+
+            calendarSizeDisposable?.Dispose();
+            calendarSizeDisposable = null;
         }
 
         private void onReportsTableScrolled(object sender, CGPoint offset)
@@ -120,6 +131,14 @@ namespace Toggl.Daneel.ViewControllers
 
             // Calendar configuration
             TopCalendarConstraint.Constant = calendarHeight;
+        }
+
+        private void onCalendarSizeChanged(NSObservedChange change)
+        {
+            if (CalendarIsVisible)
+                TopCalendarConstraint.Constant = 0;
+            else
+                TopCalendarConstraint.Constant = calendarHeight;
         }
     }
 }

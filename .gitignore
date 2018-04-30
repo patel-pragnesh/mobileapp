@@ -303,3 +303,4 @@ Toggl.Daneel/Views/ActivityIndicatorView.designer.cs
 Toggl.Daneel/service-account.json
 
 giskard.keystore
+Toggl.Giskard/**/Resource.designer.cs

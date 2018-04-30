@@ -150,6 +150,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTime = parameter.Duration.HasValue
                 ? StartTime + parameter.Duration.Value
                 : timeService.CurrentDateTime;
+
+            MinimumDateTime = StartTime.DateTime;
+            MaximumDateTime = StopTime.DateTime;
         }
 
         public override async Task Initialize()

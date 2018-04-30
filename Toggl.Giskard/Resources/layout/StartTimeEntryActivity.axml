@@ -101,7 +101,7 @@
             android:lineSpacingExtra="5sp"
             android:scrollHorizontally="true"
             android:textColor="@android:color/white"
-            android:textCursorDrawable="@null"
+            android:textCursorDrawable="@drawable/EditTextWhiteCursor"
             android:background="@color/blueToolbarBackground"
             android:hint="@string/StartTimeEntryHint"
             android:textColorHint="@color/blueBackgroundTextHintColor"

@@ -44,19 +44,27 @@
             android:src="@drawable/logo"
             android:layout_width="wrap_content"
             android:layout_height="24dp" />
-        <Button
+        <ImageView
             local:MvxBind="Click OpenSettingsCommand"
-            android:background="@drawable/settings_dark"
-            android:layout_gravity="end"
-            android:layout_marginLeft="16dp"
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
-        <Button
+            android:clickable="true"
+            android:paddingTop="16dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp"
+            android:src="@drawable/settings_dark"
+            android:layout_width="48dp"
+            android:layout_height="56dp"
+            android:layout_gravity="end" />
+        <ImageView
             local:MvxBind="Click OpenReportsCommand"
-            android:background="@drawable/reports_dark"
-            android:layout_gravity="end"
-            android:layout_marginLeft="16dp"
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
+            android:clickable="true"
+            android:paddingTop="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="16dp"
+            android:src="@drawable/reports_dark"
+            android:layout_width="48dp"
+            android:layout_height="56dp"
+            android:layout_gravity="end" />
     </android.support.v7.widget.Toolbar>
 </android.support.design.widget.CoordinatorLayout>

@@ -11,6 +11,9 @@ namespace Toggl.Daneel
 {
     public sealed partial class SuggestionView : UIView
     {
+        private const float noProjectDistance = 11;
+        private const float hasProjectDistance = 0;
+
         public SuggestionView (IntPtr handle) : base (handle)
         {
         }
@@ -40,7 +43,10 @@ namespace Toggl.Daneel
             Hidden = false;
             DescriptionLabel.Text = Suggestion.Description;
 
-            if (Suggestion.ProjectId == null)
+            var hasProject = Suggestion.ProjectId != null;
+            DescriptionTopDistanceConstraint.Constant = hasProject ? hasProjectDistance : noProjectDistance;
+
+            if (!hasProject)
             {
                 hideProjectTaskClient();
                 return;

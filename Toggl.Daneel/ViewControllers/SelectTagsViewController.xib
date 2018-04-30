@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -27,21 +27,26 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E3h-ZA-T3J">
-                    <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                    <rect key="frame" x="0.0" y="0.0" width="44" height="44"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="40" id="7kz-5b-8QS"/>
-                        <constraint firstAttribute="width" constant="40" id="sCJ-Vh-Nl2"/>
+                        <constraint firstAttribute="height" constant="44" id="7kz-5b-8QS"/>
+                        <constraint firstAttribute="width" constant="44" id="sCJ-Vh-Nl2"/>
                     </constraints>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="2"/>
                     <state key="normal" image="icClose"/>
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tags" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s6h-5g-H2v">
-                    <rect key="frame" x="145" y="12" width="31.666666666666657" height="17"/>
+                    <rect key="frame" x="145" y="14" width="31.666666666666657" height="17"/>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hjx-0o-EI5">
-                    <rect key="frame" x="272" y="5.6666666666666679" width="32" height="29.000000000000004"/>
+                    <rect key="frame" x="260" y="0.33333333333333215" width="60" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="60" id="9JE-i3-lJm"/>
+                        <constraint firstAttribute="height" constant="44" id="oKZ-ch-xxu"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                     <state key="normal" title="Save">
                         <color key="titleColor" red="0.29803921568627451" green="0.85098039215686272" blue="0.39215686274509803" alpha="1" colorSpace="calibratedRGB"/>
@@ -55,8 +60,11 @@
                     </constraints>
                 </imageView>
                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Add/filter tags" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="Oy7-SV-cuq">
-                    <rect key="frame" x="36" y="65.666666666666671" width="268" height="19"/>
+                    <rect key="frame" x="36" y="53.333333333333343" width="268" height="44"/>
                     <color key="tintColor" red="0.29803921568627451" green="0.85098039215686272" blue="0.39215686274509803" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="PyH-2R-zQy"/>
+                    </constraints>
                     <nil key="textColor"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits"/>
@@ -74,12 +82,11 @@
                     <color key="separatorColor" red="0.90980392156862744" green="0.90980392156862744" blue="0.90980392156862744" alpha="1" colorSpace="calibratedRGB"/>
                     <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                 </tableView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add keywords to your time entries with tags." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N1a-u9-986" userLabel="NoTagsLabel">
-                    <rect key="frame" x="85" y="243" width="150" height="36"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="150" id="F4P-v1-7Gz"/>
-                        <constraint firstAttribute="height" constant="36" id="zmb-VY-uJW"/>
-                    </constraints>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N1a-u9-986" userLabel="NoTagsLabel">
+                    <rect key="frame" x="70.000000000000014" y="243.00000000000003" width="180.33333333333337" height="50.333333333333343"/>
+                    <string key="text">Your tags will show up here.
+Use them to add keywords
+to your time entries.</string>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <color key="textColor" red="0.70980392156862748" green="0.73725490196078436" blue="0.75294117647058822" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
@@ -97,7 +104,7 @@
                 <constraint firstItem="E3h-ZA-T3J" firstAttribute="top" secondItem="2" secondAttribute="top" id="2lM-9h-qGV"/>
                 <constraint firstItem="N1a-u9-986" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="5ZP-Cs-rVb"/>
                 <constraint firstItem="5dy-Z6-wg6" firstAttribute="top" secondItem="Bxy-fS-I3J" secondAttribute="bottom" id="75o-E9-otV"/>
-                <constraint firstAttribute="trailing" secondItem="hjx-0o-EI5" secondAttribute="trailing" constant="16" id="HFX-SX-iaE"/>
+                <constraint firstAttribute="trailing" secondItem="hjx-0o-EI5" secondAttribute="trailing" id="HFX-SX-iaE"/>
                 <constraint firstItem="sx4-Gh-vgA" firstAttribute="centerX" secondItem="N1a-u9-986" secondAttribute="centerX" constant="-12" id="IEy-H0-sAP"/>
                 <constraint firstAttribute="trailing" secondItem="Oy7-SV-cuq" secondAttribute="trailing" constant="16" id="JSR-AA-31h"/>
                 <constraint firstItem="Oy7-SV-cuq" firstAttribute="leading" secondItem="vKP-CL-GPZ" secondAttribute="trailing" constant="10" id="NOB-1k-6bS"/>
@@ -111,7 +118,7 @@
                 <constraint firstItem="vKP-CL-GPZ" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="16" id="f5X-ue-fUz"/>
                 <constraint firstItem="sx4-Gh-vgA" firstAttribute="top" secondItem="2" secondAttribute="top" constant="157" id="feW-Xh-Vli"/>
                 <constraint firstItem="E3h-ZA-T3J" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="gcZ-Cv-c7l"/>
-                <constraint firstItem="vKP-CL-GPZ" firstAttribute="top" secondItem="E3h-ZA-T3J" secondAttribute="bottom" constant="30" id="iYk-C4-sIk"/>
+                <constraint firstItem="vKP-CL-GPZ" firstAttribute="top" secondItem="E3h-ZA-T3J" secondAttribute="bottom" constant="26" id="iYk-C4-sIk"/>
                 <constraint firstItem="s6h-5g-H2v" firstAttribute="centerY" secondItem="E3h-ZA-T3J" secondAttribute="centerY" id="nCF-aT-Xqq"/>
                 <constraint firstItem="s6h-5g-H2v" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="w2b-ZQ-cP2"/>
                 <constraint firstAttribute="trailing" secondItem="5dy-Z6-wg6" secondAttribute="trailing" id="wzN-2W-kyA"/>

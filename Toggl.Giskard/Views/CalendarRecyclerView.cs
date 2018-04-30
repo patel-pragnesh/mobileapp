@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Util;
+using Android.Views;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using Toggl.Giskard.Adapters;
 
@@ -30,6 +31,15 @@ namespace Toggl.Giskard.Views
             : base(context, attrs, defStyle, new CalendarRecyclerAdapter())
         {
             SetLayoutManager(new GridLayoutManager(context, 7, LinearLayoutManager.Vertical, false));
+        }
+
+        protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
+        {
+            var width = MeasureSpec.GetSize(widthMeasureSpec);
+            var offset = width % 7;
+            var newWidth = width - offset; 
+            var newWidthMeasureSpec = MeasureSpec.MakeMeasureSpec(newWidth, MeasureSpecMode.Exactly);
+            base.OnMeasure(newWidthMeasureSpec, heightMeasureSpec);
         }
     }
 }

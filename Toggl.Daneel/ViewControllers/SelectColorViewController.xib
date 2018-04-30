@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -32,9 +32,10 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fvg-dp-el4">
-                    <rect key="frame" x="240" y="12" width="32" height="16"/>
+                    <rect key="frame" x="228" y="0.0" width="60" height="44"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="16" id="3hT-4c-O2K"/>
+                        <constraint firstAttribute="height" constant="44" id="3hT-4c-O2K"/>
+                        <constraint firstAttribute="width" constant="60" id="9e4-eQ-bAH"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                     <state key="normal" title="Save">
@@ -42,11 +43,12 @@
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8iM-ju-8R3">
-                    <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                    <rect key="frame" x="0.0" y="0.0" width="44" height="44"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="40" id="7JB-d1-pm7"/>
-                        <constraint firstAttribute="height" constant="40" id="s0n-Fx-04x"/>
+                        <constraint firstAttribute="width" constant="44" id="7JB-d1-pm7"/>
+                        <constraint firstAttribute="height" constant="44" id="s0n-Fx-04x"/>
                     </constraints>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="2"/>
                     <state key="normal" image="icClose"/>
                 </button>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="oPC-Yw-XVk">
@@ -97,9 +99,9 @@
                 <constraint firstItem="oPC-Yw-XVk" firstAttribute="top" secondItem="pIl-6Q-q30" secondAttribute="bottom" constant="30" id="AHE-BY-3pr"/>
                 <constraint firstItem="9ax-lx-WQ3" firstAttribute="height" secondItem="Ny2-Jd-yif" secondAttribute="height" id="D6n-A0-KgM"/>
                 <constraint firstItem="a4O-k3-XAQ" firstAttribute="top" secondItem="oPC-Yw-XVk" secondAttribute="bottom" constant="20" id="Ihs-L2-BW7"/>
-                <constraint firstAttribute="trailing" secondItem="fvg-dp-el4" secondAttribute="trailing" constant="16" id="LeM-BJ-FUG"/>
+                <constraint firstAttribute="trailing" secondItem="fvg-dp-el4" secondAttribute="trailing" id="LeM-BJ-FUG"/>
                 <constraint firstAttribute="trailing" secondItem="Ny2-Jd-yif" secondAttribute="trailing" constant="14" id="c2V-d3-r2R"/>
-                <constraint firstItem="fvg-dp-el4" firstAttribute="top" secondItem="2" secondAttribute="top" constant="12" id="c3l-Js-zbN"/>
+                <constraint firstItem="fvg-dp-el4" firstAttribute="top" secondItem="2" secondAttribute="top" id="c3l-Js-zbN"/>
                 <constraint firstItem="pIl-6Q-q30" firstAttribute="top" secondItem="2" secondAttribute="top" constant="12" id="cC8-mg-Zb9"/>
                 <constraint firstItem="pIl-6Q-q30" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="crd-40-gPz"/>
                 <constraint firstItem="9ax-lx-WQ3" firstAttribute="trailing" secondItem="Ny2-Jd-yif" secondAttribute="trailing" id="iS3-5x-9tc"/>

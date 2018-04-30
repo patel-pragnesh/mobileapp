@@ -5,6 +5,7 @@ namespace Toggl.Tests.UI
 {
     public static class Onboarding
     {
+        public const string FirstOnboardingElement = SkipButton;
         public const string SkipButton = "OnboardingSkip";
         public const string NextButton = "OnboardingNext";
         public const string LoginButton = "OnboardingLogin";

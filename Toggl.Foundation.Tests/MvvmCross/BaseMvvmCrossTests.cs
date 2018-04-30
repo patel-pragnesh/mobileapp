@@ -26,26 +26,6 @@ namespace Toggl.Foundation.Tests.MvvmCross
         protected IApplicationShortcutCreator ApplicationShortcutCreator { get; }
             = Substitute.For<IApplicationShortcutCreator>();
 
-        protected IMvxIoCProvider Ioc { get; private set; }
-
         protected IMvxNavigationService NavigationService { get; } = Substitute.For<IMvxNavigationService>();
-
-        static BaseMvvmCrossTests()
-        {
-            if (MvxSingleton<IMvxIoCProvider>.Instance != null) return;
-
-            MvxSingletonCache.Initialize();
-            MvxSimpleIoCContainer.Initialize();
-
-            MvxSingleton<IMvxIoCProvider>.Instance.RegisterSingleton<IMvxTrace>(new TestTrace());
-            MvxSingleton<IMvxIoCProvider>.Instance.RegisterSingleton<IMvxSettings>(new MvxSettings());
-            
-            MvxTrace.Initialize();
-        }
-
-        protected BaseMvvmCrossTests()
-        {
-            Ioc = MvxSingleton<IMvxIoCProvider>.Instance;
-        }
     }
 }

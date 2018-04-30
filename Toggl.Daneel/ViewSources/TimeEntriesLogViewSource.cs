@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CoreGraphics;
 using Foundation;
 using MvvmCross.Binding.ExtensionMethods;
@@ -30,7 +32,11 @@ namespace Toggl.Daneel.ViewSources
         //Using the old API so that delete action would work on pre iOS 11 devices
         private readonly UITableViewRowAction deleteTableViewRowAction;
 
+        private readonly ISubject<TimeEntriesLogViewCell> firstTimeEntrySubject;
+
         public bool IsEmptyState { get; set; }
+
+        public IObservable<TimeEntriesLogViewCell> FirstTimeEntry { get; }
 
         public IMvxAsyncCommand<TimeEntryViewModel> ContinueTimeEntryCommand { get; set; }
 
@@ -50,6 +56,9 @@ namespace Toggl.Daneel.ViewSources
                 Resources.Delete,
                 handleDeleteTableViewRowAction);
             deleteTableViewRowAction.BackgroundColor = Color.TimeEntriesLog.DeleteSwipeActionBackground.ToNativeColor();
+
+            firstTimeEntrySubject = new ReplaySubject<TimeEntriesLogViewCell>(1);
+            FirstTimeEntry = firstTimeEntrySubject.AsObservable();
         }
 
         public override UIView GetViewForFooter(UITableView tableView, nint section)
@@ -64,7 +73,12 @@ namespace Toggl.Daneel.ViewSources
                 bindable.DataContext = item;
 
             if (cell is TimeEntriesLogViewCell logCell)
+            {
                 logCell.ContinueTimeEntryCommand = ContinueTimeEntryCommand;
+
+                if (indexPath.Section == 0 && indexPath.Row == 0)
+                    firstTimeEntrySubject.OnNext(logCell);
+            }
 
             return cell;
         }

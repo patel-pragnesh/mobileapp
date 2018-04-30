@@ -60,11 +60,6 @@ namespace Toggl.Giskard
                 view => new TextViewFontWeightTargetBinding(view)
             );
 
-            registry.RegisterCustomBindingFactory<TextView>(
-                TextViewTagListTargetBinding.BindingName,
-                view => new TextViewTagListTargetBinding(view)
-            );
-
             registry.RegisterCustomBindingFactory<View>(
                 ViewMarginTargetBinding.BindingName,
                 view => new ViewMarginTargetBinding(view)

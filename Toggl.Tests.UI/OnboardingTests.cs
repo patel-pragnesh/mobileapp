@@ -5,6 +5,7 @@ using static Toggl.Tests.UI.Extensions.OnboardingExtensions;
 namespace Toggl.Tests.UI
 {
     [TestFixture]
+    [IgnoreOnAndroid]
     public sealed class OnboardingTests
     {
         private IApp app;

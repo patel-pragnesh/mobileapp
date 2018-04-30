@@ -76,6 +76,7 @@ Global
 		Release.AdHoc|Any CPU = Release.AdHoc|Any CPU
 		Release.PlayStore|Any CPU = Release.PlayStore|Any CPU
 		Release.AdHoc.Giskard|Any CPU = Release.AdHoc.Giskard|Any CPU
+		UITests|Any CPU = UITests|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.ApiTests|Any CPU.ActiveCfg = Debug|iPhoneSimulator
@@ -98,6 +99,8 @@ Global
 		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.Release.AdHoc|Any CPU.Build.0 = Release.AdHoc|Any CPU
 		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.Release.PlayStore|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.UITests|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.UITests|Any CPU.Build.0 = Debug|iPhoneSimulator
 		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -114,6 +117,8 @@ Global
 		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.Release.AdHoc|Any CPU.ActiveCfg = Release|Any CPU
 		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{C23A5DDD-D0EA-4198-88A0-89A43EBF67B6}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.ApiTests|Any CPU.Build.0 = Debug|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -138,6 +143,8 @@ Global
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.Release.PlayStore|Any CPU.Build.0 = Release|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -158,6 +165,7 @@ Global
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{E90E4D61-D55E-4185-AE9E-C8977140694A}.UITests|Any CPU.ActiveCfg = Debug|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.ApiTests|Any CPU.Build.0 = Debug|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -182,6 +190,8 @@ Global
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.Release.PlayStore|Any CPU.Build.0 = Release|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{5ACEB155-9DD4-4309-BCC9-997A09950393}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{5ACEB155-9DD4-4309-BCC9-997A09950393}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -201,6 +211,7 @@ Global
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.UITests|Any CPU.ActiveCfg = Debug|Any CPU
 		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.ApiTests|Any CPU.Build.0 = Debug|Any CPU
 		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -221,6 +232,7 @@ Global
 		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{C400D1A6-5DC5-4A92-8DD0-FF272D0D1189}.UITests|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -244,6 +256,8 @@ Global
 		{3A603451-31B2-4975-9366-3212BEA78F57}.Release.PlayStore|Any CPU.Build.0 = Release|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{3A603451-31B2-4975-9366-3212BEA78F57}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{3A603451-31B2-4975-9366-3212BEA78F57}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -267,6 +281,8 @@ Global
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Release.PlayStore|Any CPU.Build.0 = Release|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -286,6 +302,7 @@ Global
 		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{80155A57-5BAF-4CF0-93CA-B9E99BA95E9F}.UITests|Any CPU.ActiveCfg = Debug|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -309,6 +326,8 @@ Global
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.Release.PlayStore|Any CPU.Build.0 = Release|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -332,6 +351,8 @@ Global
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Release.PlayStore|Any CPU.Build.0 = Release|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{CB2B0786-217F-455A-9349-0FC69468D3B6}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{CB2B0786-217F-455A-9349-0FC69468D3B6}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -351,6 +372,7 @@ Global
 		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E366E3C-7BE5-4962-9E0C-9094AE1FE2F4}.UITests|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -371,6 +393,8 @@ Global
 		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.Release.PlayStore|Any CPU.Build.0 = Release.PlayStore|Any CPU
 		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Release|Any CPU
 		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
+		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -389,6 +413,8 @@ Global
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.UITests|Any CPU.ActiveCfg = Release|Any CPU
+		{95E279D3-026E-4E31-92D2-44F4ABA0F511}.UITests|Any CPU.Build.0 = Release|Any CPU
 		{3098288F-5579-435C-94CC-311ACFEDA7F0}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{3098288F-5579-435C-94CC-311ACFEDA7F0}.ApiTests|iPhone.ActiveCfg = Debug|Any CPU
 		{3098288F-5579-435C-94CC-311ACFEDA7F0}.ApiTests|iPhone.Build.0 = Debug|Any CPU
@@ -420,6 +446,7 @@ Global
 		{3098288F-5579-435C-94CC-311ACFEDA7F0}.Release.AdHoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{3098288F-5579-435C-94CC-311ACFEDA7F0}.Release.PlayStore|Any CPU.ActiveCfg = Debug|Any CPU
 		{3098288F-5579-435C-94CC-311ACFEDA7F0}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|Any CPU
+		{3098288F-5579-435C-94CC-311ACFEDA7F0}.UITests|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.ApiTests|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.ApiTests|iPhone.ActiveCfg = Release|iPhone
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.ApiTests|iPhone.Build.0 = Release|iPhone
@@ -451,6 +478,7 @@ Global
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.Release.AdHoc|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.Release.PlayStore|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{D8346459-DE6B-4511-8697-3B35D35F1E90}.UITests|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

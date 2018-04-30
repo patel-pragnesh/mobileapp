@@ -6,13 +6,15 @@
 //
 using Foundation;
 using System.CodeDom.Compiler;
-using Toggl.Daneel.Views.EditDuration;
 
 namespace Toggl.Daneel.ViewControllers
 {
 	[Register ("StartTimeEntryViewController")]
 	partial class StartTimeEntryViewController
 	{
+		[Outlet]
+		UIKit.UIView AddProjectOnboardingBubble { get; set; }
+
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		UIKit.UIButton BillableButton { get; set; }
@@ -67,10 +69,15 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIButton TagsButton { get; set; }
 
 		[Outlet]
-        DurationField TimeInput { get; set; }
+		Toggl.Daneel.Views.EditDuration.DurationField TimeInput { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (AddProjectOnboardingBubble != null) {
+				AddProjectOnboardingBubble.Dispose ();
+				AddProjectOnboardingBubble = null;
+			}
+
 			if (BillableButton != null) {
 				BillableButton.Dispose ();
 				BillableButton = null;
@@ -116,11 +123,6 @@ namespace Toggl.Daneel.ViewControllers
 				DoneButton = null;
 			}
 
-			if (StartDateButton != null) {
-				StartDateButton.Dispose ();
-				StartDateButton = null;
-			}
-
 			if (Placeholder != null) {
 				Placeholder.Dispose ();
 				Placeholder = null;
@@ -129,6 +131,11 @@ namespace Toggl.Daneel.ViewControllers
 			if (ProjectsButton != null) {
 				ProjectsButton.Dispose ();
 				ProjectsButton = null;
+			}
+
+			if (StartDateButton != null) {
+				StartDateButton.Dispose ();
+				StartDateButton = null;
 			}
 
 			if (SuggestionsTableView != null) {

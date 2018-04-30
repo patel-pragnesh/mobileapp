@@ -44,7 +44,7 @@
             </subviews>
             <constraints>
                 <constraint firstItem="FLH-vi-fXY" firstAttribute="trailing" secondItem="2L8-Wo-D6t" secondAttribute="trailing" id="2au-jd-8Pf"/>
-                <constraint firstItem="FLH-vi-fXY" firstAttribute="bottom" secondItem="2L8-Wo-D6t" secondAttribute="bottom" id="8Nf-bB-Kqw"/>
+                <constraint firstAttribute="bottom" secondItem="2L8-Wo-D6t" secondAttribute="bottom" id="8Nf-bB-Kqw"/>
                 <constraint firstItem="2L8-Wo-D6t" firstAttribute="top" secondItem="X3Z-yh-5bj" secondAttribute="bottom" id="GdQ-Vr-HJp"/>
                 <constraint firstItem="X3Z-yh-5bj" firstAttribute="leading" secondItem="FLH-vi-fXY" secondAttribute="leading" id="PAA-hl-Dri"/>
                 <constraint firstItem="2L8-Wo-D6t" firstAttribute="leading" secondItem="FLH-vi-fXY" secondAttribute="leading" id="Z11-yA-OYF"/>

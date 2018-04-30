@@ -13,27 +13,40 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;__DROID__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\bin\Release</OutputPath>
+    <DefineConstants>__DROID__</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Xamarin.UITest">
-      <HintPath>..\packages\Xamarin.UITest.2.0.6\lib\Xamarin.UITest.dll</HintPath>
-    </Reference>
     <Reference Include="System.Net.Http" />
+    <Reference Include="Xamarin.UITest">
+      <HintPath>..\packages\Xamarin.UITest.2.2.2\lib\net45\Xamarin.UITest.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AndroidAccessibilityNames.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="AppExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Toggl.Giskard\Toggl.Giskard.csproj">
+      <Project>{CEB93402-CEAE-4D6F-8169-3ACA1F792DF4}</Project>
+      <Name>Toggl.Giskard</Name>
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+      <Private>False</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\Toggl.Tests.UI\Toggl.Tests.UI.projitems" Label="Shared" Condition="Exists('..\Toggl.Tests.UI\Toggl.Tests.UI.projitems')" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

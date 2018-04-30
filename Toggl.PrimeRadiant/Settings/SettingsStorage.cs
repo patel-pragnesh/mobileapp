@@ -12,6 +12,7 @@ namespace Toggl.PrimeRadiant.Settings
         private const string outdatedClientKey = "OutdatedClient";
         private const string unauthorizedAccessKey = "UnauthorizedAccessForApiToken";
 
+        private const string userSignedUpUsingTheAppKey = "UserSignedUpUsingTheApp";
         private const string isNewUserKey = "IsNewUser";
         private const string lastAccessDateKey = "LastAccessDate";
         private const string completedOnboardingKey = "CompletedOnboarding";
@@ -19,16 +20,23 @@ namespace Toggl.PrimeRadiant.Settings
         private const string preferManualMode = "PreferManualMode";
 
         private const string startButtonWasTappedBeforeKey = "StartButtonWasTappedBefore";
+        private const string hasEditedTimeEntryKey = "HasEditedTimeEntry";
+        private const string projectOrTagWasAddedBeforeKey = "ProjectOrTagWasAddedBefore";
         private const string stopButtonWasTappedBeforeKey = "StopButtonWasTappedBefore";
+        private const string hasSelectedProjectKey = "HasSelectedProject";
 
         private const string onboardingPrefix = "Onboarding_";
 
         private readonly Version version;
         private readonly IKeyValueStorage keyValueStorage;
 
+        private readonly ISubject<bool> userSignedUpUsingTheAppSubject;
         private readonly ISubject<bool> isNewUserSubject;
+        private readonly ISubject<bool> projectOrTagWasAddedSubject;
         private readonly ISubject<bool> startButtonWasTappedSubject;
+        private readonly ISubject<bool> hasEditedTimeEntrySubject;
         private readonly ISubject<bool> stopButtonWasTappedSubject;
+        private readonly ISubject<bool> hasSelectedProjectSubject;
 
         public SettingsStorage(Version version, IKeyValueStorage keyValueStorage)
         {
@@ -38,8 +46,12 @@ namespace Toggl.PrimeRadiant.Settings
             this.keyValueStorage = keyValueStorage;
 
             (isNewUserSubject, IsNewUser) = prepareSubjectAndObservable(isNewUserKey);
-            (startButtonWasTappedSubject, StartButtonWasTappedBefore) = prepareSubjectAndObservable(startButtonWasTappedBeforeKey);
             (stopButtonWasTappedSubject, StopButtonWasTappedBefore) = prepareSubjectAndObservable(stopButtonWasTappedBeforeKey);
+            (hasEditedTimeEntrySubject, HasEditedTimeEntry) = prepareSubjectAndObservable(hasEditedTimeEntryKey);
+            (hasSelectedProjectSubject, HasSelectedProject) = prepareSubjectAndObservable(hasSelectedProjectKey);
+            (userSignedUpUsingTheAppSubject, UserSignedUpUsingTheApp) = prepareSubjectAndObservable(userSignedUpUsingTheAppKey);
+            (startButtonWasTappedSubject, StartButtonWasTappedBefore) = prepareSubjectAndObservable(startButtonWasTappedBeforeKey);
+            (projectOrTagWasAddedSubject, ProjectOrTagWasAddedBefore) = prepareSubjectAndObservable(projectOrTagWasAddedBeforeKey);
         }
 
         #region IAccessRestrictionStorage
@@ -84,16 +96,30 @@ namespace Toggl.PrimeRadiant.Settings
 
         #region IOnboardingStorage
 
+        public IObservable<bool> UserSignedUpUsingTheApp { get; }
+
         public IObservable<bool> IsNewUser { get; }
 
         public IObservable<bool> StartButtonWasTappedBefore { get; }
 
+        public IObservable<bool> HasEditedTimeEntry { get; }
+
+        public IObservable<bool> ProjectOrTagWasAddedBefore { get; }
+
         public IObservable<bool> StopButtonWasTappedBefore { get; }
+
+        public IObservable<bool> HasSelectedProject { get; }
 
         public void SetLastOpened(DateTimeOffset date)
         {
             var dateString = date.ToString();
             keyValueStorage.SetString(lastAccessDateKey, dateString);
+        }
+
+        public void SetUserSignedUp()
+        {
+            userSignedUpUsingTheAppSubject.OnNext(true);
+            keyValueStorage.SetBool(userSignedUpUsingTheAppKey, true);
         }
 
         public void SetIsNewUser(bool isNewUser)
@@ -117,10 +143,34 @@ namespace Toggl.PrimeRadiant.Settings
             keyValueStorage.SetBool(startButtonWasTappedBeforeKey, true);
         }
 
+        public void TimeEntryWasTapped()
+        {
+            hasEditedTimeEntrySubject.OnNext(true);
+            keyValueStorage.SetBool(hasEditedTimeEntryKey, true);
+        }
+
+        public void ProjectOrTagWasAdded()
+        {
+            projectOrTagWasAddedSubject.OnNext(true);
+            keyValueStorage.SetBool(projectOrTagWasAddedBeforeKey, true);
+        }
+
         public void StopButtonWasTapped()
         {
             stopButtonWasTappedSubject.OnNext(true);
             keyValueStorage.SetBool(stopButtonWasTappedBeforeKey, true);
+        }
+
+        public void SelectsProject()
+        {
+            hasSelectedProjectSubject.OnNext(true);
+            keyValueStorage.SetBool(hasSelectedProjectKey, true);
+        }
+
+        public void EditedTimeEntry()
+        {
+            hasEditedTimeEntrySubject.OnNext(true);
+            keyValueStorage.SetBool(hasEditedTimeEntryKey, true);
         }
 
         public bool WasDismissed(IDismissable dismissable) => keyValueStorage.GetBool(onboardingPrefix + dismissable.Key);
@@ -132,8 +182,17 @@ namespace Toggl.PrimeRadiant.Settings
             keyValueStorage.SetBool(startButtonWasTappedBeforeKey, false);
             startButtonWasTappedSubject.OnNext(false);
 
+            keyValueStorage.SetBool(userSignedUpUsingTheAppKey, false);
+            userSignedUpUsingTheAppSubject.OnNext(false);
+
+            keyValueStorage.SetBool(hasEditedTimeEntryKey, false);
+            hasEditedTimeEntrySubject.OnNext(false);
+
             keyValueStorage.SetBool(stopButtonWasTappedBeforeKey, false);
             stopButtonWasTappedSubject.OnNext(false);
+
+            keyValueStorage.SetBool(projectOrTagWasAddedBeforeKey, false);
+            projectOrTagWasAddedSubject.OnNext(false);
 
             keyValueStorage.RemoveAllWithPrefix(onboardingPrefix);
         }

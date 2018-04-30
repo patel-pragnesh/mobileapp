@@ -14,6 +14,8 @@ using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Models;
+using Toggl.PrimeRadiant.Settings;
+using Toggl.Foundation.Analytics;
 using static Toggl.Foundation.Helper.Constants;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -28,6 +30,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IDialogService dialogService;
         private readonly IInteractorFactory interactorFactory;
         private readonly IMvxNavigationService navigationService;
+        private readonly IOnboardingStorage onboardingStorage;
+        private readonly IAnalyticsService analyticsService;
 
         private readonly HashSet<long> tagIds = new HashSet<long>();
         private IDisposable deleteDisposable;
@@ -53,6 +57,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                || (originalTimeEntry.Duration.HasValue
                    && originalTimeEntry.Duration != (long)Duration.TotalSeconds)
                || originalTimeEntry.Billable != Billable;
+
+        public IOnboardingStorage OnboardingStorage => onboardingStorage;
 
         public long Id { get; set; }
 
@@ -137,7 +143,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        public List<string> Tags { get; private set; } = new List<string>();
+        public MvxObservableCollection<string> Tags { get; private set; } = new MvxObservableCollection<string>();
 
         [DependsOn(nameof(Tags))]
         public bool HasTags => Tags?.Any() ?? false;
@@ -177,19 +183,25 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             ITogglDataSource dataSource,
             IInteractorFactory interactorFactory,
             IMvxNavigationService navigationService,
-            IDialogService dialogService)
+            IOnboardingStorage onboardingStorage,
+            IDialogService dialogService,
+            IAnalyticsService analyticsService)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
             Ensure.Argument.IsNotNull(dialogService, nameof(dialogService));
             Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
+            Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
+            Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
 
             this.dataSource = dataSource;
             this.timeService = timeService;
             this.dialogService = dialogService;
             this.interactorFactory = interactorFactory;
             this.navigationService = navigationService;
+            this.onboardingStorage = onboardingStorage;
+            this.analyticsService = analyticsService;
 
             DeleteCommand = new MvxAsyncCommand(delete);
             ConfirmCommand = new MvxCommand(confirm);
@@ -283,6 +295,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void save()
         {
+            onboardingStorage.EditedTimeEntry();
+
             var dto = new EditTimeEntryDto
             {
                 Id = Id,
@@ -377,6 +391,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async Task selectProject()
         {
+            analyticsService.TrackEditOpensProjectSelector();
+
+            onboardingStorage.SelectsProject();
+
             var returnParameter = await navigationService
                 .Navigate<SelectProjectViewModel, SelectProjectParameter, SelectProjectParameter>(
                     SelectProjectParameter.WithIds(projectId, taskId, workspaceId));
@@ -427,6 +445,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async Task selectTags()
         {
+            analyticsService.TrackEditOpensTagSelector();
+
             var tagsToPass = tagIds.ToArray();
             var returnedTags = await navigationService
                 .Navigate<SelectTagsViewModel, (long[], long), long[]>(

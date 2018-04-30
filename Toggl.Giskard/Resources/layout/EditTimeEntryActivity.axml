@@ -3,19 +3,19 @@
     xmlns:local="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:focusable="true"
+    android:clickable="true"
     android:orientation="vertical"
     android:focusableInTouchMode="true"
-    android:clickable="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <RelativeLayout
         android:id="@+id/EditTimeEntryDescriptionContainer"
         android:elevation="2dp"
+        android:paddingBottom="16dp"
+        android:minHeight="@dimen/expandedToolbarHeight"
         android:background="@color/blueToolbarBackground"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/expandedToolbarHeight"
-        android:paddingBottom="16dp">
+        android:layout_height="wrap_content">
         <ImageView
             local:MvxBind="Click CloseCommand"
             android:clickable="true"
@@ -30,27 +30,28 @@
         <EditText
             android:id="@+id/EditTimeEntryDescriptionTextField"
             local:MvxBind="Text Description; Focus IsEditingDescription"
-            android:textSize="19sp"
-            android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
             android:minLines="1"
+            android:maxLines="4"
+            android:textSize="19sp"
             android:letterSpacing="-0.01"
             android:lineSpacingExtra="5sp"
             android:scrollHorizontally="true"
-            android:textCursorDrawable="@null"
+            android:textCursorDrawable="@drawable/EditTextWhiteCursor"
             android:textColor="@android:color/white"
             android:hint="@string/StartTimeEntryHint"
             android:background="@color/blueToolbarBackground"
             android:textColorHint="@color/blueBackgroundTextHintColor"
+            android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
+            android:layout_marginTop="64dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:maxLines="4" />
+            android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/EditTimeEntryConfirmButton"
             local:MvxBind="Text ConfirmButtonText; Click ConfirmCommand"
             android:text="DONE"
+            android:textSize="14sp"
             android:textAllCaps="true"
             android:fontFamily="sans-serif-medium"
             android:textColor="@android:color/white"
@@ -58,7 +59,6 @@
             android:layout_marginRight="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
             android:layout_alignParentRight="true" />
     </RelativeLayout>
     <android.support.v4.widget.NestedScrollView
@@ -74,20 +74,20 @@
                 android:layout_height="56dp" />
             <LinearLayout
                 android:id="@+id/EditErrorContainer"
+                android:layout_marginTop="12dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp">
+                android:layout_height="wrap_content">
                 <RelativeLayout
                     local:MvxBind="Click DismissSyncErrorMessageCommand; Visibility Visibility(SyncErrorMessageVisible)"
                     android:elevation="4dp"
+                    android:paddingBottom="16dp"
                     android:lineSpacingExtra="6dp"
                     android:background="@android:color/white"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="8dp"
-                    android:paddingBottom="16dp">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
                     <ImageView
                         android:id="@+id/EditErrorIcon"
                         android:scaleType="center"
@@ -132,8 +132,8 @@
             <TextView
                 android:id="@+id/EditAddProjectLabel"
                 local:MvxBind="Click SelectProjectCommand; Visibility !Visibility(Project)"
-                tools:text="@string/AddProjectHint"
                 android:textSize="15sp"
+                tools:text="@string/AddProjectHint"
                 android:gravity="center_vertical"
                 android:textColor="@color/placeholderText"
                 android:layout_height="48dp"
@@ -188,15 +188,21 @@
                 android:layout_width="match_parent"
                 android:layout_alignTop="@id/EditTagsIcon"
                 android:layout_toRightOf="@id/EditTagsIcon" />
-            <TextView
-                android:id="@+id/EditTags"
-                local:MvxBind="Click SelectTagsCommand; Tags Tags; Visibility(HasTags)"
-                tools:text="tag1 tag2 tag3"
-                android:textSize="12sp"
-                android:textColor="#48A"
-                android:gravity="center_vertical"
+            <View
+                local:MvxBind="Click SelectTagsCommand"
+                android:background="@android:color/transparent"
+                android:clickable="true"
                 android:layout_height="48dp"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_alignTop="@id/EditTagsIcon"
+                android:layout_toRightOf="@id/EditTagsIcon" />
+            <toggl.giskard.views.TagsListRecyclerView
+                android:id="@+id/EditTags"
+                local:MvxBind="ItemClick SelectTagsCommand; ItemsSource Tags; Visibility(HasTags)"
+                local:MvxTemplateSelector="@string/TagsListTemplateSelector"
+                android:clickable="true"
+                android:layout_height="48dp"
+                android:layout_width="wrap_content"
                 android:layout_alignTop="@id/EditTagsIcon"
                 android:layout_toRightOf="@id/EditTagsIcon" />
             <View
@@ -204,7 +210,7 @@
                 android:layout_height="0.5dp"
                 android:layout_marginLeft="56dp"
                 android:layout_width="match_parent"
-                android:layout_below="@id/EditAddTagsLabel" />
+                android:layout_below="@id/EditTags" />
             <LinearLayout
                 android:id="@+id/EditBillableRow"
                 local:MvxBind="Click ToggleBillableCommand; Visibility Visibility(IsBillableAvailable)"
@@ -340,22 +346,22 @@
                 android:layout_width="match_parent"
                 android:layout_below="@id/EditBillableRow" />
             <LinearLayout
-                android:orientation="vertical"
                 android:id="@+id/EditDuration"
+                android:orientation="vertical"
                 android:layout_height="72dp"
                 android:layout_width="match_parent"
                 android:layout_below="@id/EditTimesBottomBorder"
                 android:layout_toRightOf="@id/EditTimeEntryColumnAnchor">
                 <toggl.giskard.views.DurationEditText
                     local:MvxBind="Duration DisplayedDuration"
+                    android:text="0:11:25"
                     android:textSize="15sp"
                     android:inputType="numberPassword"
                     android:textColor="@color/darkLabel"
                     android:background="@android:color/transparent"
-                    android:layout_marginTop="16dp"
-                    android:layout_width="match_parent"
                     android:layout_height="20dp"
-                    android:text="0:11:25" />
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent" />
                 <TextView
                     android:id="@+id/EditTimeEntryDurationLabel"
                     android:textSize="12sp"
@@ -409,9 +415,9 @@
             <TextView
                 android:id="@+id/EditTimeEntryDeleteLabel"
                 local:MvxBind="Click DeleteCommand"
-                android:text="@string/DeleteEntry"
                 android:textSize="15sp"
                 android:gravity="center_vertical"
+                android:text="@string/DeleteEntry"
                 android:textColor="@color/errorText"
                 android:background="?attr/selectableItemBackground"
                 android:layout_height="48dp"

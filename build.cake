@@ -49,12 +49,21 @@ private Action BuildSolution(string configuration, string platform = "")
         Configuration = configuration
     };
 
-    if (!string.IsNullOrEmpty(platform))
-    {
-        buildSettings = buildSettings.WithProperty("Platform", platform);
-    }
+	return () => MSBuild(togglSolution, buildSettings);
+}
 
-    return () => MSBuild(togglSolution, buildSettings);
+private Action GenerateApk(string configuration)
+{
+    const string droidProject = "./Toggl.Giskard/Toggl.Giskard.csproj";
+    var buildSettings = new MSBuildSettings 
+    {
+        Verbosity = Bitrise.IsRunningOnBitrise ? Verbosity.Verbose : Verbosity.Minimal,
+        Configuration = configuration
+    };
+
+    buildSettings.WithTarget("SignAndroidPackage");
+
+    return () => MSBuild(droidProject, buildSettings);
 }
 
 private string GetCommitHash()
@@ -286,6 +295,7 @@ private string[] GetUnitTestProjects() => new []
 
 private string[] GetUITestFiles() => new []
 {
+    "./bin/Debug/Toggl.Giskard.Tests.UI.dll",
     "./bin/Debug/Toggl.Daneel.Tests.UI.dll"
 };
 
@@ -331,7 +341,8 @@ Task("Nuget")
 
 Task("Build.Tests.All")
     .IsDependentOn("Nuget")
-    .Does(BuildSolution("Debug"));
+    .Does(BuildSolution("Debug"))
+    .Does(GenerateApk("Debug"));
 
 Task("Build.Tests.Unit")
     .IsDependentOn("Nuget")
@@ -343,7 +354,8 @@ Task("Build.Tests.Integration")
 
 Task("Build.Tests.UI")
     .IsDependentOn("Nuget")
-    .Does(BuildSolution("Debug"));
+    .Does(BuildSolution("UITests"))
+    .Does(GenerateApk("Release"));
 
 //iOS Builds
 Task("Build.Release.iOS.AdHoc")

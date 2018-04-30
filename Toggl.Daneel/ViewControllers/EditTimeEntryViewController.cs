@@ -16,6 +16,13 @@ using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
 using Toggl.Daneel.Presentation.Transition;
+using System.Reactive.Subjects;
+using System.ComponentModel;
+using MvvmCross.Platform.WeakSubscription;
+using System.Reactive.Linq;
+using Toggl.Daneel.Onboarding.EditView;
+using Toggl.PrimeRadiant.Extensions;
+using Foundation;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -24,8 +31,32 @@ namespace Toggl.Daneel.ViewControllers
     {
         private const float nonScrollableContentHeight = 116f;
 
+        private IDisposable hasProjectDisposable;
+        private IDisposable projectOnboardingDisposable;
+        private IDisposable contentSizeChangedDisposable;
+
+        private ISubject<bool> hasProjectSubject;
+
+        private const string boundsKey = "bounds";
+
         public EditTimeEntryViewController() : base(nameof(EditTimeEntryViewController), null)
         {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (!disposing) return;
+
+            contentSizeChangedDisposable?.Dispose();
+            contentSizeChangedDisposable = null;
+
+            hasProjectDisposable?.Dispose();
+            hasProjectDisposable = null;
+
+            projectOnboardingDisposable?.Dispose();
+            projectOnboardingDisposable = null;
         }
 
         public override void ViewDidLoad()
@@ -34,6 +65,9 @@ namespace Toggl.Daneel.ViewControllers
 
             setupDismissingByTappingOnBackground();
             prepareViews();
+            prepareOnboarding();
+
+            contentSizeChangedDisposable = ScrollViewContent.AddObserver(boundsKey, NSKeyValueObservingOptions.New, onContentSizeChanged);
 
             var durationCombiner = new DurationValueCombiner();
             var dateCombiner = new DateTimeOffsetDateFormatValueCombiner(TimeZoneInfo.Local);
@@ -66,9 +100,12 @@ namespace Toggl.Daneel.ViewControllers
                       .WithConversion(inverterVisibilityConverter);
 
             //Text
-            bindingSet.Bind(DescriptionTextView)
-                      .For(v => v.RemainingLength)
+            bindingSet.Bind(RemainingCharacterCount)
                       .To(vm => vm.DescriptionRemainingLength);
+
+            bindingSet.Bind(RemainingCharacterCount)
+                      .For(v => v.BindVisible())
+                      .To(vm => vm.DescriptionLimitExceeded);
 
             bindingSet.Bind(DescriptionTextView)
                       .For(v => v.BindText())
@@ -218,19 +255,7 @@ namespace Toggl.Daneel.ViewControllers
 
         public override void ViewWillLayoutSubviews()
         {
-            var height = nonScrollableContentHeight + ScrollViewContent.Bounds.Height;
-            if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
-            {
-                height += UIApplication.SharedApplication.KeyWindow.SafeAreaInsets.Bottom;
-            }
-
-            var newSize = new CGSize(0, height);
-            if (newSize != PreferredContentSize)
-            {
-                PreferredContentSize = newSize;
-                PresentationController.ContainerViewWillLayoutSubviews();
-                ScrollView.ScrollEnabled = ScrollViewContent.Bounds.Height > ScrollView.Bounds.Height;
-            }
+            adjustHeight();
         }
 
         private void prepareViews()
@@ -271,6 +296,45 @@ namespace Toggl.Daneel.ViewControllers
                 var tapToDismiss = new UITapGestureRecognizer(() => ViewModel.CloseCommand.Execute());
                 modalPresentationController.AdditionalContentView.AddGestureRecognizer(tapToDismiss);
             }
+        }
+
+        private void prepareOnboarding()
+        {
+            var storage = ViewModel.OnboardingStorage;
+
+            hasProjectSubject = new BehaviorSubject<bool>(!String.IsNullOrEmpty(ViewModel.Project));
+            hasProjectDisposable = ViewModel.WeakSubscribe(() => ViewModel.Project, onProjectChanged);
+
+            projectOnboardingDisposable = new CategorizeTimeUsingProjectsOnboardingStep(storage, hasProjectSubject.AsObservable())
+                .ManageDismissableTooltip(CategorizeWithProjectsBubbleView, storage);
+        }
+
+        private void onProjectChanged(object sender, PropertyChangedEventArgs args)
+        {
+            hasProjectSubject.OnNext(!String.IsNullOrEmpty(ViewModel.Project));
+        }
+
+        private void onContentSizeChanged(NSObservedChange change)
+        {
+            adjustHeight();
+        }
+
+        private void adjustHeight()
+        {
+            var height = nonScrollableContentHeight + ScrollViewContent.Bounds.Height;
+            if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
+            {
+                height += UIApplication.SharedApplication.KeyWindow.SafeAreaInsets.Bottom;
+            }
+
+            var newSize = new CGSize(0, height);
+            if (newSize != PreferredContentSize)
+            {
+                PreferredContentSize = newSize;
+                PresentationController.ContainerViewWillLayoutSubviews();
+            }
+
+            ScrollView.ScrollEnabled = ScrollViewContent.Bounds.Height > ScrollView.Bounds.Height;
         }
     }
 }

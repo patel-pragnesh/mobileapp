@@ -1,26 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Core.ViewModels;
 using MvvmCross.Binding.iOS;
+using MvvmCross.Core.ViewModels;
+using MvvmCross.Platform.WeakSubscription;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Extensions;
+using Toggl.Daneel.Onboarding.CreationView;
+using Toggl.Daneel.Onboarding.StartTimeEntryView;
 using Toggl.Daneel.Presentation.Attributes;
 using Toggl.Daneel.ViewSources;
+using Toggl.Foundation;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
-using UIKit;
-using Toggl.Foundation;
-using Foundation;
 using Toggl.Multivac;
-using Toggl.Daneel.Onboarding.CreationView;
-using System.Reactive.Linq;
-using System.ComponentModel;
-using System.Reactive.Subjects;
-using MvvmCross.Platform.WeakSubscription;
+using UIKit;
+using static Toggl.PrimeRadiant.Extensions.OnboardingStepExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -31,8 +33,10 @@ namespace Toggl.Daneel.ViewControllers
 
         private UIImage greenCheckmarkButtonImage;
 
-        private IDisposable onboardingDisposable;
         private IDisposable descriptionDisposable;
+        private IDisposable addProjectOrTagOnboardingDisposable;
+        private IDisposable disabledConfirmationButtonOnboardingDisposable;
+
 
         private ISubject<bool> isDescriptionEmptySubject;
 
@@ -47,11 +51,14 @@ namespace Toggl.Daneel.ViewControllers
 
             if (!disposing) return;
 
-            onboardingDisposable?.Dispose();
-            onboardingDisposable = null;
-
             descriptionDisposable?.Dispose();
             descriptionDisposable = null;
+
+            addProjectOrTagOnboardingDisposable?.Dispose();
+            addProjectOrTagOnboardingDisposable = null;
+
+            disabledConfirmationButtonOnboardingDisposable?.Dispose();
+            disabledConfirmationButtonOnboardingDisposable = null;
         }
 
         public override void ViewDidLoad()
@@ -243,6 +250,24 @@ namespace Toggl.Daneel.ViewControllers
 
         private void prepareOnboarding()
         {
+            prepareAddProjectOnboardingStep();
+            prepareDisableConfirmationButtonOnboardingStep();
+        }
+
+        private void prepareAddProjectOnboardingStep()
+        {
+            var onboardingStorage = ViewModel.OnboardingStorage;
+            var addProjectOrtagOnboardingStep = new AddProjectOrTagOnboardingStep(
+                onboardingStorage,
+                ViewModel.DataSource
+            );
+
+            addProjectOrTagOnboardingDisposable = addProjectOrtagOnboardingStep
+                .ManageDismissableTooltip(AddProjectOnboardingBubble, onboardingStorage);
+        }
+
+        private void prepareDisableConfirmationButtonOnboardingStep()
+        {
             greyCheckmarkButtonImage = UIImage.FromBundle("icCheckGrey");
             greenCheckmarkButtonImage = UIImage.FromBundle("doneGreen");
 
@@ -250,13 +275,19 @@ namespace Toggl.Daneel.ViewControllers
 
             descriptionDisposable = ViewModel.WeakSubscribe(() => ViewModel.Description, onDescriptionChanged);
 
-            var step = new DisabledConfirmationButtonOnboardingStep(ViewModel.OnboardingStorage, isDescriptionEmptySubject.AsObservable());
+            var disabledConfirmationButtonOnboardingStep
+                = new DisabledConfirmationButtonOnboardingStep(
+                    ViewModel.OnboardingStorage,
+                    isDescriptionEmptySubject.AsObservable());
 
-            onboardingDisposable = step.ShouldBeVisible.Subscribe(visible => InvokeOnMainThread(() =>
-            {
-                var image = visible ? greyCheckmarkButtonImage : greenCheckmarkButtonImage;
-                DoneButton.SetImage(image, UIControlState.Normal);
-            }));
+            disabledConfirmationButtonOnboardingDisposable
+                = disabledConfirmationButtonOnboardingStep
+                    .ShouldBeVisible
+                    .Subscribe(visible => InvokeOnMainThread(() =>
+                    {
+                        var image = visible ? greyCheckmarkButtonImage : greenCheckmarkButtonImage;
+                        DoneButton.SetImage(image, UIControlState.Normal);
+                    }));
         }
 
         private void onDescriptionChanged(object sender, PropertyChangedEventArgs args)

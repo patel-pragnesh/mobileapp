@@ -65,11 +65,11 @@ namespace Toggl.Giskard.Adapters
 
             var itemBindingContext = new MvxAndroidBindingContext(parent.Context, BindingContext.LayoutInflaterHolder);
             var inflatedView = InflateViewForHolder(parent, viewType, itemBindingContext);
-            var viewHolder = new SelectProjectWithExpandableTasksRecyclerViewHolder(inflatedView, itemBindingContext)
+            var viewHolder = new SelectProjectWithExpandableTasksRecyclerViewHolder(
+                inflatedView, itemBindingContext, Resource.Id.StartTimeEntryToggleTasksButton)
             {
                 Click = ItemClick,
                 LongClick = ItemLongClick,
-                ToggleTasksExpansionButtonId = Resource.Id.StartTimeEntryToggleTasksButton,
                 ToggleTasksCommand = ToggleTasksCommand
             };
 

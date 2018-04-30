@@ -39,7 +39,7 @@
             android:layout_gravity="center_vertical" />
     </LinearLayout>
     <toggl.giskard.views.SelectProjectRecyclerView
-        local:MvxBind="ItemsSource Suggestions; ItemClick SelectProjectCommand;  UseGrouping UseGrouping; CreateCommand CreateProjectCommand; Text Text; IsSuggestingCreation SuggestCreation"
+        local:MvxBind="ItemsSource Suggestions; ItemClick SelectProjectCommand;  UseGrouping UseGrouping; CreateCommand CreateProjectCommand; Text Text; IsSuggestingCreation SuggestCreation; ToggleTasksCommand ToggleTaskSuggestionsCommand"
         local:MvxTemplateSelector="@string/SelectProjectTemplateSelector"
         android:scrollbars="vertical"
         android:layout_width="match_parent"

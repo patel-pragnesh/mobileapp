@@ -1,17 +1,21 @@
-﻿using Toggl.Foundation.MvvmCross.Services;
+﻿using Android.Content;
+using Android.Net;
+using MvvmCross.Platform.Droid.Platform;
+using Toggl.Foundation.MvvmCross.Services;
 
 namespace Toggl.Giskard.Services
 {
-    public sealed class BrowserService : IBrowserService
+    public sealed class BrowserService : MvxAndroidTask, IBrowserService
     {
         public void OpenStore()
         {
-            throw new System.NotImplementedException();
+            OpenUrl("https://play.google.com/store/apps/details?id=com.toggl.giskard");
         }
 
         public void OpenUrl(string url)
         {
-            throw new System.NotImplementedException();
+            var intent = new Intent(Intent.ActionView).SetData(Uri.Parse(url));
+            StartActivity(intent);
         }
     }
 }

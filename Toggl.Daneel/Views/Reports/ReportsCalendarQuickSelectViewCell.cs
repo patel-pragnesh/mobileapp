@@ -16,8 +16,6 @@ namespace Toggl.Daneel.Views.Reports
         public static readonly NSString Key = new NSString(nameof(ReportsCalendarQuickSelectViewCell));
         public static readonly UINib Nib;
 
-        public static UIFont Font { get; } = UIFont.SystemFontOfSize(13, UIFontWeight.Medium);
-
         static ReportsCalendarQuickSelectViewCell()
         {
             Nib = UINib.FromName(nameof(ReportsCalendarQuickSelectViewCell), NSBundle.MainBundle);
@@ -33,7 +31,7 @@ namespace Toggl.Daneel.Views.Reports
         {
             base.AwakeFromNib();
 
-            TitleLabel.Font = Font;
+            TitleLabel.Font = UIFont.SystemFontOfSize(13, UIFontWeight.Medium);
 
             this.DelayBind(() =>
             {

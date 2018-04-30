@@ -14,22 +14,14 @@ namespace Toggl.Daneel.ViewSources
     public sealed class ReportsCalendarQuickSelectCollectionViewSource
         : MvxCollectionViewSource, IUICollectionViewDelegateFlowLayout
     {
+        private const int cellWidth = 96;
         private const int cellHeight = 32;
-        private const int horizontalPadding = 20;
         private const string cellIdentifier = nameof(ReportsCalendarQuickSelectViewCell);
 
-        private readonly UIStringAttributes titleAttributes;
-
         public ReportsCalendarQuickSelectCollectionViewSource(
-            UICollectionView collectionView, UIFont font) : base(collectionView)
+            UICollectionView collectionView) : base(collectionView)
         {
             Ensure.Argument.IsNotNull(collectionView, nameof(collectionView));
-            Ensure.Argument.IsNotNull(font, nameof(font));
-
-            titleAttributes = new UIStringAttributes
-            {
-                Font = font
-            };
 
             collectionView.RegisterNibForCell(ReportsCalendarQuickSelectViewCell.Nib, cellIdentifier);
         }
@@ -58,14 +50,7 @@ namespace Toggl.Daneel.ViewSources
         [Export("collectionView:layout:sizeForItemAtIndexPath:")]
         public CGSize GetSizeForItem(UICollectionView collectionView, UICollectionViewLayout layout, NSIndexPath indexPath)
         {
-            var quickSelectShortcut = (CalendarBaseQuickSelectShortcut)GetItemAt(indexPath);
-            var title = new NSString(quickSelectShortcut.Title);
-            var titleSize = title.GetSizeUsingAttributes(titleAttributes);
-
-            return new CGSize(
-                Math.Ceiling(titleSize.Width) + horizontalPadding,
-                cellHeight
-            );
+            return new CGSize(cellWidth, cellHeight);
         }
     }
 }

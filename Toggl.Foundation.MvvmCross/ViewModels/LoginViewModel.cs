@@ -367,6 +367,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsLoading = false;
 
             onboardingStorage.SetIsNewUser(IsSignUp);
+            if (IsSignUp)
+            {
+                onboardingStorage.SetUserSignedUp();
+            }
 
             await navigationService.Navigate<MainViewModel>();
         }

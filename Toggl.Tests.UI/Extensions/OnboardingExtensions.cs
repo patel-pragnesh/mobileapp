@@ -5,7 +5,7 @@ namespace Toggl.Tests.UI.Extensions
     public static class OnboardingExtensions
     {
         public static void WaitForOnboardingScreen(this IApp app)
-            => app.WaitForElement(Onboarding.SkipButton);
+            => app.WaitForElement(Onboarding.FirstOnboardingElement);
 
         public static void GoForwardToSecondOnboardingPage(this IApp app)
         {

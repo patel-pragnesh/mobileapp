@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,17 +22,18 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Duration format" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="piv-jK-LCB">
-                    <rect key="frame" x="135" y="11.5" width="105" height="17"/>
+                    <rect key="frame" x="135" y="13.5" width="105" height="17"/>
                     <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8z6-jm-qzl">
-                    <rect key="frame" x="0.0" y="0.0" width="40" height="40"/>
+                    <rect key="frame" x="0.0" y="0.0" width="44" height="44"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="40" id="8IY-D5-qXz"/>
-                        <constraint firstAttribute="height" constant="40" id="n4R-Ja-hB2"/>
+                        <constraint firstAttribute="width" constant="44" id="8IY-D5-qXz"/>
+                        <constraint firstAttribute="height" constant="44" id="n4R-Ja-hB2"/>
                     </constraints>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="2"/>
                     <state key="normal" image="icBack"/>
                 </button>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="8Wn-XL-ywf">
@@ -45,7 +46,7 @@
                 <constraint firstItem="8z6-jm-qzl" firstAttribute="top" secondItem="2" secondAttribute="top" id="93d-EJ-ezr"/>
                 <constraint firstItem="piv-jK-LCB" firstAttribute="centerY" secondItem="8z6-jm-qzl" secondAttribute="centerY" id="9lr-c8-WYF"/>
                 <constraint firstAttribute="trailing" secondItem="8Wn-XL-ywf" secondAttribute="trailing" id="Hy7-At-pb0"/>
-                <constraint firstItem="8Wn-XL-ywf" firstAttribute="top" secondItem="8z6-jm-qzl" secondAttribute="bottom" constant="12" id="Uua-9f-aNo"/>
+                <constraint firstItem="8Wn-XL-ywf" firstAttribute="top" secondItem="8z6-jm-qzl" secondAttribute="bottom" constant="8" id="Uua-9f-aNo"/>
                 <constraint firstAttribute="bottom" secondItem="8Wn-XL-ywf" secondAttribute="bottom" id="Zd0-OF-AWG"/>
                 <constraint firstItem="piv-jK-LCB" firstAttribute="centerX" secondItem="2" secondAttribute="centerX" id="dmr-Oc-yQN"/>
                 <constraint firstItem="8z6-jm-qzl" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="l7u-95-bbm"/>

@@ -9,7 +9,7 @@ namespace Toggl.Daneel.Services
     {
         public void OpenStore()
         {
-            OpenUrl("");
+            OpenUrl("https://itunes.apple.com/us/app/toggl/id1291898086?mt=8");
         }
 
         public void OpenUrl(string url)
