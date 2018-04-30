@@ -6,6 +6,8 @@ namespace Toggl.Ultrawave.Models
 {
     internal sealed partial class Workspace : IWorkspace
     {
+        private static readonly DateTimeOffset defaultAtDate = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
         public long Id { get; set; }
 
         public string Name { get; set; }
@@ -33,7 +35,7 @@ namespace Toggl.Ultrawave.Models
 
         public int RoundingMinutes { get; set; }
 
-        public DateTimeOffset? At { get; set; }
+        public DateTimeOffset At { get; set; }
 
         public string LogoUrl { get; set; }
     }

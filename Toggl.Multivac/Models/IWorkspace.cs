@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IWorkspace : IIdentifiable, IDeletable
+    public interface IWorkspace : IIdentifiable, IDeletable, ILastChangedDatable
     {
         string Name { get; }
 
@@ -25,8 +25,6 @@ namespace Toggl.Multivac.Models
         int Rounding { get; }
 
         int RoundingMinutes { get; }
-
-        DateTimeOffset? At { get; }
 
         string LogoUrl { get; }
     }

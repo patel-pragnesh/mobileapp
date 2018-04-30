@@ -8,8 +8,5 @@ namespace Toggl.Foundation.Sync.ConflictResolution.Selectors
     {
         public bool IsInSync(IDatabaseUser model)
             => model.SyncStatus == SyncStatus.InSync;
-
-        public DateTimeOffset LastModified(IDatabaseUser model)
-            => model.At;
     }
 }

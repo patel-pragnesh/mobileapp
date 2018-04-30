@@ -30,7 +30,7 @@ namespace Toggl.Foundation.Tests.Mocks
 
         public int RoundingMinutes { get; set; }
 
-        public DateTimeOffset? At { get; set; }
+        public DateTimeOffset At { get; set; }
 
         public string LogoUrl { get; set; }
 

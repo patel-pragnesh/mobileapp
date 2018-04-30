@@ -1,13 +1,9 @@
-﻿using System;
-
-namespace Toggl.Multivac.Models
+﻿namespace Toggl.Multivac.Models
 {
-    public interface ITag : IIdentifiable, IDeletable
+    public interface ITag : IIdentifiable, IDeletable, ILastChangedDatable
     {
         long WorkspaceId { get; }
 
         string Name { get; }
-
-        DateTimeOffset At { get; }
     }
 }

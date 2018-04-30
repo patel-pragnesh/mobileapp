@@ -8,7 +8,7 @@ using Toggl.Multivac.Models;
 namespace Toggl.Foundation.Sync.ConflictResolution
 {
     internal sealed class PreferNewer<T> : IConflictResolver<T>
-        where T : class
+        where T : class, ILastChangedDatable
     {
         public TimeSpan MarginOfError { get; }
 
@@ -41,7 +41,7 @@ namespace Toggl.Foundation.Sync.ConflictResolution
             if (selector.IsInSync(localEntity))
                 return Update;
 
-            var receivedDataIsOutdated = selector.LastModified(localEntity) > selector.LastModified(serverEntity).Subtract(MarginOfError);
+            var receivedDataIsOutdated = localEntity.At.Add(MarginOfError) > serverEntity.At;
             if (receivedDataIsOutdated)
                 return Ignore;
 

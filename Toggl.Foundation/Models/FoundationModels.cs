@@ -246,7 +246,7 @@ namespace Toggl.Foundation.Models
 
         public int RoundingMinutes { get; }
 
-        public DateTimeOffset? At { get; }
+        public DateTimeOffset At { get; }
 
         public string LogoUrl { get; }
 
