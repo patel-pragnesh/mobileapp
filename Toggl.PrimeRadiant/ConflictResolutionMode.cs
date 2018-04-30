@@ -1,5 +1,4 @@
-﻿using System;
-namespace Toggl.PrimeRadiant
+﻿namespace Toggl.PrimeRadiant
 {
     public enum ConflictResolutionMode
     {
