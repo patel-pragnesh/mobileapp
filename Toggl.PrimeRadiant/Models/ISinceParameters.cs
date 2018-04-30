@@ -2,13 +2,10 @@
 
 namespace Toggl.PrimeRadiant.Models
 {
-    public interface ISinceParameters
+    public interface ISinceParameter
     {
-        DateTimeOffset? Workspaces { get; }
-        DateTimeOffset? Tags { get; }
-        DateTimeOffset? Clients { get; }
-        DateTimeOffset? Projects { get; }
-        DateTimeOffset? Tasks { get; }
-        DateTimeOffset? TimeEntries { get; }
+        string Key { get; }
+
+        DateTimeOffset? Since { get; }
     }
 }

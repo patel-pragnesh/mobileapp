@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Realm.Models;
@@ -10,6 +10,11 @@ namespace Toggl.PrimeRadiant.Realm
     {
         private readonly Func<Realms.Realm> getRealmInstance;
 
+        private static readonly Dictionary<Type, string> keys = new Dictionary<Type, string>()
+        {
+            [typeof(IDatabaseUser)] = "user"
+        };
+
         public SinceParameterStorage(Func<Realms.Realm> getRealmInstance)
         {
             Ensure.Argument.IsNotNull(getRealmInstance, nameof(getRealmInstance));
@@ -17,40 +22,45 @@ namespace Toggl.PrimeRadiant.Realm
             this.getRealmInstance = getRealmInstance;
         }
 
-        public ISinceParameters Get()
+        public DateTimeOffset? Get(Type entityType)
         {
-            return doTransaction();
+            var key = getKeyByType(entityType);
+            var realm = getRealmInstance();
+            var record = realm.Find<RealmSinceParameter>(key);
+            return record?.Since;
         }
 
-        public void Set(ISinceParameters parameters)
+        public void Set(Type entityType, DateTimeOffset? since)
         {
-            doTransaction(p => p.SetValuesFrom(parameters));
-        }
-
-        private RealmSinceParameters doTransaction(Action<RealmSinceParameters> mutateParameters = null)
-        {
-            RealmSinceParameters parameters;
-
+            var key = getKeyByType(entityType);
             var realm = getRealmInstance();
             using (var transaction = realm.BeginWrite())
             {
-                parameters = getOrCreateRealmObject(realm);
-                mutateParameters?.Invoke(parameters);
+                var record = realm.Find<RealmSinceParameter>(key);
+                if (record == null)
+                {
+                    record = new RealmSinceParameter
+                    {
+                        Key = key,
+                        Since = since
+                    };
+                    realm.Add(record);
+                }
+                else
+                {
+                    record.Since = since;
+                }
+
                 transaction.Commit();
             }
-
-            return parameters;
         }
 
-        private RealmSinceParameters getOrCreateRealmObject(Realms.Realm realm)
+        private string getKeyByType(Type entityType)
         {
-            var parameters = realm.All<RealmSinceParameters>().SingleOrDefault();
-            if (parameters == null)
-            {
-                parameters = new RealmSinceParameters();
-                realm.Add(parameters);
-            }
-            return parameters;
+            if (keys.TryGetValue(entityType, out var key))
+                return key;
+
+            throw new ArgumentException($"Since parameters for the type {entityType.FullName} cannot be stored.");
         }
     }
 }

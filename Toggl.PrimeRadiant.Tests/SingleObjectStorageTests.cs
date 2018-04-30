@@ -64,14 +64,11 @@ namespace Toggl.PrimeRadiant.Tests
         [InlineData(100)]
         public void TheBatchUpdateMehtodThrowsWhenThereIsMoreThanEntityToUpdate(int entitiesToUpdate)
         {
-            var batch = Enumerable.Range(0, entitiesToUpdate).Select(id => ((long)id, new TTestModel()));
+            var batch = Enumerable.Range(0, entitiesToUpdate).Select(id => new TTestModel()).ToList();
 
-            Func<Task> callingBatchUpdate = async () => await callBatchUpdate(batch);
+            Func<Task> callingBatchUpdate = async () => await Storage.BatchUpdate(batch);
 
             callingBatchUpdate.ShouldThrow<ArgumentException>();
         }
-
-        private IObservable<IEnumerable<IConflictResolutionResult<TTestModel>>> callBatchUpdate(IEnumerable<(long, TTestModel)> batch)
-            => Storage.BatchUpdate(batch, (a, b) => ConflictResolutionMode.Ignore, Substitute.For<IRivalsResolver<TTestModel>>());
     }
 }
