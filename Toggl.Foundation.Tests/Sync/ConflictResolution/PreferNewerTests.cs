@@ -4,7 +4,6 @@ using Xunit;
 using FluentAssertions;
 using Toggl.Foundation.Sync.ConflictResolution;
 using Toggl.PrimeRadiant;
-using Toggl.Foundation.Sync.ConflictResolution.Selectors;
 using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Tests.Sync.ConflictResolution
@@ -160,12 +159,6 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
             }
         }
 
-        private sealed class TestModelSelector : ISyncSelector<TestModel>
-        {
-            public bool IsInSync(TestModel model)
-                => model.SyncStatus == SyncStatus.InSync;
-        }
-
         private TimeSpan randomTimeSpan(int seed, double max)
         {
             var lessThanMarginOfErrorSeconds = (new Random(seed)).NextDouble() * max;
@@ -173,9 +166,9 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
         }
 
         private PreferNewer<TestModel> resolver { get; }
-            = new PreferNewer<TestModel>(new TestModelSelector(), TimeSpan.FromSeconds(5));
+            = new PreferNewer<TestModel>(TimeSpan.FromSeconds(5));
 
         private PreferNewer<TestModel> zeroMarginOfErrorResolver { get; }
-            = new PreferNewer<TestModel>(new TestModelSelector());
+            = new PreferNewer<TestModel>();
     }
 }
