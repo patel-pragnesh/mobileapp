@@ -10,6 +10,7 @@ using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.Services;
 using Toggl.Foundation.Shortcuts;
 using Toggl.Foundation.Sync;
+using Toggl.Foundation.Sync.EntryPoints;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Settings;
@@ -153,8 +154,9 @@ namespace Toggl.Foundation.MvvmCross
 
         public static void Initialize(this FoundationMvvmCross self, App app, IScheduler scheduler)
         {
-            Func<ITogglDataSource, ISyncManager> createSyncManager(ITogglApi api) => dataSource =>
-                TogglSyncManager.CreateSyncManager(self.Database, api, dataSource, self.TimeService, self.AnalyticsService, retryDelayLimit, scheduler);
+            Func<ITogglDataSource, ISyncManager> createSyncManager(ITogglApi api)
+                => dataSource => TogglSyncManagerFactory.CreateSyncManager(self.Database, api,
+                    self.TimeService, self.AnalyticsService, retryDelayLimit, scheduler);
 
             ITogglDataSource createDataSource(ITogglApi api)
             {

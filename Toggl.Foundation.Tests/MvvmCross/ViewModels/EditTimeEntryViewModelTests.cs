@@ -290,7 +290,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 {
                     await ViewModel.DeleteCommand.ExecuteAsync();
 
-                    await DataSource.SyncManager.Received().StartPushSync();
+                    DataSource.SyncManager.Received().StartPushSync();
                 }
 
                 [Fact, LogIfTooSlow]
@@ -301,7 +301,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                     await ViewModel.DeleteCommand.ExecuteAsync();
 
-                    await DataSource.SyncManager.DidNotReceive().StartPushSync();
+                    DataSource.SyncManager.DidNotReceive().StartPushSync();
                 }
             }
 
@@ -325,7 +325,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 {
                     await ViewModel.DeleteCommand.ExecuteAsync();
 
-                    await DataSource.SyncManager.DidNotReceive().StartPushSync();
+                    DataSource.SyncManager.DidNotReceive().StartPushSync();
                 }
             }
         }
@@ -432,7 +432,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
-                await DataSource.SyncManager.Received().StartPushSync();
+                DataSource.SyncManager.Received().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -444,7 +444,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.IsEditingDescription = false;
                 ViewModel.ConfirmCommand.Execute();
 
-                await DataSource.SyncManager.DidNotReceive().StartPushSync();
+                DataSource.SyncManager.DidNotReceive().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]

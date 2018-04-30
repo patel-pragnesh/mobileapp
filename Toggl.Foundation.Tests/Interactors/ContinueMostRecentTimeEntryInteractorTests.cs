@@ -196,7 +196,7 @@ namespace Toggl.Foundation.Tests.Interactors
             {
                 await interactor.Execute();
 
-                await DataSource.SyncManager.Received().StartPushSync();
+                DataSource.SyncManager.Received().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]

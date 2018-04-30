@@ -159,7 +159,7 @@ namespace Toggl.Foundation.Tests.Interactors
             {
                 await CallInteractor(CreatePrototype(ValidTime, ValidDescription, true, ProjectId));
 
-                await DataSource.SyncManager.Received().StartPushSync();
+                DataSource.SyncManager.Received().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -172,7 +172,7 @@ namespace Toggl.Foundation.Tests.Interactors
                     () => CallInteractor(CreatePrototype(ValidTime, ValidDescription, true, ProjectId)).Wait();
 
                 executeCommand.ShouldThrow<Exception>();
-                await DataSource.SyncManager.DidNotReceive().StartPushSync();
+                DataSource.SyncManager.DidNotReceive().StartPushSync();
             }
         }
 

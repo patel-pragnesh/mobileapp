@@ -95,7 +95,11 @@ namespace Toggl.Foundation.DataSources
                 .Where(timeInBackground => timeInBackground >= minimumTimeInBackgroundForFullSync)
                 .Subscribe((TimeSpan _) => SyncManager.StartFullSync());
 
-            return SyncManager.StartFullSync()
+            SyncManager.StartFullSync();
+
+            return SyncManager.IsRunningSyncObservable
+                .Where(isRunnning => isRunnning == false)
+                .FirstAsync()
                 .Select(_ => Unit.Default);
         }
 
@@ -111,13 +115,15 @@ namespace Toggl.Foundation.DataSources
                 .Any(hasUnsynced => hasUnsynced);
 
         public IObservable<Unit> Logout()
-            => SyncManager.Freeze()
-                .FirstAsync()
-                .Do(_ => isLoggedIn = false)
-                .Do(_ => stopSyncingOnSignal())
-                .SelectMany(_ => database.Clear())
-                .Do(_ => shortcutCreator.OnLogout())
-                .FirstAsync();
+        {
+            SyncManager.Freeze();
+
+            isLoggedIn = false;
+            stopSyncingOnSignal();
+
+            return database.Clear()
+                .Do(_ => shortcutCreator.OnLogout());
+        }
 
         private IObservable<bool> hasUnsyncedData<TModel>(IRepository<TModel> repository)
             where TModel : IDatabaseSyncable

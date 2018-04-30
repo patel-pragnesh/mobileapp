@@ -285,7 +285,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 await ViewModel.StopTimeEntryCommand.ExecuteAsync();
 
-                await DataSource.SyncManager.Received().StartPushSync();
+                DataSource.SyncManager.Received().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -305,7 +305,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 Action stopTimeEntry = () => ViewModel.StopTimeEntryCommand.ExecuteAsync().Wait();
 
                 stopTimeEntry.ShouldThrow<Exception>();
-                await DataSource.SyncManager.DidNotReceive().StartPushSync();
+                DataSource.SyncManager.DidNotReceive().StartPushSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -685,7 +685,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     ViewModel.Init(ApplicationUrls.Main.Action.Stop);
                     await ViewModel.Initialize();
 
-                    await DataSource.SyncManager.Received().StartPushSync();
+                    DataSource.SyncManager.Received().StartPushSync();
                 }
             }
 

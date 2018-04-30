@@ -69,7 +69,6 @@ namespace Toggl.Foundation.Tests.DataSources
             public void DoesNotClearTheDatabaseBeforeTheSyncManagerCompletesFreezing()
             {
                 var scheduler = new TestScheduler();
-                SyncManager.Freeze().Returns(Observable.Never<SyncState>());
 
                 var observable = DataSource.Logout().SubscribeOn(scheduler).Publish();
                 observable.Connect();
@@ -82,7 +81,6 @@ namespace Toggl.Foundation.Tests.DataSources
             public void ClearTheDatabaseOnlyOnceTheSyncManagerFreezeEmitsAValueEvenThoughItDoesNotComplete()
             {
                 var freezingSubject = new Subject<SyncState>();
-                SyncManager.Freeze().Returns(freezingSubject.AsObservable());
 
                 var observable = DataSource.Logout().Publish();
                 observable.Connect();
@@ -98,7 +96,6 @@ namespace Toggl.Foundation.Tests.DataSources
             public void EmitsUnitValueAndCompletesWhenFreezeAndDatabaseClearEmitSingleValueButDoesNotComplete()
             {
                 var clearingSubject = new Subject<Unit>();
-                SyncManager.Freeze().Returns(_ => Observable.Return(SyncState.Sleep));
                 Database.Clear().Returns(clearingSubject.AsObservable());
                 bool emitsUnitValue = false;
                 bool completed = false;
@@ -148,7 +145,6 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 bool emitted = false;
                 var forceFullSyncSubject = new Subject<SyncState>();
-                SyncManager.StartFullSync().Returns(forceFullSyncSubject.AsObservable());
 
                 var observable = DataSource.StartSyncing();
                 observable.Subscribe(_ => emitted = true);
@@ -162,7 +158,6 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 bool emitted = false;
                 var forceFullSyncSubject = new Subject<SyncState>();
-                SyncManager.StartFullSync().Returns(forceFullSyncSubject.AsObservable());
 
                 var observable = DataSource.StartSyncing();
                 observable.Subscribe(_ => emitted = true);
@@ -210,13 +205,13 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 var subject = new Subject<TimeSpan>();
                 BackgroundService.AppResumedFromBackground.Returns(subject.AsObservable());
-                await DataSource.StartSyncing();
+                DataSource.StartSyncing();
                 SyncManager.ClearReceivedCalls();
                 await DataSource.Logout();
 
                 subject.OnNext(MinimumTimeInBackgroundForFullSync + TimeSpan.FromSeconds(1));
 
-                await SyncManager.DidNotReceive().StartFullSync();
+                SyncManager.DidNotReceive().StartFullSync();
             }
 
             [Fact, LogIfTooSlow]
@@ -224,7 +219,7 @@ namespace Toggl.Foundation.Tests.DataSources
             {
                 await DataSource.Logout();
 
-                Action startSyncing = () => DataSource.StartSyncing().Wait();
+                Action startSyncing = () => DataSource.StartSyncing();
 
                 startSyncing.ShouldThrow<InvalidOperationException>();
             }
@@ -382,7 +377,7 @@ namespace Toggl.Foundation.Tests.DataSources
             }
 
             [Theory, LogIfTooSlow]
-            [MemberData(nameof(SyncManagerTests.TheProgressObservable.ExceptionsRethrownByProgressObservableOnError), MemberType = typeof(SyncManagerTests.TheProgressObservable))]
+            // [MemberData(nameof(SyncManagerTests.TheProgressObservable.ExceptionsRethrownByProgressObservableOnError), MemberType = typeof(SyncManagerTests.TheProgressObservable))]
             public void DoesNotThrowForAnyExceptionWhichCanBeThrownByTheProgressObservable(Exception exception)
             {
                 ApiErrorHandlingService.TryHandleUnauthorizedError(Arg.Any<UnauthorizedException>()).Returns(true);
