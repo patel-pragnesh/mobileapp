@@ -14,7 +14,7 @@ namespace Toggl.Foundation.Tests.Mocks
 
         public DateTimeOffset At { get; set; }
 
-        public DateTimeOffset? DeletedAt { get; set; }
+        public DateTimeOffset? ServerDeletedAt { get; set; }
 
         public long Id { get; set; }
 

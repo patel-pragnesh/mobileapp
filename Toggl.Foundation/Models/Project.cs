@@ -26,7 +26,7 @@ namespace Toggl.Foundation.Models
 
             public long? WorkspaceId { get; private set; }
 
-            public DateTimeOffset? At { get; private set; }
+            public DateTimeOffset At { get; private set; }
 
             public DateTimeOffset? ServerDeletedAt { get; private set; }
 
@@ -130,7 +130,7 @@ namespace Toggl.Foundation.Models
         {
             Id = builder.Id;
             Name = builder.Name;
-            At = builder.At.Value;
+            At = builder.At;
             Color = builder.Color;
             Billable = builder.Billable;
             ClientId = builder.ClientId;

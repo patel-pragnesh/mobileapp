@@ -2,14 +2,10 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface ITag : IBaseModel
+    public interface ITag : IIdentifiable, ILastChangeDatable, IDeletable
     {
         long WorkspaceId { get; }
 
         string Name { get; }
-
-        DateTimeOffset At { get; }
-
-        DateTimeOffset? DeletedAt { get; }
     }
 }

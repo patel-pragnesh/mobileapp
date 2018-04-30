@@ -8,6 +8,8 @@ namespace Toggl.Foundation.Tests.Mocks
 {
     public sealed class MockWorkspaceFeatureCollection : IDatabaseWorkspaceFeatureCollection
     {
+        public long Id => WorkspaceId;
+
         public IDatabaseWorkspace Workspace { get; set; }
 
         public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures { get; set; }

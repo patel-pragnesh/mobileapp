@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IProject : IBaseModel
+    public interface IProject : IIdentifiable, ILastChangeDatable, IDeletable
     {
         long WorkspaceId { get; }
 
@@ -13,10 +13,6 @@ namespace Toggl.Multivac.Models
         bool IsPrivate { get; }
 
         bool Active { get; }
-
-        DateTimeOffset At { get; }
-
-        DateTimeOffset? ServerDeletedAt { get; }
 
         string Color { get; }
 

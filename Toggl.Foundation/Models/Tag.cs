@@ -17,9 +17,9 @@ namespace Toggl.Foundation.Models
 
             public string Name { get; private set; }
 
-            public DateTimeOffset? At { get; private set; }
+            public DateTimeOffset At { get; private set; }
 
-            public DateTimeOffset? DeletedAt { get; private set; }
+            public DateTimeOffset? ServerDeletedAt { get; private set; }
 
             public SyncStatus SyncStatus { get; private set; }
 
@@ -46,9 +46,9 @@ namespace Toggl.Foundation.Models
                 return this;
             }
 
-            public Builder SetDeletedAt(DateTimeOffset? deletedAt)
+            public Builder SetServerDeletedAt(DateTimeOffset? serverDeletedAt)
             {
-                DeletedAt = deletedAt;
+                ServerDeletedAt = serverDeletedAt;
                 return this;
             }
 
@@ -72,7 +72,7 @@ namespace Toggl.Foundation.Models
                 if (string.IsNullOrEmpty(Name))
                     throw new InvalidOperationException(string.Format(errorMessage, nameof(Name)));
 
-                if (At == null)
+                if (At == default(DateTimeOffset))
                     throw new InvalidOperationException(string.Format(errorMessage, nameof(At)));
             }
         }
@@ -81,8 +81,8 @@ namespace Toggl.Foundation.Models
         {
             Id = builder.Id;
             Name = builder.Name;
-            At = builder.At.Value;
-            DeletedAt = builder.DeletedAt;
+            At = builder.At;
+            ServerDeletedAt = builder.ServerDeletedAt;
             SyncStatus = builder.SyncStatus;
             WorkspaceId = builder.WorkspaceId.Value;
         }

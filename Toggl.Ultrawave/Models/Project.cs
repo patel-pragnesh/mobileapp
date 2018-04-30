@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Serialization;
 
@@ -18,6 +19,14 @@ namespace Toggl.Ultrawave.Models
 
         public bool Active { get; set; }
 
+        [JsonProperty("at")]
+        public DateTimeOffset? DirtyAt
+        {
+            get => At;
+            set => At = value ?? DateTimeOffset.UtcNow;
+        }
+
+        [JsonIgnore]
         public DateTimeOffset At { get; set; }
 
         [IgnoreWhenPosting]

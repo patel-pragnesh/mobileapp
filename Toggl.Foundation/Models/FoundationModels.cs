@@ -30,7 +30,7 @@ namespace Toggl.Foundation.Models
 
     internal partial class Preferences : IDatabasePreferences
     {
-        public long Id { get; }
+        public long Id => 0;
 
         public TimeFormat TimeOfDayFormat { get; }
 
@@ -39,6 +39,8 @@ namespace Toggl.Foundation.Models
         public DurationFormat DurationFormat { get; }
 
         public bool CollapseTimeEntries { get; }
+
+        public DateTimeOffset At { get; }
 
         public bool IsDeleted { get; }
 
@@ -104,7 +106,7 @@ namespace Toggl.Foundation.Models
 
         public DateTimeOffset At { get; }
 
-        public DateTimeOffset? DeletedAt { get; }
+        public DateTimeOffset? ServerDeletedAt { get; }
 
         public IDatabaseWorkspace Workspace { get; }
 
@@ -246,7 +248,7 @@ namespace Toggl.Foundation.Models
 
         public int RoundingMinutes { get; }
 
-        public DateTimeOffset? At { get; }
+        public DateTimeOffset At { get; }
 
         public string LogoUrl { get; }
 
@@ -267,6 +269,8 @@ namespace Toggl.Foundation.Models
 
     internal partial class WorkspaceFeatureCollection : IDatabaseWorkspaceFeatureCollection
     {
+        public long Id => WorkspaceId;
+
         public long WorkspaceId { get; }
 
         public IEnumerable<IWorkspaceFeature> Features { get; }
