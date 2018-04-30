@@ -1,30 +1,23 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Toggl.Foundation.Analytics;
-using Toggl.Foundation.Extensions;
-using Toggl.Foundation.Sync.States;
 using Toggl.Multivac;
 using Toggl.Ultrawave.Exceptions;
-using static Toggl.Foundation.Sync.SyncState;
 
 namespace Toggl.Foundation.Sync
 {
     public sealed class SyncManager : ISyncManager
     {
-        private readonly object freezingLock = new object();
-
         private readonly ISyncStateQueue queue;
         private readonly IAnalyticsService analyticsService;
         private readonly ISyncProgressManager syncProgressManager;
-        private readonly IState pullSyncEntryPoint;
-        private readonly IState pushSyncEntryPoint;
+        private readonly IStateMachine stateMachine;
 
         private readonly ISubject<bool> isFrozenSubject;
 
-        private readonly IObservable<Unit> abortObservable;
+        private readonly IObservable<bool> abortObservable;
 
         public IObservable<SyncProgress> ProgressObservable => syncProgressManager.Progress;
 
@@ -34,23 +27,20 @@ namespace Toggl.Foundation.Sync
             ISyncStateQueue queue,
             IAnalyticsService analyticsService,
             ISyncProgressManager syncProgressManager,
-            IState pullSyncEntryPoint,
-            IState pushSyncEntryPoint)
+            IStateMachine stateMachine)
         {
             Ensure.Argument.IsNotNull(queue, nameof(queue));
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
             Ensure.Argument.IsNotNull(syncProgressManager, nameof(syncProgressManager));
-            Ensure.Argument.IsNotNull(pullSyncEntryPoint, nameof(pullSyncEntryPoint));
-            Ensure.Argument.IsNotNull(pushSyncEntryPoint, nameof(pushSyncEntryPoint));
+            Ensure.Argument.IsNotNull(stateMachine, nameof(stateMachine));
 
             this.queue = queue;
             this.analyticsService = analyticsService;
             this.syncProgressManager = syncProgressManager;
-            this.pullSyncEntryPoint = pullSyncEntryPoint;
-            this.pushSyncEntryPoint = pushSyncEntryPoint;
+            this.stateMachine = stateMachine;
 
             isFrozenSubject = new BehaviorSubject<bool>(false);
-            abortObservable = isFrozenSubject.AsObservable().Select(_ => Unit.Default);
+            abortObservable = isFrozenSubject.AsObservable().Select(isFrozen => !isFrozen);
         }
 
         public void StartPushSync()
@@ -77,48 +67,21 @@ namespace Toggl.Foundation.Sync
 
             if (isRunningSync || isFrozen) return;
 
-            await sync();
-        }
-
-        private async Task sync()
-        {
             syncProgressManager.ReportStart();
 
-            var entryPoint = chooseNextEntryPoint();
-            while (entryPoint != null && await isFrozenSubject.FirstAsync() == false)
+            try
             {
-                try
-                {
-                    await entryPoint.RunUntilReachingDeadEnd(abortObservable);
-                }
-                catch (Exception exception)
-                {
-                    processError(exception);
-                    return;
-                }
-
-                entryPoint = chooseNextEntryPoint();
+                await stateMachine.Run(queue, abortObservable);
+            }
+            catch (Exception exception)
+            {
+                processError(exception);
+                return;
             }
 
             syncProgressManager.ReportFinishing();
         }
 
-        private IState chooseNextEntryPoint()
-        {
-            var state = queue.Dequeue();
-
-            switch (state)
-            {
-                case Pull:
-                    return pullSyncEntryPoint;
-
-                case Push:
-                    return pushSyncEntryPoint;
-
-                default:
-                    return null;
-            }
-        }
 
         private void processError(Exception error)
         {
