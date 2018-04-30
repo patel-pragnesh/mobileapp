@@ -7,7 +7,6 @@ using System.Reactive.Subjects;
 using Toggl.Foundation.DTOs;
 using Toggl.Foundation.Models;
 using Toggl.Multivac;
-using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 
@@ -49,11 +48,8 @@ namespace Toggl.Foundation.DataSources
                 .Select(Preferences.From)
                 .Do(currentPreferencesSubject.OnNext);
 
-        public IObservable<IEnumerable<IConflictResolutionResult<IDatabasePreferences>>> BatchUpdate(
-            IEnumerable<(long Id, IDatabasePreferences Entity)> entities,
-            Func<IDatabasePreferences, IDatabasePreferences, ConflictResolutionMode> conflictResolution,
-            IRivalsResolver<IDatabasePreferences> rivalsResolver = null)
-            => storage.BatchUpdate(entities, conflictResolution, rivalsResolver)
+        public IObservable<IEnumerable<IConflictResolutionResult<IDatabasePreferences>>> BatchUpdate(IList<IDatabasePreferences> entities)
+            => storage.BatchUpdate(entities)
                 .Do(processConflictResultionResult);
 
         public IObservable<IDatabasePreferences> GetById(long id)

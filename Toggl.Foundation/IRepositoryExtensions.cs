@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Toggl.Multivac.Models;
@@ -13,14 +14,10 @@ namespace Toggl.Foundation
             => repository.Update(entity.Id, entity);
 
         public static IObservable<IConflictResolutionResult<TModel>> UpdateWithConflictResolution<TModel>(
-            this IRepository<TModel> repository,
-            long id,
-            TModel entity,
-            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
-            IRivalsResolver<TModel> rivalsResolver = null)
+            this IRepository<TModel> repository, TModel entity)
             where TModel : IDatabaseSyncable
             => repository
-                .BatchUpdate(new[] { (id, entity) }, conflictResolution, rivalsResolver)
+                .BatchUpdate(new List<TModel> { entity })
                 .SingleAsync()
                 .Select(entities => entities.First());
     }

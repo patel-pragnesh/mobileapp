@@ -4,7 +4,7 @@ namespace Toggl.PrimeRadiant.Tests
 {
     public interface ITestModel : IIdentifiable, IDatabaseSyncable { }
 
-    public sealed class TestModel : ITestModel
+    public sealed class TestModel : ITestModel, ISingleEntity
     {
         public long Id { get; set; }
 

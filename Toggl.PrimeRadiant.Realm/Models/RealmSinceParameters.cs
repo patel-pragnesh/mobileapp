@@ -4,23 +4,11 @@ using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.PrimeRadiant.Realm.Models
 {
-    internal sealed class RealmSinceParameters : RealmObject, ISinceParameters
+    internal sealed class RealmSinceParameter : RealmObject, ISinceParameter
     {
-        public void SetValuesFrom(ISinceParameters parameters)
-        {
-            Workspaces = parameters.Workspaces;
-            Tags = parameters.Tags;
-            Clients = parameters.Clients;
-            Projects = parameters.Projects;
-            Tasks = parameters.Tasks;
-            TimeEntries = parameters.TimeEntries;
-        }
+        [PrimaryKey]
+        public string Key { get; set; }
 
-        public DateTimeOffset? Workspaces { get; set; }
-        public DateTimeOffset? Tags { get; set; }
-        public DateTimeOffset? Clients { get; set; }
-        public DateTimeOffset? Projects { get; set; }
-        public DateTimeOffset? Tasks { get; set; }
-        public DateTimeOffset? TimeEntries { get; set; }
+        public DateTimeOffset? Since { get; set; }
     }
 }

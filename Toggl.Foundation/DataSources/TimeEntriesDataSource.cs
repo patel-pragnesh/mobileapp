@@ -110,7 +110,7 @@ namespace Toggl.Foundation.DataSources
 
         public IObservable<IDatabaseTimeEntry> Create(IDatabaseTimeEntry entity)
             => repository
-                .UpdateWithConflictResolution(entity.Id, entity, alwaysCreate, rivalsResolver)
+                .UpdateWithConflictResolution(entity, alwaysCreate, rivalsResolver)
                 .Select(result => ((CreateResult<IDatabaseTimeEntry>)result).Entity)
                 .Select(TimeEntry.From)
                 .Do(timeEntryCreatedSubject.OnNext);
@@ -120,12 +120,9 @@ namespace Toggl.Foundation.DataSources
                 .Do(updatedEntity => maybeUpdateCurrentlyRunningTimeEntryId(id, updatedEntity))
                 .Do(updatedEntity => timeEntryUpdatedSubject.OnNext((id, TimeEntry.From(updatedEntity))));
 
-        public IObservable<IEnumerable<IConflictResolutionResult<IDatabaseTimeEntry>>> BatchUpdate(
-            IEnumerable<(long Id, IDatabaseTimeEntry Entity)> entities,
-            Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode> conflictResolution,
-            IRivalsResolver<IDatabaseTimeEntry> rivalsResolver = null)
+        public IObservable<IEnumerable<IConflictResolutionResult<IDatabaseTimeEntry>>> BatchUpdate(IList<IDatabaseTimeEntry> entities)
             => repository
-                .BatchUpdate(entities, conflictResolution, rivalsResolver)
+                .BatchUpdate(entities)
                 .Do(updatedEntities => updatedEntities
                     .Where(result => !(result is IgnoreResult<IDatabaseTimeEntry>))
                     .ForEach(handleBatchUpdateResult));

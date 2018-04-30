@@ -6,15 +6,14 @@ using System.Reactive.Linq;
 using Realms;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
+using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant.Exceptions;
 
 namespace Toggl.PrimeRadiant.Realm
 {
     internal sealed class SingleObjectStorage<TModel> : BaseStorage<TModel>, ISingleObjectStorage<TModel>
-        where TModel : IDatabaseSyncable
+        where TModel : ISingleEntity
     {
-        private const int fakeId = 0;
-
         public SingleObjectStorage(IRealmAdapter<TModel> adapter)
             : base(adapter) { }
 
@@ -36,10 +35,7 @@ namespace Toggl.PrimeRadiant.Realm
             });
         }
 
-        public IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(
-            IEnumerable<(long Id, TModel Entity)> entities,
-            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
-            IRivalsResolver<TModel> rivalsResolver = null)
+        public IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(IList<TModel> entities)
             => CreateObservable(() =>
             {
                 var list = entities.ToList();
@@ -57,13 +53,12 @@ namespace Toggl.PrimeRadiant.Realm
             where TRealmEntity : RealmObject, TModel, IUpdatesFrom<TModel>
             => new SingleObjectStorage<TModel>(new RealmAdapter<TRealmEntity, TModel>(
                 getRealmInstance,
-                convertToRealm, _ => __ => true,
-                obj => fakeId));
-
-        public IObservable<TModel> Update(TModel entity)
-            => Update(fakeId, entity);
+                convertToRealm));
 
         public IObservable<Unit> Delete()
-            => Single().SelectMany(entity => Delete(fakeId));
+            => Single().SelectMany(entity => Delete(entity.Id));
+
+        public IObservable<TModel> Update(TModel entity)
+            => Single().SelectMany(oldEntity => Update(oldEntity.Id, entity));
     }
 }

@@ -9,10 +9,7 @@ namespace Toggl.PrimeRadiant
         IObservable<TModel> GetById(long id);
         IObservable<TModel> Create(TModel entity);
         IObservable<TModel> Update(long id, TModel entity);
-        IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(
-            IEnumerable<(long Id, TModel Entity)> entities,
-            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
-            IRivalsResolver<TModel> rivalsResolver = null);
+        IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(IList<TModel> entities);
         IObservable<Unit> Delete(long id);
         IObservable<IEnumerable<TModel>> GetAll();
         IObservable<IEnumerable<TModel>> GetAll(Func<TModel, bool> predicate);
