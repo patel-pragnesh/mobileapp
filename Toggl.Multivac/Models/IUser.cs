@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IUser : IBaseModel
+    public interface IUser : IIdentifiable
     {
         string ApiToken { get; }
 

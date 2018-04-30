@@ -1,6 +1,6 @@
 ﻿namespace Toggl.Multivac.Models
 {
-    public interface IBaseModel
+    public interface IIdentifiable
     {
         long Id { get; }
     }

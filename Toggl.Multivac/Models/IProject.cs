@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IProject : IBaseModel
+    public interface IProject : IIdentifiable
     {
         long WorkspaceId { get; }
 

@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface ITask : IBaseModel
+    public interface ITask : IIdentifiable
     {
         string Name { get; }
 
