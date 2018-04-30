@@ -2,15 +2,13 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IWorkspace : IIdentifiable
+    public interface IWorkspace : IIdentifiable, IDeletable
     {
         string Name { get; }
 
         bool Admin { get; }
 
         DateTimeOffset? SuspendedAt { get; }
-
-        DateTimeOffset? ServerDeletedAt { get; }
 
         double? DefaultHourlyRate { get; }
 

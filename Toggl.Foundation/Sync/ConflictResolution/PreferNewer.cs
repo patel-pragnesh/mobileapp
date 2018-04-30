@@ -3,6 +3,7 @@ using Toggl.PrimeRadiant;
 using Toggl.Multivac;
 using static Toggl.PrimeRadiant.ConflictResolutionMode;
 using System;
+using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Sync.ConflictResolution
 {
@@ -31,7 +32,7 @@ namespace Toggl.Foundation.Sync.ConflictResolution
         {
             Ensure.Argument.IsNotNull(serverEntity, nameof(serverEntity));
 
-            if (selector.IsDeleted(serverEntity))
+            if (serverEntity is IDeletable deletable && deletable.ServerDeletedAt.HasValue)
                 return localEntity == null ? Ignore : Delete;
 
             if (localEntity == null)

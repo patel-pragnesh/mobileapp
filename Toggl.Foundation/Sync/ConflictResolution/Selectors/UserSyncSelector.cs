@@ -6,9 +6,6 @@ namespace Toggl.Foundation.Sync.ConflictResolution.Selectors
 {
     internal sealed class UserSyncSelector : ISyncSelector<IDatabaseUser>
     {
-        public bool IsDeleted(IDatabaseUser model)
-            => model.IsDeleted;
-
         public bool IsInSync(IDatabaseUser model)
             => model.SyncStatus == SyncStatus.InSync;
 

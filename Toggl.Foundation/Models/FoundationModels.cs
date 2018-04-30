@@ -104,7 +104,7 @@ namespace Toggl.Foundation.Models
 
         public DateTimeOffset At { get; }
 
-        public DateTimeOffset? DeletedAt { get; }
+        public DateTimeOffset? ServerDeletedAt { get; }
 
         public IDatabaseWorkspace Workspace { get; }
 

@@ -11,8 +11,5 @@ namespace Toggl.Foundation.Sync.ConflictResolution.Selectors
 
         public bool IsInSync(IDatabaseTimeEntry model)
             => model.SyncStatus == SyncStatus.InSync;
-
-        public bool IsDeleted(IDatabaseTimeEntry model)
-            => model.ServerDeletedAt.HasValue;
     }
 }

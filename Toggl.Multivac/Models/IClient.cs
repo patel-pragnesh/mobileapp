@@ -2,14 +2,12 @@
 
 namespace Toggl.Multivac.Models
 {
-    public interface IClient : IIdentifiable
+    public interface IClient : IIdentifiable, IDeletable
     {
         long WorkspaceId { get; }
 
         string Name { get; }
 
         DateTimeOffset At { get; }
-
-        DateTimeOffset? ServerDeletedAt { get; }
     }
 }

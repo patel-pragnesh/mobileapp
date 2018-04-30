@@ -6,6 +6,5 @@ namespace Toggl.Foundation.Sync.ConflictResolution.Selectors
     {
         DateTimeOffset LastModified(T model);
         bool IsInSync(T model);
-        bool IsDeleted(T model);
     }
 }

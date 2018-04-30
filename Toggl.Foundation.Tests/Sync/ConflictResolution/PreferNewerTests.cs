@@ -5,6 +5,7 @@ using FluentAssertions;
 using Toggl.Foundation.Sync.ConflictResolution;
 using Toggl.PrimeRadiant;
 using Toggl.Foundation.Sync.ConflictResolution.Selectors;
+using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Tests.Sync.ConflictResolution
 {
@@ -141,7 +142,7 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
             mode.Should().Be(ConflictResolutionMode.Update);
         }
 
-        private sealed class TestModel : IDatabaseSyncable
+        private sealed class TestModel : IDeletable, IDatabaseSyncable
         {
             private readonly DateTimeOffset now = new DateTimeOffset(2017, 01, 05, 12, 34, 56, TimeSpan.Zero);
 
@@ -166,9 +167,6 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
 
             public bool IsInSync(TestModel model)
                 => model.SyncStatus == SyncStatus.InSync;
-
-            public bool IsDeleted(TestModel model)
-                => model.ServerDeletedAt.HasValue;
         }
 
         private TimeSpan randomTimeSpan(int seed, double max)

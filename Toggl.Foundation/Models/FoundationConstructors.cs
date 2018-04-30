@@ -172,7 +172,7 @@ namespace Toggl.Foundation.Models
             WorkspaceId = entity.WorkspaceId;
             Name = entity.Name;
             At = entity.At;
-            DeletedAt = entity.DeletedAt;
+            ServerDeletedAt = entity.ServerDeletedAt;
             SyncStatus = syncStatus;
             LastSyncErrorMessage = lastSyncErrorMessage;
             IsDeleted = isDeleted;
