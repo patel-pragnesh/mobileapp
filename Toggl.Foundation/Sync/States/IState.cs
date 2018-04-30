@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive;
+using Toggl.Foundation.Sync.States.Results;
 
 namespace Toggl.Foundation.Sync.States
 {
     public interface IState
     {
-        IEnumerable<IState> AllPossibleOutcomes { get; }
+        IEnumerable<IResult> AllPossibleOutcomes { get; }
 
-        IObservable<IResult> Run(IObservable<Unit> abort);
+        IObservable<IResult> Run();
     }
 }

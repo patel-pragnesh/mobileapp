@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Toggl.Foundation.Sync.States
+﻿namespace Toggl.Foundation.Sync.States
 {
     public interface ISpeculativePreloadable
     {
-        IEnumerable<ISpeculativePreloadable> Preload();
+        void Preload();
     }
 }
