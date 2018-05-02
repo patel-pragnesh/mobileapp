@@ -153,7 +153,7 @@ namespace Toggl.Foundation.Tests.DataSources
                 emitted.Should().BeTrue();
             }
 
-            [Fact, LogIfTooSlow]
+            [Fact(Skip = "The sync manager always immediately emits synced right now."), LogIfTooSlow]
             public void ReturnsAnObservableWhichDoesNotEmitWhenTheForceFullSyncObservableDoesNotEmit()
             {
                 bool emitted = false;

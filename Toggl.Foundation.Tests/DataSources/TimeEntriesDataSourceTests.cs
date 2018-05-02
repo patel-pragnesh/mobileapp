@@ -310,8 +310,8 @@ namespace Toggl.Foundation.Tests.DataSources
 
             private void prepareBatchUpdate()
             {
-                Repository.BatchUpdate(Arg.Any<IList<IDatabaseTimeEntry>>(), (x, y) => ConflictResolutionMode.Ignore, null)
-                    .Returns(info => Observable.Return(new[] { new CreateResult<IDatabaseTimeEntry>(info.Arg<IEnumerable<(long, IDatabaseTimeEntry Entity)>>().First().Entity) }));
+                Repository.BatchUpdate(Arg.Any<IList<IDatabaseTimeEntry>>(), Arg.Any<Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode>>(), Arg.Any<IRivalsResolver<IDatabaseTimeEntry>>())
+                    .Returns(info => Observable.Return(new[] { new CreateResult<IDatabaseTimeEntry>(info.Arg<IList<IDatabaseTimeEntry>>().First()) }));
             }
         }
 
