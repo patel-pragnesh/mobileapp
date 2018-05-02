@@ -17,6 +17,8 @@ namespace Toggl.Foundation.Sync.States.Pull
         private readonly IRepository<TDatabaseInterface> repository;
         private readonly Func<TInterface, TDatabaseInterface> convertToDatabaseEntity;
         private readonly Func<IObservable<IEnumerable<TInterface>>> fetch;
+        private readonly Func<TDatabaseInterface, TDatabaseInterface, ConflictResolutionMode> conflictResolution;
+        private readonly IRivalsResolver<TDatabaseInterface> rivalsResolver;
 
         private IObservable<IEnumerable<TInterface>> fetchObservable;
 
@@ -29,15 +31,21 @@ namespace Toggl.Foundation.Sync.States.Pull
             Func<IObservable<IEnumerable<TInterface>>> fetch,
             IRepository<TDatabaseInterface> repository,
             Func<TInterface, TDatabaseInterface> convertToDatabaseEntity,
+            Func<TDatabaseInterface, TDatabaseInterface, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<TDatabaseInterface> rivalsResolver,
             IState nextState = null)
         {
             Ensure.Argument.IsNotNull(fetch, nameof(fetch));
             Ensure.Argument.IsNotNull(repository, nameof(repository));
             Ensure.Argument.IsNotNull(convertToDatabaseEntity, nameof(convertToDatabaseEntity));
+            Ensure.Argument.IsNotNull(conflictResolution, nameof(conflictResolution));
+            Ensure.Argument.IsNotNull(rivalsResolver, nameof(rivalsResolver));
 
             this.fetch = fetch;
             this.repository = repository;
             this.convertToDatabaseEntity = convertToDatabaseEntity;
+            this.conflictResolution = conflictResolution;
+            this.rivalsResolver = rivalsResolver;
 
             proceed = new Proceed(nextState);
         }
@@ -54,7 +62,7 @@ namespace Toggl.Foundation.Sync.States.Pull
         {
             return fetchIfNeeded()
                 .Select(databaseEntities)
-                .Do(entities => repository.BatchUpdate(entities))
+                .Do(entities => repository.BatchUpdate(entities, conflictResolution, rivalsResolver))
                 .Select(_ => proceed)
                 .Catch((Exception exception) => processError(exception));
         }

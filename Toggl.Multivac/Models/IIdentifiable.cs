@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Toggl.Multivac.Models
+﻿namespace Toggl.Multivac.Models
 {
     public interface IIdentifiable
     {

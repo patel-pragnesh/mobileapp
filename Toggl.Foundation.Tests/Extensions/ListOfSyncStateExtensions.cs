@@ -8,7 +8,7 @@ namespace Toggl.Foundation.Tests.Extensions
 {
     internal static class ListOfSyncStateExtensions
     {
-        public static void ShouldBeSameEventsAs(this List<SyncState> actualEvents,
+        internal static void ShouldBeSameEventsAs(this List<SyncState> actualEvents,
             params SyncState[] expectedEvents)
         {
             Ensure.Argument.IsNotNull(expectedEvents, nameof(expectedEvents));
@@ -26,7 +26,7 @@ namespace Toggl.Foundation.Tests.Extensions
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"Found unexpected event at index {i}", e);
+                    throw new Exception($"Found unexpected event at index {i}.", e);
                 }
             }
         }

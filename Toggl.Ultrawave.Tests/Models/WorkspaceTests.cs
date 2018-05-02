@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Models;
 using Xunit;
 
@@ -36,7 +35,7 @@ namespace Toggl.Ultrawave.Tests.Models
                 var validWorkspace = (Workspace)validObject;
                 SerializationHelper.CanBeSerialized(validJson, validWorkspace);
             }
-            
+
             [Theory, LogIfTooSlow]
             [MemberData(nameof(DeserializationCases))]
             public void CanBeDeserialized(string validJson, object validObject)
@@ -48,8 +47,7 @@ namespace Toggl.Ultrawave.Tests.Models
             public static IEnumerable<object[]> SerializationCases
                 => new[]
                 {
-                    new object[] { completeJson, completeObject },
-                    new object[] { jsonWithNulls, objectWithNulls }
+                    new object[] { completeJson, completeObject }
                 };
 
             public static IEnumerable<object[]> DeserializationCases
@@ -67,7 +65,7 @@ namespace Toggl.Ultrawave.Tests.Models
                 "{\"id\":1234,\"name\":\"Default workspace\",\"admin\":true,\"SuspendedAt\":null,\"server_deleted_at\":null,\"default_hourly_rate\":null,\"default_currency\":\"USD\",\"only_admins_may_create_projects\":false,\"only_admins_see_billable_rates\":false,\"only_admins_see_team_dashboard\":false,\"projects_billable_by_default\":true,\"rounding\":0,\"rounding_minutes\":0,\"at\":\"2017-04-24T12:16:48+00:00\",\"logo_url\":\"https://assets.toggl.com/images/workspace.jpg\"}";
 
             private const string jsonWithoutSomeFields =
-                "{\"id\":1234,\"name\":\"Default workspace\",\"admin\":true,\"default_currency\":\"USD\",\"only_admins_may_create_projects\":false,\"only_admins_see_billable_rates\":false,\"only_admins_see_team_dashboard\":false,\"projects_billable_by_default\":true,\"rounding\":0,\"rounding_minutes\":0,\"at\":\"2017-04-24T12:16:48+00:00\",\"logo_url\":\"https://assets.toggl.com/images/workspace.jpg\"}";
+                "{\"id\":1234,\"name\":\"Default workspace\",\"admin\":true,\"default_currency\":\"USD\",\"only_admins_may_create_projects\":false,\"only_admins_see_billable_rates\":false,\"only_admins_see_team_dashboard\":false,\"projects_billable_by_default\":true,\"rounding\":0,\"rounding_minutes\":0,\"at\":\"2017-04-24T12:16:48+00:00\",\"at\":\"2017-04-24T12:16:48+00:00\",\"logo_url\":\"https://assets.toggl.com/images/workspace.jpg\"}";
 
             private static readonly Workspace completeObject = new Workspace
             {

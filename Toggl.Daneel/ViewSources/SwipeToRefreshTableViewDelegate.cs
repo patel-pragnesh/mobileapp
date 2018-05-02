@@ -33,7 +33,7 @@ namespace Toggl.Daneel.ViewSources
         private bool wasReleased;
         private bool needsRefresh;
         private bool shouldCalculateOnDeceleration;
-        private bool isSyncing => syncProgress == this.SyncProgress.Syncing;
+        private bool isSyncing => syncProgress == SyncProgress.Syncing;
         private int syncIndicatorLastShown;
         private bool shouldRefreshOnTap;
 
@@ -126,17 +126,17 @@ namespace Toggl.Daneel.ViewSources
 
             switch (SyncProgress)
             {
-                case this.SyncProgress.Unknown:
+                case SyncProgress.Unknown:
                     return;
 
-                case this.SyncProgress.Syncing:
+                case SyncProgress.Syncing:
 					setSyncIndicatorTextAndBackground(
                         new NSAttributedString(Resources.Syncing),
 						syncingColor);
 					setActivityIndicatorVisible(true);
                     break;
 
-                case this.SyncProgress.OfflineModeDetected:
+                case SyncProgress.OfflineModeDetected:
 					setSyncIndicatorTextAndBackground(
 						Resources.Offline.EndingWithRefreshIcon(syncStateLabel.Font.CapHeight),
 						offlineColor);
@@ -145,7 +145,7 @@ namespace Toggl.Daneel.ViewSources
 					shouldRefreshOnTap = true;
                     break;
 
-                case this.SyncProgress.Synced:
+                case SyncProgress.Synced:
 					setSyncIndicatorTextAndBackground(
 						Resources.SyncCompleted.EndingWithTick(syncStateLabel.Font.CapHeight),
 						syncCompletedColor);
@@ -153,7 +153,7 @@ namespace Toggl.Daneel.ViewSources
 					setActivityIndicatorVisible(false);
                     break;
 
-                case this.SyncProgress.Failed:
+                case SyncProgress.Failed:
 					setSyncIndicatorTextAndBackground(
 						Resources.SyncFailed.EndingWithRefreshIcon(syncStateLabel.Font.CapHeight),
 						syncFailedColor);

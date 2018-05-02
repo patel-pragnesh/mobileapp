@@ -10,14 +10,12 @@ using Toggl.PrimeRadiant;
 namespace Toggl.Foundation.Sync.States.Pull
 {
     public sealed class PullSinceState<TInterface, TDatabaseInterface> : IState, ISpeculativePreloadable
-        where TInterface : IIdentifiable, IHasLastChangedDate
-        where TDatabaseInterface : TInterface
+        where TInterface : IIdentifiable, ILastChangedDatable
+        where TDatabaseInterface : TInterface, IDatabaseSyncable
     {
         private readonly Func<DateTimeOffset?, IObservable<IEnumerable<TInterface>>> fetchSince;
         private readonly ISinceParameterRepository sinceParameterRepository;
         private readonly PullState<TInterface, TDatabaseInterface> pullState;
-        private readonly UniqueAccessLock<PullSinceState<TInterface, TDatabaseInterface>> uniqueAccessLock
-            = new UniqueAccessLock<PullSinceState<TInterface, TDatabaseInterface>>();
 
         private DateTimeOffset? lastUpdate;
 
@@ -28,6 +26,8 @@ namespace Toggl.Foundation.Sync.States.Pull
             IRepository<TDatabaseInterface> repository,
             Func<TInterface, TDatabaseInterface> convertToDatabaseEntity,
             ISinceParameterRepository sinceParameterRepository,
+            Func<TDatabaseInterface, TDatabaseInterface, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<TDatabaseInterface> rivalsResolver,
             IState nextState = null)
         {
             Ensure.Argument.IsNotNull(fetchSince, nameof(fetchSince));
@@ -38,7 +38,8 @@ namespace Toggl.Foundation.Sync.States.Pull
             this.fetchSince = fetchSince;
             this.sinceParameterRepository = sinceParameterRepository;
 
-            pullState = new PullState<TInterface, TDatabaseInterface>(fetch, repository, convertToDatabaseEntity, nextState);
+            pullState = new PullState<TInterface, TDatabaseInterface>(
+                fetch, repository, convertToDatabaseEntity, conflictResolution, rivalsResolver, nextState);
         }
 
         public void Preload()
@@ -47,15 +48,11 @@ namespace Toggl.Foundation.Sync.States.Pull
         }
 
         public IObservable<IResult> Run()
-        {
-            uniqueAccessLock.LockOrThrow();
-            return pullState.Run()
-                .Do(updateSince);
-        }
+            => pullState.Run().Do(updateSince);
 
         private IObservable<IEnumerable<TInterface>> fetch()
         {
-            var since = sinceParameterRepository.Get(typeof(TInterface));
+            var since = sinceParameterRepository.Get<TDatabaseInterface>();
             return fetchSince(since)
                 .Select(fetchedEntities => fetchedEntities.ToList())
                 .Do(storeLastUpdate);
@@ -73,7 +70,7 @@ namespace Toggl.Foundation.Sync.States.Pull
             if (result is Proceed == false || lastUpdate.HasValue == false)
                 return;
 
-            sinceParameterRepository.Set(typeof(TInterface), lastUpdate.Value);
+            sinceParameterRepository.Set<TDatabaseInterface>(lastUpdate);
         }
     }
 }

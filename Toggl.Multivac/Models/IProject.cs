@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Toggl.Multivac.Models
+﻿namespace Toggl.Multivac.Models
 {
-    public interface IProject : IIdentifiable, ILastChangeDatable, IDeletable
+    public interface IProject : IIdentifiable, IDeletable, ILastChangedDatable
     {
         long WorkspaceId { get; }
 

@@ -6,61 +6,78 @@ using Toggl.PrimeRadiant.Realm.Models;
 
 namespace Toggl.PrimeRadiant.Realm
 {
-    public sealed class SinceParameterStorage : ISinceParameterRepository
+    internal sealed class SinceParameterStorage : ISinceParameterRepository
     {
-        private readonly Func<Realms.Realm> getRealmInstance;
+        private readonly IRealmAdapter<IDatabaseSinceParameter> realmAdapter;
 
-        private static readonly Dictionary<Type, string> keys = new Dictionary<Type, string>()
-        {
-            [typeof(IDatabaseUser)] = "user"
-        };
+        private readonly object storageAccess = new object();
 
-        public SinceParameterStorage(Func<Realms.Realm> getRealmInstance)
-        {
-            Ensure.Argument.IsNotNull(getRealmInstance, nameof(getRealmInstance));
-
-            this.getRealmInstance = getRealmInstance;
-        }
-
-        public DateTimeOffset? Get(Type entityType)
-        {
-            var key = getKeyByType(entityType);
-            var realm = getRealmInstance();
-            var record = realm.Find<RealmSinceParameter>(key);
-            return record?.Since;
-        }
-
-        public void Set(Type entityType, DateTimeOffset? since)
-        {
-            var key = getKeyByType(entityType);
-            var realm = getRealmInstance();
-            using (var transaction = realm.BeginWrite())
+        private static readonly Dictionary<Type, long> typesToIdsMapping
+            = new Dictionary<Type, long>
             {
-                var record = realm.Find<RealmSinceParameter>(key);
-                if (record == null)
-                {
-                    record = new RealmSinceParameter
-                    {
-                        Key = key,
-                        Since = since
-                    };
-                    realm.Add(record);
-                }
-                else
-                {
-                    record.Since = since;
-                }
+                [typeof(IDatabaseClient)] = 0,
+                [typeof(IDatabaseProject)] = 1,
+                [typeof(IDatabaseTag)] = 2,
+                [typeof(IDatabaseTask)] = 3,
+                [typeof(IDatabaseTimeEntry)] = 4,
+                [typeof(IDatabaseWorkspace)] = 5
+            };
 
-                transaction.Commit();
+        public SinceParameterStorage(IRealmAdapter<IDatabaseSinceParameter> realmAdapter)
+        {
+            Ensure.Argument.IsNotNull(realmAdapter, nameof(realmAdapter));
+
+            this.realmAdapter = realmAdapter;
+        }
+
+        public DateTimeOffset? Get<T>()
+            where T : IDatabaseSyncable
+        {
+            var id = getId<T>();
+
+            lock (storageAccess)
+            {
+                try
+                {
+                    var record = realmAdapter.Get(id);
+                    return record.Since;
+                }
+                catch (InvalidOperationException)
+                {
+                    return null;
+                }
             }
         }
 
-        private string getKeyByType(Type entityType)
+        public void Set<T>(DateTimeOffset? since)
+            where T : IDatabaseSyncable
         {
-            if (keys.TryGetValue(entityType, out var key))
-                return key;
+            var id = getId<T>();
+            var record = new RealmSinceParameter
+            {
+                Id = id,
+                Since = since
+            };
 
-            throw new ArgumentException($"Since parameters for the type {entityType.FullName} cannot be stored.");
+            lock (storageAccess)
+            {
+                try
+                {
+                    realmAdapter.Update(id, record);
+                }
+                catch (InvalidOperationException)
+                {
+                    realmAdapter.Create(record);
+                }
+            }
+        }
+
+        private static long getId<T>()
+        {
+            if (typesToIdsMapping.TryGetValue(typeof(T), out var id))
+                return id;
+
+            throw new ArgumentException($"Since parameters for the type {typeof(T).FullName} cannot be stored.");
         }
     }
 }

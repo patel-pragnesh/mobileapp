@@ -14,10 +14,13 @@ namespace Toggl.Foundation
             => repository.Update(entity.Id, entity);
 
         public static IObservable<IConflictResolutionResult<TModel>> UpdateWithConflictResolution<TModel>(
-            this IRepository<TModel> repository, TModel entity)
-            where TModel : IDatabaseSyncable
+            this IRepository<TModel> repository,
+            TModel entity,
+            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<TModel> rivalsResolver = null)
+            where TModel : IIdentifiable, IDatabaseSyncable
             => repository
-                .BatchUpdate(new List<TModel> { entity })
+                .BatchUpdate(new List<TModel> { entity }, conflictResolution, rivalsResolver)
                 .SingleAsync()
                 .Select(entities => entities.First());
     }

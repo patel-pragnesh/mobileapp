@@ -1,11 +1,10 @@
 ﻿﻿using System;
+ using Toggl.Multivac.Models;
 
 namespace Toggl.PrimeRadiant.Models
 {
-    public interface ISinceParameter
+    public interface IDatabaseSinceParameter : IIdentifiable
     {
-        string Key { get; }
-
         DateTimeOffset? Since { get; }
     }
 }

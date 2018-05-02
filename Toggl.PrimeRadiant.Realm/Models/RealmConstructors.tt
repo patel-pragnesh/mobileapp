@@ -19,7 +19,7 @@ namespace Toggl.PrimeRadiant.Realm
     foreach(var modelFile in modelsToGenerate)
     {
         var interfaceName = Path.GetFileName(modelFile).Replace(".cs", "");
-        if (interfaceName == "IBaseModel") continue;
+        if (interfaceName == "IIdentifiable") continue;
 
         var className = interfaceName.Substring(1, interfaceName.Length - 1);
         var realmClassName = $"Realm{className}";
@@ -44,7 +44,7 @@ namespace Toggl.PrimeRadiant.Realm
             var isStartOfClass = line.Contains($" interface {interfaceName}");
             if (isStartOfClass)
             {
-                var extendsIBaseModel = line.Contains(": IBaseModel");
+                var extendsIIdentifiable = line.Contains(": IIdentifiable");
                 var interfaces = $"IUpdatesFrom<{updatesFromInterface}>";
                 if (implementsIDatabaseSyncable)
                     interfaces += ", IModifiableId";
@@ -52,7 +52,7 @@ namespace Toggl.PrimeRadiant.Realm
                 WriteLine($"    internal partial class {realmClassName} : {interfaces}");
                 WriteLine( "    {");
 
-                if (extendsIBaseModel)
+                if (extendsIIdentifiable)
                 {
                     WriteLine( "        public long Id { get; set; }\n");
                 }
@@ -88,7 +88,7 @@ namespace Toggl.PrimeRadiant.Realm
                     WriteLine("            LastSyncErrorMessage = entity.LastSyncErrorMessage;");
                 }
 
-                if (extendsIBaseModel)
+                if (extendsIIdentifiable)
                 {
                     WriteLine("            Id = entity.Id;");
                 }

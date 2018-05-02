@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 
 namespace Toggl.Multivac.Models
 {
-    public interface ILastChangeDatable
+    public interface ILastChangedDatable
     {
         DateTimeOffset At { get; }
     }

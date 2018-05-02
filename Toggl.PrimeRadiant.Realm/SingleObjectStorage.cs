@@ -12,7 +12,7 @@ using Toggl.PrimeRadiant.Exceptions;
 namespace Toggl.PrimeRadiant.Realm
 {
     internal sealed class SingleObjectStorage<TModel> : BaseStorage<TModel>, ISingleObjectStorage<TModel>
-        where TModel : ISingleEntity
+        where TModel : IIdentifiable
     {
         public SingleObjectStorage(IRealmAdapter<TModel> adapter)
             : base(adapter) { }
@@ -35,14 +35,17 @@ namespace Toggl.PrimeRadiant.Realm
             });
         }
 
-        public IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(IList<TModel> entities)
+        public IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(
+            IList<TModel> entities,
+            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<TModel> rivalsResolver)
             => CreateObservable(() =>
             {
                 var list = entities.ToList();
                 if (list.Count > 1)
                     throw new ArgumentException("Too many entities to update.");
 
-                return Adapter.BatchUpdate(list, conflictResolution, rivalsResolver);
+                return Adapter.BatchUpdate(entities, conflictResolution, rivalsResolver);
             });
 
         public IObservable<TModel> Single()

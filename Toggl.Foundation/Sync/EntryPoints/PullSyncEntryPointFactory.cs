@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using Toggl.Foundation.Models;
+using Toggl.Foundation.Sync.ConflictResolution;
 using Toggl.Foundation.Sync.States;
 using Toggl.Foundation.Sync.States.Pull;
 using Toggl.Multivac;
@@ -41,28 +42,32 @@ namespace Toggl.Foundation.Sync.EntryPoints
         {
             var pullWorkspaceFeatures = createPullWorkspaceFeaturesState();
             return new PullState<IWorkspace, IDatabaseWorkspace>(
-                api.Workspaces.GetAll, database.Workspaces, Workspace.Clean, pullWorkspaceFeatures);
+                api.Workspaces.GetAll, database.Workspaces, Workspace.Clean,
+                Resolver.ForWorkspaces().Resolve, null, pullWorkspaceFeatures);
         }
 
         private IState createPullWorkspaceFeaturesState()
         {
             var pullUser = createPullUserState();
             return new PullState<IWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection>(
-                api.WorkspaceFeatures.GetAll, database.WorkspaceFeatures, WorkspaceFeatureCollection.From, pullUser);
+                api.WorkspaceFeatures.GetAll, database.WorkspaceFeatures, WorkspaceFeatureCollection.From,
+                Resolver.ForWorkspaceFeatures().Resolve, null, pullUser);
         }
 
         private IState createPullUserState()
         {
             var pullPreferences = createPullPreferencesState();
             return new PullState<IUser, IDatabaseUser>(
-                asList(api.User.Get), database.User, User.Clean, pullPreferences);
+                asList(api.User.Get), database.User, User.Clean,
+                Resolver.ForUser().Resolve, null, pullPreferences);
         }
 
         private IState createPullPreferencesState()
         {
             var pullTags = createPullTagsState();
             return new PullState<IPreferences, IDatabasePreferences>(
-                asList(api.Preferences.Get), database.Preferences, Preferences.Clean, pullTags);
+                asList(api.Preferences.Get), database.Preferences, Preferences.Clean,
+                Resolver.ForPreferences().Resolve, null, pullTags);
         }
 
         private IState createPullTagsState()
@@ -70,7 +75,8 @@ namespace Toggl.Foundation.Sync.EntryPoints
             var pullClients = createPullClientsState();
             return new PullSinceState<ITag, IDatabaseTag>(
                 allOrSince(api.Tags.GetAll, api.Tags.GetAllSince),
-                database.Tags, Tag.Clean, database.SinceParameters, pullClients);
+                database.Tags, Tag.Clean, database.SinceParameters,
+                Resolver.ForTags().Resolve, null, pullClients);
         }
 
         private IState createPullClientsState()
@@ -78,7 +84,8 @@ namespace Toggl.Foundation.Sync.EntryPoints
             var pullProjects = createPullProjectsState();
             return new PullSinceState<IClient, IDatabaseClient>(
                 allOrSince(api.Clients.GetAll, api.Clients.GetAllSince),
-                database.Clients, Client.Clean, database.SinceParameters, pullProjects);
+                database.Clients, Client.Clean, database.SinceParameters,
+                Resolver.ForClients().Resolve, null, pullProjects);
         }
 
         private IState createPullProjectsState()
@@ -86,7 +93,8 @@ namespace Toggl.Foundation.Sync.EntryPoints
             var pullTasks = createPullTasksState();
             return new PullSinceState<IProject, IDatabaseProject>(
                 allOrSince(api.Projects.GetAll, api.Projects.GetAllSince),
-                database.Projects, Project.Clean, database.SinceParameters, pullTasks);
+                database.Projects, Project.Clean, database.SinceParameters,
+                Resolver.ForProjects().Resolve, null, pullTasks);
         }
 
         private IState createPullTasksState()
@@ -94,13 +102,15 @@ namespace Toggl.Foundation.Sync.EntryPoints
             var pullTimeEntries = createPullTimeEntriesState();
             return new PullSinceState<ITask, IDatabaseTask>(
                 allOrSince(api.Tasks.GetAll, api.Tasks.GetAllSince),
-                database.Tasks, Task.Clean, database.SinceParameters, pullTimeEntries);
+                database.Tasks, Task.Clean, database.SinceParameters,
+                Resolver.ForTasks().Resolve, null, pullTimeEntries);
         }
 
         private IState createPullTimeEntriesState()
             => new PullSinceState<ITimeEntry, IDatabaseTimeEntry>(
                 allOrSince(api.TimeEntries.GetAll, api.TimeEntries.GetAllSince),
-                database.TimeEntries, TimeEntry.Clean, database.SinceParameters);
+                database.TimeEntries, TimeEntry.Clean, database.SinceParameters,
+                Resolver.ForTimeEntries().Resolve, new TimeEntryRivalsResolver(timeService));
 
         private Func<DateTimeOffset?, IObservable<IEnumerable<T>>> allOrSince<T>(
             Func<IObservable<IEnumerable<T>>> all,

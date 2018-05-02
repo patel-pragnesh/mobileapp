@@ -21,11 +21,16 @@
   <ItemGroup>
     <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Models\RealmConstructors.cs">
       <DependentUpon>RealmConstructors.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <None Remove="Models\RealmConstructors.tt" />
     <None Include="Models\RealmConstructors.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>RealmConstructors.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 </Project>

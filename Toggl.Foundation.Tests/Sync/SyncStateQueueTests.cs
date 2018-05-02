@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FsCheck;
 using FsCheck.Xunit;
+using Toggl.Foundation.Tests.Extensions;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Tests.Extensions;
 using static Toggl.Foundation.Sync.SyncState;

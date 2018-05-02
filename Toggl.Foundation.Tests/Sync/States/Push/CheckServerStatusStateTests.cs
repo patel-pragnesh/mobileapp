@@ -8,6 +8,8 @@ using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Sync.States;
+using Toggl.Foundation.Sync.States.Results;
+using Toggl.Foundation.Sync.States.RetryLoop;
 using Toggl.Ultrawave;
 using Toggl.Ultrawave.Exceptions;
 using Toggl.Ultrawave.Network;
@@ -17,12 +19,13 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
 {
     public sealed class CheckServerStatusStateTests
     {
-        private ITogglApi api;
-        private TestScheduler scheduler;
-        private IRetryDelayService apiDelay;
-        private IRetryDelayService statusDelay;
+        private readonly ITogglApi api;
+        private readonly TestScheduler scheduler;
+        private readonly IRetryDelayService apiDelay;
+        private readonly IRetryDelayService statusDelay;
         private readonly CheckServerStatusState state;
-        private ISubject<Unit> delayCancellation;
+        private readonly ISubject<Unit> delayCancellation;
+        private readonly IState serverIsAvailableState;
 
         public CheckServerStatusStateTests()
         {
@@ -30,21 +33,22 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             scheduler = new TestScheduler();
             apiDelay = Substitute.For<IRetryDelayService>();
             statusDelay = Substitute.For<IRetryDelayService>();
+            serverIsAvailableState = Substitute.For<IState>();
             delayCancellation = new Subject<Unit>();
-            state = new CheckServerStatusState(api, scheduler, apiDelay, statusDelay, delayCancellation.AsObservable());
+            state = new CheckServerStatusState(api, scheduler, apiDelay, statusDelay, delayCancellation.AsObservable(), serverIsAvailableState);
         }
 
         [Fact, LogIfTooSlow]
-        public void ReturnsTheServerIsAvailableTransitionWhenTheStatusEndpointReturnsOK()
+        public void ReturnsTheServerIsAvailableStateWhenTheStatusEndpointReturnsOK()
         {
             api.Status.IsAvailable().Returns(Observable.Return(Unit.Default));
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(1));
 
-            ITransition transition = null;
-            state.Start().Subscribe(t => transition = t);
+            IResult result = null;
+            state.Run().Subscribe(r => result = r);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
 
-            transition.Result.Should().Be(state.ServerIsAvailable);
+            result.Should().BeOfType<Proceed>();
         }
 
         [Fact, LogIfTooSlow]
@@ -53,7 +57,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             api.Status.IsAvailable().Returns(Observable.Return(Unit.Default));
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(1));
 
-            state.Start().Subscribe(_ => { });
+            state.Run().Subscribe(_ => { });
             scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks - 1);
 
             statusDelay.DidNotReceive().Reset();
@@ -65,7 +69,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             api.Status.IsAvailable().Returns(Observable.Return(Unit.Default));
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(1));
 
-            state.Start().Subscribe(_ => { });
+            state.Run().Subscribe(_ => { });
             scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
 
             statusDelay.Received().Reset();
@@ -81,8 +85,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             statusDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(1));
             var hasCompleted = false;
 
-            var transition = state.Start();
-            var subscription = transition.Subscribe(_ => hasCompleted = true);
+            var subscription = state.Run().Subscribe(_ => hasCompleted = true);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(10).Ticks - 1);
             subscription.Dispose();
 
@@ -99,8 +102,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             statusDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(100));
             var hasCompleted = false;
 
-            var transition = state.Start();
-            var subscription = transition.Subscribe(_ => hasCompleted = true);
+            var subscription = state.Run().Subscribe(_ => hasCompleted = true);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(10).Ticks);
             subscription.Dispose();
 
@@ -116,8 +118,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
             var hasCompleted = false;
 
-            var transition = state.Start();
-            var subscription = transition.Subscribe(_ => hasCompleted = true);
+            var subscription = state.Run().Subscribe(_ => hasCompleted = true);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(10).Ticks);
             subscription.Dispose();
 
@@ -133,8 +134,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             statusDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
             var hasCompleted = false;
 
-            var transition = state.Start();
-            var subscription = transition.Subscribe(_ => hasCompleted = true);
+            var subscription = state.Run().Subscribe(_ => hasCompleted = true);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(10).Ticks - 1);
             subscription.Dispose();
 
@@ -150,8 +150,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             statusDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(100));
             var hasCompleted = false;
 
-            var transition = state.Start();
-            var subscription = transition.Subscribe(_ => hasCompleted = true);
+            var subscription = state.Run().Subscribe(_ => hasCompleted = true);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(10).Ticks + 1);
             subscription.Dispose();
 
@@ -167,8 +166,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             statusDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(1));
             var hasCompleted = false;
 
-            var transition = state.Start();
-            var subscription = transition.Subscribe(_ => hasCompleted = true);
+            var subscription = state.Run().Subscribe(_ => hasCompleted = true);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(10).Ticks - 1);
             subscription.Dispose();
 
@@ -181,12 +179,13 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             api.Status.IsAvailable().Returns(Observable.Return(Unit.Default));
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
 
-            ITransition transition = null;
-            state.Start().Subscribe(t => transition = t);
+            IResult result = null;
+            state.Run().Subscribe(r => result = r);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
             delayCancellation.OnNext(Unit.Default);
 
-            transition.Result.Should().Be(state.ServerIsAvailable);
+            result.Should().BeOfType<Proceed>();
+            ((Proceed)result).NextState.Should().Be(serverIsAvailableState);
         }
 
         [Fact, LogIfTooSlow]
@@ -196,12 +195,13 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             api.Status.IsAvailable().Returns(observable);
             apiDelay.NextSlowDelay().Returns(TimeSpan.FromSeconds(10));
 
-            ITransition transition = null;
-            state.Start().Subscribe(t => transition = t);
+            IResult result = null;
+            state.Run().Subscribe(r => result = r);
             scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
             delayCancellation.OnNext(Unit.Default);
 
-            transition.Result.Should().Be(state.Retry);
+            result.Should().BeOfType<Proceed>();
+            ((Proceed)result).NextState.Should().Be(state);
         }
 
         public static IEnumerable<object[]> ServerExceptionsOtherThanInternalServerErrorException()

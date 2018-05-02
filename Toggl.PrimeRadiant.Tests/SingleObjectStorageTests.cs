@@ -66,7 +66,7 @@ namespace Toggl.PrimeRadiant.Tests
         {
             var batch = Enumerable.Range(0, entitiesToUpdate).Select(id => new TTestModel()).ToList();
 
-            Func<Task> callingBatchUpdate = async () => await Storage.BatchUpdate(batch);
+            Func<Task> callingBatchUpdate = async () => await Storage.BatchUpdate(batch, (a, b) => ConflictResolutionMode.Ignore, null);
 
             callingBatchUpdate.ShouldThrow<ArgumentException>();
         }

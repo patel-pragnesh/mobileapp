@@ -4,8 +4,8 @@ namespace Toggl.PrimeRadiant
 {
     public interface ISinceParameterRepository
     {
-        DateTimeOffset? Get(Type entityType);
+        DateTimeOffset? Get<T>() where T : IDatabaseSyncable;
 
-        void Set(Type entityType, DateTimeOffset? since);
+        void Set<T>(DateTimeOffset? since) where T : IDatabaseSyncable;
     }
 }

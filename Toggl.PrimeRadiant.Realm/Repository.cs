@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reactive.Linq;
 using Realms;
 using Toggl.Multivac;
@@ -12,18 +11,9 @@ namespace Toggl.PrimeRadiant.Realm
     internal sealed class Repository<TModel> : BaseStorage<TModel>, IRepository<TModel>
         where TModel : IIdentifiable
     {
-        private readonly Func<TModel, TModel, ConflictResolutionMode> conflictResolution;
-
-        private readonly IRivalsResolver<TModel> rivalsResolver;
-
-        public Repository(IRealmAdapter<TModel> adapter,
-            Func<TModel, TModel, ConflictResolutionMode> conflictResolution, IRivalsResolver<TModel> rivalsResolver)
+        public Repository(IRealmAdapter<TModel> adapter)
             : base(adapter)
         {
-            Ensure.Argument.IsNotNull(conflictResolution, nameof(conflictResolution));
-
-            this.conflictResolution = conflictResolution;
-            this.rivalsResolver = rivalsResolver;
         }
 
         public IObservable<TModel> Create(TModel entity)
@@ -34,13 +24,16 @@ namespace Toggl.PrimeRadiant.Realm
                 .Start(() => Adapter.Create(entity))
                 .Catch<TModel, Exception>(ex => Observable.Throw<TModel>(new DatabaseException(ex)));
         }
-        
-        public IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(IList<TModel> entities)
+
+        public IObservable<IEnumerable<IConflictResolutionResult<TModel>>> BatchUpdate(
+            IList<TModel> batch,
+            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<TModel> rivalsResolver)
         {
-            Ensure.Argument.IsNotNull(entities, nameof(entities));
+            Ensure.Argument.IsNotNull(batch, nameof(batch));
             Ensure.Argument.IsNotNull(conflictResolution, nameof(conflictResolution));
 
-            return CreateObservable(() => Adapter.BatchUpdate(entities, conflictResolution, rivalsResolver));
+            return CreateObservable(() => Adapter.BatchUpdate(batch, conflictResolution, rivalsResolver));
         }
 
         public IObservable<TModel> GetById(long id)
@@ -48,13 +41,8 @@ namespace Toggl.PrimeRadiant.Realm
 
         public static Repository<TModel> For<TRealmEntity>(
             Func<Realms.Realm> getRealmInstance,
-            Func<TModel, Realms.Realm, TRealmEntity> convertToRealm,
-            Func<TModel, TModel, ConflictResolutionMode> conflictResolution,
-            IRivalsResolver<TModel> rivalsResolver = null)
+            Func<TModel, Realms.Realm, TRealmEntity> convertToRealm)
             where TRealmEntity : RealmObject, TModel, IUpdatesFrom<TModel>
-            => new Repository<TModel>(
-                new RealmAdapter<TRealmEntity, TModel>(getRealmInstance, convertToRealm),
-                conflictResolution,
-                rivalsResolver);
+            => new Repository<TModel>(new RealmAdapter<TRealmEntity, TModel>(getRealmInstance, convertToRealm));
     }
 }

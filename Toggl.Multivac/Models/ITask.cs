@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Toggl.Multivac.Models
+﻿namespace Toggl.Multivac.Models
 {
-    public interface ITask : IIdentifiable, ILastChangeDatable
+    public interface ITask : IIdentifiable, ILastChangedDatable
     {
         string Name { get; }
 

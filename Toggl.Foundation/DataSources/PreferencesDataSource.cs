@@ -48,8 +48,11 @@ namespace Toggl.Foundation.DataSources
                 .Select(Preferences.From)
                 .Do(currentPreferencesSubject.OnNext);
 
-        public IObservable<IEnumerable<IConflictResolutionResult<IDatabasePreferences>>> BatchUpdate(IList<IDatabasePreferences> entities)
-            => storage.BatchUpdate(entities)
+        public IObservable<IEnumerable<IConflictResolutionResult<IDatabasePreferences>>> BatchUpdate(
+            IList<IDatabasePreferences> entities,
+            Func<IDatabasePreferences, IDatabasePreferences, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<IDatabasePreferences> rivalsResolver)
+            => storage.BatchUpdate(entities, conflictResolution, rivalsResolver)
                 .Do(processConflictResultionResult);
 
         public IObservable<IDatabasePreferences> GetById(long id)

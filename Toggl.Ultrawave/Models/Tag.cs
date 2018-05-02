@@ -12,14 +12,6 @@ namespace Toggl.Ultrawave.Models
 
         public string Name { get; set; }
 
-        [JsonProperty("at")]
-        public DateTimeOffset? DirtyAt
-        {
-            get => At;
-            set => At = value ?? DateTimeOffset.UtcNow;
-        }
-
-        [JsonIgnore]
         public DateTimeOffset At { get; set; }
 
         [JsonProperty("deleted_at")]

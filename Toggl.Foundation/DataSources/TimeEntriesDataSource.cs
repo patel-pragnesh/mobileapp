@@ -120,9 +120,12 @@ namespace Toggl.Foundation.DataSources
                 .Do(updatedEntity => maybeUpdateCurrentlyRunningTimeEntryId(id, updatedEntity))
                 .Do(updatedEntity => timeEntryUpdatedSubject.OnNext((id, TimeEntry.From(updatedEntity))));
 
-        public IObservable<IEnumerable<IConflictResolutionResult<IDatabaseTimeEntry>>> BatchUpdate(IList<IDatabaseTimeEntry> entities)
+        public IObservable<IEnumerable<IConflictResolutionResult<IDatabaseTimeEntry>>> BatchUpdate(
+            IList<IDatabaseTimeEntry> entities,
+            Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode> conflictResolution,
+            IRivalsResolver<IDatabaseTimeEntry> rivalsResolver)
             => repository
-                .BatchUpdate(entities)
+                .BatchUpdate(entities, Resolver.ForTimeEntries().Resolve, rivalsResolver)
                 .Do(updatedEntities => updatedEntities
                     .Where(result => !(result is IgnoreResult<IDatabaseTimeEntry>))
                     .ForEach(handleBatchUpdateResult));
