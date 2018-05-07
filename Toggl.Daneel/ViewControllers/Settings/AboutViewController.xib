@@ -13,10 +13,10 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AboutViewController">
             <connections>
                 <outlet property="LicensesView" destination="mQd-Gl-vfM" id="3TI-ni-6yy"/>
+                <outlet property="PrivacyPolicyView" destination="fNa-eA-OX0" id="name-outlet-fNa-eA-OX0"/>
+                <outlet property="TermsOfServiceView" destination="sfN-oS-9e6" id="name-outlet-sfN-oS-9e6"/>
                 <outlet property="TopConstraint" destination="txq-YO-Zdd" id="NTp-gh-wAc"/>
                 <outlet property="view" destination="2" id="RRd-Eg-VrN"/>
-                <outlet property="TermsOfServiceView" destination="sfN-oS-9e6" id="name-outlet-sfN-oS-9e6"/>
-                <outlet property="PrivacyPolicyView" destination="fNa-eA-OX0" id="name-outlet-fNa-eA-OX0"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
