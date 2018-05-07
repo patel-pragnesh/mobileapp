@@ -18,15 +18,13 @@
         android:layout_height="wrap_content">
         <ImageView
             local:MvxBind="Click CloseCommand"
+            android:padding="16dp"
             android:clickable="true"
             android:src="@drawable/close"
             android:tint="@android:color/white"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp" />
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/selectableItemBackgroundBorderless" />
         <EditText
             android:id="@+id/EditTimeEntryDescriptionTextField"
             local:MvxBind="Text Description; Focus IsEditingDescription"

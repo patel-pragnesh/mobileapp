@@ -13,72 +13,54 @@ namespace Toggl.Daneel.ViewControllers
 	partial class LoginViewController
 	{
 		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
 		Toggl.Daneel.Views.ActivityIndicatorView ActivityIndicator { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.NSLayoutConstraint BottomConstraint { get; set; }
+		Toggl.Daneel.Views.LoginTextField EmailTextField { get; set; }
 
 		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UITextField EmailTextField { get; set; }
+		UIKit.UILabel ErrorLabel { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		UIKit.UIButton ForgotPasswordButton { get; set; }
 
 		[Outlet]
-		UIKit.UIButton GoogleSignInButton { get; set; }
+		UIKit.UIButton GoogleLoginButton { get; set; }
 
 		[Outlet]
-		UIKit.UIImageView GoogleSignInImage { get; set; }
+		UIKit.UIButton LoginButton { get; set; }
 
 		[Outlet]
-		UIKit.UILabel InfoLabel { get; set; }
+		UIKit.UIImageView LogoImageView { get; set; }
 
 		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIImageView PasswordManagerButton { get; set; }
-
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UITextField PasswordTextField { get; set; }
+		UIKit.UIButton PasswordManagerButton { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton PrivacyPolicyButton { get; set; }
+		Toggl.Daneel.Views.LoginTextField PasswordTextField { get; set; }
 
 		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIImageView ShowPasswordButton { get; set; }
+		UIKit.UIButton ShowPasswordButton { get; set; }
 
 		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIView SignUpLabels { get; set; }
+		UIKit.UIView SignupCard { get; set; }
 
 		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton TermsOfServiceButton { get; set; }
-
-		[Outlet]
-		UIKit.UIButton TryLoggingInInsteadButton { get; set; }
+		UIKit.NSLayoutConstraint TopConstraint { get; set; }
 		
 		void ReleaseDesignerOutlets ()
 		{
+			if (TopConstraint != null) {
+				TopConstraint.Dispose ();
+				TopConstraint = null;
+			}
+
 			if (ActivityIndicator != null) {
 				ActivityIndicator.Dispose ();
 				ActivityIndicator = null;
-			}
-
-			if (BottomConstraint != null) {
-				BottomConstraint.Dispose ();
-				BottomConstraint = null;
-			}
-
-			if (GoogleSignInImage != null) {
-				GoogleSignInImage.Dispose ();
-				GoogleSignInImage = null;
 			}
 
 			if (EmailTextField != null) {
@@ -86,24 +68,29 @@ namespace Toggl.Daneel.ViewControllers
 				EmailTextField = null;
 			}
 
+			if (ErrorLabel != null) {
+				ErrorLabel.Dispose ();
+				ErrorLabel = null;
+			}
+
 			if (ForgotPasswordButton != null) {
 				ForgotPasswordButton.Dispose ();
 				ForgotPasswordButton = null;
 			}
 
-			if (GoogleSignInButton != null) {
-				GoogleSignInButton.Dispose ();
-				GoogleSignInButton = null;
+			if (GoogleLoginButton != null) {
+				GoogleLoginButton.Dispose ();
+				GoogleLoginButton = null;
 			}
 
-			if (InfoLabel != null) {
-				InfoLabel.Dispose ();
-				InfoLabel = null;
+			if (LoginButton != null) {
+				LoginButton.Dispose ();
+				LoginButton = null;
 			}
 
-			if (TryLoggingInInsteadButton != null) {
-				TryLoggingInInsteadButton.Dispose ();
-				TryLoggingInInsteadButton = null;
+			if (LogoImageView != null) {
+				LogoImageView.Dispose ();
+				LogoImageView = null;
 			}
 
 			if (PasswordManagerButton != null) {
@@ -116,24 +103,14 @@ namespace Toggl.Daneel.ViewControllers
 				PasswordTextField = null;
 			}
 
-			if (PrivacyPolicyButton != null) {
-				PrivacyPolicyButton.Dispose ();
-				PrivacyPolicyButton = null;
-			}
-
 			if (ShowPasswordButton != null) {
 				ShowPasswordButton.Dispose ();
 				ShowPasswordButton = null;
 			}
 
-			if (SignUpLabels != null) {
-				SignUpLabels.Dispose ();
-				SignUpLabels = null;
-			}
-
-			if (TermsOfServiceButton != null) {
-				TermsOfServiceButton.Dispose ();
-				TermsOfServiceButton = null;
+			if (SignupCard != null) {
+				SignupCard.Dispose ();
+				SignupCard = null;
 			}
 		}
 	}

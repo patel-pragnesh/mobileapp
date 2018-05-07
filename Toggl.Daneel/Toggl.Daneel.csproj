@@ -291,9 +291,6 @@
     <ImageAsset Include="Resources\Images.xcassets\togglCronometer.imageset\illustration2%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\togglCronometer.imageset\illustration2%403x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\Contents.json" />
-    <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\1password.png" />
-    <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\1password%402x.png" />
-    <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\1password%403x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icPassword.imageset\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\icPassword.imageset\icPassword.png" />
     <ImageAsset Include="Resources\Images.xcassets\icPassword.imageset\icPassword%402x.png" />
@@ -450,6 +447,21 @@
     <ImageAsset Include="Resources\Images.xcassets\icCheckGrey.imageset\icCheckGrey.png" />
     <ImageAsset Include="Resources\Images.xcassets\icCheckGrey.imageset\icCheckGrey%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icCheckGrey.imageset\icCheckGrey%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\bike.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\bike.imageset\bike.png" />
+    <ImageAsset Include="Resources\Images.xcassets\bike.imageset\bike%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\bike.imageset\bike%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\togglLogoBig.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\togglLogoBig.imageset\logo.png" />
+    <ImageAsset Include="Resources\Images.xcassets\togglLogoBig.imageset\logo%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\togglLogoBig.imageset\logo%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icGoogleColored.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\icGoogleColored.imageset\google.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icGoogleColored.imageset\google%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icGoogleColored.imageset\google%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\passwordman.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\passwordman%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\passwordman%403x.png" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -865,6 +877,9 @@
     <Compile Include="Onboarding\MainView\SwipeRightOnboardingStep.cs" />
     <Compile Include="Onboarding\EditView\CategorizeTimeUsingProjectsOnboardingStep.cs" />
     <Compile Include="Extensions\TimeEntriesLogViewCellExtensions.cs" />
+    <Compile Include="Views\LoginTextField.cs" />
+    <Compile Include="Binding\ButtonAnimatedTitleTargetBinding.cs" />
+    <Compile Include="Binding\LoginTextFieldFirstResponderTargetBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation.MvvmCross\Toggl.Foundation.MvvmCross.csproj">
@@ -925,6 +940,9 @@
     <Folder Include="Onboarding\StartTimeEntryView\" />
     <Folder Include="Onboarding\CreationView\" />
     <Folder Include="Onboarding\EditView\" />
+    <Folder Include="Resources\Images.xcassets\bike.imageset\" />
+    <Folder Include="Resources\Images.xcassets\togglLogoBig.imageset\" />
+    <Folder Include="Resources\Images.xcassets\icGoogleColored.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="GoogleService-Info.plist" />

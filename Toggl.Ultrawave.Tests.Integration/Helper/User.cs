@@ -23,7 +23,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             var password = "123456".ToPassword();
 
             var api = new TogglApi(new ApiConfiguration(ApiEnvironment.Staging, Credentials.None, Configuration.UserAgent));
-            await api.User.SignUp(email, password);
+            await api.User.SignUp(email, password, true, 237);
 
             return (email, password);
         }

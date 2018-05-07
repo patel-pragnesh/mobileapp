@@ -51,7 +51,7 @@ namespace Toggl.Daneel.Views
         private void init()
         {
             Image = UIImage.FromBundle(ImageResource);
-            ContentMode = UIViewContentMode.ScaleAspectFit;
+            ContentMode = UIViewContentMode.Center;
         }
 
         private CAAnimation createAnimation()

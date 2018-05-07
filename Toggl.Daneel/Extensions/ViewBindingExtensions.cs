@@ -18,6 +18,9 @@ namespace Toggl.Daneel.Extensions
         public static string BindCommand(this UIBarButtonItem self)
             => BarButtonCommandTargetBinding.BindingName;
 
+        public static string BindAnimatedTitle(this UIButton self)
+            => ButtonAnimatedTitleTargetBinding.BindingName;
+
         public static string BindImage(this UIButton self)
             => ButtonImageTargetBinding.BindingName;
 
@@ -32,6 +35,9 @@ namespace Toggl.Daneel.Extensions
 
         public static string BindConstant(this NSLayoutConstraint self)
             => LayoutConstraintConstantTargetBinding.BindingName;
+
+        public static string BindFirstResponder(this LoginTextField self)
+            => LoginTextFieldFirstResponderTargetBinding.BindingName;
 
         public static string BindHidesBackButton(this UINavigationItem self)
             => NavigationItemHidesBackButtonTargetBinding.BindingName;

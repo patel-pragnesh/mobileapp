@@ -74,7 +74,7 @@ namespace Toggl.Foundation.Login
                 .Select(dataSourceFromUser)
                 .Do(shortcutCreator.OnLogin);
 
-        public IObservable<ITogglDataSource> SignUp(Email email, Password password)
+        public IObservable<ITogglDataSource> SignUp(Email email, Password password, bool termsAccepted, int countryId)
         {
             if (!email.IsValid)
                 throw new ArgumentException($"A valid {nameof(email)} must be provided when trying to signup");
@@ -83,7 +83,7 @@ namespace Toggl.Foundation.Login
 
             return database
                     .Clear()
-                    .SelectMany(_ => apiFactory.CreateApiWith(Credentials.None).User.SignUp(email, password))
+                    .SelectMany(_ => signUp(email, password, termsAccepted, countryId))
                     .Select(User.Clean)
                     .SelectMany(database.User.Create)
                     .Select(dataSourceFromUser)
@@ -139,6 +139,14 @@ namespace Toggl.Foundation.Login
             var newCredentials = Credentials.WithApiToken(user.ApiToken);
             var api = apiFactory.CreateApiWith(newCredentials);
             return createDataSource(api);
+        }
+
+        private IObservable<IUser> signUp(Email email, Password password, bool termsAccepted, int countryId)
+        {
+            return apiFactory
+                .CreateApiWith(Credentials.None)
+                .User
+                .SignUp(email, password, termsAccepted, countryId);
         }
     }
 }

@@ -46,7 +46,10 @@ of your time with reports</value>
         <value>Sign up</value>
     </data>
     <data name="LoginForgotPassword">
-        <value>Forgot your password?</value>
+        <value>Forgot your password? </value>
+    </data>
+    <data name="LoginGetHelpLoggingIn">
+        <value>Get help logging in</value>
     </data>
     <data name="Today">
         <value>Today</value>
@@ -356,5 +359,8 @@ account is not set up</value>
     </data>
      <data name="Done">     
         <value>Done</value>      
+    </data>
+    <data name="SignUpCountryRequired">
+        <value>Please select your country.</value>
     </data>
 </root>
