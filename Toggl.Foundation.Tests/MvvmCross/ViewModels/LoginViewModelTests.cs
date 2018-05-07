@@ -563,7 +563,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.OpenTermsOfServiceCommand.Execute();
 
                 NavigationService.Received().Navigate<BrowserViewModel, BrowserParameters>(
-                    Arg.Is<BrowserParameters>(parameter => parameter.Url == LoginViewModel.TermsOfServiceUrl)
+                    Arg.Is<BrowserParameters>(parameter => parameter.Url == Resources.TermsOfServiceUrl)
                 );
             }
 
@@ -586,7 +586,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.OpenPrivacyPolicyCommand.Execute();
 
                 NavigationService.Received().Navigate<BrowserViewModel, BrowserParameters>(
-                    Arg.Is<BrowserParameters>(parameter => parameter.Url == LoginViewModel.PrivacyPolicyUrl)
+                    Arg.Is<BrowserParameters>(parameter => parameter.Url == Resources.PrivacyPolicyUrl)
                 );
             }
 

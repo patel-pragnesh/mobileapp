@@ -317,9 +317,21 @@ namespace Toggl.Foundation {
             }
         }
         
+        public static string PrivacyPolicyUrl {
+            get {
+                return ResourceManager.GetString("PrivacyPolicyUrl", resourceCulture);
+            }
+        }
+        
         public static string TermsOfService {
             get {
                 return ResourceManager.GetString("TermsOfService", resourceCulture);
+            }
+        }
+        
+        public static string TermsOfServiceUrl {
+            get {
+                return ResourceManager.GetString("TermsOfServiceUrl", resourceCulture);
             }
         }
         

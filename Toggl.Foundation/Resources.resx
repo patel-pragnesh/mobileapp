@@ -153,8 +153,14 @@ time entries will appear here.</value>
     <data name="PrivacyPolicy">
         <value>Privacy Policy</value>
     </data>
+    <data name="PrivacyPolicyUrl">
+        <value>https://toggl.com/legal/privacy</value>
+    </data>
     <data name="TermsOfService">
         <value>Terms of Service</value>
+    </data>
+    <data name="TermsOfServiceUrl">
+        <value>https://toggl.com/legal/terms</value>
     </data>
     <data name="Delete">
         <value>Delete</value>

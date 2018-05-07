@@ -23,8 +23,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public const int EmailPage = 0;
         public const int PasswordPage = 1;
         public const int ForgotPasswordPage = 2;
-        public const string PrivacyPolicyUrl = "https://toggl.com/legal/privacy";
-        public const string TermsOfServiceUrl = "https://toggl.com/legal/terms";
 
         private readonly ILoginManager loginManager;
         private readonly IOnboardingStorage onboardingStorage;
@@ -196,12 +194,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void openTermsOfServiceCommand() =>
             navigationService.Navigate<BrowserViewModel, BrowserParameters>(
-                BrowserParameters.WithUrlAndTitle(TermsOfServiceUrl, Resources.TermsOfService)
+                BrowserParameters.WithUrlAndTitle(Resources.TermsOfServiceUrl, Resources.TermsOfService)
             );
 
         private void openPrivacyPolicyCommand() =>
             navigationService.Navigate<BrowserViewModel, BrowserParameters>(
-                BrowserParameters.WithUrlAndTitle(PrivacyPolicyUrl, Resources.PrivacyPolicy)
+                BrowserParameters.WithUrlAndTitle(Resources.PrivacyPolicyUrl, Resources.PrivacyPolicy)
             );
 
         private void next()

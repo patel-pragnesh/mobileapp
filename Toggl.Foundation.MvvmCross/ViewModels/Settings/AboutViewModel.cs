@@ -9,9 +9,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Settings
     [Preserve(AllMembers = true)]
     public sealed class AboutViewModel : MvxViewModel
     {
-        public const string PrivacyPolicyUrl = "https://toggl.com/legal/privacy";
-        public const string TermsOfServiceUrl = "https://toggl.com/legal/terms";
-
         private readonly IMvxNavigationService navigationService;
       
         public IMvxAsyncCommand PrivacyPolicyCommand { get; }
@@ -32,12 +29,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Settings
 
         private Task openPrivacyPolicyView() => 
             navigationService.Navigate<BrowserViewModel, BrowserParameters>(
-                BrowserParameters.WithUrlAndTitle(PrivacyPolicyUrl, Resources.PrivacyPolicy)
+                BrowserParameters.WithUrlAndTitle(Resources.PrivacyPolicyUrl, Resources.PrivacyPolicy)
             );
 
         private Task openTermsOfServiceView() => 
             navigationService.Navigate<BrowserViewModel, BrowserParameters>(
-                BrowserParameters.WithUrlAndTitle(TermsOfServiceUrl, Resources.TermsOfService)
+                BrowserParameters.WithUrlAndTitle(Resources.TermsOfServiceUrl, Resources.TermsOfService)
             );
 
         private Task openLicensesView()
