@@ -223,21 +223,25 @@ private TemporaryFileTransformation GetIosInfoConfigurationTransformation()
     const string path = "Toggl.Daneel/Info.plist";
     const string bundleIdToReplace = "com.toggl.daneel.debug";
     const string appNameToReplace = "Toggl for Devs";
+    const string iconSetToReplace = "Assets.xcassets/AppIcon-debug.appiconset";
 
     var commitCount = GetCommitCount();
     var reversedClientId = EnvironmentVariable("TOGGL_REVERSED_CLIENT_ID");
     var bundleId = bundleIdToReplace;
     var appName = appNameToReplace;
+    var iconSet = iconSetToReplace;
 
     if (target == "Build.Release.iOS.AdHoc")
     {
         bundleId = "com.toggl.daneel.adhoc";
         appName = "Toggl for Tests";
+        iconSet = "Assets.xcassets/AppIcon-adhoc.appiconset";
     }
     else if (target == "Build.Release.iOS.AppStore")
     {
         bundleId = "com.toggl.daneel";
         appName = "Toggl";
+        iconSet = "Assets.xcassets/AppIcon.appiconset";
     }
 
     var filePath = GetFiles(path).Single();
@@ -251,6 +255,7 @@ private TemporaryFileTransformation GetIosInfoConfigurationTransformation()
                         .Replace("IOS_BUNDLE_VERSION", commitCount)
                         .Replace(bundleIdToReplace, bundleId)
                         .Replace(appNameToReplace, appName)
+                        .Replace(iconSetToReplace, iconSet)
     };
 }
 
