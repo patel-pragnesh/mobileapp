@@ -30,6 +30,11 @@ namespace Toggl.Daneel
             );
 
             registry.RegisterCustomBindingFactory<UIButton>(
+                ButtonAnimatedTitleTargetBinding.BindingName,
+                view => new ButtonAnimatedTitleTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<UIButton>(
                 ButtonImageTargetBinding.BindingName,
                 view => new ButtonImageTargetBinding(view)
             );
@@ -52,6 +57,11 @@ namespace Toggl.Daneel
             registry.RegisterCustomBindingFactory<NSLayoutConstraint>(
                 LayoutConstraintConstantTargetBinding.BindingName,
                 view => new LayoutConstraintConstantTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<LoginTextField>(
+                LoginTextFieldFirstResponderTargetBinding.BindingName,
+                view => new LoginTextFieldFirstResponderTargetBinding(view)
             );
 
             registry.RegisterCustomBindingFactory<UINavigationItem>(

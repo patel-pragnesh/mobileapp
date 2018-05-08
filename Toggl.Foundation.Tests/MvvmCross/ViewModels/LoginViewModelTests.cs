@@ -33,6 +33,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected readonly Password ValidPassword = Password.From("123456");
             protected readonly Password InvalidPassword = Password.Empty;
 
+            protected readonly int? ValidCountryId = 237;
+            protected readonly int? InvalidCountryId = null;
+
             protected ILoginManager LoginManager { get; } = Substitute.For<ILoginManager>();
             protected IPasswordManagerService PasswordManagerService { get; } = Substitute.For<IPasswordManagerService>();
             protected IAnalyticsService AnalyticsService { get; } = Substitute.For<IAnalyticsService>();
@@ -269,11 +272,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 public void CallsTheLoginManagerForSignUpWhenThePasswordIsValidAndInSignUpMode()
                 {
                     ViewModel.Prepare(LoginType.SignUp);
+                    ViewModel.CountryId = ValidCountryId;
                     ViewModel.Password = ValidPassword;
 
                     ViewModel.NextCommand.Execute();
 
-                    LoginManager.Received().SignUp(Arg.Any<Email>(), Arg.Any<Password>());
+                    LoginManager.Received().SignUp(Arg.Any<Email>(), Arg.Any<Password>(), Arg.Any<bool>(), Arg.Any<int>());
                 }
 
                 [Fact, LogIfTooSlow]
@@ -319,8 +323,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 public void TracksTheSignUpEventWhenTheSignUpSucceeds()
                 {
                     ViewModel.Prepare(LoginType.SignUp);
+                    ViewModel.CountryId = ValidCountryId;
                     ViewModel.Password = ValidPassword;
-                    LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>())
+
+                    LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>(), Arg.Any<bool>(), Arg.Any<int>())
                         .Returns(Observable.Return(Substitute.For<ITogglDataSource>()));
 
                     ViewModel.NextCommand.Execute();
@@ -959,6 +965,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void IsPasswordRequirementsWhenSwitchingFromEmailToPasswordPageInSignUpMode()
             {
                 ViewModel.Prepare(LoginType.SignUp);
+                ViewModel.CountryId = ValidCountryId;
                 ViewModel.Email = ValidEmail;
 
                 ViewModel.NextCommand.Execute();
@@ -984,9 +991,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var notification = Notification.CreateOnError<ITogglDataSource>(new Exception());
                 var message = new Recorded<Notification<ITogglDataSource>>(0, notification);
                 var observable = scheduler.CreateColdObservable(message);
-                LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>())
+                LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>(), Arg.Any<bool>(), Arg.Any<int>())
                             .Returns(observable);
                 ViewModel.Prepare(LoginType.SignUp);
+                ViewModel.CountryId = ValidCountryId;
                 ViewModel.Email = ValidEmail;
                 ViewModel.NextCommand.Execute();
                 ViewModel.Password = ValidPassword;
@@ -995,6 +1003,20 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 scheduler.AdvanceTo(1);
 
                 ViewModel.InfoText.Should().Be(Resources.GenericSignUpError);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void IsCountryRequiredWhenCountryIsNotSelected()
+            {
+                ViewModel.Prepare(LoginType.SignUp);
+
+                ViewModel.Email = ValidEmail;
+                ViewModel.NextCommand.Execute();
+
+                ViewModel.Password = ValidPassword;
+                ViewModel.NextCommand.Execute();
+
+                ViewModel.InfoText.Should().Be(Resources.SignUpCountryRequired);
             }
 
             public sealed class WhenInForgotPasswordPage : LoginViewModelTest
@@ -1364,7 +1386,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var response = Substitute.For<IResponse>();
                 var badRequestException = new BadRequestException(request, response);
                 var emailTakenException = new EmailIsAlreadyUsedException(badRequestException);
-                LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>())
+                LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>(), Arg.Any<bool>(), Arg.Any<int>())
                     .Returns(Observable.Throw<ITogglDataSource>(emailTakenException));
 
                 ViewModel.Prepare(LoginType.SignUp);
@@ -1430,10 +1452,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 protected override void CallAndThrow(Exception e)
                 {
-                    LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>())
+                    LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>(), Arg.Any<bool>(), Arg.Any<int>())
                         .Returns(_ => Observable.Throw<ITogglDataSource>(e));
 
                     ViewModel.Prepare(LoginType.SignUp);
+                    ViewModel.CountryId = ValidCountryId;
                     ViewModel.Email = ValidEmail;
                     ViewModel.NextCommand.Execute();
                     ViewModel.Password = ValidPassword;

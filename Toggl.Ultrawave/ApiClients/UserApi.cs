@@ -44,7 +44,12 @@ namespace Toggl.Ultrawave.ApiClients
                 .Select(instructions => instructions.Trim('"'));
         }
 
-        public IObservable<IUser> SignUp(Email email, Password password)
+        public IObservable<IUser> SignUp(
+            Email email,
+            Password password,
+            bool termsAccepted,
+            int countryId
+        )
         {
             if (!email.IsValid)
                 throw new ArgumentException(nameof(email));
@@ -56,7 +61,9 @@ namespace Toggl.Ultrawave.ApiClients
                 Workspace = new WorkspaceParameters
                 {
                     InitialPricingPlan = PricingPlans.Free
-                }
+                },
+                TermsAccepted = termsAccepted,
+                CountryId = countryId
             };
             var json = serializer.Serialize(dto, SerializationReason.Post, null);
             return CreateObservable<User>(endPoints.Post, new HttpHeader[0], json, checkForApiToken)
@@ -106,6 +113,11 @@ namespace Toggl.Ultrawave.ApiClients
             public Password Password { get; set; }
 
             public WorkspaceParameters Workspace { get; set; }
+
+            [JsonProperty("tos_accepted")]
+            public bool TermsAccepted { get; set; }
+
+            public int CountryId { get; set; }
         }
 
         [Preserve(AllMembers = true)]

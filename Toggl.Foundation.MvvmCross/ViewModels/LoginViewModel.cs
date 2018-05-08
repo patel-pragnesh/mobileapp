@@ -62,6 +62,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public Password Password { get; set; } = Password.Empty;
 
+        public bool TermsAccepted { get; set; } = false;
+
+        public int? CountryId { get; set; } = null;
+
         public string InfoText { get; set; } = "";
 
         [DependsOn(nameof(IsSignUp))]
@@ -227,6 +231,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (IsSignUp)
             {
                 validatePassword();
+                validateCountryId();
             }
         }
 
@@ -239,6 +244,18 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 : Resources.SignUpPasswordRequirements;
 
             RaisePropertyChanged(nameof(InfoText));
+        }
+
+        private void validateCountryId()
+        {
+            if (!CountryId.HasValue)
+            {
+                IsErrorText = true;
+                InfoText = Resources.SignUpCountryRequired;
+
+                RaisePropertyChanged(nameof(IsErrorText));
+                RaisePropertyChanged(nameof(InfoText));
+            }
         }
 
         private void resetPassword()
@@ -331,13 +348,16 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void signUp()
         {
-            IsLoading = true;
+            if (CountryId != null)
+            {
+                IsLoading = true;
 
-            loginDisposable =
-                loginManager
-                    .SignUp(Email, Password)
-                    .Do(_ => analyticsService.TrackSignUpEvent(AuthenticationMethod.EmailAndPassword))
-                    .Subscribe(onDataSource, onError, onCompleted);
+                loginDisposable =
+                    loginManager
+                        .SignUp(Email, Password, TermsAccepted, CountryId.Value)
+                        .Do(_ => analyticsService.TrackSignUpEvent(AuthenticationMethod.EmailAndPassword))
+                        .Subscribe(onDataSource, onError, onCompleted);
+            }
         }
 
         private async Task startPasswordManager()

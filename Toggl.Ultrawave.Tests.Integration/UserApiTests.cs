@@ -147,7 +147,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             {
                 Action signingUp = () => unauthenticatedTogglApi
                     .User
-                    .SignUp(Email.Empty, "dummyButValidPassword".ToPassword())
+                    .SignUp(Email.Empty, "dummyButValidPassword".ToPassword(), true, 237)
                     .Wait();
 
                 signingUp.ShouldThrow<ArgumentException>();
@@ -159,7 +159,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             {
                 Action signingUp = () => unauthenticatedTogglApi
                     .User
-                    .SignUp(Email.From(emailString), "dummyButValidPassword".ToPassword())
+                    .SignUp(Email.From(emailString), "dummyButValidPassword".ToPassword(), true, 237)
                     .Wait();
 
                 signingUp.ShouldThrow<ArgumentException>();
@@ -180,7 +180,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             {
                 Action signingUp = () => unauthenticatedTogglApi
                     .User
-                    .SignUp(Email.From("dummy@email.com"), empty.ToPassword())
+                    .SignUp(Email.From("dummy@email.com"), empty.ToPassword(), true, 237)
                     .Wait();
 
                 signingUp.ShouldThrow<BadRequestException>();
@@ -197,7 +197,7 @@ namespace Toggl.Ultrawave.Tests.Integration
 
                 var user = await unauthenticatedTogglApi
                     .User
-                    .SignUp(email, seeminglyEmpty.ToPassword());
+                    .SignUp(email, seeminglyEmpty.ToPassword(), true, 237);
 
                 user.Id.Should().BeGreaterThan(0);
                 user.Email.Should().Be(email);
@@ -210,7 +210,7 @@ namespace Toggl.Ultrawave.Tests.Integration
 
                 var user = await unauthenticatedTogglApi
                     .User
-                    .SignUp(emailAddress, "somePassword".ToPassword());
+                    .SignUp(emailAddress, "somePassword".ToPassword(), true, 237);
 
                 user.Email.Should().Be(emailAddress);
             }
@@ -219,11 +219,11 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task FailsWhenTheEmailIsAlreadyTaken()
             {
                 var email = Email.From($"{Guid.NewGuid().ToString()}@address.com");
-                await unauthenticatedTogglApi.User.SignUp(email, "somePassword".ToPassword());
+                await unauthenticatedTogglApi.User.SignUp(email, "somePassword".ToPassword(), true, 237);
 
                 Action secondSigningUp = () => unauthenticatedTogglApi
                     .User
-                    .SignUp(email, "thePasswordIsNotImportant".ToPassword())
+                    .SignUp(email, "thePasswordIsNotImportant".ToPassword(), true, 237)
                     .Wait();
 
                 secondSigningUp.ShouldThrow<EmailIsAlreadyUsedException>();
@@ -234,9 +234,9 @@ namespace Toggl.Ultrawave.Tests.Integration
             {
                 var email = Email.From($"{Guid.NewGuid().ToString()}@address.com");
                 var password = "somePassword".ToPassword();
-                await unauthenticatedTogglApi.User.SignUp(email, password);
+                await unauthenticatedTogglApi.User.SignUp(email, password, true, 237);
 
-                Action secondSigningUp = () => unauthenticatedTogglApi.User.SignUp(email, password).Wait();
+                Action secondSigningUp = () => unauthenticatedTogglApi.User.SignUp(email, password, true, 237).Wait();
 
                 secondSigningUp.ShouldThrow<EmailIsAlreadyUsedException>();
             }
@@ -247,7 +247,7 @@ namespace Toggl.Ultrawave.Tests.Integration
                 var emailAddress = Email.From($"{Guid.NewGuid().ToString()}@address.com");
                 var password = Guid.NewGuid().ToString().ToPassword();
 
-                var signedUpUser = await unauthenticatedTogglApi.User.SignUp(emailAddress, password);
+                var signedUpUser = await unauthenticatedTogglApi.User.SignUp(emailAddress, password, true, 237);
                 var credentials = Credentials.WithPassword(emailAddress, password);
                 var togglApi = TogglApiWith(credentials);
                 var user = await togglApi.User.Get();
@@ -264,13 +264,68 @@ namespace Toggl.Ultrawave.Tests.Integration
                 var email = Email.From($"{emailPrefix}@{Guid.NewGuid().ToString()}.com");
                 var password = Guid.NewGuid().ToString().ToPassword();
 
-                var user = await unauthenticatedTogglApi.User.SignUp(email, password);
+                var user = await unauthenticatedTogglApi.User.SignUp(email, password, true, 237);
                 var credentials = Credentials.WithPassword(email, password);
                 var togglApi = TogglApiWith(credentials);
                 var workspace = await togglApi.Workspaces.GetById(user.DefaultWorkspaceId);
 
                 workspace.Id.Should().BeGreaterThan(0);
                 workspace.Name.Should().Be(expectedWorkspaceName);
+            }
+
+            [Fact, LogTestInfo]
+            public async Task SucceedsEvenIfUserDidNotAcceptTermsAndConditions()
+            {
+                var email = Email.From($"{Guid.NewGuid().ToString()}@email.com");
+                var password = "s3cr3tzzz".ToPassword();
+                var termsNotAccepted = false;
+                var countryId = 237;
+
+                // User.SignUp will throw in the future when acceptance of ToS is enforced in the backend
+                var user = await unauthenticatedTogglApi
+                    .User
+                    .SignUp(email, password, termsNotAccepted, countryId);
+
+                user.Id.Should().BeGreaterThan(0);
+                user.Email.Should().Be(email);
+            }
+
+            [Theory, LogTestInfo]
+            [InlineData(1)]
+            [InlineData(20)]
+            [InlineData(237)]
+            [InlineData(250)]
+            public async Task SucceedsForValidCountryId(int countryId)
+            {
+                var email = Email.From($"{Guid.NewGuid().ToString()}@email.com");
+                var password = "s3cr3tzzz".ToPassword();
+                var termsNotAccepted = true;
+
+                var user = await unauthenticatedTogglApi
+                    .User
+                    .SignUp(email, password, termsNotAccepted, countryId);
+
+                user.Id.Should().BeGreaterThan(0);
+                user.Email.Should().Be(email);
+            }
+
+            [Theory, LogTestInfo]
+            [InlineData(0)]
+            [InlineData(-1)]
+            [InlineData(251)]
+            [InlineData(1111111)]
+            public async Task SucceedsEvenIfCountryIdIsNotValid(int countryId)
+            {
+                var email = Email.From($"{Guid.NewGuid().ToString()}@email.com");
+                var password = "s3cr3tzzz".ToPassword();
+                var termsNotAccepted = true;
+
+                var user = await unauthenticatedTogglApi
+                    .User
+                    .SignUp(email, password, termsNotAccepted, countryId);
+
+                user.Id.Should().BeGreaterThan(0);
+                user.Email.Should().Be(email);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
@@ -44,9 +45,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly bool[] pagesVisited = new bool[PageInfo.Length];
 
         private int currentPage;
-        public int CurrentPage 
-        { 
-            get { return currentPage; } 
+        public int CurrentPage
+        {
+            get { return currentPage; }
             set
             {
                 if (currentPage == value) return;
@@ -123,10 +124,19 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             OnCurrentPageChanged();
         }
 
-        private Task login()
+        private async Task login()
         {
             setOnboardingCompletedIfNeeded();
-            return navigationService.Navigate<LoginViewModel, LoginType>(LoginType.Login);
+
+            //TEMP: this is ugly and needs to be removed asap
+            try
+            {
+                await navigationService.Navigate<LoginViewModel, LoginType>(LoginType.Login);
+            }
+            catch (KeyNotFoundException)
+            {
+                await navigationService.Navigate<NewLoginViewModel>();                
+            }
         }
 
         private Task signup()

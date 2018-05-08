@@ -28,6 +28,8 @@ namespace Toggl.Foundation.Tests.Login
         {
             protected static readonly Password Password = "theirobotmoviesucked123".ToPassword();
             protected static readonly Email Email = "susancalvin@psychohistorian.museum".ToEmail();
+            protected static readonly bool TermsAccepted = true;
+            protected static readonly int CountryId = 237;
 
             protected IUser User { get; } = new User { Id = 10, ApiToken = "ABCDEFG" };
             protected ITogglApi Api { get; } = Substitute.For<ITogglApi>();
@@ -47,8 +49,8 @@ namespace Toggl.Foundation.Tests.Login
                 LoginManager = new LoginManager(ApiFactory, Database, GoogleService, ApplicationShortcutCreator, AccessRestrictionStorage, CreateDataSource);
 
                 Api.User.Get().Returns(Observable.Return(User));
+                Api.User.SignUp(Email, Password, TermsAccepted, CountryId).Returns(Observable.Return(User));
                 Api.User.GetWithGoogle().Returns(Observable.Return(User));
-                Api.User.SignUp(Email, Password).Returns(Observable.Return(User));
                 ApiFactory.CreateApiWith(Arg.Any<Credentials>()).Returns(Api);
                 Database.Clear().Returns(Observable.Return(Unit.Default));
             }
@@ -251,7 +253,7 @@ namespace Toggl.Foundation.Tests.Login
                 var actualPassword = password.ToPassword();
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => LoginManager.SignUp(actualEmail, actualPassword).Wait();
+                    () => LoginManager.SignUp(actualEmail, actualPassword, true, 0).Wait();
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentException>();
@@ -260,27 +262,27 @@ namespace Toggl.Foundation.Tests.Login
             [Fact, LogIfTooSlow]
             public async Task EmptiesTheDatabaseBeforeTryingToCreateTheUser()
             {
-                await LoginManager.SignUp(Email, Password);
+                await LoginManager.SignUp(Email, Password, TermsAccepted, CountryId);
 
                 Received.InOrder(async () =>
                 {
                     await Database.Clear();
-                    await Api.User.SignUp(Email, Password);
+                    await Api.User.SignUp(Email, Password, TermsAccepted, CountryId);
                 });
             }
 
             [Fact, LogIfTooSlow]
             public async Task CallsTheSignUpMethodOfTheUserApi()
             {
-                await LoginManager.SignUp(Email, Password);
+                await LoginManager.SignUp(Email, Password, TermsAccepted, CountryId);
 
-                await Api.User.Received().SignUp(Email, Password);
+                await Api.User.Received().SignUp(Email, Password, TermsAccepted, CountryId);
             }
 
             [Fact, LogIfTooSlow]
             public async Task PersistsTheUserToTheDatabase()
             {
-                await LoginManager.SignUp(Email, Password);
+                await LoginManager.SignUp(Email, Password, TermsAccepted, CountryId);
 
                 await Database.User.Received().Create(Arg.Is<IDatabaseUser>(receivedUser => receivedUser.Id == User.Id));
             }
@@ -288,7 +290,7 @@ namespace Toggl.Foundation.Tests.Login
             [Fact, LogIfTooSlow]
             public async Task PersistsTheUserWithTheSyncStatusSetToInSync()
             {
-                await LoginManager.SignUp(Email, Password);
+                await LoginManager.SignUp(Email, Password, TermsAccepted, CountryId);
 
                 await Database.User.Received().Create(Arg.Is<IDatabaseUser>(receivedUser => receivedUser.SyncStatus == SyncStatus.InSync));
             }
@@ -297,14 +299,14 @@ namespace Toggl.Foundation.Tests.Login
             public async Task AlwaysReturnsASingleResult()
             {
                 await LoginManager
-                        .SignUp(Email, Password)
+                        .SignUp(Email, Password, TermsAccepted, CountryId)
                         .SingleAsync();
             }
 
             [Fact, LogIfTooSlow]
             public async Task NotifiesShortcutCreatorAboutLogin()
             {
-                await LoginManager.SignUp(Email, Password);
+                await LoginManager.SignUp(Email, Password, TermsAccepted, CountryId);
 
                 ApplicationShortcutCreator.Received().OnLogin(Arg.Any<ITogglDataSource>());
             }
