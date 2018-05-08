@@ -4,7 +4,7 @@ using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
-    [Preserve]
+    [Preserve(AllMembers = true)]
     public sealed class SelectableBeginningOfWeekViewModel : MvxNotifyPropertyChanged
     {
         public BeginningOfWeek BeginningOfWeek { get; }
