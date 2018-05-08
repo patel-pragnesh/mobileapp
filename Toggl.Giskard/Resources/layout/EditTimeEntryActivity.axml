@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:focusable="true"
@@ -22,9 +23,9 @@
             android:clickable="true"
             android:src="@drawable/close"
             android:tint="@android:color/white"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+            android:layout_height="?attr/actionBarSize" />
         <EditText
             android:id="@+id/EditTimeEntryDescriptionTextField"
             local:MvxBind="Text Description; Focus IsEditingDescription"
@@ -34,10 +35,10 @@
             android:letterSpacing="-0.01"
             android:lineSpacingExtra="5sp"
             android:scrollHorizontally="true"
-            android:textCursorDrawable="@drawable/EditTextWhiteCursor"
             android:textColor="@android:color/white"
             android:hint="@string/StartTimeEntryHint"
             android:background="@color/blueToolbarBackground"
+            android:textCursorDrawable="@drawable/EditTextWhiteCursor"
             android:textColorHint="@color/blueBackgroundTextHintColor"
             android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
             android:layout_marginTop="64dp"
@@ -188,8 +189,8 @@
                 android:layout_toRightOf="@id/EditTagsIcon" />
             <View
                 local:MvxBind="Click SelectTagsCommand"
-                android:background="@android:color/transparent"
                 android:clickable="true"
+                android:background="@android:color/transparent"
                 android:layout_height="48dp"
                 android:layout_width="wrap_content"
                 android:layout_alignTop="@id/EditTagsIcon"
@@ -197,8 +198,8 @@
             <toggl.giskard.views.TagsListRecyclerView
                 android:id="@+id/EditTags"
                 local:MvxBind="ItemClick SelectTagsCommand; ItemsSource Tags; Visibility(HasTags)"
-                local:MvxTemplateSelector="@string/TagsListTemplateSelector"
                 android:clickable="true"
+                local:MvxTemplateSelector="@string/TagsListTemplateSelector"
                 android:layout_height="48dp"
                 android:layout_width="wrap_content"
                 android:layout_alignTop="@id/EditTagsIcon"

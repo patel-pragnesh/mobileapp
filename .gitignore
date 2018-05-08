@@ -278,6 +278,7 @@ __pycache__/
 tools/**
 Tools/**
 !tools/packages.config
+!tools/xml-format
 
 # Telerik's JustMock configuration file
 *.jmconfig

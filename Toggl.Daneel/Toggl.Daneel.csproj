@@ -215,6 +215,8 @@
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\icArrowUp.imageset\Contents.json" />
@@ -308,13 +310,29 @@
     <ImageAsset Include="Resources\Images.xcassets\icLoader.imageset\ic-spinner%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icLoader.imageset\ic-spinner%403x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-29x29.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-29x29.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-29x29.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-80x80.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-80x80.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-80x80.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-120x120.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-120x120.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-120x120.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-58x58.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-58x58.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-58x58.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-87x87.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-87x87.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-87x87.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-57x57.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-57x57.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-57x57.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-114x114.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-114x114.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-114x114.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-App-180x180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\Icon-App-180x180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\Icon-App-180x180.png" />
     <ImageAsset Include="Resources\Images.xcassets\icAdd.imageset\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\icAdd.imageset\icAddS.png" />
     <ImageAsset Include="Resources\Images.xcassets\icAdd.imageset\icAddS%402x.png" />
@@ -352,6 +370,8 @@
     <ImageAsset Include="Resources\Images.xcassets\icUnsynced.imageset\icUnsynced%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icUnsynced.imageset\icUnsynced%403x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\toggl-app-icon-1024x1024.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-adhoc.appiconset\toggl-app-icon-1024x1024.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon-debug.appiconset\toggl-app-icon-1024x1024.png" />
     <ImageAsset Include="Resources\Images.xcassets\search.imageset\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\search.imageset\search.png" />
     <ImageAsset Include="Resources\Images.xcassets\search.imageset\search%402x.png" />
