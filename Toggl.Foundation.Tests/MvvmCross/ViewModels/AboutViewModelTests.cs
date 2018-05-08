@@ -35,7 +35,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task NavigatesToTheLicensesViewModel()
             {
-                await ViewModel.LicensesCommand.ExecuteAsync();
+                await ViewModel.OpenLicensesCommand.ExecuteAsync();
 
                 await NavigationService.Received().Navigate<LicensesViewModel>();
             }
@@ -46,7 +46,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void OpensTheBrowserInTheTermsOfServicePage()
             {
-                ViewModel.TermsOfServiceCommand.Execute();
+                ViewModel.OpenTermsOfServiceCommand.Execute();
 
                 NavigationService.Received().Navigate<BrowserViewModel, BrowserParameters>(
                     Arg.Is<BrowserParameters>(parameter => parameter.Url == Resources.TermsOfServiceUrl)
@@ -56,7 +56,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void OpensTheBrowserWithTheAppropriateTitle()
             {
-                ViewModel.TermsOfServiceCommand.Execute();
+                ViewModel.OpenTermsOfServiceCommand.Execute();
 
                 NavigationService.Received().Navigate<BrowserViewModel, BrowserParameters>(
                     Arg.Is<BrowserParameters>(parameter => parameter.Title == Resources.TermsOfService)
@@ -69,7 +69,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void OpensTheBrowserInThePrivacyPolicyPage()
             {
-                ViewModel.PrivacyPolicyCommand.Execute();
+                ViewModel.OpenPrivacyPolicyCommand.Execute();
 
                 NavigationService.Received().Navigate<BrowserViewModel, BrowserParameters>(
                     Arg.Is<BrowserParameters>(parameter => parameter.Url == Resources.PrivacyPolicyUrl)
@@ -79,7 +79,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void OpensTheBrowserWithTheAppropriateTitle()
             {
-                ViewModel.PrivacyPolicyCommand.Execute();
+                ViewModel.OpenPrivacyPolicyCommand.Execute();
 
                 NavigationService.Received().Navigate<BrowserViewModel, BrowserParameters>(
                     Arg.Is<BrowserParameters>(parameter => parameter.Title == Resources.PrivacyPolicy)

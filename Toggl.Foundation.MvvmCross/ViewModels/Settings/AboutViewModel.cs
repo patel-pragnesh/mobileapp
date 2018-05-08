@@ -11,9 +11,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Settings
     {
         private readonly IMvxNavigationService navigationService;
       
-        public IMvxAsyncCommand PrivacyPolicyCommand { get; }
-        public IMvxAsyncCommand TermsOfServiceCommand { get; }
-        public IMvxAsyncCommand LicensesCommand { get; }
+        public IMvxAsyncCommand OpenPrivacyPolicyCommand { get; }
+        public IMvxAsyncCommand OpenTermsOfServiceCommand { get; }
+        public IMvxAsyncCommand OpenLicensesCommand { get; }
 
         public AboutViewModel(IMvxNavigationService navigationService)
         {
@@ -21,9 +21,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Settings
 
             this.navigationService = navigationService;
 
-            PrivacyPolicyCommand = new MvxAsyncCommand(openPrivacyPolicyView);
-            TermsOfServiceCommand = new MvxAsyncCommand(openTermsOfServiceView);
-            LicensesCommand = new MvxAsyncCommand(openLicensesView);
+            OpenPrivacyPolicyCommand = new MvxAsyncCommand(openPrivacyPolicyView);
+            OpenTermsOfServiceCommand = new MvxAsyncCommand(openTermsOfServiceView);
+            OpenLicensesCommand = new MvxAsyncCommand(openLicensesView);
         }
 
 
