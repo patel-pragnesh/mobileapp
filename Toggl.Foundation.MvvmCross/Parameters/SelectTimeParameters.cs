@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Toggl.Foundation;
+using Toggl.Multivac;
 using static Toggl.Foundation.Helper.Constants;
 
 namespace Toggl.Foundation.MvvmCross.Parameters
 {
+    [Preserve(AllMembers = true)]
     public sealed class SelectTimeParameters
     {
         public DateTimeOffset Start { get; private set; }
