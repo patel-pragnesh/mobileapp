@@ -61,6 +61,11 @@ namespace Toggl.Giskard
             );
 
             registry.RegisterCustomBindingFactory<View>(
+                ViewAlphaTargetBinding.BindingName,
+                view => new ViewAlphaTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<View>(
                 ViewMarginTargetBinding.BindingName,
                 view => new ViewMarginTargetBinding(view)
             );
