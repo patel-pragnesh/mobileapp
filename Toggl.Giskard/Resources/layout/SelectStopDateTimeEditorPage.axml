@@ -35,7 +35,7 @@
         android:layout_alignParentRight="true">
         <ImageView
             android:alpha="0.7"
-            android:src="@drawable/play_white"
+            android:src="@drawable/timer_light"
             android:layout_width="16dp"
             android:layout_height="16dp" />
         <TextView
@@ -75,7 +75,7 @@
         android:layout_alignParentLeft="true">
         <ImageView
             android:alpha="0.7"
-            android:src="@drawable/play_white"
+            android:src="@drawable/date_light"
             android:layout_width="16dp"
             android:layout_height="16dp" />
         <TextView
@@ -103,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_alignParentLeft="true">
             <ImageView
-                android:src="@drawable/play_white"
+                android:src="@drawable/date_light"
                 android:layout_width="16dp"
                 android:layout_height="16dp" />
             <TextView
