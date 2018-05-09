@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using PropertyChanged;
+using Toggl.Foundation.MvvmCross.Combiners;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
@@ -18,6 +19,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly ITimeService timeService;
 
         private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
+
+        private readonly DateTimeOffsetTimeFormatValueCombiner timeFormatValueCombiner;
+        private readonly DateTimeOffsetDateFormatValueCombiner dateFormatValueCombiner;
 
         public DateTimeOffset CurrentDateTime { get; set; }
 
@@ -238,6 +242,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTimeEntryCommand = new MvxCommand(stopTimeEntry);
 
             ToggleClockCalendarModeCommand = new MvxCommand(togglClockCalendarMode);
+
+            timeFormatValueCombiner = new DateTimeOffsetTimeFormatValueCombiner(TimeZoneInfo.Local);
+            dateFormatValueCombiner = new DateTimeOffsetDateFormatValueCombiner(TimeZoneInfo.Local);
         }
 
         public override void Prepare(SelectTimeParameters parameter)
