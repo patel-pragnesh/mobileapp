@@ -23,7 +23,6 @@
     <string name="AddTagsHint">Add/filter tags</string>
     <string name="StartTime">Start time</string>
     <string name="EndTime">End time</string>
-    <string name="StopButtonText">Stop</string>
     <string name="Save">Save</string>
     <string name="Oops">Oops!</string>
     <string name="NameTakenError">Sorry, this name is already taken.</string>

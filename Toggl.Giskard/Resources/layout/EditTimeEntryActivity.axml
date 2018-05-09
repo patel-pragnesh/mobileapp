@@ -310,7 +310,7 @@
                 <TextView
                     android:id="@+id/EditEndValueSetLabel"
                     local:MvxBind="Visibility Visibility(IsTimeEntryRunning)"
-                    android:text="@string/StopButtonText"
+                    android:text="@string/Stop"
                     android:textSize="15sp"
                     android:textColor="@color/buttonBlue"
                     android:layout_width="match_parent"
