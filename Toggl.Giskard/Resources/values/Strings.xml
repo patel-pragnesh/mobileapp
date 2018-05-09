@@ -59,6 +59,8 @@ your app to continue.</string>
     <string name="Reports">Reports</string>
     <string name="NewTimeEntry">New time entry</string>
     <string name="StopTimer">Stop timer</string>
+    <string name="Start">Start</string>
+    <string name="Stop">Stop</string>
     
     <string name="MainTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.MainTemplateSelector, Toggl.Giskard</string>
     <string name="ReportsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.ReportsTemplateSelector, Toggl.Giskard</string>
