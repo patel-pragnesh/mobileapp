@@ -25,6 +25,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public int StartingTabIndex { get; private set; }
 
+        public DateFormat DateFormat { get; set; }
+        public TimeFormat TimeFormat { get; set; }
+
         [DependsOn(nameof(CurrentDateTime))]
         public DateTimeOffset? StopTime { get; set; }
 
@@ -241,6 +244,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             StartTime = parameter.Start;
             StopTime = parameter.Stop;
+
+            DateFormat = parameter.DateFormat;
+            TimeFormat = parameter.TimeFormat;
 
             StartingTabIndex = parameter.StartingTabIndex;
             IsCalendarView = parameter.ShouldStartOnCalendar;

@@ -355,7 +355,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             var parameters = 
                 SelectTimeParameters
-                .CreateFromBindingString(bindingParameter, StartTime, StopTime);
+                .CreateFromBindingString(bindingParameter, StartTime, StopTime)
+                .WithFormats(DateFormat, TimeFormat);
 
             var data = await navigationService
                 .Navigate<SelectTimeViewModel, SelectTimeParameters, SelectTimeResultsParameters>(parameters)
