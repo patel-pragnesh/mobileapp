@@ -689,6 +689,11 @@
     <AndroidResource Include="Resources\layout\SelectStopDateTimeEditorPage.axml" />
     <AndroidResource Include="Resources\layout\SelectDateTimeTabHeader.axml" />
     <AndroidResource Include="Resources\layout\SelectStartDateTimeEditorPage.axml" />
+    <AndroidResource Include="Resources\drawable-hdpi\date_light.png" />
+    <AndroidResource Include="Resources\drawable-mdpi\date_light.png" />
+    <AndroidResource Include="Resources\drawable-xhdpi\date_light.png" />
+    <AndroidResource Include="Resources\drawable-xxhdpi\date_light.png" />
+    <AndroidResource Include="Resources\drawable-xxxhdpi\date_light.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">
