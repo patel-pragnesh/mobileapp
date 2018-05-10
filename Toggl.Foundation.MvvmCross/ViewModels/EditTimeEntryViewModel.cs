@@ -119,6 +119,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(StopTime))]
         public bool IsTimeEntryRunning => !StopTime.HasValue;
 
+        public DateTimeOffset StopTimeOrCurrent => StopTime ?? timeService.CurrentDateTime;
+
         private DateTimeOffset? stopTime;
         public DateTimeOffset? StopTime
         {

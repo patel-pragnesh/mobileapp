@@ -50,11 +50,11 @@
     <string name="OnboardingSignup">Don\'t have an account? <b>Sign up for free!</b></string>
     <string name="OnboardingGetStarted">Let\'s get started!</string>
     <string name="OnboardingKickstartProductivity">Kickstart your productivity\nwith Toggl</string>
-	<string name="OutdatedAppMessage">Seems you haven’t updated the app
+	  <string name="OutdatedAppMessage">Seems you haven’t updated the app
 for quite some time… Please update
 your app to continue.</string>
-	<string name="TryTogglDotCom"> Try Toggl.com </string>
-	<string name="UpdateTheApp">Update the app</string>
+	  <string name="TryTogglDotCom"> Try Toggl.com </string>
+	  <string name="UpdateTheApp">Update the app</string>
     <string name="Reports">Reports</string>
     <string name="NewTimeEntry">New time entry</string>
     <string name="StopTimer">Stop timer</string>
