@@ -21,6 +21,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
+        private IDisposable timeServiceDisposable;
 
         private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
 
@@ -257,8 +258,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            timeService.CurrentDateTimeObservable
-                       .Subscribe(currentDateTime => CurrentDateTime = currentDateTime);
+            timeServiceDisposable =
+                timeService.CurrentDateTimeObservable
+                           .Subscribe(currentDateTime => CurrentDateTime = currentDateTime);
         }
 
         private Action increaseDuration(int minutes)
