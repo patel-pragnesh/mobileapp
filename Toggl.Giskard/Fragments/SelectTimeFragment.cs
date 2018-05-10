@@ -105,7 +105,6 @@ namespace Toggl.Giskard.Fragments
             editorMode = calculateEditorMode();
 
             updateLayoutHeight();
-
         }
 
         private EditorMode calculateEditorMode()
