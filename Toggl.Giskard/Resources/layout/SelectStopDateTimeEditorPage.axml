@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true" />
     <TextView
         android:id="@+id/SelectDateTimeDateLabel"
-        local:MvxBind="Text StopDateText; Visibility Visibility(And(IsCalendarView, IsTimeEntryStopped))"
+        local:MvxBind="Text DateTimeOffsetShortDateFormat(StopTimeOrCurrent, DateFormat); Visibility Visibility(And(IsCalendarView, IsTimeEntryStopped))"
         tools:text="03/13"
         android:textSize="60sp"
         android:textStyle="normal"
@@ -39,7 +39,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp" />
         <TextView
-            local:MvxBind="Text StopTimeText"
+            local:MvxBind="Text DateTimeOffsetTimeFormat(StopTimeOrCurrent, TimeFormat)"
             tools:text="12:20"
             android:textSize="11sp"
             android:textColor="@color/halfTransparentWhite"
@@ -79,7 +79,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp" />
         <TextView
-            local:MvxBind="Text StopDateText"
+            local:MvxBind="Text DateTimeOffsetShortDateFormat(StopTimeOrCurrent, DateFormat)"
             tools:text="03/13"
             android:textSize="11sp"
             android:textColor="@color/halfTransparentWhite"
@@ -107,7 +107,7 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp" />
             <TextView
-                local:MvxBind="Text StopDateText"
+                local:MvxBind="Text DateTimeOffsetShortDateFormat(StopTimeOrCurrent, DateFormat)"
                 tools:text="03/13"
                 android:textSize="11sp"
                 android:textColor="@android:color/white"
@@ -116,7 +116,7 @@
         </LinearLayout>
         <TextView
             android:id="@+id/SelectDateTimeRunningTimeEntryCurrentTime"
-            local:MvxBind="Text StopTimeText"
+            local:MvxBind="Text DateTimeOffsetTimeFormat(StopTimeOrCurrent, TimeFormat)"
             tools:text="12:30"
             android:textSize="60sp"
             android:textColor="@android:color/white"
@@ -161,13 +161,13 @@
         <Button
             local:MvxBind="Click StopTimeEntryCommand"
             android:background="?android:attr/selectableItemBackground"
-        android:layout_width="match_parent"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-        android:textSize="14sp"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="@color/lightGray"
-        android:gravity="center"
-        android:textAllCaps="true"
-        android:text="@string/StopTimer" />
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/lightGray"
+            android:gravity="center"
+            android:textAllCaps="true"
+            android:text="@string/StopTimer" />
     </FrameLayout>
 </RelativeLayout>

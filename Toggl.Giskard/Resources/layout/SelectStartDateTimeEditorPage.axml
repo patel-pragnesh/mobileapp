@@ -13,7 +13,7 @@
         android:layout_alignParentTop="true" />
     <TextView
         android:id="@+id/SelectDateTimeDateLabel"
-        local:MvxBind="Text StartDateText; Visibility Visibility(IsCalendarView)"
+        local:MvxBind="Text DateTimeOffsetShortDateFormat(StartTime, DateFormat); Visibility Visibility(IsCalendarView)"
         tools:text="03/13"
         android:textSize="60sp"
         android:textStyle="normal"
@@ -39,7 +39,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp" />
         <TextView
-            local:MvxBind="Text StartTimeText"
+            local:MvxBind="Text DateTimeOffsetTimeFormat(StartTime, TimeFormat)"
             tools:text="12:20"
             android:textSize="11sp"
             android:textColor="@color/halfTransparentWhite"
@@ -79,7 +79,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp" />
         <TextView
-            local:MvxBind="Text StartDateText"
+            local:MvxBind="Text DateTimeOffsetShortDateFormat(StartTime, DateFormat)"
             tools:text="03/13"
             android:textSize="11sp"
             android:textColor="@color/halfTransparentWhite"
