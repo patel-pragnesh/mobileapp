@@ -73,8 +73,14 @@ namespace Toggl.Giskard.Fragments
             onModeChangedDisposable =
                 ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.IsCalendarView), onIsCalendarViewChanged);
 
+            var startPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStartTimeTabHeader, null);
+            tabLayout.GetTabAt(StartTimeTab).SetCustomView(startPageView);
 
+            var stopPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStopTimeTabHeader, null);
+            tabLayout.GetTabAt(StopTimeTab).SetCustomView(stopPageView);
 
+            var durationPageView = this.BindingInflate(Resource.Layout.SelectDateTimeDurationTabHeader, null);
+            tabLayout.GetTabAt(DurationTab).SetCustomView(durationPageView);
 
             pager.SetCurrentItem(ViewModel.StartingTabIndex, false);
 

@@ -687,8 +687,10 @@
     <AndroidResource Include="Resources\layout\SelectTimeFragment.axml" />
     <AndroidResource Include="Resources\layout\SelectTimeDurationPage.axml" />
     <AndroidResource Include="Resources\layout\SelectStopDateTimeEditorPage.axml" />
-    <AndroidResource Include="Resources\layout\SelectDateTimeTabHeader.axml" />
+    <AndroidResource Include="Resources\layout\SelectDateTimeStartTimeTabHeader.axml" />
     <AndroidResource Include="Resources\layout\SelectStartDateTimeEditorPage.axml" />
+    <AndroidResource Include="Resources\layout\SelectDateTimeStopTimeTabHeader.axml" />
+    <AndroidResource Include="Resources\layout\SelectDateTimeDurationTabHeader.axml" />
     <AndroidResource Include="Resources\drawable-hdpi\date_light.png" />
     <AndroidResource Include="Resources\drawable-mdpi\date_light.png" />
     <AndroidResource Include="Resources\drawable-xhdpi\date_light.png" />
