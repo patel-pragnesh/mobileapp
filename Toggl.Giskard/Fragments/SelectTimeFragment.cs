@@ -101,7 +101,7 @@ namespace Toggl.Giskard.Fragments
 
         private void onTabChange(int tabPosition)
         {
-			ViewModel.CurrentTab = tabPosition;
+            ViewModel.CurrentTab = tabPosition;
             editorMode = calculateEditorMode();
 
             updateLayoutHeight();
@@ -154,13 +154,13 @@ namespace Toggl.Giskard.Fragments
         {
         }
 
-		protected override void Dispose(bool disposing)
-		{
+        protected override void Dispose(bool disposing)
+        {
             base.Dispose(disposing);
 
             if (disposing == false) return;
 
             onModeChangedDisposable.Dispose();
-		}
+        }
     }
 }
