@@ -383,7 +383,6 @@
     <Compile Include="Adapters\SelectTimePagerAdapter.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Views\TogglDroidTimePicker.cs" />
-    <Compile Include="Fragments\TabHeaderUpdateManager.cs" />
     <Compile Include="Bindings\ViewAlphaTargetBinding.cs" />
   </ItemGroup>
   <ItemGroup>
