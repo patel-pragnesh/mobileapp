@@ -25,9 +25,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
 
-        private readonly DateTimeOffsetTimeFormatValueCombiner timeFormatValueCombiner;
-        private readonly DateTimeOffsetDateFormatValueCombiner dateFormatValueCombiner;
-
         public DateTimeOffset CurrentDateTime { get; set; }
 
         public DateTimeOffset StartTime { get; set; }
@@ -237,9 +234,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTimeEntryCommand = new MvxCommand(stopTimeEntry);
 
             ToggleClockCalendarModeCommand = new MvxCommand(togglClockCalendarMode);
-
-            timeFormatValueCombiner = new DateTimeOffsetTimeFormatValueCombiner(TimeZoneInfo.Local);
-            dateFormatValueCombiner = new DateTimeOffsetDateFormatValueCombiner(TimeZoneInfo.Local);
         }
 
         public override void Prepare(SelectTimeParameters parameter)
