@@ -24,24 +24,21 @@ namespace Toggl.Giskard.Fragments
     using System.Collections.Generic;
     using MvvmCross.Binding.BindingContext;
     using static SelectTimeFragment.EditorMode;
+    using static SelectTimeViewModel;
 
     [MvxDialogFragmentPresentation(AddToBackStack = true)]
     public sealed class SelectTimeFragment : MvxDialogFragment<SelectTimeViewModel>, TabLayout.IOnTabSelectedListener
     {
-        private const int startTimeTab = 0;
-        private const int stopTimeTab = 1;
-        private const int durationTab = 2;
-
         internal enum EditorMode
         {
             Date,
             Time,
-            Duration
+            Duration,
+            RunningTimeEntry
         }
 
-        private readonly int[] heights = { 450, 400, 224 };
+        private readonly int[] heights = { 450, 400, 224, 204 };
 
-        private int currentPosition;
         private EditorMode editorMode = Date;
 
         private IDisposable onModeChangedDisposable;
@@ -98,7 +95,7 @@ namespace Toggl.Giskard.Fragments
 
         private void onTabChange(int tabPosition)
         {
-            currentPosition = tabPosition;
+			ViewModel.CurrentTab = tabPosition;
             editorMode = calculateEditorMode();
 
             updateLayoutHeight();
@@ -107,8 +104,11 @@ namespace Toggl.Giskard.Fragments
 
         private EditorMode calculateEditorMode()
         {
-            if (currentPosition == durationTab)
+            if (ViewModel.CurrentTab == DurationTab)
                 return Duration;
+
+            if (ViewModel.CurrentTab == StopTimeTab && !ViewModel.IsTimeEntryStopped)
+                return RunningTimeEntry;
 
             return ViewModel.IsCalendarView ? Date : Time;
         }

@@ -15,6 +15,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     public sealed class SelectTimeViewModel
         : MvxViewModel<SelectTimeParameters, SelectTimeResultsParameters>
     {
+        public const int StartTimeTab = 0;
+        public const int StopTimeTab = 1;
+        public const int DurationTab = 2;
+
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
 
@@ -171,6 +175,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         [DependsOn(nameof(StartTime))]
         public string StartTimeText => $"{StartTime:HH:mm}";
+        public int CurrentTab { get; set; }
 
         [DependsOn(nameof(StartTime))]
         public string StartDateText => $"{StartTime:MM/dd}";
@@ -186,6 +191,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             => IsTimeEntryStopped
             ? $"{StopTime:MM/dd}"
             : $"{CurrentDateTime:MM/dd}";
+        public bool IsOnStartTimeTab => CurrentTab == StartTimeTab;
+        public bool IsOnStopTimeTab => CurrentTab == StopTimeTab;
+        public bool IsOnDurationTab => CurrentTab == DurationTab;
 
         public bool IsDurationVisible { get; set; }
 
