@@ -249,6 +249,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             RaisePropertyChanged(nameof(DurationFormat));
         }
 
+        public override void ViewDestroy()
+        {
+            base.ViewDestroy();
+            runningTimeEntryDisposable?.Dispose();
+            preferencesDisposable?.Dispose();
+        }
+
         private enum EditMode
         {
             None,

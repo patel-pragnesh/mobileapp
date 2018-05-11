@@ -489,5 +489,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             CurrentPage = EmailPage;
             RaisePropertyChanged(nameof(TryLoggingInInsteadOfSignup));
         }
+
+        public override void ViewDestroy()
+        {
+            base.ViewDestroy();
+            loginDisposable?.Dispose();
+        }
     }
 }

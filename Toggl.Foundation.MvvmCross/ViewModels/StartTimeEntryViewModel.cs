@@ -291,7 +291,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             {
                 case QuerySymbolSuggestion querySymbolSuggestion:
 
-                    if (querySymbolSuggestion.Symbol == QuerySymbols.ProjectsString) 
+                    if (querySymbolSuggestion.Symbol == QuerySymbols.ProjectsString)
                     {
                         analyticsService.TrackStartOpensProjectSelector(ProjectTagSuggestionSource.TableCellButton);
                     }
@@ -527,7 +527,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsBillable = !IsBillable;
         }
 
-        private async Task selectTime(string bindingString) 
+        private async Task selectTime(string bindingString)
         {
             IsEditingTime = true;
 
@@ -541,7 +541,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             StartTime = result.Start;
 
-            if (result.Stop.HasValue) 
+            if (result.Stop.HasValue)
                 updateDurationAfterEditing(result.Stop - result.Start);
 
             IsEditingTime = false;
@@ -564,8 +564,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsEditingTime = false;
         }
 
-        private void updateDurationAfterEditing(TimeSpan? duration) 
-        { 
+        private void updateDurationAfterEditing(TimeSpan? duration)
+        {
             Duration = duration;
             displayedTime = duration.Value;
             elapsedTimeDisposable?.Dispose();
@@ -626,7 +626,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             bool suggestsTags = parsedQuery.SuggestionType == AutocompleteSuggestionType.Tags;
             bool suggestsProjects = parsedQuery.SuggestionType == AutocompleteSuggestionType.Projects;
 
-            if (!IsSuggestingTags && suggestsTags) 
+            if (!IsSuggestingTags && suggestsTags)
             {
                 analyticsService.TrackStartOpensTagSelector(ProjectTagSuggestionSource.TextField);
             }
@@ -711,6 +711,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     foreach (var taskSuggestion in projectSuggestion.Tasks)
                         yield return taskSuggestion;
             }
+        }
+
+        public override void ViewDestroy()
+        {
+            base.ViewDestroy();
+            queryDisposable?.Dispose();
+            elapsedTimeDisposable?.Dispose();
         }
     }
 }
