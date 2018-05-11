@@ -420,6 +420,47 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     InfoText = getGenericError();
                     break;
             }
+
+            if (IsSignUp)
+            {
+                analyticsService.TrackSignUpErrorEvent(signUpErrorSource(exception));
+            }
+            else
+            {
+                analyticsService.TrackLoginErrorEvent(loginErrorSource(exception));
+            }
+        }
+
+        private LoginErrorSource loginErrorSource(Exception exception)
+        {
+            switch (exception)
+            {
+                case UnauthorizedException _:
+                    return LoginErrorSource.InvalidEmailOrPassword;
+                case GoogleLoginException _:
+                    return LoginErrorSource.GoogleLoginError;
+                case OfflineException _:
+                    return LoginErrorSource.Offline;
+                case ServerErrorException _:
+                    return LoginErrorSource.ServerError;
+                default:
+                    return LoginErrorSource.Other;
+            }
+        }
+
+        private SignUpErrorSource signUpErrorSource(Exception exception)
+        {
+            switch (exception)
+            {
+                case EmailIsAlreadyUsedException _:
+                    return SignUpErrorSource.EmailIsAlreadyUsed;
+                case OfflineException _:
+                    return SignUpErrorSource.Offline;
+                case ServerErrorException _:
+                    return SignUpErrorSource.ServerError;
+                default:
+                    return SignUpErrorSource.Other;
+            }
         }
 
         private string getGenericError()

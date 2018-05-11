@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
@@ -269,9 +270,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            timeServiceDisposable =
-                timeService.CurrentDateTimeObservable
-                           .Subscribe(currentDateTime => CurrentDateTime = currentDateTime);
+            timeServiceDisposable = timeService.CurrentDateTimeObservable
+                       .StartWith(timeService.CurrentDateTime)
+                       .Subscribe(currentDateTime => CurrentDateTime = currentDateTime);
         }
 
         private Action increaseDuration(int minutes)

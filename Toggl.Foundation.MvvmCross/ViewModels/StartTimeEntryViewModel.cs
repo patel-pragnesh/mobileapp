@@ -682,7 +682,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async Task setBillableValues(long? currentProjectId)
         {
-            var hasProject = currentProjectId.HasValue;
+            var hasProject = currentProjectId.HasValue && currentProjectId.Value != ProjectSuggestion.NoProjectId;
             if (hasProject)
             {
                 var projectId = currentProjectId.Value;

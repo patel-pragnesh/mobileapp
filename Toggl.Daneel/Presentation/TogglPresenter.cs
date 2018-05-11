@@ -146,8 +146,7 @@ namespace Toggl.Daneel.Presentation
                 : getPresentedViewController(navigationController.TopViewController) as MvxViewController;
             
             //Don't show the same view twice
-            if (topViewController != null
-                && topViewController.ViewModel.GetType() == request.ViewModelType)
+            if (topViewController?.ViewModel?.GetType() == request.ViewModelType)
                 return;
                 
             base.Show(request);

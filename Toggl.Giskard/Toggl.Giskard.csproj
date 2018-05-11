@@ -261,7 +261,6 @@
     <Compile Include="Adapters\SelectTagsRecyclerAdapter.cs" />
     <Compile Include="Activities\SelectProjectActivity.cs" />
     <Compile Include="Adapters\SelectProjectRecyclerAdapter.cs" />
-    <Compile Include="Bindings\ImageViewVerticalFlipTargetBinding.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
@@ -384,6 +383,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Views\TogglDroidTimePicker.cs" />
     <Compile Include="Bindings\ViewAlphaTargetBinding.cs" />
+    <Compile Include="Bindings\ViewUpsideDownTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMaxDateTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMinDateTargetBinding.cs" />
   </ItemGroup>

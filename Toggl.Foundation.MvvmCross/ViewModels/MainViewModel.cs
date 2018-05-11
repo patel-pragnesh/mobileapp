@@ -217,13 +217,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsInManualMode = userPreferences.IsManualModeEnabled();
         }
 
-        public override void ViewAppeared()
-        {
-            base.ViewAppeared();
-
-            ChangePresentation(new CardVisibilityHint(CurrentTimeEntryId != null));
-        }
-
         private void setRunningEntry(IDatabaseTimeEntry timeEntry)
         {
             CurrentTimeEntryId = timeEntry?.Id;

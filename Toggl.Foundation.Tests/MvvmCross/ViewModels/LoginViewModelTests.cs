@@ -369,6 +369,33 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                     NavigationService.DidNotReceive().Navigate<MainViewModel>();
                 }
+
+                [Fact, LogIfTooSlow]
+                public void TracksTheLoginErrorWhenLoginFails()
+                {
+                    ViewModel.Password = ValidPassword;
+                    LoginManager.Login(Arg.Any<Email>(), Arg.Any<Password>())
+                                .Returns(Observable.Throw<ITogglDataSource>(new Exception()));
+
+                    ViewModel.NextCommand.Execute();
+
+                    AnalyticsService.Received().TrackLoginErrorEvent(LoginErrorSource.Other);
+                }
+
+                [Fact, LogIfTooSlow]
+                public void TracksTheSignUpErrorWhenSignUpFails()
+                {
+                    ViewModel.Prepare(LoginType.SignUp);
+                    ViewModel.CountryId = ValidCountryId;
+                    ViewModel.Password = ValidPassword;               
+
+                    LoginManager.SignUp(Arg.Any<Email>(), Arg.Any<Password>(), Arg.Any<bool>(), Arg.Any<int>())
+                                .Returns(Observable.Throw<ITogglDataSource>(new Exception()));
+
+                    ViewModel.NextCommand.Execute();
+
+                    AnalyticsService.Received().TrackSignUpErrorEvent(SignUpErrorSource.Other);
+                }
             }
 
             public sealed class WhenInForgotPasswordPage : LoginViewModelTest
@@ -525,6 +552,17 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.GoogleLoginCommand.Execute();
 
                 AnalyticsService.Received().TrackSignUpEvent(AuthenticationMethod.Google);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void TracksGoogleLoginErrorWhenLoginFails()
+            {   
+                LoginManager.LoginWithGoogle()
+                            .Returns(Observable.Throw<ITogglDataSource>(new Exception()));
+
+                ViewModel.GoogleLoginCommand.Execute();
+
+                AnalyticsService.Received().TrackLoginErrorEvent(LoginErrorSource.Other);
             }
 
             [Fact, LogIfTooSlow]

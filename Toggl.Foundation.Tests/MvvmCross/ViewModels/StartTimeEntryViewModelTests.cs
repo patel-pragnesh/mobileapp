@@ -18,6 +18,7 @@ using Toggl.Foundation.Tests.Generators;
 using Toggl.Foundation.Tests.Mocks;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
+using Toggl.PrimeRadiant.Exceptions;
 using Toggl.PrimeRadiant.Models;
 using Xunit;
 using static Toggl.Foundation.Helper.Constants;
@@ -1440,6 +1441,24 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     ViewModel.SelectSuggestionCommand.Execute(Suggestion);
 
                     ViewModel.TextFieldInfo.TaskId.Should().BeNull();
+                }
+
+                [Theory, LogIfTooSlow]
+                [InlineData(true)]
+                [InlineData(false)]
+                public void SetsTheAppropriateBillableValueBasedOnTheWorkspaceWhenSelectingNoProject(bool isBillableAvailable)
+                {
+                    InteractorFactory.GetWorkspaceById(WorkspaceId).Execute().Returns(Observable.Return(Workspace));
+                    InteractorFactory.IsBillableAvailableForProject(ProjectId).Execute()
+                        .Returns(Observable.Throw<bool>(new EntityNotFoundException(new Exception())));
+                    InteractorFactory.IsBillableAvailableForWorkspace(WorkspaceId).Execute()
+                        .Returns(Observable.Return(isBillableAvailable));
+                    var noProjectSuggestion = ProjectSuggestion.NoProject(WorkspaceId, Workspace.Name);
+
+                    ViewModel.SelectSuggestionCommand.Execute(noProjectSuggestion);
+
+                    ViewModel.IsBillable.Should().BeFalse();
+                    ViewModel.IsBillableAvailable.Should().Be(isBillableAvailable);
                 }
             }
 
