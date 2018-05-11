@@ -24,7 +24,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
         private IDisposable timeServiceDisposable;
-
+        private TimeSpan editingDuration;
         private bool isViewModelPrepared;
 
         private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
@@ -33,8 +33,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly DateTimeOffsetDateFormatValueCombiner dateFormatValueCombiner;
 
         public DateTimeOffset MinStartTime { get; set; }
+
         public DateTimeOffset MaxStartTime { get; set; }
+
         public DateTimeOffset MinStopTime { get; set; }
+
         public DateTimeOffset MaxStopTime { get; set; }
 
         public DateTimeOffset CurrentDateTime { get; set; }
@@ -44,6 +47,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public int StartingTabIndex { get; private set; }
 
         public DateFormat DateFormat { get; set; }
+
         public TimeFormat TimeFormat { get; set; }
 
         [DependsOn(nameof(CurrentDateTime))]
@@ -172,15 +176,19 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public IMvxCommand StopTimeEntryCommand { get; }
 
         public IMvxAsyncCommand CancelCommand { get; }
+
         public IMvxAsyncCommand SaveCommand { get; }
 
         public IMvxCommand ToggleClockCalendarModeCommand { get; }
 
         public IMvxCommand IncreaseDuration5MinCommand { get; }
+
         public IMvxCommand IncreaseDuration10MinCommand { get; }
+
         public IMvxCommand IncreaseDuration30MinCommand { get; }
 
         public IMvxCommand FocusDurationCommand { get; }
+       
         public IMvxCommand UnfocusDurationCommand { get; }
 
         public bool IsCalendarView { get; set; }
@@ -188,7 +196,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public int CurrentTab { get; set; }
 
         public bool IsOnStartTimeTab => CurrentTab == StartTimeTab;
+
         public bool IsOnStopTimeTab => CurrentTab == StopTimeTab;
+
         public bool IsOnDurationTab => CurrentTab == DurationTab;
 
         public bool IsDurationVisible { get; set; }
@@ -201,7 +211,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public string DurationText
             => (string)durationConverter.Convert(Duration, typeof(TimeSpan), null, CultureInfo.CurrentCulture);
 
-        private TimeSpan editingDuration;
         public TimeSpan EditingDuration
         {
             get => editingDuration;
