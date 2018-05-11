@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using PropertyChanged;
+using Toggl.Foundation.Helper;
 using Toggl.Foundation.MvvmCross.Combiners;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Parameters;
@@ -23,10 +24,17 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly ITimeService timeService;
         private IDisposable timeServiceDisposable;
 
+        private bool isViewModelPrepared;
+
         private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
 
         private readonly DateTimeOffsetTimeFormatValueCombiner timeFormatValueCombiner;
         private readonly DateTimeOffsetDateFormatValueCombiner dateFormatValueCombiner;
+
+        public DateTimeOffset MinStartTime { get; set; }
+        public DateTimeOffset MaxStartTime { get; set; }
+        public DateTimeOffset MinStopTime { get; set; }
+        public DateTimeOffset MaxStopTime { get; set; }
 
         public DateTimeOffset CurrentDateTime { get; set; }
 
@@ -252,6 +260,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             StartingTabIndex = parameter.StartingTabIndex;
             IsCalendarView = parameter.ShouldStartOnCalendar;
+
+            initializeTimeConstraints();
+            isViewModelPrepared = true;
         }
 
         public override async Task Initialize()
@@ -286,6 +297,41 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private void stopTimeEntry()
         {
             StopTime = CurrentDateTime;
+        }
+
+        private void initializeTimeConstraints()
+        {
+            MinStopTime = StartTime;
+            MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
+
+            if (StopTime.HasValue)
+            {
+                MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
+                MaxStartTime = StopTime.Value;
+            }
+            else
+            {
+                MinStartTime = Constants.EarliestAllowedStartTime;
+                MaxStartTime = Constants.LatestAllowedStartTime;
+            }
+        }
+
+        private void OnStartTimeChanged()
+        {
+            if (!isViewModelPrepared)
+                return;
+
+            MinStopTime = StartTime;
+            MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
+        }
+
+        private void OnStopTimeChanged()
+        {
+            if (!isViewModelPrepared)
+                return;
+
+            MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
+            MaxStartTime = StopTime.Value;
         }
 
         private async Task cancel()

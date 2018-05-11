@@ -30,6 +30,16 @@ namespace Toggl.Giskard
                 view => new ViewMarginTargetBinding(view, ViewMarginTargetBinding.BoundMargin.Bottom)
             );
 
+            registry.RegisterCustomBindingFactory<DatePicker>(
+                DatePickerMaxDateTargetBinding.BindingName,
+                view => new DatePickerMaxDateTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<DatePicker>(
+                DatePickerMinDateTargetBinding.BindingName,
+                view => new DatePickerMinDateTargetBinding(view)
+            );
+
             registry.RegisterCustomBindingFactory<View>(
                 DrawableColorTargetBinding.BindingName,
                 view => new DrawableColorTargetBinding(view)
