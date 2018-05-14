@@ -4,6 +4,7 @@ using FsCheck;
 using FsCheck.Xunit;
 using MvvmCross.Core.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels;
+using Toggl.Foundation.Tests.Generators;
 using Xunit;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
@@ -74,5 +75,23 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.Duration.Should().Be(duration + TimeSpan.FromMinutes(minutes));
             }
         }
+
+        public sealed class TheConstructor : SelectTimeViewModelTest
+        {
+            [Theory, LogIfTooSlow]
+            [ClassData(typeof(TwoParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService)
+            {
+                var navigationService = useNavigationService ? NavigationService : null;
+                var timeService = useTimeService ? TimeService : null;
+
+                Action constructingWithEmptyParameters =
+                    () => new SelectTimeViewModel(navigationService, timeService);
+
+                constructingWithEmptyParameters.ShouldThrow<ArgumentNullException>();
+            }
+        }
+
+
     }
 }
