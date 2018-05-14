@@ -29,6 +29,7 @@ namespace Toggl.Giskard.Activities
 
         private IDisposable disposable;
         private View runningEntryCardFrame;
+        private RecyclerView mainRecyclerView;
         private FloatingActionButton playButton;
         private FloatingActionButton stopButton;
         private CoordinatorLayout coordinatorLayout;
@@ -49,6 +50,7 @@ namespace Toggl.Giskard.Activities
             runningEntryCardFrame = FindViewById(Resource.Id.MainRunningTimeEntryFrame);
             runningEntryCardFrame.Visibility = ViewStates.Invisible;
 
+            mainRecyclerView = FindViewById<RecyclerView>(Resource.Id.MainRecyclerView);
             playButton = FindViewById<FloatingActionButton>(Resource.Id.MainPlayButton);
             stopButton = FindViewById<FloatingActionButton>(Resource.Id.MainStopButton);
             coordinatorLayout = FindViewById<CoordinatorLayout>(Resource.Id.MainCoordinatorLayout);
@@ -115,6 +117,9 @@ namespace Toggl.Giskard.Activities
                     .OnAnimationEnd(_ => playButton.Show())
                     .Start();
             }
+
+            int bottomPadding = visible ? 104.DpToPixels(this) : 0;
+            mainRecyclerView.SetPadding(0, 0, 0, bottomPadding);
         }
 
         private sealed class FabAsyncHideListener : FloatingActionButton.OnVisibilityChangedListener
