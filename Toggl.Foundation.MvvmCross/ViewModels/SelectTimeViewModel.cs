@@ -193,10 +193,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public string DurationText
             => (string)durationConverter.Convert(Duration, typeof(TimeSpan), null, CultureInfo.CurrentCulture);
 
-        private TimeSpan editingDuration;
+        private TimeSpan? editingDuration = null;
         public TimeSpan EditingDuration
         {
-            get => editingDuration;
+            get => editingDuration ?? Duration;
             set
             {
                 if (StopTime.HasValue)

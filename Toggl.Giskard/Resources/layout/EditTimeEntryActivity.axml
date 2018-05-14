@@ -130,7 +130,7 @@
                 android:layout_below="@id/EditErrorContainer" />
             <TextView
                 android:id="@+id/EditAddProjectLabel"
-                local:MvxBind="Click SelectProjectCommand; Visibility !Visibility(Project)"
+                local:MvxBind="Click SelectProjectCommand; Visibility InvertedVisibility(Project)"
                 android:textSize="15sp"
                 android:text="@string/AddProjectTask"
                 android:gravity="center_vertical"

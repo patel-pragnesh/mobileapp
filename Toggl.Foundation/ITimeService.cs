@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Subjects;
 
 namespace Toggl.Foundation
 {
@@ -7,8 +6,8 @@ namespace Toggl.Foundation
     {
         DateTimeOffset CurrentDateTime { get; }
 
-        IConnectableObservable<DateTimeOffset> CurrentDateTimeObservable { get; } 
+        IObservable<DateTimeOffset> CurrentDateTimeObservable { get; } 
 
-        IConnectableObservable<DateTimeOffset> MidnightObservable { get; }
+        IObservable<DateTimeOffset> MidnightObservable { get; }
     }
 }
