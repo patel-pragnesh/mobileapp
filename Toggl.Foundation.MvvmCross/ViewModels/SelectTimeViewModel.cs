@@ -183,9 +183,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxCommand<int> IncreaseDurationCommand { get; }
 
-
-
-        public IMvxCommand FocusDurationCommand { get; }\
+        public IMvxCommand FocusDurationCommand { get; }
 
         public IMvxCommand UnfocusDurationCommand { get; }
 
