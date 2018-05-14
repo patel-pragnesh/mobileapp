@@ -139,10 +139,19 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        private Task signup()
+        private async Task signup()
         {
             setOnboardingCompletedIfNeeded();
-            return navigationService.Navigate<LoginViewModel, LoginType>(LoginType.SignUp);
+
+            //TEMP: this is ugly and needs to be removed asap
+            try
+            {
+                await navigationService.Navigate<LoginViewModel, LoginType>(LoginType.SignUp);
+            }
+            catch (KeyNotFoundException)
+            {
+                await navigationService.Navigate<SignupViewModel>();
+            }
         }
 
         private void skip()

@@ -36,13 +36,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected readonly int? ValidCountryId = 237;
             protected readonly int? InvalidCountryId = null;
 
-            protected ILoginManager LoginManager { get; } = Substitute.For<ILoginManager>();
-            protected IPasswordManagerService PasswordManagerService { get; } = Substitute.For<IPasswordManagerService>();
-            protected IAnalyticsService AnalyticsService { get; } = Substitute.For<IAnalyticsService>();
-
-            protected IApiErrorHandlingService ApiErrorHandlingService { get; } =
-                Substitute.For<IApiErrorHandlingService>();
-
             protected override LoginViewModel CreateViewModel()
                 => new LoginViewModel(LoginManager,
                                       OnboardingStorage,

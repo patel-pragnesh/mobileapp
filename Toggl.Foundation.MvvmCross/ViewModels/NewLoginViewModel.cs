@@ -8,6 +8,7 @@ using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Exceptions;
 using Toggl.Foundation.Login;
+using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;
@@ -17,7 +18,7 @@ using Toggl.Ultrawave.Exceptions;
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
     [Preserve(AllMembers = true)]
-    public sealed class NewLoginViewModel : MvxViewModel
+    public sealed class NewLoginViewModel : MvxViewModel<CredentialsParameter>
     {
         private readonly ILoginManager loginManager;
         private readonly IAnalyticsService analyticsService;
@@ -57,6 +58,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxCommand TogglePasswordVisibilityCommand { get; }
 
+        public IMvxAsyncCommand SignupCommand { get; }
+
         public IMvxAsyncCommand StartPasswordManagerCommand { get; }
 
         public NewLoginViewModel(
@@ -81,11 +84,18 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.passwordManagerService = passwordManagerService;
             this.apiErrorHandlingService = apiErrorHandlingService;
 
+            SignupCommand = new MvxAsyncCommand(signup);
             GoogleLoginCommand = new MvxCommand(googleLogin);
             ForgotPasswordCommand = new MvxCommand(forgotPassword);
             LoginCommand = new MvxCommand(login, () => LoginEnabled);
             TogglePasswordVisibilityCommand = new MvxCommand(togglePasswordVisibility);
             StartPasswordManagerCommand = new MvxAsyncCommand(startPasswordManager, () => IsPasswordManagerAvailable);
+        }
+
+        public override void Prepare(CredentialsParameter parameter)
+        {
+            Email = parameter.Email;
+            Password = parameter.Password;
         }
 
         private void login()
@@ -188,6 +198,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .LoginWithGoogle()
                 .Do(_ => analyticsService.TrackLoginEvent(AuthenticationMethod.Google))
                 .Subscribe(onDataSource, onError, onCompleted);
+        }
+
+        private Task signup()
+        {
+            var parameter = CredentialsParameter.With(Email, Password);
+            return navigationService.Navigate<SignupViewModel, CredentialsParameter>(parameter);
         }
     }
 }

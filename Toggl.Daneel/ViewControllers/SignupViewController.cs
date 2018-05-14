@@ -1,6 +1,4 @@
-﻿using CoreGraphics;
-using Foundation;
-using MvvmCross.Binding;
+﻿using MvvmCross.Binding;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
 using MvvmCross.iOS.Views;
@@ -12,16 +10,17 @@ using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
+using static Toggl.Daneel.Extensions.LoginSignupViewExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
     [MvxRootPresentation(WrapInNavigationController = true)]
-    public sealed partial class LoginViewController : MvxViewController<NewLoginViewModel>
+    public sealed partial class SignupViewController : MvxViewController<SignupViewModel>
     {
         private const int iPhoneSeScreenHeight = 568;
+        private const int topConstraintForBiggerScreens = 70;
 
-        public LoginViewController() 
-            : base(nameof(LoginViewController), null)
+        public SignupViewController() : base(nameof(SignupViewController), null)
         {
         }
 
@@ -29,50 +28,45 @@ namespace Toggl.Daneel.ViewControllers
         {
             base.ViewDidLoad();
 
-            var loginButtonColorConverter = new BoolToConstantValueConverter<UIColor>(UIColor.White, UIColor.Black);
-            var loginButtonTitleConverter = new BoolToConstantValueConverter<string>("", Resources.LoginTitle);
-            var invertedBoolConverter = new BoolToConstantValueConverter<bool>(false, true);
+            var signupButtonTitleConverter = new BoolToConstantValueConverter<string>("", Resources.SignUpTitle);
 
-            var bindingSet = this.CreateBindingSet<LoginViewController, NewLoginViewModel>();
+            var bindingSet = this.CreateBindingSet<SignupViewController, SignupViewModel>();
 
             //Text
-            bindingSet.Bind(ErrorLabel).To(vm => vm.ErrorMessage);
+            bindingSet.Bind(ErrorLabel).To(vm => vm.ErrorText);
             bindingSet.Bind(EmailTextField)
                       .To(vm => vm.Email)
                       .WithConversion(new EmailToStringValueConverter());
-            
+
             bindingSet.Bind(PasswordTextField)
                       .To(vm => vm.Password)
                       .WithConversion(new PasswordToStringValueConverter());
-            
-            bindingSet.Bind(LoginButton)
+
+            bindingSet.Bind(SignupButton)
                       .For(v => v.BindAnimatedTitle())
                       .To(vm => vm.IsLoading)
-                      .WithConversion(loginButtonTitleConverter);
+                      .WithConversion(signupButtonTitleConverter);
+
+            bindingSet.Bind(SelectCountryButton)
+                      .For(v => v.BindTitle())
+                      .To(vm => vm.Country.Name);
 
             //Commands
-            bindingSet.Bind(LoginButton).To(vm => vm.LoginCommand);
-            bindingSet.Bind(GoogleLoginButton).To(vm => vm.GoogleLoginCommand);
-            bindingSet.Bind(ForgotPasswordButton).To(vm => vm.ForgotPasswordCommand);
-            bindingSet.Bind(PasswordManagerButton).To(vm => vm.StartPasswordManagerCommand);
+            bindingSet.Bind(SignupButton).To(vm => vm.SignupCommand);
+            bindingSet.Bind(GoogleSignupButton).To(vm => vm.GoogleSignupCommand);
             bindingSet.Bind(ShowPasswordButton).To(vm => vm.TogglePasswordVisibilityCommand);
-
-            bindingSet.Bind(SignupCard)
+            bindingSet.Bind(LoginCard)
                       .For(v => v.BindTap())
-                      .To(vm => vm.SignupCommand);
+                      .To(vm => vm.LoginCommand);
 
-            //Visibilty
+            //Visibility
             bindingSet.Bind(ErrorLabel)
                       .For(v => v.BindAnimatedVisibility())
                       .To(vm => vm.HasError);
 
             bindingSet.Bind(ActivityIndicator)
-                     .For(v => v.BindVisibilityWithFade())
-                     .To(vm => vm.IsLoading);
-
-            bindingSet.Bind(PasswordManagerButton)
-                      .For(v => v.BindVisible())
-                      .To(vm => vm.IsPasswordManagerAvailable);
+                      .For(v => v.BindVisibilityWithFade())
+                      .To(vm => vm.IsLoading);
 
             bindingSet.Bind(PasswordTextField)
                       .For(v => v.BindSecureTextEntry())
@@ -86,12 +80,7 @@ namespace Toggl.Daneel.ViewControllers
                       .For(v => v.BindFirstResponder())
                       .To(vm => vm.IsShowPasswordButtonVisible)
                       .Mode(MvxBindingMode.OneWayToSource);
-            //Color
-            bindingSet.Bind(LoginButton)
-                      .For(v => v.TintColor)
-                      .To(vm => vm.HasError)
-                      .WithConversion(loginButtonColorConverter);
-
+            
             bindingSet.Apply();
 
             prepareViews();
@@ -102,10 +91,10 @@ namespace Toggl.Daneel.ViewControllers
             base.ViewDidLayoutSubviews();
 
             if (View.Frame.Height > iPhoneSeScreenHeight)
-                TopConstraint.Constant = 132;
+                TopConstraint.Constant = topConstraintForBiggerScreens;
 
-            SignupCard.SetupBottomCard();
-            GoogleLoginButton.SetupGoogleButton();
+            LoginCard.SetupBottomCard();
+            GoogleSignupButton.SetupGoogleButton();
         }
 
         private void prepareViews()
@@ -113,7 +102,7 @@ namespace Toggl.Daneel.ViewControllers
             ActivityIndicator.Alpha = 0;
             ActivityIndicator.StartAnimation();
 
-            LoginButton.SetTitleColor(
+            SignupButton.SetTitleColor(
                 Color.Login.DisabledButtonColor.ToNativeColor(),
                 UIControlState.Disabled
             );
@@ -132,22 +121,11 @@ namespace Toggl.Daneel.ViewControllers
             PasswordTextField.ResignFirstResponder();
 
             ShowPasswordButton.SetupShowPasswordButton();
-            prepareForgotPasswordButton();
-        }
 
-        private void prepareForgotPasswordButton()
-        {
-            var normalFont = UIFont.SystemFontOfSize(12, UIFontWeight.Regular);
-            var boldFont = UIFont.SystemFontOfSize(12, UIFontWeight.Medium);
-            var color = Color.Login.ForgotPassword.ToNativeColor();
-            var text = new NSMutableAttributedString(
-                Resources.LoginForgotPassword, foregroundColor: color);
-            var boldText = new NSAttributedString(
-                Resources.LoginGetHelpLoggingIn,
-                foregroundColor: color,
-                font: boldFont);
-            text.Append(boldText);
-            ForgotPasswordButton.SetAttributedTitle(text, UIControlState.Normal);
+            SelectCountryButton.SemanticContentAttribute = UISemanticContentAttribute.ForceRightToLeft;
+            var spacing = 4;
+            SelectCountryButton.ImageEdgeInsets = new UIEdgeInsets(0, spacing, 0, 0);
+            SelectCountryButton.TitleEdgeInsets = new UIEdgeInsets(0, 0, 0, spacing);
         }
     }
 }

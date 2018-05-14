@@ -43,7 +43,7 @@ of your time with reports</value>
         <value>Back</value>
     </data>
     <data name="SignUpTitle">
-        <value>Sign up</value>
+        <value>Sign up for free</value>
     </data>
     <data name="LoginForgotPassword">
         <value>Forgot your password? </value>
@@ -362,5 +362,8 @@ account is not set up</value>
     </data>
     <data name="SignUpCountryRequired">
         <value>Please select your country.</value>
+    </data>
+    <data name="TermsOfServiceDialogMessage">
+        <value>By tapping I Agree, you understand and agree to Toggl’s Terms of Service and Privacy Policy.</value>
     </data>
 </root>
