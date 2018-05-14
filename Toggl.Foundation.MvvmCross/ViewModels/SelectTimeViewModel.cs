@@ -168,9 +168,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxCommand ToggleClockCalendarModeCommand { get; }
 
-        public IMvxCommand IncreaseDuration5MinCommand { get; }
-        public IMvxCommand IncreaseDuration10MinCommand { get; }
-        public IMvxCommand IncreaseDuration30MinCommand { get; }
+        public IMvxCommand<int> IncreaseDurationCommand { get; }
 
         public IMvxCommand FocusDurationCommand { get; }
         public IMvxCommand UnfocusDurationCommand { get; }
@@ -228,9 +226,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             CancelCommand = new MvxAsyncCommand(cancel);
             SaveCommand = new MvxAsyncCommand(save);
 
-            IncreaseDuration5MinCommand = new MvxCommand(increaseDuration(5));
-            IncreaseDuration10MinCommand = new MvxCommand(increaseDuration(10));
-            IncreaseDuration30MinCommand = new MvxCommand(increaseDuration(30));
+            IncreaseDurationCommand = new MvxCommand<int>(increaseDuration);
 
             FocusDurationCommand = new MvxCommand(focusDurationCommand);
             UnfocusDurationCommand = new MvxCommand(unfocusDurationCommand);
@@ -268,9 +264,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        private Action increaseDuration(int minutes)
+        private void increaseDuration(int minutes)
         {
-            return () => EditingDuration = EditingDuration + TimeSpan.FromMinutes(minutes);
+            EditingDuration = EditingDuration + TimeSpan.FromMinutes(minutes);
         }
 
         private void focusDurationCommand()
