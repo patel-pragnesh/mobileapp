@@ -24,8 +24,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
         private IDisposable timeServiceDisposable;
-        private TimeSpan editingDuration;
         private bool isViewModelPrepared;
+        private TimeSpan? editingDuration;
 
         private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
 
@@ -204,7 +204,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public string DurationText
             => (string)durationConverter.Convert(Duration, typeof(TimeSpan), null, CultureInfo.CurrentCulture);
 
-        private TimeSpan? editingDuration = null;
         public TimeSpan EditingDuration
         {
             get => editingDuration ?? Duration;
