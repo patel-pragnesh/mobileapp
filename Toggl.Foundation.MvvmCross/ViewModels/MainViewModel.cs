@@ -239,6 +239,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTimeEntryCommand.RaiseCanExecuteChanged();
             StartTimeEntryCommand.RaiseCanExecuteChanged();
             EditTimeEntryCommand.RaiseCanExecuteChanged();
+
+            MainLogFooterViewModel.IsRunning = CurrentTimeEntryId.HasValue;
         }
 
         private void refresh()

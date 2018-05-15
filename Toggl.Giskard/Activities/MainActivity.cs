@@ -115,8 +115,6 @@ namespace Toggl.Giskard.Activities
                     .OnAnimationEnd(_ => playButton.Show())
                     .Start();
             }
-
-            ViewModel.MainLogFooterViewModel.IsRunning = visible;
         }
 
         private sealed class FabAsyncHideListener : FloatingActionButton.OnVisibilityChangedListener

@@ -27,7 +27,7 @@ namespace Toggl.Giskard.TemplateSelectors
 
         public int GetItemViewType(object forItemObject)
         {
-            if (forItemObject == null)
+            if (forItemObject is MainLogFooterViewModel)
                 return Footer;
 
             if (forItemObject is TimeEntryViewModelCollection)

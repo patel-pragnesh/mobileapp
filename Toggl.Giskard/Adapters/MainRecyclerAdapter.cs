@@ -85,7 +85,7 @@ namespace Toggl.Giskard.Adapters
                 return SuggestionsViewModel;
 
             if (viewPosition == ItemCount - 1)
-                return null;
+                return MainLogFooterViewModel;
 
             return base.GetItem(viewPosition - (ShouldShowSuggestions ? 1 : 0));
         }
