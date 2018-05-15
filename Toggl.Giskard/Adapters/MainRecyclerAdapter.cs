@@ -13,7 +13,7 @@ using Toggl.Giskard.Views;
 
 namespace Toggl.Giskard.Adapters
 {
-    public sealed class MainRecyclerAdapter 
+    public sealed class MainRecyclerAdapter
         : SegmentedRecyclerAdapter<TimeEntryViewModelCollection, TimeEntryViewModel>
     {
         public bool ShouldShowSuggestions
@@ -22,6 +22,17 @@ namespace Toggl.Giskard.Adapters
         public SuggestionsViewModel SuggestionsViewModel { get; set; }
 
         public TimeEntriesLogViewModel TimeEntriesLogViewModel { get; set; }
+
+        private bool isRunning = false;
+        public bool IsRunning
+        {
+            get => isRunning;
+            set
+            {
+                isRunning = value;
+                NotifyItemChanged(ItemCount - 1);
+            }
+        }
 
         public MainRecyclerAdapter()
         {
@@ -57,6 +68,9 @@ namespace Toggl.Giskard.Adapters
                         Click = SuggestionsViewModel.StartTimeEntryCommand
                     };
 
+                case MainTemplateSelector.Footer:
+                    return new MainRecyclerViewFooterViewHolder(inflatedView, itemBindingContext);
+
                 default:
                     return new MvxRecyclerViewHolder(inflatedView, itemBindingContext);
             }
@@ -72,6 +86,9 @@ namespace Toggl.Giskard.Adapters
                 && GetItem(position) is TimeEntryViewModel timeEntry)
             {
                 timeEntriesLogRecyclerViewHolder.CanSync = timeEntry.CanSync;
+            } else if (holder is MainRecyclerViewFooterViewHolder footer)
+            {
+                footer.IsRunning = IsRunning;
             }
         }
 
@@ -81,7 +98,7 @@ namespace Toggl.Giskard.Adapters
         {
             if (viewPosition == 0 && ShouldShowSuggestions)
                 return SuggestionsViewModel;
-            
+
             if (viewPosition == ItemCount - 1)
                 return null;
 
