@@ -28,8 +28,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .CreateFromBindingString("StartTime", start, stop)
                     .WithFormats(dateFormat, timeFormat);
             }
-
-            public SelectTimeParameters Parameters { get; protected set; }
         }
 
         public sealed class TheIncreaseDurationCommand : SelectTimeViewModelTest
