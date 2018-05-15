@@ -13,7 +13,6 @@ using MvvmCross.Droid.Views.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
-using Toggl.Giskard.Views;
 using static Toggl.Foundation.Sync.SyncProgress;
 using static Toggl.Giskard.Extensions.CircularRevealAnimation.AnimationType;
 using FoundationResources = Toggl.Foundation.Resources;
@@ -29,7 +28,6 @@ namespace Toggl.Giskard.Activities
         private const int snackbarDuration = 5000;
 
         private IDisposable disposable;
-        private MainRecyclerView mainRecyclerView;
         private View runningEntryCardFrame;
         private FloatingActionButton playButton;
         private FloatingActionButton stopButton;
@@ -48,7 +46,6 @@ namespace Toggl.Giskard.Activities
             SupportActionBar.SetDisplayShowHomeEnabled(false);
             SupportActionBar.SetDisplayShowTitleEnabled(false);
 
-            mainRecyclerView = FindViewById<MainRecyclerView>(Resource.Id.MainRecyclerView);
             runningEntryCardFrame = FindViewById(Resource.Id.MainRunningTimeEntryFrame);
             runningEntryCardFrame.Visibility = ViewStates.Invisible;
 
@@ -118,8 +115,6 @@ namespace Toggl.Giskard.Activities
                     .OnAnimationEnd(_ => playButton.Show())
                     .Start();
             }
-
-            mainRecyclerView.IsRunning = visible;
         }
 
         private sealed class FabAsyncHideListener : FloatingActionButton.OnVisibilityChangedListener

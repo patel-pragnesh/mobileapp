@@ -384,7 +384,6 @@
     <Compile Include="Views\TogglDroidTimePicker.cs" />
     <Compile Include="Bindings\ViewAlphaTargetBinding.cs" />
     <Compile Include="Bindings\ViewUpsideDownTargetBinding.cs" />
-    <Compile Include="Views\MainRecyclerViewFooterViewHolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
