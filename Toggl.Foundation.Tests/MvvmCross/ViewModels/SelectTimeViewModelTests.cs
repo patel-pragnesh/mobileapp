@@ -3,8 +3,11 @@ using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using MvvmCross.Core.ViewModels;
+using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
+using Toggl.Foundation.Helper;
+using Toggl.Multivac;
 using Xunit;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
@@ -15,6 +18,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             protected override SelectTimeViewModel CreateViewModel()
                 => new SelectTimeViewModel(NavigationService, TimeService);
+
+            protected SelectTimeParameters CreateParameter(DateTimeOffset start, DateTimeOffset? stop)
+            {
+                var dateFormat = DateFormat.FromLocalizedDateFormat("MM.DD.YYYY");
+                var timeFormat = TimeFormat.FromLocalizedTimeFormat("H:mm");
+
+                return SelectTimeParameters
+                    .CreateFromBindingString("StartTime", start, stop)
+                    .WithFormats(dateFormat, timeFormat);
+            }
+
+            public SelectTimeParameters Parameters { get; protected set; }
         }
 
         public sealed class TheIncreaseDurationCommand : SelectTimeViewModelTest
@@ -92,6 +107,164 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
         }
 
+        public sealed class TheMinStartTimeProperty : SelectTimeViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForStoppedEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now + TimeSpan.FromHours(1);
+                var parameter = CreateParameter(start, stop);
 
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MinStartTime.Should().Be(stop - Constants.MaxTimeEntryDuration);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForRunningEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var parameter = CreateParameter(start, null);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MinStartTime.Should().Be(Constants.EarliestAllowedStartTime);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ChangingStartAndStopTimeDoesNotChangeBoundaryBeforePrepareHasRun()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now.AddHours(1);
+                var nextStop = DateTimeOffset.Now.AddHours(1);
+                var oldMinStartTime = ViewModel.MinStartTime;
+
+                ViewModel.StartTime = start;
+                ViewModel.StopTime = stop;
+
+                ViewModel.MinStartTime.Should().Be(oldMinStartTime);
+            }
+        }
+
+        public sealed class TheMaxStartTimeProperty : SelectTimeViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForStoppedEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now + TimeSpan.FromHours(1);
+                var parameter = CreateParameter(start, stop);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MaxStartTime.Should().Be(stop);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForRunningEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var parameter = CreateParameter(start, null);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MaxStartTime.Should().Be(Constants.LatestAllowedStartTime);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ChangingStartAndStopTimeDoesNotChangeBoundaryBeforePrepareHasRun()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now.AddHours(1);
+                var nextStop = DateTimeOffset.Now.AddHours(1);
+                var oldMaxStartTime = ViewModel.MaxStartTime;
+
+                ViewModel.StartTime = start;
+                ViewModel.StopTime = stop;
+
+                ViewModel.MaxStartTime.Should().Be(oldMaxStartTime);
+            }
+        }
+
+        public sealed class TheMinStopTimeProperty : SelectTimeViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForStoppedEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now + TimeSpan.FromHours(1);
+                var parameter = CreateParameter(start, stop);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MinStopTime.Should().Be(start);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForRunningEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var parameter = CreateParameter(start, null);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MinStopTime.Should().Be(start);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ChangingStartAndStopTimeDoesNotChangeBoundaryBeforePrepareHasRun()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now.AddHours(1);
+                var nextStop = DateTimeOffset.Now.AddHours(1);
+                var oldMinStopTime = ViewModel.MinStopTime;
+
+                ViewModel.StartTime = start;
+                ViewModel.StopTime = stop;
+
+                ViewModel.MinStopTime.Should().Be(oldMinStopTime);
+            }
+        }
+
+        public sealed class TheMaxStopTimeProperty : SelectTimeViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForStoppedEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now + TimeSpan.FromHours(1);
+                var parameter = CreateParameter(start, stop);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MaxStopTime.Should().Be(start + Constants.MaxTimeEntryDuration);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void IsCorrectlyInitializedOnPrepareForRunningEntry()
+            {
+                var start = DateTimeOffset.Now;
+                var parameter = CreateParameter(start, null);
+
+                ViewModel.Prepare(parameter);
+
+                ViewModel.MaxStopTime.Should().Be(start + Constants.MaxTimeEntryDuration);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ChangingStartAndStopTimeDoesNotChangeBoundaryBeforePrepareHasRun()
+            {
+                var start = DateTimeOffset.Now;
+                var stop = DateTimeOffset.Now.AddHours(1);
+                var nextStop = DateTimeOffset.Now.AddHours(1);
+                var oldMaxStopTime = ViewModel.MaxStopTime;
+
+                ViewModel.StartTime = start;
+                ViewModel.StopTime = stop;
+
+                ViewModel.MaxStopTime.Should().Be(oldMaxStopTime);
+            }
+        }
     }
 }
