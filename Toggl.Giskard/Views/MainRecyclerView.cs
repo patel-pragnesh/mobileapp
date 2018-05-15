@@ -27,6 +27,12 @@ namespace Toggl.Giskard.Views
             set => MainRecyclerAdapter.TimeEntriesLogViewModel = value;
         }
 
+        public MainLogFooterViewModel MainLogFooterViewModel
+        {
+            get => MainRecyclerAdapter.MainLogFooterViewModel;
+            set => MainRecyclerAdapter.MainLogFooterViewModel = value;
+        }
+
         public MainRecyclerView(IntPtr javaReference, JniHandleOwnership transfer)
             : base(javaReference, transfer)
         {

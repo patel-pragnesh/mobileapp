@@ -91,6 +91,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public SuggestionsViewModel SuggestionsViewModel { get; }
 
+        public MainLogFooterViewModel MainLogFooterViewModel { get; }
+
         public IOnboardingStorage OnboardingStorage => onboardingStorage;
 
         public IMvxNavigationService NavigationService => navigationService;
@@ -138,6 +140,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             TimeEntriesLogViewModel = new TimeEntriesLogViewModel(timeService, dataSource, interactorFactory, onboardingStorage, navigationService);
             SuggestionsViewModel = new SuggestionsViewModel(dataSource, interactorFactory, suggestionProviders);
+            MainLogFooterViewModel = new MainLogFooterViewModel();
 
             RefreshCommand = new MvxCommand(refresh);
             OpenReportsCommand = new MvxAsyncCommand(openReports);
@@ -158,6 +161,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             await TimeEntriesLogViewModel.Initialize();
             await SuggestionsViewModel.Initialize();
+            await MainLogFooterViewModel.Initialize();
 
             var tickDisposable = timeService
                 .CurrentDateTimeObservable
@@ -169,7 +173,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .CurrentlyRunningTimeEntry
                 .Throttle(currentTimeEntryDueTime, scheduler) // avoid overwhelming the UI with frequent updates
                 .Subscribe(setRunningEntry);
-            
+
             var syncManagerDisposable = dataSource
                 .SyncManager
                 .ProgressObservable
@@ -257,7 +261,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             var parameter = IsInManualMode
                 ? StartTimeEntryParameters.ForManualMode(timeService.CurrentDateTime)
-                : StartTimeEntryParameters.ForTimerMode(timeService.CurrentDateTime); 
+                : StartTimeEntryParameters.ForTimerMode(timeService.CurrentDateTime);
             return navigationService.Navigate<StartTimeEntryViewModel, StartTimeEntryParameters>(parameter);
         }
 
