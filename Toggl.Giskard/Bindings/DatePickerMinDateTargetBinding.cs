@@ -23,7 +23,16 @@ namespace Toggl.Giskard.Bindings
 
         protected override void SetValueImpl(DatePicker target, DateTimeOffset value)
         {
-            target.MinDate = value.ToUnixTimeMilliseconds();
+            var utcValue = value.ToUniversalTime();
+            var lowerBoundary = (DateTimeOffset)utcValue.Date;
+
+            // Workaround for a DatePicker bug in which
+            // there's an early return if the year is the same
+            // and the dates are different, which is bad logic.
+            // https://stackoverflow.com/a/19722636/93770
+            target.MinDate = 0;
+
+            target.MinDate = lowerBoundary.ToUnixTimeMilliseconds();
         }
     }
 }
