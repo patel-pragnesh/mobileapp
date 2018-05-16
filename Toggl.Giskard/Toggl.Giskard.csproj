@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Xamarin.Build.Download.0.4.9\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.9\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
@@ -638,6 +638,7 @@
     <AndroidResource Include="Resources\drawable\TopShadow.xml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivity.axml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityTimeEntryCell.axml" />
+    <AndroidResource Include="Resources\layout\StartTimeEntryActivityTimeEntryWithPartialContentCell.axml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityProjectCell.axml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityTagCell.axml" />
     <AndroidResource Include="Resources\layout\StartTimeEntryActivityTaskCell.axml" />
