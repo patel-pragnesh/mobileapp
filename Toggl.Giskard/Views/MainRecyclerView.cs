@@ -26,7 +26,7 @@ namespace Toggl.Giskard.Views
             get => MainRecyclerAdapter.TimeEntriesLogViewModel;
             set => MainRecyclerAdapter.TimeEntriesLogViewModel = value;
         }
-            
+
         public bool IsTimeEntryRunning
         {
             get => MainRecyclerAdapter.IsTimeEntryRunning;
