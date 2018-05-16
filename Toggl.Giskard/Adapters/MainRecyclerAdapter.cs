@@ -26,7 +26,7 @@ namespace Toggl.Giskard.Adapters
         private bool isTimeEntryRunning;
         public bool IsTimeEntryRunning
         {
-            get => isTimeEntryRunning; 
+            get => isTimeEntryRunning;
             set
             {
                 if (isTimeEntryRunning == value)

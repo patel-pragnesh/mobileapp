@@ -18,9 +18,12 @@ namespace Toggl.Giskard.Bindings
 
         protected override void SetValueImpl(View target, int value)
         {
-            var layoutParams = target.LayoutParameters;
-            layoutParams.Height = value.DpToPixels(target.Context);
-            target.LayoutParameters = layoutParams;
+            target.Post(() =>
+            {
+                var layoutParams = target.LayoutParameters;
+                layoutParams.Height = value.DpToPixels(target.Context);
+                target.LayoutParameters = layoutParams;
+            });
         }
     }
 }
