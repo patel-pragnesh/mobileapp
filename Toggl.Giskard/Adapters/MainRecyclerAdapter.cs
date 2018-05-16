@@ -23,7 +23,19 @@ namespace Toggl.Giskard.Adapters
 
         public TimeEntriesLogViewModel TimeEntriesLogViewModel { get; set; }
 
-        public MainLogFooterViewModel MainLogFooterViewModel { get; set; }
+        private bool isTimeEntryRunning;
+        public bool IsTimeEntryRunning
+        {
+            get => isTimeEntryRunning; 
+            set
+            {
+                if (isTimeEntryRunning == value)
+                    return;
+
+                isTimeEntryRunning = value;
+                NotifyItemChanged(ItemCount - 1);
+            }
+        }
 
         public MainRecyclerAdapter()
         {
@@ -85,7 +97,7 @@ namespace Toggl.Giskard.Adapters
                 return SuggestionsViewModel;
 
             if (viewPosition == ItemCount - 1)
-                return MainLogFooterViewModel;
+                return IsTimeEntryRunning;
 
             return base.GetItem(viewPosition - (ShouldShowSuggestions ? 1 : 0));
         }

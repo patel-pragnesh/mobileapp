@@ -61,6 +61,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(SyncingProgress))]
         public bool ShowSyncIndicator => SyncingProgress == SyncProgress.Syncing;
 
+        public bool IsTimeEntryRunning => CurrentTimeEntryId.HasValue;
+
         public bool IsAddDescriptionLabelVisible =>
             string.IsNullOrEmpty(CurrentTimeEntryDescription)
             && string.IsNullOrEmpty(CurrentTimeEntryProject);
@@ -90,8 +92,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public TimeEntriesLogViewModel TimeEntriesLogViewModel { get; }
 
         public SuggestionsViewModel SuggestionsViewModel { get; }
-
-        public MainLogFooterViewModel MainLogFooterViewModel { get; }
 
         public IOnboardingStorage OnboardingStorage => onboardingStorage;
 
@@ -140,7 +140,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             TimeEntriesLogViewModel = new TimeEntriesLogViewModel(timeService, dataSource, interactorFactory, onboardingStorage, navigationService);
             SuggestionsViewModel = new SuggestionsViewModel(dataSource, interactorFactory, suggestionProviders);
-            MainLogFooterViewModel = new MainLogFooterViewModel();
 
             RefreshCommand = new MvxCommand(refresh);
             OpenReportsCommand = new MvxAsyncCommand(openReports);
@@ -161,7 +160,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             await TimeEntriesLogViewModel.Initialize();
             await SuggestionsViewModel.Initialize();
-            await MainLogFooterViewModel.Initialize();
 
             var tickDisposable = timeService
                 .CurrentDateTimeObservable
@@ -240,7 +238,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StartTimeEntryCommand.RaiseCanExecuteChanged();
             EditTimeEntryCommand.RaiseCanExecuteChanged();
 
-            MainLogFooterViewModel.IsRunning = CurrentTimeEntryId.HasValue;
+            RaisePropertyChanged(nameof(IsTimeEntryRunning));
         }
 
         private void refresh()
