@@ -79,6 +79,6 @@ namespace Toggl.Giskard.Converters
 
     public sealed class MainFooterHeightValueConverter : BoolToConstantValueConverter<int>
     {
-        public MainFooterHeightValueConverter() : base (124, 70) { }
+        public MainFooterHeightValueConverter() : base (104, 70) { }
     }
 }
