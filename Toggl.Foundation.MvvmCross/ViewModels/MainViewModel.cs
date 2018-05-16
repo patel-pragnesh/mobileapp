@@ -81,6 +81,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             && TimeEntriesLogViewModel.IsEmpty
             && !IsWelcome;
 
+        public bool IsRunning => CurrentTimeEntryId.HasValue;
+
         public int TimeEntriesCount => TimeEntriesLogViewModel.TimeEntries?.Select(section => section.Count).Sum() ?? 0;
 
         public bool IsWelcome => TimeEntriesLogViewModel.IsWelcome;
@@ -90,8 +92,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public TimeEntriesLogViewModel TimeEntriesLogViewModel { get; }
 
         public SuggestionsViewModel SuggestionsViewModel { get; }
-
-        public MainLogFooterViewModel MainLogFooterViewModel { get; }
 
         public IOnboardingStorage OnboardingStorage => onboardingStorage;
 
@@ -140,7 +140,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             TimeEntriesLogViewModel = new TimeEntriesLogViewModel(timeService, dataSource, interactorFactory, onboardingStorage, navigationService);
             SuggestionsViewModel = new SuggestionsViewModel(dataSource, interactorFactory, suggestionProviders);
-            MainLogFooterViewModel = new MainLogFooterViewModel();
 
             RefreshCommand = new MvxCommand(refresh);
             OpenReportsCommand = new MvxAsyncCommand(openReports);
@@ -161,7 +160,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             await TimeEntriesLogViewModel.Initialize();
             await SuggestionsViewModel.Initialize();
-            await MainLogFooterViewModel.Initialize();
 
             var tickDisposable = timeService
                 .CurrentDateTimeObservable
@@ -239,8 +237,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTimeEntryCommand.RaiseCanExecuteChanged();
             StartTimeEntryCommand.RaiseCanExecuteChanged();
             EditTimeEntryCommand.RaiseCanExecuteChanged();
-
-            MainLogFooterViewModel.IsRunning = CurrentTimeEntryId.HasValue;
         }
 
         private void refresh()
