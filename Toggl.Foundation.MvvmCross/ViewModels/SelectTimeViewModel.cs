@@ -304,18 +304,18 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void initializeTimeConstraints()
         {
-            MinStopTime = StartTime;
             MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
+            MinStopTime = StartTime;
 
             if (StopTime.HasValue)
             {
-                MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
                 MaxStartTime = StopTime.Value;
+                MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
             }
             else
             {
-                MinStartTime = Constants.EarliestAllowedStartTime;
                 MaxStartTime = Constants.LatestAllowedStartTime;
+                MinStartTime = Constants.EarliestAllowedStartTime;
             }
         }
 
@@ -324,8 +324,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (!isViewModelPrepared)
                 return;
 
-            MinStopTime = StartTime;
+            // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
             MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
+            MinStopTime = StartTime;
         }
 
         private void OnStopTimeChanged()
@@ -333,10 +334,20 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (!isViewModelPrepared)
                 return;
 
-            MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
-            MaxStartTime = StopTime.Value;
+            if (StopTime.HasValue)
+            {
+                // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
+                MaxStartTime = StopTime.Value;
+                MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
+            }
+            else
+            {
+                // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
+                MaxStartTime = Constants.LatestAllowedStartTime;
+                MinStartTime = Constants.EarliestAllowedStartTime;
+            }
         }
-        
+
         public override void ViewDestroy()
         {
             base.ViewDestroy();
