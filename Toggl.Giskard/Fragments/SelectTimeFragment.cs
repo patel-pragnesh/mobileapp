@@ -103,22 +103,6 @@ namespace Toggl.Giskard.Fragments
             return view;
         }
 
-        private void vibrateForError() 
-        {
-            const int duration = 250;
-
-            if (!vibrator.HasVibrator)
-                return;
-            
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                vibrator.Vibrate(VibrationEffect.CreateOneShot(duration, 10));
-            }
-            else
-            {
-                vibrator.Vibrate(duration);
-            }
-        }
 
         private void onStopTimeBeforeStartTime(EventPattern<EventArgs> onNext)
         {
