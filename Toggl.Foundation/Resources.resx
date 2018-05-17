@@ -39,7 +39,7 @@ of your time with reports</value>
     <data name="LoginNextButton">
         <value>Next</value>
     </data>
-    <data name="LoginBackButton">
+    <data name="Back">
         <value>Back</value>
     </data>
     <data name="SignUpTitle">
@@ -362,6 +362,9 @@ account is not set up</value>
     </data>
     <data name="SignUpCountryRequired">
         <value>Please select your country.</value>
+    </data>
+    <data name="GetPasswordResetLink">
+        <value>Get password reset link</value>
     </data>
     <data name="TermsOfServiceDialogMessage">
         <value>By tapping I Agree, you understand and agree to Toggl’s Terms of Service and Privacy Policy.</value>

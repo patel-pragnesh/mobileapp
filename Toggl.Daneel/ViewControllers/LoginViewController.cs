@@ -108,11 +108,16 @@ namespace Toggl.Daneel.ViewControllers
             GoogleLoginButton.SetupGoogleButton();
         }
 
-        private void prepareViews()
+        public override void ViewDidAppear(bool animated)
         {
+            base.ViewDidAppear(animated);
+
             ActivityIndicator.Alpha = 0;
             ActivityIndicator.StartAnimation();
+        }
 
+        private void prepareViews()
+        {
             LoginButton.SetTitleColor(
                 Color.Login.DisabledButtonColor.ToNativeColor(),
                 UIControlState.Disabled

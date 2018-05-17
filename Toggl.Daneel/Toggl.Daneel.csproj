@@ -482,6 +482,14 @@
     <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\passwordman.png" />
     <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\passwordman%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icOnePassword.imageset\passwordman%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\confirmation.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\confirmation.imageset\confirmation.png" />
+    <ImageAsset Include="Resources\Images.xcassets\confirmation.imageset\confirmation%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\confirmation.imageset\confirmation%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icBackNoPadding.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\icBackNoPadding.imageset\icBack.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icBackNoPadding.imageset\icBack%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icBackNoPadding.imageset\icBack%403x.png" />
     <ImageAsset Include="Resources\Images.xcassets\paws.imageset\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\paws.imageset\paws.png" />
     <ImageAsset Include="Resources\Images.xcassets\paws.imageset\paws%402x.png" />
@@ -546,6 +554,7 @@
     <InterfaceDefinition Include="Views\Settings\LicensesViewCell.xib" />
     <InterfaceDefinition Include="Views\Log\TimeEntriesEmptyLogView.xib" />
     <InterfaceDefinition Include="Views\Log\TimeEntryMockView.xib" />
+    <InterfaceDefinition Include="ViewControllers\ForgotPasswordViewController.xib" />
     <InterfaceDefinition Include="ViewControllers\SignupViewController.xib" />
     <InterfaceDefinition Include="ViewControllers\TermsOfServiceViewController.xib" />
   </ItemGroup>
@@ -909,6 +918,10 @@
     <Compile Include="Views\LoginTextField.cs" />
     <Compile Include="Binding\ButtonAnimatedTitleTargetBinding.cs" />
     <Compile Include="Binding\LoginTextFieldFirstResponderTargetBinding.cs" />
+    <Compile Include="ViewControllers\ForgotPasswordViewController.cs" />
+    <Compile Include="ViewControllers\ForgotPasswordViewController.designer.cs">
+      <DependentUpon>ForgotPasswordViewController.cs</DependentUpon>
+    </Compile>
     <Compile Include="ViewControllers\SignupViewController.cs" />
     <Compile Include="ViewControllers\SignupViewController.designer.cs">
       <DependentUpon>SignupViewController.cs</DependentUpon>
@@ -982,6 +995,8 @@
     <Folder Include="Resources\Images.xcassets\bike.imageset\" />
     <Folder Include="Resources\Images.xcassets\togglLogoBig.imageset\" />
     <Folder Include="Resources\Images.xcassets\icGoogleColored.imageset\" />
+    <Folder Include="Resources\Images.xcassets\confirmation.imageset\" />
+    <Folder Include="Resources\Images.xcassets\icBackNoPadding.imageset\" />
     <Folder Include="Resources\Images.xcassets\paws.imageset\" />
     <Folder Include="Resources\Images.xcassets\icBackNoPadding.imageset\" />
   </ItemGroup>
