@@ -43,6 +43,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public TimeFormat TimeFormat { get; set; }
 
+        private bool stopTimeEntryRequested;
+
         [DependsOn(nameof(CurrentDateTime))]
         public DateTimeOffset? StopTime { get; set; }
 
@@ -104,6 +106,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
             set
             {
+                if (!StopTime.HasValue && !stopTimeEntryRequested)
+                    return;
+
                 var startDateYear = StopTime?.Year;
                 var startDateMonth = StopTime?.Month;
                 var startDateDay = StopTime?.Day;
@@ -138,6 +143,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
             set
             {
+                if (!StopTime.HasValue && !stopTimeEntryRequested)
+                    return;
+
                 var stopTimeHours = StopTime?.TimeOfDay.Hours;
                 var stopTimeMinutes = StopTime?.TimeOfDay.Minutes;
 
@@ -290,6 +298,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void stopTimeEntry()
         {
+            stopTimeEntryRequested = true;
             StopTime = CurrentDateTime;
         }
 
