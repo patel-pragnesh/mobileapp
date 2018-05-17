@@ -6,8 +6,6 @@ using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation.Helper;
-using Toggl.Foundation.MvvmCross.Combiners;
-using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
 
@@ -26,8 +24,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private IDisposable timeServiceDisposable;
         private bool isViewModelPrepared;
         private TimeSpan? editingDuration;
-
-        private readonly TimeSpanToDurationValueConverter durationConverter = new TimeSpanToDurationValueConverter();
 
         public DateTimeOffset MinStartTime { get; set; }
 
@@ -199,10 +195,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(StartTime), nameof(StopTime))]
         public TimeSpan Duration
             => (StopTime ?? CurrentDateTime) - StartTime;
-
-        [DependsOn(nameof(Duration))]
-        public string DurationText
-            => (string)durationConverter.Convert(Duration, typeof(TimeSpan), null, CultureInfo.CurrentCulture);
 
         public TimeSpan EditingDuration
         {
