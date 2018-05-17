@@ -45,5 +45,11 @@ namespace Toggl.Foundation.Interactors
         IInteractor<IObservable<bool>> IsBillableAvailableForWorkspace(long workspaceId);
 
         #endregion
+
+        #region Sync
+
+        IInteractor<IObservable<IEnumerable<SyncFailureItem>>> GetItemsThatFailedToSync();
+
+        #endregion
     }
 }

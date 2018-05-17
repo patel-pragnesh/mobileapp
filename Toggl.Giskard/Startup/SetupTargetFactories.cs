@@ -76,6 +76,11 @@ namespace Toggl.Giskard
             );
 
             registry.RegisterCustomBindingFactory<View>(
+                ViewHeightTargetBinding.BindingName,
+                view => new ViewHeightTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<View>(
                 ViewMarginTargetBinding.BindingName,
                 view => new ViewMarginTargetBinding(view)
             );

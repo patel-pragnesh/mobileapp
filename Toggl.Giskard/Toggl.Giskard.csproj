@@ -384,6 +384,7 @@
     <Compile Include="Views\TogglDroidTimePicker.cs" />
     <Compile Include="Bindings\ViewAlphaTargetBinding.cs" />
     <Compile Include="Bindings\ViewUpsideDownTargetBinding.cs" />
+    <Compile Include="Bindings\ViewHeightTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMinDateTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMaxExclusiveDateTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMaxInclusiveDateTargetBinding.cs" />
@@ -700,6 +701,7 @@
     <AndroidResource Include="Resources\drawable-xhdpi\date_light.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\date_light.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\date_light.png" />
+    <AndroidResource Include="Resources\drawable\TagRoundedRectangle.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">
