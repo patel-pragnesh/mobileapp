@@ -209,22 +209,6 @@ private TemporaryFileTransformation GetAndroidGoogleLoginTransformation()
     };
 }
 
-private TemporaryFileTransformation GetDroidCrashConfigurationTransformation()
-{
-    const string path = "Toggl.Giskard/Startup/SplashScreen.cs";
-    var appCenterId = EnvironmentVariable("TOGGL_APP_CENTER_ID_DROID");
-
-    var filePath = GetFiles(path).Single();
-    var file = TransformTextFile(filePath).ToString();
-
-    return new TemporaryFileTransformation
-    { 
-        Path = path, 
-        Original = file,
-        Temporary = file.Replace("{TOGGL_APP_CENTER_ID_DROID}", appCenterId)
-    };
-}
-
 private TemporaryFileTransformation GetIosInfoConfigurationTransformation()
 {
     const string path = "Toggl.Daneel/Info.plist";
@@ -301,12 +285,12 @@ private TemporaryFileTransformation GetAndroidManifestTransformation()
     };
 }
 
-private TemporaryFileTransformation GetAndroidMainActivityTransformation()
+private TemporaryFileTransformation GetAndroidSplashScreenTransformation()
 {
     const string path = "Toggl.Giskard/Startup/SplashScreen.cs";
     const string appNameToReplace = "Toggl for Devs";
+    var appCenterId = EnvironmentVariable("TOGGL_APP_CENTER_ID_DROID");
 
-    var commitCount = GetCommitCount();
     var appName = appNameToReplace;
 
     if (target == "Build.Release.Android.AdHoc")
@@ -326,6 +310,7 @@ private TemporaryFileTransformation GetAndroidMainActivityTransformation()
         Path = path, 
         Original = file,
         Temporary = file.Replace(appNameToReplace, appName)
+                        .Replace("{TOGGL_APP_CENTER_ID_DROID}", appCenterId)
     };
 }
 
@@ -348,13 +333,12 @@ var transformations = new List<TemporaryFileTransformation>
 {
     GetIosInfoConfigurationTransformation(),
     GetIosCrashConfigurationTransformation(),
-    GetDroidCrashConfigurationTransformation(),
     GetIntegrationTestsConfigurationTransformation(),
     GetIosAnalyticsServicesConfigurationTransformation(),
     GetAndroidProjectConfigurationTransformation(),
     GetAndroidGoogleServicesTransformation(),
     GetAndroidGoogleLoginTransformation(),
-    GetAndroidMainActivityTransformation(),
+    GetAndroidSplashScreenTransformation(),
     GetAndroidManifestTransformation()
 };
 
