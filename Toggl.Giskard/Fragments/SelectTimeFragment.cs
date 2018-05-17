@@ -103,7 +103,6 @@ namespace Toggl.Giskard.Fragments
             return view;
         }
 
-
         private void onStopTimeBeforeStartTime(EventPattern<EventArgs> onNext)
         {
             if (stopToast != null)
@@ -111,7 +110,6 @@ namespace Toggl.Giskard.Fragments
             
             stopToast = Toast.MakeText(Context, "Stop time must be after Start time!", ToastLength.Short);
             stopToast.Show();
-            vibrateForError();
         }
 
         private void onStartTimeAfterStopTime(EventPattern<EventArgs> onNext)
