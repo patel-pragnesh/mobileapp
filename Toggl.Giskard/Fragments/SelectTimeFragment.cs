@@ -22,6 +22,8 @@ using Toggl.Multivac.Extensions;
 namespace Toggl.Giskard.Fragments
 {
     using System.Collections.Generic;
+    using System.Reactive;
+    using System.Reactive.Linq;
     using MvvmCross.Binding.BindingContext;
     using static SelectTimeFragment.EditorMode;
     using static SelectTimeViewModel;
@@ -42,10 +44,15 @@ namespace Toggl.Giskard.Fragments
         private EditorMode editorMode = Date;
 
         private IDisposable onModeChangedDisposable;
+        private IDisposable onStartTimeResetDisposable;
+        private IDisposable onStopTimeResetDisposable;
 
         private LinearLayout controlButtons;
         private TabLayout tabLayout;
         private ViewPager pager;
+
+        private Toast startToast;
+        private Toast stopToast;
 
         public SelectTimeFragment()
         {
@@ -72,6 +79,12 @@ namespace Toggl.Giskard.Fragments
             onModeChangedDisposable =
                 ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.IsCalendarView), onIsCalendarViewChanged);
 
+            onStartTimeResetDisposable = Observable.FromEventPattern<EventArgs>(ViewModel, nameof(ViewModel.StartTimeAfterStopTime))
+                                                   .Subscribe(onStartTimeAfterStopTime);
+
+            onStopTimeResetDisposable = Observable.FromEventPattern<EventArgs>(ViewModel, nameof(ViewModel.StopTimeBeforeStartTime))
+                                                  .Subscribe(onStopTimeBeforeStartTime);
+
             var startPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStartTimeTabHeader, null);
             var stopPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStopTimeTabHeader, null);
             var durationPageView = this.BindingInflate(Resource.Layout.SelectDateTimeDurationTabHeader, null);
@@ -88,6 +101,42 @@ namespace Toggl.Giskard.Fragments
             });
 
             return view;
+        }
+
+        private void vibrateForError() 
+        {
+            const int duration = 250;
+
+            if (!vibrator.HasVibrator)
+                return;
+            
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                vibrator.Vibrate(VibrationEffect.CreateOneShot(duration, 10));
+            }
+            else
+            {
+                vibrator.Vibrate(duration);
+            }
+        }
+
+        private void onStopTimeBeforeStartTime(EventPattern<EventArgs> onNext)
+        {
+            if (stopToast != null)
+                stopToast.Cancel();
+            
+            stopToast = Toast.MakeText(Context, "Stop time must be after Start time!", ToastLength.Short);
+            stopToast.Show();
+            vibrateForError();
+        }
+
+        private void onStartTimeAfterStopTime(EventPattern<EventArgs> onNext)
+        {
+            if (startToast != null)
+                startToast.Cancel();
+            
+            startToast = Toast.MakeText(Context, "Start time must be before Stop time!", ToastLength.Short);
+            startToast.Show();
         }
 
         private void onIsCalendarViewChanged(object sender, PropertyChangedEventArgs args)
@@ -163,6 +212,8 @@ namespace Toggl.Giskard.Fragments
             if (disposing == false) return;
 
             onModeChangedDisposable.Dispose();
+            onStartTimeResetDisposable?.Dispose();
+            onStopTimeResetDisposable?.Dispose();
         }
     }
 }

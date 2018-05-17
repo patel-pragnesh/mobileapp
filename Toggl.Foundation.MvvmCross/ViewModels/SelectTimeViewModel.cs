@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
+using MvvmCross.Platform.Core;
 using PropertyChanged;
 using Toggl.Foundation.Helper;
 using Toggl.Foundation.MvvmCross.Parameters;
@@ -49,6 +50,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public DateTimeOffset? StopTime { get; set; }
 
         public DateTimeOffset StopTimeOrCurrent => StopTime ?? CurrentDateTime;
+
+        public event EventHandler StopTimeBeforeStartTime;
+        public event EventHandler StartTimeAfterStopTime;
 
         [DependsOn(nameof(StartTime))]
         public DateTime StartDatePart
@@ -324,6 +328,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (!isViewModelPrepared)
                 return;
 
+            if (StopTime.HasValue && StopTime < StartTime)
+            {
+                StartTime = StopTime.Value;
+                StartTimeAfterStopTime.Raise(this);
+            }
+
             // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
             MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
             MinStopTime = StartTime;
@@ -336,6 +346,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             if (StopTime.HasValue)
             {
+                if (StopTime < StartTime)
+                {
+                    StopTime = StartTime;
+                    StopTimeBeforeStartTime.Raise(this);
+                }
+
                 // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
                 MaxStartTime = StopTime.Value;
                 MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
