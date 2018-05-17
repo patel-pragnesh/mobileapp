@@ -7,7 +7,7 @@ using Android.Support.Design.Widget;
 using Android.Support.V4.View;
 
 namespace Toggl.Giskard
-{
+{ 
     public partial class Setup
     {
         protected override void FillTargetFactories(IMvxTargetBindingFactoryRegistry registry)
@@ -31,8 +31,13 @@ namespace Toggl.Giskard
             );
 
             registry.RegisterCustomBindingFactory<DatePicker>(
-                DatePickerMaxDateTargetBinding.BindingName,
-                view => new DatePickerMaxDateTargetBinding(view)
+                DatePickerMaxExclusiveDateTargetBinding.BindingName,
+                view => new DatePickerMaxExclusiveDateTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<DatePicker>(
+                DatePickerMaxInclusiveDateTargetBinding.BindingName,
+                view => new DatePickerMaxInclusiveDateTargetBinding(view)
             );
 
             registry.RegisterCustomBindingFactory<DatePicker>(

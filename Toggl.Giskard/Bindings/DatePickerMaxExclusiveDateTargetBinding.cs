@@ -1,21 +1,15 @@
 ﻿using System;
-using Android.Graphics.Drawables;
-using Android.Views;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Droid.Target;
-using Toggl.Giskard.Extensions;
-using MvvmCross.Plugins.Color.Droid;
-using MvvmCross.Platform.UI;
-using Android.Graphics;
 using Android.Widget;
 
 namespace Toggl.Giskard.Bindings
 {
-    public sealed class DatePickerMaxDateTargetBinding : MvxAndroidTargetBinding<DatePicker, DateTimeOffset>
+    public sealed class DatePickerMaxExclusiveDateTargetBinding : MvxAndroidTargetBinding<DatePicker, DateTimeOffset>
     {
-        public const string BindingName = "MaxDate";
+        public const string BindingName = "MaxExclusiveDate";
 
-        public DatePickerMaxDateTargetBinding(DatePicker target) : base(target)
+        public DatePickerMaxExclusiveDateTargetBinding(DatePicker target) : base(target)
         {
         }
 
@@ -23,8 +17,8 @@ namespace Toggl.Giskard.Bindings
 
         protected override void SetValueImpl(DatePicker target, DateTimeOffset value)
         {
-            var utcValue = value.ToLocalTime();
-            var upperBoundary = (DateTimeOffset)utcValue.Date.AddDays(1);
+            var utcValue = value.ToUniversalTime();
+            var upperBoundary = (DateTimeOffset)utcValue.Date;
             var nextYear = utcValue.AddYears(1);
 
             target.Post(() =>
