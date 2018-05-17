@@ -27,13 +27,16 @@ namespace Toggl.Giskard.Bindings
             var upperBoundary = (DateTimeOffset)utcValue.Date.AddDays(1);
             var nextYear = utcValue.AddYears(1);
 
-            // Workaround for a DatePicker bug in which
-            // there's an early return if the year is the same
-            // and the dates are different, which is bad logic.
-            // https://stackoverflow.com/a/19722636/93770
-            target.MaxDate = nextYear.ToUnixTimeMilliseconds();
+            target.Post(() =>
+            {
+                // Workaround for a DatePicker bug in which
+                // there's an early return if the year is the same
+                // and the dates are different, which is bad logic.
+                // https://stackoverflow.com/a/19722636/93770
+                target.MaxDate = nextYear.ToUnixTimeMilliseconds();
 
-            target.MaxDate = upperBoundary.ToUnixTimeMilliseconds();
+                target.MaxDate = upperBoundary.ToUnixTimeMilliseconds();
+            });
         }
     }
 }
