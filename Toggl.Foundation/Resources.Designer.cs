@@ -731,6 +731,12 @@ namespace Toggl.Foundation {
             }
         }
         
+        public static string CountriesJson {
+            get {
+                return ResourceManager.GetString("CountriesJson", resourceCulture);
+            }
+        }
+        
         public static string GetPasswordResetLink {
             get {
                 return ResourceManager.GetString("GetPasswordResetLink", resourceCulture);

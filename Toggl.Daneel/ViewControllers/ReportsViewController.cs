@@ -123,8 +123,6 @@ namespace Toggl.Daneel.ViewControllers
 
         private void prepareViews()
         {
-            TopConstraint.AdaptForIos10(NavigationController.NavigationBar);
-
             // Title view
             NavigationItem.TitleView = titleButton = new UIButton(new CGRect(0, 0, 200, 40));
             titleButton.Font = UIFont.SystemFontOfSize(14, UIFontWeight.Medium);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Toggl.Foundation.Models;
 using Toggl.Foundation.Suggestions;
 using Toggl.PrimeRadiant.Models;
+using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Interactors
 {
@@ -46,6 +47,12 @@ namespace Toggl.Foundation.Interactors
 
         #endregion
 
+        #region Country
+
+        IInteractor<IObservable<List<ICountry>>> GetAllCountries();
+
+        #endregion
+        
         #region Sync
 
         IInteractor<IObservable<IEnumerable<SyncFailureItem>>> GetItemsThatFailedToSync();

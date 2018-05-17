@@ -50,5 +50,7 @@
   <ItemGroup>
     <Folder Include="Analytics\" />
     <Folder Include="Interactors\Sync\" />
+    <Folder Include="Interactors\Country\" />
+    <Folder Include="Serialization\" />
   </ItemGroup>
 </Project>

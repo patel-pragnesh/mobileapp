@@ -554,6 +554,8 @@
     <InterfaceDefinition Include="Views\Settings\LicensesViewCell.xib" />
     <InterfaceDefinition Include="Views\Log\TimeEntriesEmptyLogView.xib" />
     <InterfaceDefinition Include="Views\Log\TimeEntryMockView.xib" />
+    <InterfaceDefinition Include="ViewControllers\SelectCountryViewController.xib" />
+    <InterfaceDefinition Include="Views\CountrySelection\CountryViewCell.xib" />
     <InterfaceDefinition Include="ViewControllers\ForgotPasswordViewController.xib" />
     <InterfaceDefinition Include="ViewControllers\SignupViewController.xib" />
     <InterfaceDefinition Include="ViewControllers\TermsOfServiceViewController.xib" />
@@ -915,6 +917,15 @@
     <Compile Include="Onboarding\MainView\SwipeRightOnboardingStep.cs" />
     <Compile Include="Onboarding\EditView\CategorizeTimeUsingProjectsOnboardingStep.cs" />
     <Compile Include="Extensions\TimeEntriesLogViewCellExtensions.cs" />
+    <Compile Include="ViewControllers\SelectCountryViewController.cs" />
+    <Compile Include="ViewControllers\SelectCountryViewController.designer.cs">
+      <DependentUpon>SelectCountryViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSources\CountryTableViewSource.cs" />
+    <Compile Include="Views\CountrySelection\CountryViewCell.cs" />
+    <Compile Include="Views\CountrySelection\CountryViewCell.designer.cs">
+      <DependentUpon>CountryViewCell.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\LoginTextField.cs" />
     <Compile Include="Binding\ButtonAnimatedTitleTargetBinding.cs" />
     <Compile Include="Binding\LoginTextFieldFirstResponderTargetBinding.cs" />
@@ -992,6 +1003,7 @@
     <Folder Include="Onboarding\StartTimeEntryView\" />
     <Folder Include="Onboarding\CreationView\" />
     <Folder Include="Onboarding\EditView\" />
+    <Folder Include="Views\CountrySelection\" />
     <Folder Include="Resources\Images.xcassets\bike.imageset\" />
     <Folder Include="Resources\Images.xcassets\togglLogoBig.imageset\" />
     <Folder Include="Resources\Images.xcassets\icGoogleColored.imageset\" />
