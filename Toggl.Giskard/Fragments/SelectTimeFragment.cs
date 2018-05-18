@@ -44,15 +44,13 @@ namespace Toggl.Giskard.Fragments
         private EditorMode editorMode = Date;
 
         private IDisposable onModeChangedDisposable;
-        private IDisposable onStartTimeResetDisposable;
-        private IDisposable onStopTimeResetDisposable;
+        private IDisposable onTemporalInconsistencyDisposable;
 
         private LinearLayout controlButtons;
         private TabLayout tabLayout;
         private ViewPager pager;
 
-        private Toast startToast;
-        private Toast stopToast;
+        private Toast toast;
 
         public SelectTimeFragment()
         {
@@ -79,16 +77,13 @@ namespace Toggl.Giskard.Fragments
             onModeChangedDisposable =
                 ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.IsCalendarView), onIsCalendarViewChanged);
 
-            onStartTimeResetDisposable = Observable.FromEventPattern<EventArgs>(ViewModel, nameof(ViewModel.StartTimeAfterStopTime))
-                                                   .Subscribe(onStartTimeAfterStopTime);
-
-            onStopTimeResetDisposable = Observable.FromEventPattern<EventArgs>(ViewModel, nameof(ViewModel.StopTimeBeforeStartTime))
-                                                  .Subscribe(onStopTimeBeforeStartTime);
+            onTemporalInconsistencyDisposable = Observable.FromEventPattern<TemporalInconsistency>(ViewModel, nameof(ViewModel.TemporalInconsistencyDetected))
+                                                          .Subscribe(onTemporalInconsistency);
 
             var startPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStartTimeTabHeader, null);
             var stopPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStopTimeTabHeader, null);
             var durationPageView = this.BindingInflate(Resource.Layout.SelectDateTimeDurationTabHeader, null);
-            
+
             tabLayout.Post(() =>
             {
                 tabLayout.SetupWithViewPager(pager, true);
@@ -103,22 +98,23 @@ namespace Toggl.Giskard.Fragments
             return view;
         }
 
-        private void onStopTimeBeforeStartTime(EventPattern<EventArgs> onNext)
+        private Dictionary<TemporalInconsistency, int> inconsistencyMessages = new Dictionary<TemporalInconsistency, int>
         {
-            if (stopToast != null)
-                stopToast.Cancel();
-            
-            stopToast = Toast.MakeText(Context, "Stop time must be after Start time!", ToastLength.Short);
-            stopToast.Show();
-        }
+            [TemporalInconsistency.StartTimeAfterStopTime] = Resource.String.StartTimeAfterStopTimeWarning,
+            [TemporalInconsistency.StopTimeBeforeStartTime] = Resource.String.StopTimeBeforeStartTimeWarning,
+            [TemporalInconsistency.DurationTooLong] = Resource.String.DurationTooLong
+        };
 
-        private void onStartTimeAfterStopTime(EventPattern<EventArgs> onNext)
+        private void onTemporalInconsistency(EventPattern<TemporalInconsistency> onNext)
         {
-            if (startToast != null)
-                startToast.Cancel();
-            
-            startToast = Toast.MakeText(Context, "Start time must be before Stop time!", ToastLength.Short);
-            startToast.Show();
+            if (toast != null)
+                toast.Cancel();
+
+            var messageResourceId = inconsistencyMessages[onNext.EventArgs];
+            var message = Resources.GetString(messageResourceId);
+
+            toast = Toast.MakeText(Context, message, ToastLength.Short);
+            toast.Show();
         }
 
         private void onIsCalendarViewChanged(object sender, PropertyChangedEventArgs args)
@@ -194,8 +190,7 @@ namespace Toggl.Giskard.Fragments
             if (disposing == false) return;
 
             onModeChangedDisposable.Dispose();
-            onStartTimeResetDisposable?.Dispose();
-            onStopTimeResetDisposable?.Dispose();
+            onTemporalInconsistencyDisposable?.Dispose();
         }
     }
 }
