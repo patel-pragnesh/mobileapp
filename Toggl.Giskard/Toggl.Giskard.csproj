@@ -388,6 +388,7 @@
     <Compile Include="Bindings\DatePickerMinDateTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMaxExclusiveDateTargetBinding.cs" />
     <Compile Include="Bindings\DatePickerMaxInclusiveDateTargetBinding.cs" />
+    <Compile Include="Helper\VibratorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

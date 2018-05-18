@@ -25,6 +25,7 @@ namespace Toggl.Giskard.Fragments
     using System.Reactive;
     using System.Reactive.Linq;
     using MvvmCross.Binding.BindingContext;
+    using Toggl.Giskard.Helper;
     using static SelectTimeFragment.EditorMode;
     using static SelectTimeViewModel;
 
@@ -40,6 +41,7 @@ namespace Toggl.Giskard.Fragments
         }
 
         private readonly int[] heights = { 450, 400, 224, 204 };
+        private const int vibrationDuration = 250;
 
         private EditorMode editorMode = Date;
 
@@ -53,6 +55,7 @@ namespace Toggl.Giskard.Fragments
 
         private Toast startToast;
         private Toast stopToast;
+        private Vibrator vibrator;
 
         public SelectTimeFragment()
         {
@@ -65,6 +68,8 @@ namespace Toggl.Giskard.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            vibrator = (Vibrator)Context.GetSystemService(Context.VibratorService);
+
             base.OnCreateView(inflater, container, savedInstanceState);
             var view = this.BindingInflate(Resource.Layout.SelectTimeFragment, null);
 
@@ -88,7 +93,7 @@ namespace Toggl.Giskard.Fragments
             var startPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStartTimeTabHeader, null);
             var stopPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStopTimeTabHeader, null);
             var durationPageView = this.BindingInflate(Resource.Layout.SelectDateTimeDurationTabHeader, null);
-            
+
             tabLayout.Post(() =>
             {
                 tabLayout.SetupWithViewPager(pager, true);
@@ -110,6 +115,7 @@ namespace Toggl.Giskard.Fragments
             
             stopToast = Toast.MakeText(Context, "Stop time must be after Start time!", ToastLength.Short);
             stopToast.Show();
+            vibrator.ActivateVibration(vibrationDuration);
         }
 
         private void onStartTimeAfterStopTime(EventPattern<EventArgs> onNext)
@@ -119,6 +125,7 @@ namespace Toggl.Giskard.Fragments
             
             startToast = Toast.MakeText(Context, "Start time must be before Stop time!", ToastLength.Short);
             startToast.Show();
+            vibrator.ActivateVibration(vibrationDuration);
         }
 
         private void onIsCalendarViewChanged(object sender, PropertyChangedEventArgs args)
