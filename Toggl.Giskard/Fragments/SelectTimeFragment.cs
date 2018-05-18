@@ -27,6 +27,7 @@ namespace Toggl.Giskard.Fragments
     using MvvmCross.Binding.BindingContext;
     using static SelectTimeFragment.EditorMode;
     using static SelectTimeViewModel;
+    using static SelectTimeViewModel.TemporalInconsistency;
 
     [MvxDialogFragmentPresentation(AddToBackStack = true)]
     public sealed class SelectTimeFragment : MvxDialogFragment<SelectTimeViewModel>, TabLayout.IOnTabSelectedListener
@@ -100,9 +101,9 @@ namespace Toggl.Giskard.Fragments
 
         private Dictionary<TemporalInconsistency, int> inconsistencyMessages = new Dictionary<TemporalInconsistency, int>
         {
-            [TemporalInconsistency.StartTimeAfterStopTime] = Resource.String.StartTimeAfterStopTimeWarning,
-            [TemporalInconsistency.StopTimeBeforeStartTime] = Resource.String.StopTimeBeforeStartTimeWarning,
-            [TemporalInconsistency.DurationTooLong] = Resource.String.DurationTooLong
+            [StartTimeAfterStopTime] = Resource.String.StartTimeAfterStopTimeWarning,
+            [StopTimeBeforeStartTime] = Resource.String.StopTimeBeforeStartTimeWarning,
+            [DurationTooLong] = Resource.String.DurationTooLong
         };
 
         private void onTemporalInconsistency(EventPattern<TemporalInconsistency> onNext)

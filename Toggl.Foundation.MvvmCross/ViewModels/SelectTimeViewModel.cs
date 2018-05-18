@@ -12,6 +12,8 @@ using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
+    using static SelectTimeViewModel.TemporalInconsistency;
+
     [Preserve(AllMembers = true)]
     public sealed class SelectTimeViewModel
         : MvxViewModel<SelectTimeParameters, SelectTimeResultsParameters>
@@ -339,13 +341,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 if (StopTime < StartTime)
                 {
                     StartTime = StopTime.Value;
-                    TemporalInconsistencyDetected?.Invoke(this, TemporalInconsistency.StartTimeAfterStopTime);
+                    TemporalInconsistencyDetected?.Invoke(this, StartTimeAfterStopTime);
                 }
 
                 if (StopTime.Value - StartTime > Constants.MaxTimeEntryDuration)
                 {
                     StartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
-                    TemporalInconsistencyDetected?.Invoke(this, TemporalInconsistency.DurationTooLong);
+                    TemporalInconsistencyDetected?.Invoke(this, DurationTooLong);
                 }
             }
 
@@ -364,13 +366,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 if (StopTime < StartTime)
                 {
                     StopTime = StartTime;
-                    TemporalInconsistencyDetected?.Invoke(this, TemporalInconsistency.StopTimeBeforeStartTime);
+                    TemporalInconsistencyDetected?.Invoke(this, StopTimeBeforeStartTime);
                 }
 
                 if (StopTime.Value - StartTime > Constants.MaxTimeEntryDuration)
                 {
                     StopTime = StartTime + Constants.MaxTimeEntryDuration;
-                    TemporalInconsistencyDetected?.Invoke(this, TemporalInconsistency.DurationTooLong);
+                    TemporalInconsistencyDetected?.Invoke(this, DurationTooLong);
                 }
 
                 // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
