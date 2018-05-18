@@ -12,6 +12,7 @@ using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
+    using System.Reactive.Subjects;
     using static SelectTimeViewModel.TemporalInconsistency;
 
     [Preserve(AllMembers = true)]
@@ -28,6 +29,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StopTimeBeforeStartTime,
             DurationTooLong
         }
+
+        private readonly ISubject<TemporalInconsistency> temporalInconsistencySubject = new Subject<TemporalInconsistency>();
 
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
@@ -60,7 +63,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public DateTimeOffset StopTimeOrCurrent => StopTime ?? CurrentDateTime;
 
-        public event EventHandler<TemporalInconsistency> TemporalInconsistencyDetected;
+        public IObservable<TemporalInconsistency> TemporalInconsistencyDetected
+            => temporalInconsistencySubject.AsObservable();
 
         [DependsOn(nameof(StartTime))]
         public DateTime StartDatePart
@@ -341,13 +345,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 if (StopTime < StartTime)
                 {
                     StartTime = StopTime.Value;
-                    TemporalInconsistencyDetected?.Invoke(this, StartTimeAfterStopTime);
+                    temporalInconsistencySubject.OnNext(StartTimeAfterStopTime);
                 }
 
                 if (StopTime.Value - StartTime > Constants.MaxTimeEntryDuration)
                 {
                     StartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
-                    TemporalInconsistencyDetected?.Invoke(this, DurationTooLong);
+                    temporalInconsistencySubject.OnNext(DurationTooLong);
                 }
             }
 
@@ -366,13 +370,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 if (StopTime < StartTime)
                 {
                     StopTime = StartTime;
-                    TemporalInconsistencyDetected?.Invoke(this, StopTimeBeforeStartTime);
+                    temporalInconsistencySubject.OnNext(StopTimeBeforeStartTime);
                 }
 
                 if (StopTime.Value - StartTime > Constants.MaxTimeEntryDuration)
                 {
                     StopTime = StartTime + Constants.MaxTimeEntryDuration;
-                    TemporalInconsistencyDetected?.Invoke(this, DurationTooLong);
+                    temporalInconsistencySubject.OnNext(DurationTooLong);
                 }
 
                 // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime

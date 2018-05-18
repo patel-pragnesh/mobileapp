@@ -78,8 +78,8 @@ namespace Toggl.Giskard.Fragments
             onModeChangedDisposable =
                 ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.IsCalendarView), onIsCalendarViewChanged);
 
-            onTemporalInconsistencyDisposable = Observable.FromEventPattern<TemporalInconsistency>(ViewModel, nameof(ViewModel.TemporalInconsistencyDetected))
-                                                          .Subscribe(onTemporalInconsistency);
+            onTemporalInconsistencyDisposable = ViewModel.TemporalInconsistencyDetected
+                                                         .Subscribe(onTemporalInconsistency);
 
             var startPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStartTimeTabHeader, null);
             var stopPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStopTimeTabHeader, null);
@@ -106,12 +106,12 @@ namespace Toggl.Giskard.Fragments
             [DurationTooLong] = Resource.String.DurationTooLong
         };
 
-        private void onTemporalInconsistency(EventPattern<TemporalInconsistency> onNext)
+        private void onTemporalInconsistency(TemporalInconsistency temporalInconsistency)
         {
             if (toast != null)
                 toast.Cancel();
 
-            var messageResourceId = inconsistencyMessages[onNext.EventArgs];
+            var messageResourceId = inconsistencyMessages[temporalInconsistency];
             var message = Resources.GetString(messageResourceId);
 
             toast = Toast.MakeText(Context, message, ToastLength.Short);
