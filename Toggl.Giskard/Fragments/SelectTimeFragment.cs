@@ -28,6 +28,7 @@ namespace Toggl.Giskard.Fragments
     using Toggl.Giskard.Helper;
     using static SelectTimeFragment.EditorMode;
     using static SelectTimeViewModel;
+    using static SelectTimeViewModel.TemporalInconsistency;
 
     [MvxDialogFragmentPresentation(AddToBackStack = true)]
     public sealed class SelectTimeFragment : MvxDialogFragment<SelectTimeViewModel>, TabLayout.IOnTabSelectedListener
@@ -46,15 +47,13 @@ namespace Toggl.Giskard.Fragments
         private EditorMode editorMode = Date;
 
         private IDisposable onModeChangedDisposable;
-        private IDisposable onStartTimeResetDisposable;
-        private IDisposable onStopTimeResetDisposable;
+        private IDisposable onTemporalInconsistencyDisposable;
 
         private LinearLayout controlButtons;
         private TabLayout tabLayout;
         private ViewPager pager;
 
-        private Toast startToast;
-        private Toast stopToast;
+        private Toast toast;
         private Vibrator vibrator;
 
         public SelectTimeFragment()
@@ -84,11 +83,8 @@ namespace Toggl.Giskard.Fragments
             onModeChangedDisposable =
                 ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.IsCalendarView), onIsCalendarViewChanged);
 
-            onStartTimeResetDisposable = Observable.FromEventPattern<EventArgs>(ViewModel, nameof(ViewModel.StartTimeAfterStopTime))
-                                                   .Subscribe(onStartTimeAfterStopTime);
-
-            onStopTimeResetDisposable = Observable.FromEventPattern<EventArgs>(ViewModel, nameof(ViewModel.StopTimeBeforeStartTime))
-                                                  .Subscribe(onStopTimeBeforeStartTime);
+            onTemporalInconsistencyDisposable = ViewModel.TemporalInconsistencyDetected
+                                                         .Subscribe(onTemporalInconsistency);
 
             var startPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStartTimeTabHeader, null);
             var stopPageView = this.BindingInflate(Resource.Layout.SelectDateTimeStopTimeTabHeader, null);
@@ -108,24 +104,23 @@ namespace Toggl.Giskard.Fragments
             return view;
         }
 
-        private void onStopTimeBeforeStartTime(EventPattern<EventArgs> onNext)
+        private Dictionary<TemporalInconsistency, int> inconsistencyMessages = new Dictionary<TemporalInconsistency, int>
         {
-            if (stopToast != null)
-                stopToast.Cancel();
-            
-            stopToast = Toast.MakeText(Context, "Stop time must be after Start time!", ToastLength.Short);
-            stopToast.Show();
-            vibrator.ActivateVibration(vibrationDuration);
-        }
+            [StartTimeAfterStopTime] = Resource.String.StartTimeAfterStopTimeWarning,
+            [StopTimeBeforeStartTime] = Resource.String.StopTimeBeforeStartTimeWarning,
+            [DurationTooLong] = Resource.String.DurationTooLong
+        };
 
-        private void onStartTimeAfterStopTime(EventPattern<EventArgs> onNext)
+        private void onTemporalInconsistency(TemporalInconsistency temporalInconsistency)
         {
-            if (startToast != null)
-                startToast.Cancel();
-            
-            startToast = Toast.MakeText(Context, "Start time must be before Stop time!", ToastLength.Short);
-            startToast.Show();
-            vibrator.ActivateVibration(vibrationDuration);
+            if (toast != null)
+                toast.Cancel();
+
+            var messageResourceId = inconsistencyMessages[temporalInconsistency];
+            var message = Resources.GetString(messageResourceId);
+
+            toast = Toast.MakeText(Context, message, ToastLength.Short);
+            toast.Show();
         }
 
         private void onIsCalendarViewChanged(object sender, PropertyChangedEventArgs args)
@@ -201,8 +196,7 @@ namespace Toggl.Giskard.Fragments
             if (disposing == false) return;
 
             onModeChangedDisposable.Dispose();
-            onStartTimeResetDisposable?.Dispose();
-            onStopTimeResetDisposable?.Dispose();
+            onTemporalInconsistencyDisposable?.Dispose();
         }
     }
 }

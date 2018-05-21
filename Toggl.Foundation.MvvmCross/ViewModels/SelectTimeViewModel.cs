@@ -12,6 +12,9 @@ using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
+    using System.Reactive.Subjects;
+    using static SelectTimeViewModel.TemporalInconsistency;
+
     [Preserve(AllMembers = true)]
     public sealed class SelectTimeViewModel
         : MvxViewModel<SelectTimeParameters, SelectTimeResultsParameters>
@@ -19,6 +22,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public const int StartTimeTab = 0;
         public const int StopTimeTab = 1;
         public const int DurationTab = 2;
+
+        public enum TemporalInconsistency
+        {
+            StartTimeAfterStopTime,
+            StopTimeBeforeStartTime,
+            DurationTooLong
+        }
+
+        private readonly ISubject<TemporalInconsistency> temporalInconsistencySubject = new Subject<TemporalInconsistency>();
 
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
@@ -47,8 +59,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public DateTimeOffset StopTimeOrCurrent => StopTime ?? CurrentDateTime;
 
-        public event EventHandler StopTimeBeforeStartTime;
-        public event EventHandler StartTimeAfterStopTime;
+        public IObservable<TemporalInconsistency> TemporalInconsistencyDetected
+            => temporalInconsistencySubject.AsObservable();
 
         [DependsOn(nameof(StartTime))]
         public DateTime StartDatePart
@@ -327,10 +339,19 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (!isViewModelPrepared)
                 return;
 
-            if (StopTime.HasValue && StopTime < StartTime)
+            if (StopTime.HasValue)
             {
-                StartTime = StopTime.Value;
-                StartTimeAfterStopTime.Raise(this);
+                if (StopTime < StartTime)
+                {
+                    StartTime = StopTime.Value;
+                    temporalInconsistencySubject.OnNext(StartTimeAfterStopTime);
+                }
+
+                if (StopTime.Value - StartTime > Constants.MaxTimeEntryDuration)
+                {
+                    StartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
+                    temporalInconsistencySubject.OnNext(DurationTooLong);
+                }
             }
 
             StopTimeBoundaries = new DateTimeOffsetRange(
@@ -348,7 +369,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 if (StopTime < StartTime)
                 {
                     StopTime = StartTime;
-                    StopTimeBeforeStartTime.Raise(this);
+                    temporalInconsistencySubject.OnNext(StopTimeBeforeStartTime);
+                }
+
+                if (StopTime.Value - StartTime > Constants.MaxTimeEntryDuration)
+                {
+                    StopTime = StartTime + Constants.MaxTimeEntryDuration;
+                    temporalInconsistencySubject.OnNext(DurationTooLong);
                 }
 
                 StartTimeBoundaries = new DateTimeOffsetRange(
