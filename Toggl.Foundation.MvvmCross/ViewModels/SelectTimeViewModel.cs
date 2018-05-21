@@ -58,8 +58,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public DateTimeOffset StopTimeOrCurrent => StopTime ?? CurrentDateTime;
 
-        public IObservable<TemporalInconsistency> TemporalInconsistencyDetected
-            => temporalInconsistencySubject.AsObservable();
+        public IObservable<TemporalInconsistency> TemporalInconsistencyDetected { get; }
 
         [DependsOn(nameof(StartTime))]
         public DateTime StartDatePart
@@ -242,6 +241,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
+
+            TemporalInconsistencyDetected = temporalInconsistencySubject.AsObservable();
 
             this.navigationService = navigationService;
             this.timeService = timeService;
