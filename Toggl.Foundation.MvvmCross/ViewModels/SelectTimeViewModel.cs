@@ -9,12 +9,11 @@ using PropertyChanged;
 using Toggl.Foundation.Helper;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
+using System.Reactive.Subjects;
+using static Toggl.Foundation.MvvmCross.ViewModels.SelectTimeViewModel.TemporalInconsistency;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
-    using System.Reactive.Subjects;
-    using static SelectTimeViewModel.TemporalInconsistency;
-
     [Preserve(AllMembers = true)]
     public sealed class SelectTimeViewModel
         : MvxViewModel<SelectTimeParameters, SelectTimeResultsParameters>
