@@ -143,7 +143,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var start = DateTimeOffset.Now;
                 var stop = DateTimeOffset.Now.AddHours(1);
-                var nextStop = DateTimeOffset.Now.AddHours(1);
                 var oldBoundaries = ViewModel.StartTimeBoundaries;
 
                 ViewModel.StartTime = start;
@@ -185,7 +184,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var start = DateTimeOffset.Now;
                 var stop = DateTimeOffset.Now.AddHours(1);
-                var nextStop = DateTimeOffset.Now.AddHours(1);
                 var oldBoundaries = ViewModel.StopTimeBoundaries;
 
                 ViewModel.StartTime = start;
