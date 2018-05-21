@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Toggl.Foundation.Interactors
 {
-    internal class GetAllCountriesInteractor : IInteractor<IObservable<List<ICountry>>>
+    public class GetAllCountriesInteractor : IInteractor<IObservable<List<ICountry>>>
     {
         [Preserve(AllMembers = true)]
         private sealed partial class Country : ICountry

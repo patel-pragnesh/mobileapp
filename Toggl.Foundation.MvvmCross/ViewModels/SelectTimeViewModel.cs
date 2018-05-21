@@ -26,13 +26,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private bool isViewModelPrepared;
         private TimeSpan? editingDuration;
 
-        public DateTimeOffset MinStartTime { get; set; }
+        public DateTimeOffsetRange StartTimeBoundaries { get; set; }
 
-        public DateTimeOffset MaxStartTime { get; set; }
-
-        public DateTimeOffset MinStopTime { get; set; }
-
-        public DateTimeOffset MaxStopTime { get; set; }
+        public DateTimeOffsetRange StopTimeBoundaries { get; set; }
 
         public DateTimeOffset CurrentDateTime { get; set; }
 
@@ -308,18 +304,21 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void initializeTimeConstraints()
         {
-            MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
-            MinStopTime = StartTime;
+            StopTimeBoundaries = new DateTimeOffsetRange(
+                StartTime,
+                StartTime + Constants.MaxTimeEntryDuration);
 
             if (StopTime.HasValue)
             {
-                MaxStartTime = StopTime.Value;
-                MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
+                StartTimeBoundaries = new DateTimeOffsetRange(
+                    StopTime.Value - Constants.MaxTimeEntryDuration,
+                    StopTime.Value);
             }
             else
             {
-                MaxStartTime = Constants.LatestAllowedStartTime;
-                MinStartTime = Constants.EarliestAllowedStartTime;
+                StartTimeBoundaries = new DateTimeOffsetRange(
+                    Constants.EarliestAllowedStartTime,
+                    Constants.LatestAllowedStartTime);
             }
         }
 
@@ -334,9 +333,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 StartTimeAfterStopTime.Raise(this);
             }
 
-            // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
-            MaxStopTime = StartTime + Constants.MaxTimeEntryDuration;
-            MinStopTime = StartTime;
+            StopTimeBoundaries = new DateTimeOffsetRange(
+                StartTime,
+                StartTime + Constants.MaxTimeEntryDuration);
         }
 
         private void OnStopTimeChanged()
@@ -352,15 +351,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     StopTimeBeforeStartTime.Raise(this);
                 }
 
-                // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
-                MaxStartTime = StopTime.Value;
-                MinStartTime = StopTime.Value - Constants.MaxTimeEntryDuration;
+                StartTimeBoundaries = new DateTimeOffsetRange(
+                    StopTime.Value - Constants.MaxTimeEntryDuration,
+                    StopTime.Value);
             }
             else
             {
-                // Because of the bug in datepicker, MaxStopTime must be set before MinStopTime
-                MaxStartTime = Constants.LatestAllowedStartTime;
-                MinStartTime = Constants.EarliestAllowedStartTime;
+                StartTimeBoundaries = new DateTimeOffsetRange(
+                    Constants.EarliestAllowedStartTime,
+                    Constants.LatestAllowedStartTime);
             }
         }
 

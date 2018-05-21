@@ -19,7 +19,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     public sealed class SelectCountryViewModel : MvxViewModel<SelectCountryParameter, SelectCountryParameter>
     {
         private readonly IMvxNavigationService navigationService;
-        private readonly IInteractorFactory interactorFactory;
 
         private List<ICountry> allCountries;
         private string selectedCountryCode;
@@ -33,12 +32,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public string Text { get; set; } = "";
 
-        public SelectCountryViewModel(IInteractorFactory interactorFactory, IMvxNavigationService navigationService)
+        public SelectCountryViewModel(IMvxNavigationService navigationService)
         {
-            Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
 
-            this.interactorFactory = interactorFactory;
             this.navigationService = navigationService;
 
             CloseCommand = new MvxAsyncCommand(close);
@@ -49,7 +46,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            allCountries = await interactorFactory.GetAllCountries().Execute();
+            allCountries = await new GetAllCountriesInteractor().Execute();
          
             var selectedElement = allCountries.Find(c => c.CountryCode == selectedCountryCode);
             if (selectedElement != null)

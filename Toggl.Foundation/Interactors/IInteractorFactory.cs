@@ -47,12 +47,6 @@ namespace Toggl.Foundation.Interactors
 
         #endregion
 
-        #region Country
-
-        IInteractor<IObservable<List<ICountry>>> GetAllCountries();
-
-        #endregion
-        
         #region Sync
 
         IInteractor<IObservable<IEnumerable<SyncFailureItem>>> GetItemsThatFailedToSync();
