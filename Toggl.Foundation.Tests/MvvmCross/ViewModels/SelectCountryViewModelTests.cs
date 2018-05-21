@@ -24,7 +24,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 = SelectCountryParameter.With("", "");
 
             protected override SelectCountryViewModel CreateViewModel()
-                => new SelectCountryViewModel(InteractorFactory, NavigationService);
+                => new SelectCountryViewModel(NavigationService);
 
             protected List<ICountry> GenerateCountriesList() =>
                 Enumerable.Range(1, 10).Select(i =>
@@ -39,15 +39,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheConstructor : SelectCountryViewModelTest
         {
-            [Theory, LogIfTooSlow]
-            [ClassData(typeof(TwoParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useInteractorFactory, bool useNavigationService)
+            [Fact, LogIfTooSlow]
+            public void ThrowsIfTheArgumentIsNull()
             {
-                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
-                var navigationService = useNavigationService ? NavigationService : null;
-
                 Action tryingToConstructWithEmptyParameters =
-                    () => new SelectCountryViewModel(interactorFactory, navigationService);
+                    () => new SelectCountryViewModel(null);
 
                 tryingToConstructWithEmptyParameters
                     .ShouldThrow<ArgumentNullException>();
@@ -60,35 +56,22 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public async Task AddsAllCountriesToTheListOfSuggestions()
             {
                 var countries = GenerateCountriesList();
-
-                InteractorFactory.GetAllCountries()
-                    .Execute()
-                    .Returns(Observable.Return(countries));
                 
                 ViewModel.Prepare(Parameters);
 
                 await ViewModel.Initialize();
 
-                ViewModel.Suggestions.Should().HaveCount(10);
+                ViewModel.Suggestions.Should().HaveCount(250);
             }
 
             [Theory, LogIfTooSlow]
-            [InlineData("1")]
-            [InlineData("2")]
-            [InlineData("3")]
-            [InlineData("4")]
-            [InlineData("5")]
-            [InlineData("6")]
-            [InlineData("7")]
-            [InlineData("8")]
-            [InlineData("9")]
+            [InlineData("AL")]
+            [InlineData("GR")]
+            [InlineData("EE")]
             public async Task SetsTheAppropriateCountryAsTheCurrentlySelectedOne(string code)
             {
                 var parameter = SelectCountryParameter.With(code, "");
-                var countries = GenerateCountriesList();
-                InteractorFactory.GetAllCountries()
-                    .Execute()
-                    .Returns(Observable.Return(countries));
+
                 ViewModel.Prepare(parameter);
 
                 await ViewModel.Initialize();
@@ -99,14 +82,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheSelectCountryCommand : SelectCountryViewModelTest
         {
-            private const string countryCode = "AL";
-
             public TheSelectCountryCommand()
             {
-                var countries = GenerateCountriesList();
-                InteractorFactory.GetAllCountries()
-                    .Execute()
-                    .Returns(Observable.Return(countries));
                 ViewModel.Prepare(Parameters);
             }
 
@@ -115,8 +92,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var country = Substitute.For<ICountry>();
                 country.Id.Returns(1);
-                country.Name.Returns(countryCode);
-                country.CountryCode.Returns(countryCode);
+                country.Name.Returns("Greece");
+                country.CountryCode.Returns("GR");
 
                 await ViewModel.Initialize();
 
@@ -134,14 +111,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task FiltersTheSuggestionsWhenItChanges()
             {
-                var countries = GenerateCountriesList();
-                InteractorFactory.GetAllCountries()
-                    .Execute()
-                    .Returns(Observable.Return(countries));
                 ViewModel.Prepare(Parameters);
                 await ViewModel.Initialize();
 
-                ViewModel.Text = "2";
+                ViewModel.Text = "Greece";
 
                 ViewModel.Suggestions.Should().HaveCount(1);
             }

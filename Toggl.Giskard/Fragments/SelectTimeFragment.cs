@@ -25,6 +25,7 @@ namespace Toggl.Giskard.Fragments
     using System.Reactive;
     using System.Reactive.Linq;
     using MvvmCross.Binding.BindingContext;
+    using Toggl.Giskard.Helper;
     using static SelectTimeFragment.EditorMode;
     using static SelectTimeViewModel;
     using static SelectTimeViewModel.TemporalInconsistency;
@@ -41,6 +42,7 @@ namespace Toggl.Giskard.Fragments
         }
 
         private readonly int[] heights = { 450, 400, 224, 204 };
+        private const int vibrationDuration = 250;
 
         private EditorMode editorMode = Date;
 
@@ -52,6 +54,7 @@ namespace Toggl.Giskard.Fragments
         private ViewPager pager;
 
         private Toast toast;
+        private Vibrator vibrator;
 
         public SelectTimeFragment()
         {
@@ -64,6 +67,8 @@ namespace Toggl.Giskard.Fragments
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
+            vibrator = (Vibrator)Context.GetSystemService(Context.VibratorService);
+
             base.OnCreateView(inflater, container, savedInstanceState);
             var view = this.BindingInflate(Resource.Layout.SelectTimeFragment, null);
 
