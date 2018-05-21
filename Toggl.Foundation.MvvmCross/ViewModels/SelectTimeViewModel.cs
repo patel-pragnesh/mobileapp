@@ -63,10 +63,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(StartTime))]
         public DateTime StartDatePart
         {
-            get
-            {
-                return StartTime.Date;
-            }
+            get => StartTime.Date;
             set
             {
                 var newYear = value.Year;
@@ -87,10 +84,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(StartTime))]
         public TimeSpan StartTimePart
         {
-            get
-            {
-                return StartTime.TimeOfDay;
-            }
+            get => StartTime.TimeOfDay;
             set
             {
                 var newTimeHours = value.Hours;
@@ -110,10 +104,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(StopTime))]
         public DateTime StopDatePart
         {
-            get
-            {
-                return StopTime?.Date ?? default(DateTime);
-            }
+            get => StopTime?.Date ?? default(DateTime);
             set
             {
                 if (!StopTime.HasValue && !stopTimeEntryRequested)
@@ -147,10 +138,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         [DependsOn(nameof(StopTime))]
         public TimeSpan StopTimePart
         {
-            get
-            {
-                return StopTime?.TimeOfDay ?? default(TimeSpan);
-            }
+            get => StopTime?.TimeOfDay ?? default(TimeSpan);
             set
             {
                 if (!StopTime.HasValue && !stopTimeEntryRequested)
