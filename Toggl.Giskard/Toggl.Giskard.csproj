@@ -385,9 +385,7 @@
     <Compile Include="Bindings\ViewAlphaTargetBinding.cs" />
     <Compile Include="Bindings\ViewUpsideDownTargetBinding.cs" />
     <Compile Include="Bindings\ViewHeightTargetBinding.cs" />
-    <Compile Include="Bindings\DatePickerMinDateTargetBinding.cs" />
-    <Compile Include="Bindings\DatePickerMaxExclusiveDateTargetBinding.cs" />
-    <Compile Include="Bindings\DatePickerMaxInclusiveDateTargetBinding.cs" />
+    <Compile Include="Bindings\DatePickerBoundariesTargetBinding.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
