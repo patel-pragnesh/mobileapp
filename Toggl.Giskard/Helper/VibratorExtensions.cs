@@ -13,7 +13,7 @@ namespace Toggl.Giskard.Helper
 
             try
             {
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+                if (OreoApis.AreAvailable)
                     vibrator.Vibrate(VibrationEffect.CreateOneShot(duration, 10));
                 else
                     vibrator.Vibrate(duration);
