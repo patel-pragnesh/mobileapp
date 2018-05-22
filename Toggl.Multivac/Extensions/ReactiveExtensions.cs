@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Toggl.Multivac.Extensions
 {
-    public static class ObservableExtensions
+    public static class ReactiveExtensions
     {
         private class Observer<T> : IObserver<T>
         {
@@ -37,6 +40,12 @@ namespace Toggl.Multivac.Extensions
             return observable.Subscribe(observer);
         }
 
+        public static IDisposable Subscribe(this IObservable<Unit> observable, Action onNext)
+            => observable.Subscribe(_ => onNext());
+
+        public static IDisposable Subscribe(this IObservable<Unit> observable, Func<Task> onNext)
+            => observable.Subscribe(async _ => await onNext());
+
         public static IObservable<T> ConnectedReplay<T>(this IObservable<T> observable)
         {
             var replayed = observable.Replay();
@@ -48,5 +57,10 @@ namespace Toggl.Multivac.Extensions
             => observable.SelectMany(value => predicate(value)
                 ? Observable.Return(value).Delay(delay)
                 : Observable.Return(value));
+
+        public static void DisposedBy(this IDisposable disposable, CompositeDisposable disposeBag)
+        {
+            disposeBag.Add(disposable);
+        }
     }
 }
