@@ -387,6 +387,7 @@
     <Compile Include="Bindings\ViewHeightTargetBinding.cs" />
     <Compile Include="Helper\VibratorExtensions.cs" />
     <Compile Include="Bindings\DatePickerBoundariesTargetBinding.cs" />
+    <Compile Include="Activities\NonBindingAppCompatActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
