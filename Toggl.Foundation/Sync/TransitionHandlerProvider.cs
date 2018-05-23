@@ -1,30 +1,29 @@
-using System;
 using System.Collections.Generic;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.Sync
 {
-    public sealed class TransitionHandlerProvider : ITransitionHandlerProvider
+    public sealed class TransitionHandlerProvider : ITransitionHandlerProvider, ITransitionConfigurator
     {
         private readonly Dictionary<IStateResult, TransitionHandler> transitionHandlers
             = new Dictionary<IStateResult, TransitionHandler>();
-        
-        public void ConfigureTransition(IStateResult result, Func<IObservable<ITransition>> stateFactory)
+
+        public void ConfigureTransition(IStateResult result, ISyncState state)
         {
             Ensure.Argument.IsNotNull(result, nameof(result));
-            Ensure.Argument.IsNotNull(stateFactory, nameof(stateFactory));
+            Ensure.Argument.IsNotNull(state, nameof(state));
 
-            transitionHandlers.Add(result, _ => stateFactory());
+            transitionHandlers.Add(result, _ => state.Start());
         }
 
-        public void ConfigureTransition<T>(StateResult<T> result, Func<T, IObservable<ITransition>> stateFactory)
+        public void ConfigureTransition<T>(StateResult<T> result, ISyncState<T> state)
         {
             Ensure.Argument.IsNotNull(result, nameof(result));
-            Ensure.Argument.IsNotNull(stateFactory, nameof(stateFactory));
+            Ensure.Argument.IsNotNull(state, nameof(state));
 
             transitionHandlers.Add(
                 result,
-                t => stateFactory(((Transition<T>)t).Parameter)
+                t => state.Start(((Transition<T>)t).Parameter)
             );
         }
 

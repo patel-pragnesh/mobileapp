@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 
 namespace Toggl.Foundation.Sync.States
 {
-    internal sealed class ResetAPIDelayState
+    internal sealed class ResetAPIDelayState : ISyncState
     {
         public StateResult Continue { get; } = new StateResult();
 

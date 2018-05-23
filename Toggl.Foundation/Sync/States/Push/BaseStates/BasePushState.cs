@@ -7,7 +7,7 @@ using Toggl.PrimeRadiant;
 
 namespace Toggl.Foundation.Sync.States
 {
-    internal abstract class BasePushState<TModel>
+    internal abstract class BasePushState<TModel> : ISyncState
         where TModel : class, IBaseModel, IDatabaseSyncable
     {
         private readonly IRepository<TModel> repository;
@@ -18,7 +18,7 @@ namespace Toggl.Foundation.Sync.States
         public BasePushState(IRepository<TModel> repository)
         {
             Ensure.Argument.IsNotNull(repository, nameof(repository));
-        
+
             this.repository = repository;
         }
 
@@ -42,7 +42,7 @@ namespace Toggl.Foundation.Sync.States
 
         private bool syncNeeded(TModel entity)
             => entity.SyncStatus == SyncStatus.SyncNeeded;
-            
+
         protected abstract TModel CopyFrom(TModel entity);
     }
 }

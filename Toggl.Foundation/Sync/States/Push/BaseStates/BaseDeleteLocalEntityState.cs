@@ -5,7 +5,7 @@ using Toggl.PrimeRadiant;
 
 namespace Toggl.Foundation.Sync.States
 {
-    public abstract class BaseDeleteLocalEntityState<TModel>
+    public abstract class BaseDeleteLocalEntityState<TModel> : ISyncState<TModel>
         where TModel : class
     {
         public StateResult Deleted { get; } = new StateResult();

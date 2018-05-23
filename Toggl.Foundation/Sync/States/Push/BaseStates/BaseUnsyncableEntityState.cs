@@ -6,7 +6,7 @@ using Toggl.Ultrawave.Exceptions;
 
 namespace Toggl.Foundation.Sync.States
 {
-    internal abstract class BaseUnsyncableEntityState<TModel>
+    internal abstract class BaseUnsyncableEntityState<TModel> : ISyncState<(Exception Reason, TModel Entity)>
         where TModel : IBaseModel, IDatabaseSyncable
     {
         private readonly IRepository<TModel> repository;

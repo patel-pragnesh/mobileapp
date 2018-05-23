@@ -9,7 +9,7 @@ using Toggl.Ultrawave.Exceptions;
 
 namespace Toggl.Foundation.Sync.States
 {
-    internal abstract class BasePersistState<TInterface, TDatabaseInterface>
+    internal abstract class BasePersistState<TInterface, TDatabaseInterface> : ISyncState<FetchObservables>
         where TDatabaseInterface : TInterface
     {
         private readonly IRepository<TDatabaseInterface> repository;

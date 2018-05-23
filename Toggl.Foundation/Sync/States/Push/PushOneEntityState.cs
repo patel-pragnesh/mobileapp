@@ -5,7 +5,7 @@ using Toggl.PrimeRadiant;
 
 namespace Toggl.Foundation.Sync.States
 {
-    internal sealed class PushOneEntityState<TModel>
+    internal sealed class PushOneEntityState<TModel> : ISyncState<TModel>
         where TModel : class, IBaseModel, IDatabaseSyncable
     {
         public StateResult<TModel> CreateEntity { get; } = new StateResult<TModel>();
