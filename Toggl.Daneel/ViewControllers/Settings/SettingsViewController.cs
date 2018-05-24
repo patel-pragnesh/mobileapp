@@ -1,38 +1,55 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS;
 using MvvmCross.iOS.Views;
 using MvvmCross.iOS.Views.Presenters.Attributes;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Extensions;
+using Toggl.Multivac.Extensions;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
+using Toggl.Foundation.MvvmCross.Views;
 using UIKit;
+using ReactiveUI.Events;
+using System.Reactive;
+using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Daneel.ViewControllers
 {
     [MvxChildPresentation]
-    public partial class SettingsViewController : MvxViewController<SettingsViewModel>
+    public partial class SettingsViewController : MvxViewController<SettingsViewModel>, ISettingsView
     {
-        private IDisposable willEnterForegroundNotification;
+        private CompositeDisposable disposeBag;
 
         private const int verticalSpacing = 24;
 
-        public SettingsViewController() 
+        public IObservable<Unit> EmailTappedObservable => EmailView.TappedObservable();
+
+        public IObservable<Unit> AboutTappedObservable => AboutView.TappedObservable();
+
+        public IObservable<Unit> FeedbackTappedObservable => FeedbackView.TappedObservable();
+
+        public IObservable<Unit> WorkspaceTappedObservable => WorkspaceView.TappedObservable();
+
+        public IObservable<Unit> ManualModeTappedObservable => ManualModeView.TappedObservable();
+
+        public IObservable<Unit> DateFormatTappedObservable => DateFormatView.TappedObservable();
+
+        public IObservable<Unit> LogoutButtonTappedObservable => LogoutButton.TappedObservable();
+
+        public IObservable<Unit> DurationFormatTappedObservable => DurationFormatView.TappedObservable();
+
+        public IObservable<Unit> BeginningOfWeekTappedObservable => BeginningOfWeekView.TappedObservable();
+
+        public IObservable<Unit> TwentyFourHourClockTappedObservable => TwentyFourHourClockView.TappedObservable();
+
+        public IObservable<Unit> TwentyFourHourClockSwTappedObservable => TwentyFourHourClockView.TappedObservable();
+
+        public SettingsViewController()
             : base(nameof(SettingsViewController), null)
         {
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing == false) return;
-
-            willEnterForegroundNotification?.Dispose();
-            willEnterForegroundNotification = null;
         }
 
         public override void ViewDidLoad()
@@ -49,95 +66,78 @@ namespace Toggl.Daneel.ViewControllers
 
             var bindingSet = this.CreateBindingSet<SettingsViewController, SettingsViewModel>();
 
-            // Text
-            bindingSet.Bind(EmailLabel).To(vm => vm.Email);
-            bindingSet.Bind(WorkspaceLabel).To(vm => vm.WorkspaceName);
-            bindingSet.Bind(DateFormatLabel).To(vm => vm.DateFormat.Localized);
-            bindingSet.Bind(DurationFormatLabel)
-                      .To(vm => vm.DurationFormat)
-                      .WithConversion(durationFormatToStringConverter);
-            bindingSet.Bind(BeginningOfWeekLabel).To(vm => vm.BeginningOfWeek);
-            bindingSet.Bind(VersionLabel).To(vm => vm.Version);
+            this.CreateBindings(ViewModel).DisposedBy(disposeBag);
 
-            // Commands
-            bindingSet.Bind(LogoutButton).To(vm => vm.LogoutCommand);
-            bindingSet.Bind(EmailView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.EditProfileCommand);
+            UIApplication.Notifications
+                .ObserveWillEnterForeground((sender, e) => startAnimations())
+                .DisposedBy(disposeBag);
 
-            bindingSet.Bind(DateFormatView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.SelectDateFormatCommand);
+            //// Text
+            //bindingSet.Bind(DateFormatLabel).To(vm => vm.DateFormat.Localized);
+            //bindingSet.Bind(DurationFormatLabel)
+            //          .To(vm => vm.DurationFormat)
+            //          .WithConversion(durationFormatToStringConverter);
+            //bindingSet.Bind(BeginningOfWeekLabel).To(vm => vm.BeginningOfWeek);
+            //bindingSet.Bind(VersionLabel).To(vm => vm.Version);
 
-            bindingSet.Bind(DurationFormatView)
-                      .For(verticalSpacing => verticalSpacing.BindTap())
-                      .To(vm => vm.SelectDurationFormatCommand);
 
-            bindingSet.Bind(WorkspaceView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.PickWorkspaceCommand);
+            //// Logout process
+            //bindingSet.Bind(LogoutButton)
+            //          .For(btn => btn.Enabled)
+            //          .To(vm => vm.IsLoggingOut)
+            //          .WithConversion(inverseBoolConverter);
 
-            bindingSet.Bind(ManualModeView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.ToggleManualModeCommand);
+            //bindingSet.Bind(NavigationItem)
+            //          .For(nav => nav.BindHidesBackButton())
+            //          .To(vm => vm.IsLoggingOut);
 
-            bindingSet.Bind(TwentyFourHourClockView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.ToggleUseTwentyFourHourClockCommand);
+            //bindingSet.Bind(SyncingView)
+            //          .For(view => view.BindVisibility())
+            //          .To(vm => vm.IsRunningSync)
+            //          .WithConversion(visibilityConverter);
 
-            bindingSet.Bind(TwentyFourHourClockSwitch)
-                      .For(v => v.BindValueChanged())
-                      .To(vm => vm.ToggleUseTwentyFourHourClockCommand);
+            //bindingSet.Bind(SyncedView)
+            //          .For(view => view.BindVisibility())
+            //          .To(vm => vm.IsSynced)
+            //          .WithConversion(visibilityConverter);
 
-            bindingSet.Bind(BeginningOfWeekView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.SelectBeginningOfWeekCommand);
+            //bindingSet.Bind(LoggingOutView)
+            //          .For(view => view.BindVisibility())
+            //          .To(vm => vm.IsLoggingOut)
+            //          .WithConversion(visibilityConverter);
 
-            bindingSet.Bind(FeedbackView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.SubmitFeedbackCommand);
+            //// Switches
+            //bindingSet.Bind(TwentyFourHourClockSwitch)
+            //          .For(v => v.BindAnimatedOn())
+            //          .To(vm => vm.UseTwentyFourHourClock);
 
-            bindingSet.Bind(AboutView)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.AboutCommand);
+            //bindingSet.Bind(ManualModeSwitch)
+            //          .For(v => v.BindAnimatedOn())
+            //          .To(vm => vm.IsManualModeEnabled);
 
-            // Logout process
-            bindingSet.Bind(LogoutButton)
-                      .For(btn => btn.Enabled)
-                      .To(vm => vm.IsLoggingOut)
-                      .WithConversion(inverseBoolConverter);
+            //bindingSet.Apply();
 
-            bindingSet.Bind(NavigationItem)
-                      .For(nav => nav.BindHidesBackButton())
-                      .To(vm => vm.IsLoggingOut);
+        }
 
-            bindingSet.Bind(SyncingView)
-                      .For(view => view.BindVisibility())
-                      .To(vm => vm.IsRunningSync)
-                      .WithConversion(visibilityConverter);
+        public void UserChanged(IDatabaseUser user)
+        {
+            EmailLabel.Text = user.Email.ToString();
+            WorkspaceLabel).To(vm => vm.WorkspaceName);
+        }
 
-            bindingSet.Bind(SyncedView)
-                      .For(view => view.BindVisibility())
-                      .To(vm => vm.IsSynced)
-                      .WithConversion(visibilityConverter);
+        public void LoggingOut()
+        {
+            throw new NotImplementedException();
+        }
 
-            bindingSet.Bind(LoggingOutView)
-                      .For(view => view.BindVisibility())
-                      .To(vm => vm.IsLoggingOut)
-                      .WithConversion(visibilityConverter);
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
 
-            // Switches
-            bindingSet.Bind(TwentyFourHourClockSwitch)
-                      .For(v => v.BindAnimatedOn())
-                      .To(vm => vm.UseTwentyFourHourClock);
+            if (disposing == false) return;
 
-            bindingSet.Bind(ManualModeSwitch)
-                      .For(v => v.BindAnimatedOn())
-                      .To(vm => vm.IsManualModeEnabled);
-
-            bindingSet.Apply();
-
-            willEnterForegroundNotification = UIApplication.Notifications.ObserveWillEnterForeground((sender, e) => startAnimations());
+            disposeBag?.Dispose();
+            disposeBag = null;
         }
 
         public override void ViewWillAppear(bool animated)

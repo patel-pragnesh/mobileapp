@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Toggl.Foundation.MvvmCross.Services
 {
     public interface IDialogService
     {
-        Task<bool> Confirm(
+        IObservable<bool> Confirm(
             string title,
             string message,
             string confirmButtonText,

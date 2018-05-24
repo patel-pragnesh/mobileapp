@@ -24,5 +24,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Settings\" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="App.cs" />
   </ItemGroup>
 </Project>

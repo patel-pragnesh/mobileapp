@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:local="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@color/lightGray"
     android:layout_width="match_parent"
@@ -16,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <TextView
-                local:MvxBind="Text Name"
+				android:id="@+id/SettingsNameTextView"
                 tools:text="Heidi"
                 android:textSize="15sp"
                 android:lineSpacingExtra="5sp"

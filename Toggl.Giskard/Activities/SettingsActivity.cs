@@ -1,13 +1,16 @@
 using System;
+using System.Reactive.Disposables;
 using Android.App;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V7.Widget;
-using MvvmCross.Droid.Support.V7.AppCompat;
+using Android.Widget;
+using Toggl.Multivac.Extensions;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
+using Toggl.Foundation.MvvmCross.Views;
 
 namespace Toggl.Giskard.Activities
 {
@@ -15,8 +18,12 @@ namespace Toggl.Giskard.Activities
     [Activity(Theme = "@style/AppTheme",
               ScreenOrientation = ScreenOrientation.Portrait,
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
-    public sealed class SettingsActivity : MvxAppCompatActivity<SettingsViewModel>
+    public sealed class SettingsActivity : NonBindingAppCompatActivity<SettingsViewModel>, ISettingsView
     {
+        private CompositeDisposable disposeBag;
+        private TextView settingsNameTextField;
+
+
         protected override void OnCreate(Bundle bundle)
         {
             this.ChangeStatusBarColor(Color.ParseColor("#2C2C2C"));
@@ -27,6 +34,19 @@ namespace Toggl.Giskard.Activities
             OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
 
             setupToolbar();
+
+
+            settingsNameTextField = FindViewById<TextView>(Resource.Id.SettingsNameTextView);
+
+            ViewModel
+                .CurrentUser
+                .Subscribe(user =>
+                {
+                    settingsNameTextField.
+                
+                })
+                .DisposedBy(disposeBag);
+            
         }
 
         private void setupToolbar()
