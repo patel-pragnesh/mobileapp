@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Toggl.Multivac.Extensions
 {
-    public static class Functions
+    public static class CommonFunctions
     {
         public static T Identity<T>(T t) => t;
 
@@ -15,6 +15,9 @@ namespace Toggl.Multivac.Extensions
     {
         public static TResult Apply<T, TResult>(this T self, Func<T, TResult> funcToApply)
             => funcToApply(self);
+
+        public static EventHandler<TEventArgs> AsEventHandler<TEventArgs>(this Action function)
+            => (_, __) => function();
 
         public static void ForEach<T>(this IEnumerable<T> self, Action<T> action)
         {

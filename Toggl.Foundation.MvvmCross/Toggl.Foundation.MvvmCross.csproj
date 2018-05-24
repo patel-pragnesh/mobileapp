@@ -24,5 +24,6 @@
     <PackageReference Include="Fody" Version="2.2.1" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Transformations\" />
   </ItemGroup>
 </Project>

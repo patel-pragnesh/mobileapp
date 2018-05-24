@@ -40,12 +40,6 @@ namespace Toggl.Multivac.Extensions
             return observable.Subscribe(observer);
         }
 
-        public static IDisposable Subscribe(this IObservable<Unit> observable, Action onNext)
-            => observable.Subscribe(_ => onNext());
-
-        public static IDisposable Subscribe(this IObservable<Unit> observable, Func<Task> onNext)
-            => observable.Subscribe(async _ => await onNext());
-
         public static IObservable<T> ConnectedReplay<T>(this IObservable<T> observable)
         {
             var replayed = observable.Replay();
