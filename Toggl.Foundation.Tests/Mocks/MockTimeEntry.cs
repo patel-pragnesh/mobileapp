@@ -67,5 +67,15 @@ namespace Toggl.Foundation.Tests.Mocks
         public string LastSyncErrorMessage { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public IThreadSafeTask ThreadSafeTask { get; }
+
+        public IThreadSafeUser ThreadSafeUser { get; }
+
+        public IThreadSafeProject ThreadSafeProject { get; }
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+
+        public IEnumerable<IThreadSafeTag> ThreadSafeTags { get; }
     }
 }

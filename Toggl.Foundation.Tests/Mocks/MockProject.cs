@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 
@@ -50,5 +51,11 @@ namespace Toggl.Foundation.Tests.Mocks
         public string LastSyncErrorMessage { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public IThreadSafeClient ThreadSafeClient { get; }
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+
+        public IEnumerable<IThreadSafeTask> ThreadSafeTasks { get; }
     }
 }
