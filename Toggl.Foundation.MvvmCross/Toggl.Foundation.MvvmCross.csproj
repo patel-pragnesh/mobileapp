@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj" />
     <ProjectReference Include="..\Toggl.Multivac\Toggl.Multivac.csproj" />
     <ProjectReference Include="..\Toggl.PrimeRadiant\Toggl.PrimeRadiant.csproj" />
+    <ProjectReference Include="..\Toggl.Ultrawave\Toggl.Ultrawave.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="PropertyChanged.Fody" Version="2.2.0" />
@@ -23,10 +24,5 @@
     <PackageReference Include="Fody" Version="2.2.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModels\Settings\" />
-    <Folder Include="Views\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="App.cs" />
   </ItemGroup>
 </Project>
