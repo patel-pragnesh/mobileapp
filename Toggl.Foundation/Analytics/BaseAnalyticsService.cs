@@ -43,6 +43,13 @@ namespace Toggl.Foundation.Analytics
         private const string startEntrySelectTagEventName = "StartEntrySelectTag";
         private const string suggestionSourceParameter = "Source";
 
+        private const string reportsSuccessEventName = "ReportsSuccess";
+        private const string reportsFailureEventName = "ReportsFailure";
+        private const string reportsSourceParameter = "Source";
+        private const string reportsTotalDaysParameter = "TotalDays";
+        private const string reportsProjectsNotSyncedCountParameter = "ProjectsNotSynced";
+        private const string reportsLoadingTimeParameter = "LoadingTime";
+
         public void TrackOnboardingSkipEvent(string pageName)
         {
             track(onboardingSkipEventName, pageParameter, pageName);
@@ -142,6 +149,31 @@ namespace Toggl.Foundation.Analytics
         public void TrackStartOpensTagSelector(ProjectTagSuggestionSource source)
         {
             track(startEntrySelectTagEventName, suggestionSourceParameter, source.ToString());
+        }
+
+        public void TrackReportsSuccess(ReportsSource source, int totalDays, int projectsNotSyncedCount, double loadingTime)
+        {
+            var parameters = new Dictionary<string, string>
+            {
+                [reportsSourceParameter] = source.ToString(),
+                [reportsTotalDaysParameter] = totalDays.ToString(),
+                [reportsProjectsNotSyncedCountParameter] = projectsNotSyncedCount.ToString(),
+                [reportsLoadingTimeParameter] = loadingTime.ToString()
+            };
+
+            NativeTrackEvent(reportsSuccessEventName, parameters);
+        }
+
+        public void TrackReportsFailure(ReportsSource source, int totalDays, double loadingTime)
+        {
+            var parameters = new Dictionary<string, string>
+            {
+                [reportsSourceParameter] = source.ToString(),
+                [reportsTotalDaysParameter] = totalDays.ToString(),
+                [reportsLoadingTimeParameter] = loadingTime.ToString()
+            };
+
+            NativeTrackEvent(reportsSuccessEventName, parameters);
         }
 
         private void track(string eventName)

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Toggl.Foundation.Models;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
-using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Autocomplete.Suggestions
 {
@@ -14,7 +15,7 @@ namespace Toggl.Foundation.Autocomplete.Suggestions
             => new ProjectSuggestion(workspaceId, workspaceName);
 
         public static IEnumerable<ProjectSuggestion> FromProjects(
-            IEnumerable<IDatabaseProject> projects
+            IEnumerable<IThreadSafeProject> projects
         ) => projects.Select(project => new ProjectSuggestion(project));
 
         public long ProjectId { get; }
@@ -45,7 +46,7 @@ namespace Toggl.Foundation.Autocomplete.Suggestions
             WorkspaceName = workspaceName;
         }
 
-        public ProjectSuggestion(IDatabaseProject project)
+        public ProjectSuggestion(IThreadSafeProject project)
         {
             ProjectId = project.Id;
             ProjectName = project.Name;
@@ -54,7 +55,7 @@ namespace Toggl.Foundation.Autocomplete.Suggestions
             ClientName = project.Client?.Name ?? "";
             WorkspaceId = project.WorkspaceId;
             WorkspaceName = project.Workspace?.Name ?? "";
-            Tasks = project.Tasks?.Select(task => new TaskSuggestion(task)).ToList() ?? new List<TaskSuggestion>();
+            Tasks = project.Tasks?.Select(task => new TaskSuggestion(Task.From(task))).ToList() ?? new List<TaskSuggestion>();
         }
 
         public override int GetHashCode()

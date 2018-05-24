@@ -275,7 +275,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await base.Initialize();
 
             TextFieldInfo =
-                await dataSource.User.Current.Select(user => TextFieldInfo.Empty(user.DefaultWorkspaceId));
+                await dataSource.User.Current.FirstAsync().Select(user => TextFieldInfo.Empty(user.DefaultWorkspaceId));
 
             await setBillableValues(lastProjectId);
 

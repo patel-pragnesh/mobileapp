@@ -8,6 +8,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using MvvmCross.Core.ViewModels;
 using PropertyChanged;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
@@ -86,7 +87,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             {
                 var date = tappedDay.DateTimeOffset;
 
-                var dateRange = DateRangeParameter.WithDates(date, date);
+                var dateRange = DateRangeParameter
+                    .WithDates(date, date)
+                    .WithSource(ReportsSource.Calendar);
                 startOfSelection = tappedDay;
                 highlightDateRange(dateRange);
             }
@@ -95,7 +98,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 var startDate = startOfSelection.DateTimeOffset;
                 var endDate = tappedDay.DateTimeOffset;
 
-                var dateRange = DateRangeParameter.WithDates(startDate, endDate);
+                var dateRange = DateRangeParameter
+                    .WithDates(startDate, endDate)
+                    .WithSource(ReportsSource.Calendar);
                 startOfSelection = null;
                 changeDateRange(dateRange);
             }
@@ -113,7 +118,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            BeginningOfWeek = (await dataSource.User.Current).BeginningOfWeek;
+            BeginningOfWeek = (await dataSource.User.Current.FirstAsync()).BeginningOfWeek;
             fillMonthArray();
             RaisePropertyChanged(nameof(CurrentMonth));
 
@@ -139,7 +144,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (startOfSelection == null) return;
 
             var date = startOfSelection.DateTimeOffset;
-            var dateRange = DateRangeParameter.WithDates(date, date);
+            var dateRange = DateRangeParameter
+                .WithDates(date, date)
+                .WithSource(ReportsSource.Calendar);
             changeDateRange(dateRange);
         }
 

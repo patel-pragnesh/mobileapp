@@ -15,6 +15,7 @@ using Toggl.PrimeRadiant.Models;
 using Xunit;
 using TimeEntry = Toggl.Foundation.Models.TimeEntry;
 using ITimeEntryPrototype = Toggl.Foundation.Models.ITimeEntryPrototype;
+using Toggl.Foundation.Models.Interfaces;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -136,7 +137,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             public TheStartTimeEntryCommand()
             {
-                var user = Substitute.For<IDatabaseUser>();
+                var user = Substitute.For<IThreadSafeUser>();
                 user.Id.Returns(10);
                 DataSource.User.Current.Returns(Observable.Return(user));
 

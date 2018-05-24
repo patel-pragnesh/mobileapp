@@ -61,6 +61,7 @@ namespace Toggl.Foundation.Interactors
 
         public IObservable<IDatabaseTimeEntry> Execute()
             => dataSource.User.Current
+                .FirstAsync()
                 .Select(userFromPrototype)
                 .SelectMany(dataSource.TimeEntries.Create)
                 .Do(_ => dataSource.SyncManager.PushSync())

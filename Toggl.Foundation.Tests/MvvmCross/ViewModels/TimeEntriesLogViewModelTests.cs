@@ -7,8 +7,10 @@ using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using NSubstitute;
+using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Models;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
 using Toggl.Multivac;
@@ -135,7 +137,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                                     .SetAt(now).Build())
                             .Apply(Observable.Return);
 
-                        DataSource.TimeEntries.GetAll().Returns(observable);
+                        InteractorFactory.GetAllNonDeletedTimeEntries().Execute().Returns(observable);
 
                         return viewModel;
                     });
@@ -157,10 +159,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             protected const int InitialAmountOfTimeEntries = 20;
 
-            protected Subject<IDatabaseTimeEntry> TimeEntryCreatedSubject = new Subject<IDatabaseTimeEntry>();
-            protected Subject<(long Id, IDatabaseTimeEntry Entity)> TimeEntryUpdatedSubject = new Subject<(long, IDatabaseTimeEntry)>();
+            protected Subject<IThreadSafeTimeEntry> TimeEntryCreatedSubject = new Subject<IThreadSafeTimeEntry>();
+            protected Subject<EntityUpdate<IThreadSafeTimeEntry>> TimeEntryUpdatedSubject = new Subject<EntityUpdate<IThreadSafeTimeEntry>>();
             protected Subject<long> TimeEntryDeletedSubject = new Subject<long>();
-            protected IDatabaseTimeEntry NewTimeEntry =
+            protected IThreadSafeTimeEntry NewTimeEntry =
                 TimeEntry.Builder.Create(21)
                          .SetUserId(10)
                          .SetWorkspaceId(12)
@@ -185,10 +187,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                   .Select(te => te.With((long)TimeSpan.FromHours(te.Id * 2 + 2).TotalSeconds))
                   .Apply(Observable.Return);
 
-                DataSource.TimeEntries.GetAll().Returns(observable);
-                DataSource.TimeEntries.TimeEntryCreated.Returns(TimeEntryCreatedSubject.AsObservable());
-                DataSource.TimeEntries.TimeEntryUpdated.Returns(TimeEntryUpdatedSubject.AsObservable());
-                DataSource.TimeEntries.TimeEntryDeleted.Returns(TimeEntryDeletedSubject.AsObservable());
+                InteractorFactory.GetAllNonDeletedTimeEntries().Execute().Returns(observable);
+                DataSource.TimeEntries.Created.Returns(TimeEntryCreatedSubject.AsObservable());
+                DataSource.TimeEntries.Updated.Returns(TimeEntryUpdatedSubject.AsObservable());
+                DataSource.TimeEntries.Deleted.Returns(TimeEntryDeletedSubject.AsObservable());
             }
         }
 
@@ -251,7 +253,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 await ViewModel.Initialize();
                 var newTimeEntry = NewTimeEntry.With((long)TimeSpan.FromHours(1).TotalSeconds);
 
-                TimeEntryUpdatedSubject.OnNext((newTimeEntry.Id, newTimeEntry));
+                TimeEntryUpdatedSubject.OnNext(new EntityUpdate<IThreadSafeTimeEntry>(newTimeEntry.Id, newTimeEntry));
 
                 ViewModel.TimeEntries.Any(c => c.Any(te => te.Id == 21)).Should().BeTrue();
                 ViewModel.TimeEntries.Aggregate(0, (acc, te) => acc + te.Count).Should().Be(InitialAmountOfTimeEntries + 1);
@@ -275,7 +277,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public async ThreadingTask RemovesTheTimeEntryIfItWasNotRemovedPreviously()
             {
                 await ViewModel.Initialize();
-                var timeEntryCollection = await DataSource.TimeEntries.GetAll().FirstAsync();
+                var timeEntryCollection = await InteractorFactory.GetAllNonDeletedTimeEntries().Execute().FirstAsync();
                 var timeEntryToDelete = timeEntryCollection.First();
 
                 TimeEntryDeletedSubject.OnNext(timeEntryToDelete.Id);
@@ -321,7 +323,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             public TheContinueTimeEntryCommand()
             {
-                var user = Substitute.For<IDatabaseUser>();
+                var user = Substitute.For<IThreadSafeUser>();
                 user.Id.Returns(10);
                 DataSource.User.Current.Returns(Observable.Return(user));
 
@@ -395,7 +397,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Property]
             public void DeletesTheTimeEntry(long id)
             {
-                var timeEntry = Substitute.For<IDatabaseTimeEntry>();
+                var timeEntry = Substitute.For<IThreadSafeTimeEntry>();
                 timeEntry.Id.Returns(id);
                 timeEntry.Duration.Returns(100);
                 timeEntry.WorkspaceId.Returns(10);
@@ -403,7 +405,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 ViewModel.DeleteCommand.ExecuteAsync(timeEntryViewModel).Wait();
 
-                DataSource.TimeEntries.Received().Delete(id).Wait();
+                InteractorFactory.Received().DeleteTimeEntry(Arg.Is(id));
+                InteractorFactory.DeleteTimeEntry(timeEntry.Id).Received().Execute();
             }
 
             [Fact]

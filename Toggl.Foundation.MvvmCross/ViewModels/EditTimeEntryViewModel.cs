@@ -279,7 +279,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             try
             {
-                await dataSource.TimeEntries.Delete(Id);
+                await interactorFactory.DeleteTimeEntry(Id).Execute();
 
                 analyticsService.TrackDeletingTimeEntry();
                 dataSource.SyncManager.PushSync();

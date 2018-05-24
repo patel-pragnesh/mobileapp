@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.Models;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Suggestions;
 using Toggl.PrimeRadiant.Models;
 
@@ -18,6 +20,10 @@ namespace Toggl.Foundation.Interactors
         IInteractor<IObservable<IDatabaseTimeEntry>> ContinueTimeEntry(ITimeEntryPrototype prototype);
 
         IInteractor<IObservable<IDatabaseTimeEntry>> ContinueMostRecentTimeEntry();
+
+        IInteractor<IObservable<Unit>> DeleteTimeEntry(long id);
+
+        IInteractor<IObservable<IEnumerable<IThreadSafeTimeEntry>>> GetAllNonDeletedTimeEntries();
 
         #endregion
 

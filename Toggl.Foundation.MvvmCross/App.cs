@@ -61,7 +61,7 @@ namespace Toggl.Foundation.MvvmCross
                 return;
             }
 
-            var user = await dataSource.User.Current;
+            var user = await dataSource.User.Current.FirstAsync();
             if (accessRestrictionStorage.IsUnauthorized(user.ApiToken))
             {
                 await navigationService.Navigate<TokenResetViewModel>();

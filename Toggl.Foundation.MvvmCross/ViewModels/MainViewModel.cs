@@ -188,9 +188,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Subscribe(progress => SyncingProgress = progress);
 
             var isEmptyChangedDisposable = Observable.Empty<Unit>()
-                .Merge(dataSource.TimeEntries.TimeEntryUpdated.Select(_ => Unit.Default))
-                .Merge(dataSource.TimeEntries.TimeEntryDeleted.Select(_ => Unit.Default))
-                .Merge(dataSource.TimeEntries.TimeEntryCreated.Select(_ => Unit.Default))
+                .Merge(dataSource.TimeEntries.Updated.Select(_ => Unit.Default))
+                .Merge(dataSource.TimeEntries.Deleted.Select(_ => Unit.Default))
+                .Merge(dataSource.TimeEntries.Created.Select(_ => Unit.Default))
                 .Subscribe(_ =>
                 {
                     RaisePropertyChanged(nameof(ShouldShowTimeEntriesLog));
@@ -269,7 +269,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async Task openReports()
         {
-            var user = await dataSource.User.Current;
+            var user = await dataSource.User.Current.FirstAsync();
             await navigationService.Navigate<ReportsViewModel, long>(user.DefaultWorkspaceId);
         }
 
