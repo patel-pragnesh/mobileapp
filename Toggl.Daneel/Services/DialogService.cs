@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Services;
@@ -20,7 +21,7 @@ namespace Toggl.Daneel.Services
             this.topViewControllerProvider = topViewControllerProvider;
         }
 
-        public Task<bool> Confirm(
+        public IObservable<bool> Confirm(
             string title,
             string message,
             string confirmButtonText,
@@ -40,7 +41,7 @@ namespace Toggl.Daneel.Services
                 .TopViewController
                 .PresentViewController(alert, true, null);
 
-            return tcs.Task;
+            return Observable.FromAsync(() => tcs.Task);
         }
 
         public Task<bool> ConfirmDestructiveAction(ActionType type)
