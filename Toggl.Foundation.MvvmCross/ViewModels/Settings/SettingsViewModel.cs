@@ -74,7 +74,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public bool AddMobileTag { get; set; }
 
-        public bool IsLoggingOut { get; private set; }
+        public bool isLoggingOut { get; private set; }
 
         public MvxObservableCollection<SelectableWorkspaceViewModel> Workspaces { get; }
             = new MvxObservableCollection<SelectableWorkspaceViewModel>();
@@ -175,27 +175,27 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        public void Rate() => throw new NotImplementedException();
+        internal void Rate() => throw new NotImplementedException();
 
-        public void Update() => throw new NotImplementedException();
+        internal void Update() => throw new NotImplementedException();
 
-        public void EditProfile() => throw new NotImplementedException();
+        internal void EditProfile() => throw new NotImplementedException();
 
-        public void EditSubscription() => throw new NotImplementedException();
+        internal void EditSubscription() => throw new NotImplementedException();
 
-        public void ToggleAddMobileTag() => AddMobileTag = !AddMobileTag;
+        internal void ToggleAddMobileTag() => AddMobileTag = !AddMobileTag;
 
-        public Task Back() 
+        internal Task Back() 
             => navigationService.Close(this);
 
-        public Task OpenAboutPage()
+        internal Task OpenAboutPage()
             => navigationService.Navigate<AboutViewModel>();
 
-        public void Help() => navigationService
+        internal void Help() => navigationService
             .Navigate<BrowserViewModel, BrowserParameters>(
                 BrowserParameters.WithUrlAndTitle(platformConstants.HelpUrl, Resources.Help));
 
-        public async Task PickWorkspace()
+        internal async Task PickWorkspace()
         {
             var parameters = WorkspaceParameters.Create(currentUser.DefaultWorkspaceId, Resources.SetDefaultWorkspace, allowQuerying: false);
             var selectedWorkspaceId =
@@ -205,7 +205,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await changeDefaultWorkspace(selectedWorkspaceId);
         }
 
-        public async Task SelectDefaultWorkspace(SelectableWorkspaceViewModel workspace)
+        internal async Task SelectDefaultWorkspace(SelectableWorkspaceViewModel workspace)
         {
             foreach (var ws in Workspaces)
                 ws.Selected = ws.WorkspaceId == workspace.WorkspaceId;
@@ -213,7 +213,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await changeDefaultWorkspace(workspace.WorkspaceId);
         }
 
-        public async Task SubmitFeedback()
+        internal async Task SubmitFeedback()
         {
             var version = userAgent.ToString();
             var phone = platformConstants.PhoneModel;
@@ -244,7 +244,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             );
         }
 
-        public void ToggleManualMode()
+        internal void ToggleManualMode()
         {
             if (userPreferences.IsManualModeEnabled)
             {
@@ -256,28 +256,29 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        public async Task TryLogout()
+        internal async Task TryLogout()
         {
-            await isSynced().SelectMany(isSynced =>
+            var synced = await isSynced();
+            if (synced)
             {
-                if (isSynced)
-                    return logout();
+                await logout();
+                return;
+            }
 
-                string title = "", message = "";
+            string title = "", message = "";
                 
-                return dialogService
-                    .Confirm(title, message, Resources.SettingsDialogButtonSignOut, Resources.Cancel)
-                    .SelectMany(shouldLogout => 
-                    {
-                        if (shouldLogout)
-                            Observable.Return(Unit.Default);
+            await dialogService
+                .Confirm(title, message, Resources.SettingsDialogButtonSignOut, Resources.Cancel)
+                .SelectMany(shouldLogout => 
+                {
+                    if (shouldLogout)
+                        Observable.Return(Unit.Default);
 
-                        return logout();
-                    });
-            });
+                    return logout();
+                });
         }
 
-        public async Task SelectBeginningOfWeek()
+        internal async Task SelectBeginningOfWeek()
         {
             var newBeginningOfWeek = await navigationService
                 .Navigate<SelectBeginningOfWeekViewModel, BeginningOfWeek, BeginningOfWeek>(currentUser.BeginningOfWeek);
@@ -289,7 +290,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             dataSource.SyncManager.PushSync();
         }
 
-        public async Task ToggleUseTwentyFourHourClock()
+        internal async Task ToggleUseTwentyFourHourClock()
         {
             var timeFormat = currentPreferences.TimeOfDayFormat.IsTwentyFourHoursFormat
                 ? TimeFormat.TwelveHoursFormat
@@ -298,7 +299,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await updatePreferences(timeFormat: timeFormat);
         }
 
-        public async Task SelectDateFormat()
+        internal async Task SelectDateFormat()
         {
             var newDateFormat = await navigationService
                 .Navigate<SelectDateFormatViewModel, DateFormat, DateFormat>(currentPreferences.DateFormat);
@@ -309,7 +310,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await updatePreferences(dateFormat: newDateFormat);
         }
 
-        public async Task SelectDurationFormat()
+        internal async Task SelectDurationFormat()
         {
             var newDurationFormat = await navigationService
                 .Navigate<SelectDurationFormatViewModel, DurationFormat, DurationFormat>(currentPreferences.DurationFormat);
@@ -343,18 +344,18 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private IObservable<bool> checkSynced(SyncProgress progress)
         {
-            if (IsLoggingOut || progress != SyncProgress.Synced)
+            if (isLoggingOut || progress != SyncProgress.Synced)
                 return Observable.Return(false);
 
             return isSynced();
         }
 
         private bool isRunningSync(SyncProgress progress)
-            => IsLoggingOut == false && progress == SyncProgress.Syncing;
+            => isLoggingOut == false && progress == SyncProgress.Syncing;
 
         private IObservable<Unit> logout()
         {
-            IsLoggingOut = true;
+            isLoggingOut = true;
             analyticsService.TrackLogoutEvent(LogoutSource.Settings);
             userPreferences.Reset();
 
@@ -362,8 +363,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         }
 
         private IObservable<bool> isSynced()
-            => dataSource
-                .HasUnsyncedData()
-                .WithLatestFrom(IsRunningSync, And);
+            => dataSource.HasUnsyncedData().Select(Invert);
     }
 }

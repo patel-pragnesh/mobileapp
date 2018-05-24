@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Reactive.Disposables;
-using MvvmCross.Binding.BindingContext;
 using MvvmCross.iOS.Views;
 using MvvmCross.iOS.Views.Presenters.Attributes;
 using MvvmCross.Plugins.Color.iOS;
-using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Extensions;
 using Toggl.Multivac.Extensions;
-using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.Views;
 using UIKit;
 using System.Reactive;
-using Toggl.Foundation.Models.Interfaces;
-using Toggl.Multivac;
 using Math = System.Math;
 
 namespace Toggl.Daneel.ViewControllers
@@ -59,11 +54,49 @@ namespace Toggl.Daneel.ViewControllers
 
             Title = ViewModel.Title;
 
+            LoggingOutView.Hidden = true;
+
             this.CreateBindings(ViewModel).DisposedBy(disposeBag);
 
             UIApplication.Notifications
                 .ObserveWillEnterForeground((sender, e) => startAnimations())
                 .DisposedBy(disposeBag);
+        }
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+            startAnimations();
+        }
+
+        public override void ViewWillLayoutSubviews()
+        {
+            base.ViewWillLayoutSubviews();
+            tryAlignLogoutButtonWithBottomEdge();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing == false) return;
+
+            disposeBag?.Dispose();
+            disposeBag = null;
+        }
+
+        private void prepareViews()
+        {
+            // Syncing indicator colors
+            setIndicatorSyncColor(SyncedIcon);
+            setIndicatorSyncColor(SyncingIndicator);
+            setIndicatorSyncColor(LoggingOutIndicator);
+
+            // Resize Switches
+            TwentyFourHourClockSwitch.Resize();
+            ManualModeSwitch.Resize();
+
+            TopConstraint.AdaptForIos10(NavigationController.NavigationBar);
         }
 
         public void OnEmailChanged(string email)
@@ -101,44 +134,14 @@ namespace Toggl.Daneel.ViewControllers
             ManualModeSwitch.SetState(isOnManualMode, true);
         }
 
-        public void LoggingOut()
+        public void OnIsRunningSyncChanged(bool isRunningSync)
         {
+            SyncingView.Hidden = !isRunningSync;
         }
 
-        protected override void Dispose(bool disposing)
+        public void OnIsSyncedChanged(bool isSynced)
         {
-            base.Dispose(disposing);
-
-            if (disposing == false) return;
-
-            disposeBag?.Dispose();
-            disposeBag = null;
-        }
-
-        public override void ViewWillAppear(bool animated)
-        {
-            base.ViewWillAppear(animated);
-            startAnimations();
-        }
-
-        public override void ViewWillLayoutSubviews()
-        {
-            base.ViewWillLayoutSubviews();
-            tryAlignLogoutButtonWithBottomEdge();
-        }
-
-        private void prepareViews()
-        {
-            // Syncing indicator colors
-            setIndicatorSyncColor(SyncedIcon);
-            setIndicatorSyncColor(SyncingIndicator);
-            setIndicatorSyncColor(LoggingOutIndicator);
-
-            // Resize Switches
-            TwentyFourHourClockSwitch.Resize();
-            ManualModeSwitch.Resize();
-
-            TopConstraint.AdaptForIos10(NavigationController.NavigationBar);
+            SyncedView.Hidden = !isSynced;
         }
 
         private void setIndicatorSyncColor(UIImageView imageView)

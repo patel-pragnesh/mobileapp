@@ -3,16 +3,20 @@ using System.Reactive.Disposables;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
+using System.Threading;
 
 namespace Toggl.Foundation.MvvmCross.Views
 {
     public interface ISettingsView
     {
-        void LoggingOut();
         void OnEmailChanged(string email);
+        void OnIsSyncedChanged(bool isSynced);
         void OnDurationChanged(string duration);
         void OnDateFormatChanged(string dateFormat);
         void OnManualModeChanged(bool isOnManualMode);
+        void OnIsRunningSyncChanged(bool isRunningSync);
         void OnWorkspaceNameChanged(string workspaceName);
         void OnBeginningOfWeekChanged(string beginningOfWeek);
         void OnUseTwentyFourHourFormatChanged(bool useTwentyFourHourFormat);
@@ -35,13 +39,15 @@ namespace Toggl.Foundation.MvvmCross.Views
         {
             var disposeBag = new CompositeDisposable();
 
-            viewModel.Email.Subscribe(view.OnEmailChanged).DisposedBy(disposeBag);
-            viewModel.Duration.Subscribe(view.OnDurationChanged).DisposedBy(disposeBag);
-            viewModel.WorkspaceName.Subscribe(view.OnWorkspaceNameChanged).DisposedBy(disposeBag);
-            viewModel.CurrentDateFormat.Subscribe(view.OnDateFormatChanged).DisposedBy(disposeBag);
-            viewModel.IsManualModeEnabled.Subscribe(view.OnManualModeChanged).DisposedBy(disposeBag);
-            viewModel.BeginningOfWeek.Subscribe(view.OnBeginningOfWeekChanged).DisposedBy(disposeBag);
-            viewModel.UseTwentyFourHourFormat.Subscribe(view.OnUseTwentyFourHourFormatChanged).DisposedBy(disposeBag);
+            viewModel.Email.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnEmailChanged).DisposedBy(disposeBag);
+            viewModel.Duration.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnDurationChanged).DisposedBy(disposeBag);
+            viewModel.IsSynced.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnIsSyncedChanged).DisposedBy(disposeBag);
+            viewModel.IsRunningSync.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnIsRunningSyncChanged).DisposedBy(disposeBag);
+            viewModel.WorkspaceName.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnWorkspaceNameChanged).DisposedBy(disposeBag);
+            viewModel.CurrentDateFormat.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnDateFormatChanged).DisposedBy(disposeBag);
+            viewModel.IsManualModeEnabled.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnManualModeChanged).DisposedBy(disposeBag);
+            viewModel.BeginningOfWeek.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnBeginningOfWeekChanged).DisposedBy(disposeBag);
+            viewModel.UseTwentyFourHourFormat.ObserveOn(SynchronizationContext.Current).Subscribe(view.OnUseTwentyFourHourFormatChanged).DisposedBy(disposeBag);
 
             view.EmailTappedObservable.Subscribe((Unit _) => viewModel.EditProfile()).DisposedBy(disposeBag);
             view.AboutTappedObservable.Subscribe((Unit _) => viewModel.OpenAboutPage()).DisposedBy(disposeBag);

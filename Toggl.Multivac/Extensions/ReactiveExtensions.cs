@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace Toggl.Multivac.Extensions
 {
@@ -56,5 +54,8 @@ namespace Toggl.Multivac.Extensions
         {
             disposeBag.Add(disposable);
         }
+
+        public static IObservable<T> Debug<T>(this IObservable<T> observable, string tag = "")
+        => observable.Do(x => Console.WriteLine($"{tag}: {x}"));
     }
 }
