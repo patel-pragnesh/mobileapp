@@ -12,16 +12,17 @@ using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.Views;
 using UIKit;
-using ReactiveUI.Events;
 using System.Reactive;
-using Toggl.PrimeRadiant.Models;
+using Toggl.Foundation.Models.Interfaces;
+using Toggl.Multivac;
+using Math = System.Math;
 
 namespace Toggl.Daneel.ViewControllers
 {
     [MvxChildPresentation]
     public partial class SettingsViewController : MvxViewController<SettingsViewModel>, ISettingsView
     {
-        private CompositeDisposable disposeBag;
+        private CompositeDisposable disposeBag = new CompositeDisposable();
 
         private const int verticalSpacing = 24;
 
@@ -45,8 +46,6 @@ namespace Toggl.Daneel.ViewControllers
 
         public IObservable<Unit> TwentyFourHourClockTappedObservable => TwentyFourHourClockView.TappedObservable();
 
-        public IObservable<Unit> TwentyFourHourClockSwTappedObservable => TwentyFourHourClockView.TappedObservable();
-
         public SettingsViewController()
             : base(nameof(SettingsViewController), null)
         {
@@ -60,74 +59,50 @@ namespace Toggl.Daneel.ViewControllers
 
             Title = ViewModel.Title;
 
-            var inverseBoolConverter = new BoolToConstantValueConverter<bool>(false, true);
-            var visibilityConverter = new MvxVisibilityValueConverter();
-            var durationFormatToStringConverter = new DurationFormatToStringValueConverter();
-
-            var bindingSet = this.CreateBindingSet<SettingsViewController, SettingsViewModel>();
-
             this.CreateBindings(ViewModel).DisposedBy(disposeBag);
 
             UIApplication.Notifications
                 .ObserveWillEnterForeground((sender, e) => startAnimations())
                 .DisposedBy(disposeBag);
-
-            //// Text
-            //bindingSet.Bind(DateFormatLabel).To(vm => vm.DateFormat.Localized);
-            //bindingSet.Bind(DurationFormatLabel)
-            //          .To(vm => vm.DurationFormat)
-            //          .WithConversion(durationFormatToStringConverter);
-            //bindingSet.Bind(BeginningOfWeekLabel).To(vm => vm.BeginningOfWeek);
-            //bindingSet.Bind(VersionLabel).To(vm => vm.Version);
-
-
-            //// Logout process
-            //bindingSet.Bind(LogoutButton)
-            //          .For(btn => btn.Enabled)
-            //          .To(vm => vm.IsLoggingOut)
-            //          .WithConversion(inverseBoolConverter);
-
-            //bindingSet.Bind(NavigationItem)
-            //          .For(nav => nav.BindHidesBackButton())
-            //          .To(vm => vm.IsLoggingOut);
-
-            //bindingSet.Bind(SyncingView)
-            //          .For(view => view.BindVisibility())
-            //          .To(vm => vm.IsRunningSync)
-            //          .WithConversion(visibilityConverter);
-
-            //bindingSet.Bind(SyncedView)
-            //          .For(view => view.BindVisibility())
-            //          .To(vm => vm.IsSynced)
-            //          .WithConversion(visibilityConverter);
-
-            //bindingSet.Bind(LoggingOutView)
-            //          .For(view => view.BindVisibility())
-            //          .To(vm => vm.IsLoggingOut)
-            //          .WithConversion(visibilityConverter);
-
-            //// Switches
-            //bindingSet.Bind(TwentyFourHourClockSwitch)
-            //          .For(v => v.BindAnimatedOn())
-            //          .To(vm => vm.UseTwentyFourHourClock);
-
-            //bindingSet.Bind(ManualModeSwitch)
-            //          .For(v => v.BindAnimatedOn())
-            //          .To(vm => vm.IsManualModeEnabled);
-
-            //bindingSet.Apply();
-
         }
 
-        public void UserChanged(IDatabaseUser user)
+        public void OnEmailChanged(string email)
         {
-            EmailLabel.Text = user.Email.ToString();
-            WorkspaceLabel).To(vm => vm.WorkspaceName);
+            EmailLabel.Text = email;
+        }
+
+        public void OnWorkspaceNameChanged(string workspaceName)
+        {
+            WorkspaceLabel.Text = workspaceName;
+        }
+
+        public void OnDateFormatChanged(string dateFormat)
+        {
+            DateFormatLabel.Text = dateFormat;
+        }
+
+        public void OnUseTwentyFourHourFormatChanged(bool useTwentyFourHourFormat)
+        {
+            TwentyFourHourClockSwitch.SetState(useTwentyFourHourFormat, true);
+        }
+
+        public void OnDurationChanged(string duration)
+        {
+            DurationFormatLabel.Text = duration;
+        }
+
+        public void OnBeginningOfWeekChanged(string beginningOfWeek)
+        {
+            BeginningOfWeekLabel.Text = beginningOfWeek;
+        }
+
+        public void OnManualModeChanged(bool isOnManualMode)
+        {
+            ManualModeSwitch.SetState(isOnManualMode, true);
         }
 
         public void LoggingOut()
         {
-            throw new NotImplementedException();
         }
 
         protected override void Dispose(bool disposing)
