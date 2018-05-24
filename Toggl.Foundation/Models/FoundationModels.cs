@@ -16,7 +16,9 @@ namespace Toggl.Foundation.Models
 
         public string Name { get; }
 
-        public IDatabaseWorkspace Workspace { get; }
+        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
 
         public bool IsDeleted { get; }
 
@@ -76,11 +78,17 @@ namespace Toggl.Foundation.Models
 
         public int? ActualHours { get; }
 
-        public IDatabaseClient Client { get; }
+        public IDatabaseClient Client => ThreadSafeClient;
 
-        public IDatabaseWorkspace Workspace { get; }
+        public IThreadSafeClient ThreadSafeClient { get; }
 
-        public IEnumerable<IDatabaseTask> Tasks { get; }
+        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+
+        public IEnumerable<IDatabaseTask> Tasks => ThreadSafeTasks;
+
+        public IEnumerable<IThreadSafeTask> ThreadSafeTasks { get; }
 
         public bool IsDeleted { get; }
 
@@ -101,7 +109,9 @@ namespace Toggl.Foundation.Models
 
         public string Name { get; }
 
-        public IDatabaseWorkspace Workspace { get; }
+        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
 
         public bool IsDeleted { get; }
 
@@ -132,11 +142,17 @@ namespace Toggl.Foundation.Models
 
         public long TrackedSeconds { get; }
 
-        public IDatabaseUser User { get; }
+        public IDatabaseUser User => ThreadSafeUser;
 
-        public IDatabaseProject Project { get; }
+        public IThreadSafeUser ThreadSafeUser { get; }
 
-        public IDatabaseWorkspace Workspace { get; }
+        public IDatabaseProject Project => ThreadSafeProject;
+
+        public IThreadSafeProject ThreadSafeProject { get; }
+
+        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
 
         public bool IsDeleted { get; }
 
@@ -169,15 +185,25 @@ namespace Toggl.Foundation.Models
 
         public long UserId { get; }
 
-        public IDatabaseTask Task { get; }
+        public IDatabaseTask Task => ThreadSafeTask;
 
-        public IDatabaseUser User { get; }
+        public IThreadSafeTask ThreadSafeTask { get; }
 
-        public IDatabaseProject Project { get; }
+        public IDatabaseUser User => ThreadSafeUser;
 
-        public IDatabaseWorkspace Workspace { get; }
+        public IThreadSafeUser ThreadSafeUser { get; }
 
-        public IEnumerable<IDatabaseTag> Tags { get; }
+        public IDatabaseProject Project => ThreadSafeProject;
+
+        public IThreadSafeProject ThreadSafeProject { get; }
+
+        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+
+        public IEnumerable<IDatabaseTag> Tags => ThreadSafeTags;
+
+        public IEnumerable<IThreadSafeTag> ThreadSafeTags { get; }
 
         public bool IsDeleted { get; }
 
@@ -270,9 +296,13 @@ namespace Toggl.Foundation.Models
 
         public IEnumerable<IWorkspaceFeature> Features { get; }
 
-        public IDatabaseWorkspace Workspace { get; }
+        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
 
-        public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures { get; }
+        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+
+        public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures => ThreadSafeDatabaseFeatures;
+
+        public IEnumerable<IThreadSafeWorkspaceFeature> ThreadSafeDatabaseFeatures { get; }
 
     }
 }

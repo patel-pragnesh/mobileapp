@@ -2,6 +2,7 @@
 #><#@ assembly name="System.Core"
 #><#@ import namespace="System.IO"
 #><#@ import namespace="System.Linq"
+#><#@ import namespace="System.Text.RegularExpressions"
 #>using System;
 using System.Collections.Generic;
 using Toggl.Foundation.Models.Interfaces;
@@ -35,6 +36,10 @@ namespace Toggl.Foundation.Models
         var databaseInterfaceExists = File.Exists(databaseInterfaceFileName);
 
         if (!databaseInterfaceExists) continue;
+
+        var threadSafeInterfaceName = $"IThreadSafe{className}";
+        var threadSafeInterfaceFileName = Path.Combine(filePath, "./Interfaces/ThreadsafeModels.cs");
+        var threadSafeInterfaceExists = File.ReadAllLines(threadSafeInterfaceFileName).Any(l => l.Contains(threadSafeInterfaceName));
 
         var implementsIDatabaseSyncable = databaseInterfaceExists
             && File.ReadAllLines(databaseInterfaceFileName).Any(l => l.Contains("IDatabaseSyncable"));
@@ -73,7 +78,22 @@ namespace Toggl.Foundation.Models
                 var isProperty = line.Contains("get;");
                 if (!isProperty) continue;
 
-                WriteLine($"        public {line.Trim()}\n");
+                if (threadSafeInterfaceExists)
+                {
+                    var match = Regex.Match(line, @"^[ ]*(?<type>[^ ]+) (?<name>[^ ]+) { get; }$", RegexOptions.IgnoreCase);
+                    if (!match.Success) continue;
+
+                    var name = match.Groups["name"].Captures[0].Value;
+                    var type = match.Groups["type"].Captures[0].Value;
+                    var threadSafeType = type.Replace("IDatabase", "IThreadSafe");
+
+                    WriteLine($"        public {type} {name} => ThreadSafe{name};\n");
+                    WriteLine($"        public {threadSafeType} ThreadSafe{name} {{ get; }}\n");
+                }
+                else
+                {
+                    WriteLine($"        public {line.Trim()}\n");
+                }
             }
         }
 
@@ -95,6 +115,7 @@ namespace Toggl.Foundation.Models
         {
             WriteLine("        public DateTimeOffset? ServerDeletedAt { get; }");
         }
+
         WriteLine("    }");
 
         isFirstClass = false;

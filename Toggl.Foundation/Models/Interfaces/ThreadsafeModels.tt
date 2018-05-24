@@ -1,8 +1,10 @@
-﻿﻿<#@ template language="C#" hostspecific="True"
+﻿<#@ template language="C#" hostspecific="True"
 #><#@ assembly name="System.Core"
 #><#@ import namespace="System.IO"
 #><#@ import namespace="System.Linq"
-#>using Toggl.PrimeRadiant.Models;
+#><#@ import namespace="System.Text.RegularExpressions"
+#>using System.Collections.Generic;
+using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Models.Interfaces
 {
@@ -40,6 +42,23 @@ namespace Toggl.Foundation.Models.Interfaces
         WriteLine($"    public partial interface IThreadSafe{className}");
         WriteLine($"        : IThreadSafeModel, {databaseInterfaceName}");
         WriteLine( "    {");
+
+        var isFirst = true;
+        foreach (var line in File.ReadAllLines(databaseInterfaceFileName))
+        {
+            var match = Regex.Match(line, @"^[ ]*(?<type>[^ ]+) (?<name>[^ ]+) { get; }$", RegexOptions.IgnoreCase);
+            if (!match.Success) continue;
+
+            if (!isFirst)
+                WriteLine("");
+
+            var type = match.Groups["type"].Captures[0].Value.Replace("IDatabase", "IThreadSafe");
+            var name = match.Groups["name"].Captures[0].Value;
+
+            isFirst = false;
+            WriteLine($"        {type} ThreadSafe{name} {{ get; }}");
+        }
+        
         WriteLine( "    }");
 
         isFirstClass = false;

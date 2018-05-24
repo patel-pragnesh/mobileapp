@@ -71,7 +71,7 @@ namespace Toggl.Foundation.Models
                     var isList = line.Contains(" IEnumerable<");
                     if (isList)
                     {
-                        var foundationClassName = Regex.Match(line, "IEnumerable<IDatabase(?<class>[^>]+?)>").Groups["class"].Value;
+                        var foundationClassName = Regex.Match(line, "IEnumerable<IDatabase(?<class>[^>]+)>").Groups["class"].Value;
                         wrapping = $"entity.{propName}.Select(Models.{foundationClassName}.From)";
                     }
                     else
@@ -81,8 +81,9 @@ namespace Toggl.Foundation.Models
                 }
                 
                 var assignment = requiresWrapping ? $"entity.{propName} == null ? null : {wrapping}" : $"entity.{propName}";
+                var prefix = requiresWrapping ? "ThreadSafe" : "";
 
-                WriteLine($"            {propName} = {assignment};");
+                WriteLine($"            {prefix}{propName} = {assignment};");
             }
 
             if (implementsIDatabaseSyncable)
