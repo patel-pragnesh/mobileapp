@@ -15,10 +15,10 @@ using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Foundation.Sync;
 using Toggl.Multivac;
-using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 using System.Reactive;
 using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Suggestions;
 
 [assembly: MvxNavigation(typeof(MainViewModel), ApplicationUrls.Main.Regex)]
@@ -236,7 +236,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsInManualMode = userPreferences.IsManualModeEnabled();
         }
 
-        private void setRunningEntry(IDatabaseTimeEntry timeEntry)
+        private void setRunningEntry(IThreadSafeTimeEntry timeEntry)
         {
             CurrentTimeEntryId = timeEntry?.Id;
             currentTimeEntryStart = timeEntry?.Start;

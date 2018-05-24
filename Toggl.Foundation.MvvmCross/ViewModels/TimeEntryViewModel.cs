@@ -2,6 +2,7 @@
 using System.Linq;
 using MvvmCross.Core.ViewModels;
 using Toggl.Foundation.Models;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
@@ -13,7 +14,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     public sealed class TimeEntryViewModel : MvxNotifyPropertyChanged, ITimeEntryPrototype
     {
         public long Id { get; }
-        
+
         public long WorkspaceId { get; }
 
         public bool IsBillable { get; }
