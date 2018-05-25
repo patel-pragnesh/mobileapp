@@ -56,23 +56,11 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		ApiTests|Any CPU = ApiTests|Any CPU
-		ApiTests|iPhone = ApiTests|iPhone
-		ApiTests|iPhoneSimulator = ApiTests|iPhoneSimulator
 		Debug|Any CPU = Debug|Any CPU
 		Debug|iPhone = Debug|iPhone
 		Debug|iPhoneSimulator = Debug|iPhoneSimulator
 		Release.AppStore|Any CPU = Release.AppStore|Any CPU
-		Release.AppStore|iPhone = Release.AppStore|iPhone
-		Release.AppStore|iPhoneSimulator = Release.AppStore|iPhoneSimulator
-		Release.TestFlight|Any CPU = Release.TestFlight|Any CPU
-		Release.TestFlight|iPhone = Release.TestFlight|iPhone
-		Release.TestFlight|iPhoneSimulator = Release.TestFlight|iPhoneSimulator
-		Release|Any CPU = Release|Any CPU
-		Release|iPhone = Release|iPhone
-		Release|iPhoneSimulator = Release|iPhoneSimulator
 		UnitTests|Any CPU = UnitTests|Any CPU
-		UnitTests|iPhone = UnitTests|iPhone
-		UnitTests|iPhoneSimulator = UnitTests|iPhoneSimulator
 		Release.AdHoc|Any CPU = Release.AdHoc|Any CPU
 		Release.PlayStore|Any CPU = Release.PlayStore|Any CPU
 		Release.AdHoc.Giskard|Any CPU = Release.AdHoc.Giskard|Any CPU
