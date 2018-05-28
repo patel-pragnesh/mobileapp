@@ -11,6 +11,8 @@ namespace Toggl.Giskard.TemplateSelectors
         public const int Footer = 2;
         public const int Suggestions = 3;
 
+        public int ItemTemplateId { get; set; }
+
         public int GetItemLayoutId(int fromViewType)
         {
             if (fromViewType == Header)

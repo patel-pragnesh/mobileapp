@@ -6,9 +6,9 @@ using Android.Gms.Auth.Api.SignIn;
 using Android.Gms.Common;
 using Android.Gms.Common.Apis;
 using Android.Support.V4.App;
-using MvvmCross.Platform;
-using MvvmCross.Platform.Droid.Platform;
-using MvvmCross.Platform.Droid.Views;
+using MvvmCross;
+using MvvmCross.Platforms.Android;
+using MvvmCross.Platforms.Android.Views.Base;
 using Toggl.Foundation.Exceptions;
 using Toggl.Foundation.Login;
 

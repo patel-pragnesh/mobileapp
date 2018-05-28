@@ -1,7 +1,7 @@
 ﻿using Android.Graphics;
 using Android.Text;
 using Android.Text.Style;
-using MvvmCross.Plugins.Color.Droid;
+using MvvmCross.Plugin.Color.Platforms.Android;
 using Toggl.Foundation.MvvmCross.Converters;
 using TogglColor = Toggl.Foundation.MvvmCross.Helper.Color;
 
@@ -9,8 +9,8 @@ namespace Toggl.Giskard.Converters
 {
     public sealed class ReportTimeSpanLabelValueConverter : BaseReportTimeSpanLabelValueConverter<ISpannable>
     {
-        private static readonly Color disabledColor = TogglColor.Reports.Disabled.ToAndroidColor();
-        private static readonly Color normalColor = TogglColor.Reports.TotalTimeActivated.ToAndroidColor();
+        private static readonly Color disabledColor = TogglColor.Reports.Disabled.ToNativeColor();
+        private static readonly Color normalColor = TogglColor.Reports.TotalTimeActivated.ToNativeColor();
 
         protected override ISpannable GetFormattedString(string timeString, int lengthOfHours, bool isDisabled)
         {

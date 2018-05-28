@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Support.V7.App;
-using MvvmCross.Platform;
-using MvvmCross.Platform.Core;
-using MvvmCross.Platform.Droid.Platform;
+using MvvmCross;
+using MvvmCross.Base;
+using MvvmCross.Platforms.Android;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Services;
 

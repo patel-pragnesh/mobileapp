@@ -6,13 +6,13 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.Droid.Target;
+using MvvmCross.Platforms.Android.Binding.Target;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using V4Space = Android.Support.V4.Widget.Space;
 using Newtonsoft.Json.Converters;
 using Firebase.Provider;
-using MvvmCross.Binding.Droid.Views;
+using MvvmCross.Platforms.Android.Binding.Views;
 
 namespace Toggl.Giskard
 {
@@ -102,9 +102,9 @@ namespace Toggl.Giskard
             command.CanExecuteChanged += (s, e) => { if (command.CanExecute(null)) command.Execute(null); };
         }
         
-        public void Include(MvvmCross.Platform.IoC.MvxPropertyInjector injector)
+        public void Include(MvvmCross.IoC.MvxPropertyInjector injector)
         {
-            injector = new MvvmCross.Platform.IoC.MvxPropertyInjector ();
+            injector = new MvvmCross.IoC.MvxPropertyInjector ();
         } 
 
         public void Include(System.ComponentModel.INotifyPropertyChanged changed)

@@ -5,7 +5,7 @@ using Android.Util;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using Toggl.Giskard.Adapters;
 using Android.Views;
-using MvvmCross.ViewModels;
+using MvvmCross.Commands;
 using Toggl.Foundation.Autocomplete.Suggestions;
 
 namespace Toggl.Giskard.Views

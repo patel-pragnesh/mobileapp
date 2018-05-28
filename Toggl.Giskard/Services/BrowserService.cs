@@ -1,6 +1,6 @@
 ﻿using Android.Content;
 using Android.Net;
-using MvvmCross.Platform.Droid.Platform;
+using MvvmCross.Platforms.Android;
 using Toggl.Foundation.MvvmCross.Services;
 
 namespace Toggl.Giskard.Services

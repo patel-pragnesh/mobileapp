@@ -7,6 +7,8 @@ namespace Toggl.Giskard.TemplateSelectors
         public const int Normal = 0;
         public const int CreateEntity = 1;
 
+        public int ItemTemplateId { get; set; }
+
         public int GetItemLayoutId(int fromViewType)
             => fromViewType == Normal ? Resource.Layout.SelectTagsActivityCell : Resource.Layout.AbcCreateEntityCell;
 

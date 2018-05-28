@@ -1,4 +1,4 @@
-using Android.App;
+﻿using Android.App;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
@@ -6,7 +6,7 @@ using Android.Views;
 using Android.Widget;
 using Android.Support.V4.Content;
 using MvvmCross.Droid.Support.V7.AppCompat;
-using MvvmCross.Droid.Views.Attributes;
+using MvvmCross.Platforms.Android.Presenters.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
 

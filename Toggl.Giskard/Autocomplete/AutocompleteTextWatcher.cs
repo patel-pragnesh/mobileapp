@@ -2,7 +2,7 @@
 using System.Linq;
 using Android.Text;
 using Java.Lang;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 using Toggl.Foundation.MvvmCross.Autocomplete;
 using Object = Java.Lang.Object;
 

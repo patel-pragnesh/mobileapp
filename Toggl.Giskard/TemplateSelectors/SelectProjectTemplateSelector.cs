@@ -12,6 +12,8 @@ namespace Toggl.Giskard.TemplateSelectors
         public const int WorkspaceHeader = 2;
         public const int CreateEntity = 3;
 
+        public int ItemTemplateId { get; set; }
+
         public int GetItemLayoutId(int fromViewType)
         {
             switch (fromViewType)

@@ -1,6 +1,6 @@
 ﻿using Android.Graphics;
 using Android.Support.V4.Graphics;
-using MvvmCross.Plugins.Color.Droid;
+using MvvmCross.Plugin.Color.Platforms.Android;
 using Toggl.Foundation.MvvmCross.Converters;
 using static Toggl.Foundation.MvvmCross.Helper.Color;
 
@@ -47,7 +47,7 @@ namespace Toggl.Giskard.Converters
     public sealed class ReportsChartColorValueConverter : BoolToConstantValueConverter<Color>
     {
         public ReportsChartColorValueConverter()
-            : base(Reports.Disabled.ToAndroidColor(), Reports.TotalTimeActivated.ToAndroidColor()) { }
+            : base(Reports.Disabled.ToNativeColor(), Reports.TotalTimeActivated.ToNativeColor()) { }
     }
 
     public sealed class LoginInfoTextColorValueConverter : BoolToConstantValueConverter<Color>
@@ -63,7 +63,7 @@ namespace Toggl.Giskard.Converters
 
     public sealed class CalendarDayColorValueConverter : BoolToConstantValueConverter<Color>
     {
-        public CalendarDayColorValueConverter() : base(Color.White, Reports.DayNotInMonth.ToAndroidColor()) { }
+        public CalendarDayColorValueConverter() : base(Color.White, Reports.DayNotInMonth.ToNativeColor()) { }
     }
 
     public sealed class CalendarShortcutBackgroundColorValueConverter : BoolToConstantValueConverter<Color>

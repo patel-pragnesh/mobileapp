@@ -1,7 +1,7 @@
 ﻿using Android.Widget;
 using MvvmCross.Binding;
-using MvvmCross.Platform;
-using MvvmCross.Platform.Droid;
+using MvvmCross;
+using MvvmCross.Platforms.Android;
 using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.MvvmCross.Autocomplete;
 using Toggl.Giskard.Autocomplete;

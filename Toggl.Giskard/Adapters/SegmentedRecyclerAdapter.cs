@@ -6,7 +6,7 @@ using System.Linq;
 using Android.Runtime;
 using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 using Toggl.Foundation.MvvmCross.Collections;
 
 namespace Toggl.Giskard.Adapters

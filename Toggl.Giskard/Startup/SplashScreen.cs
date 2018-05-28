@@ -3,10 +3,10 @@ using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
-using MvvmCross.Droid.Views;
-using Toggl.Giskard.Extensions;
-using MvvmCross.Platform;
+using MvvmCross;
 using MvvmCross.Navigation;
+using MvvmCross.Platforms.Android.Views;
+using Toggl.Giskard.Extensions;
 
 namespace Toggl.Giskard
 {
@@ -30,9 +30,9 @@ namespace Toggl.Giskard
 
         }
 
-        protected override void TriggerFirstNavigate()
+        protected override void RunAppStart(Bundle bundle)
         {
-            base.TriggerFirstNavigate();
+            base.RunAppStart(bundle);
 
             var navigationUrl = Intent.Data?.ToString();
             if (string.IsNullOrEmpty(navigationUrl))
@@ -41,7 +41,7 @@ namespace Toggl.Giskard
             Mvx.Resolve<IMvxNavigationService>().Navigate(navigationUrl);
         }
 
-        protected override void OnCreate(Android.OS.Bundle bundle)
+        protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 

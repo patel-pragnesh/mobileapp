@@ -5,7 +5,7 @@ using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Util;
 using Android.Widget;
-using MvvmCross.Plugins.Color.Droid;
+using MvvmCross.Plugin.Color.Platforms.Android;
 using Toggl.Giskard.Extensions;
 using static Toggl.Foundation.MvvmCross.Helper.Color;
 
@@ -87,7 +87,7 @@ namespace Toggl.Giskard.Views
             circlePaint = new Paint
             {
                 Flags = PaintFlags.AntiAlias,
-                Color = Reports.DayNotInMonth.ToAndroidColor()
+                Color = Reports.DayNotInMonth.ToNativeColor()
             };
         }
 

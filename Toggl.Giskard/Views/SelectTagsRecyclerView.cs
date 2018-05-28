@@ -2,7 +2,7 @@
 using Android.Content;
 using Android.Runtime;
 using Android.Util;
-using MvvmCross.ViewModels;
+using MvvmCross.Commands;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using Toggl.Giskard.Adapters;
 

@@ -9,7 +9,7 @@ using Android.Views.InputMethods;
 using Android.Widget;
 using Java.Lang;
 using MvvmCross.Converters;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Giskard.Extensions;

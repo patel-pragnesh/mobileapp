@@ -1,12 +1,13 @@
 ﻿using Toggl.Foundation.MvvmCross.Combiners;
-using MvvmCross.Binding.Droid;
+using MvvmCross.Platforms.Android.Binding;
 using System;
+using MvvmCross.Binding.Combiners;
 
 namespace Toggl.Giskard
 {
     public sealed class TogglBindingBuilder : MvxAndroidBindingBuilder
     {
-        protected override void FillValueCombiners(MvvmCross.Binding.Combiners.IMvxValueCombinerRegistry registry)
+        protected override void FillValueCombiners(IMvxValueCombinerRegistry registry)
         {
             registry.AddOrOverwrite("Duration", new DurationValueCombiner());
             registry.AddOrOverwrite("DateTimeOffsetShortDateFormat", new DateTimeOffsetDateFormatValueCombiner(TimeZoneInfo.Local, false));

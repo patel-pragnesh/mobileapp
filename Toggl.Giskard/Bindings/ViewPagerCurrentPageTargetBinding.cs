@@ -2,9 +2,9 @@
 using Android.Graphics.Drawables;
 using Android.Views;
 using MvvmCross.Binding;
-using MvvmCross.Binding.Droid.Target;
+using MvvmCross.Platforms.Android.Binding.Target;
 using Toggl.Giskard.Extensions;
-using MvvmCross.Plugins.Color.Droid;
+using MvvmCross.Plugin.Color.Platforms.Android;
 using MvvmCross.UI;
 using Android.Graphics;
 using Android.Support.V4.View;

@@ -1,5 +1,5 @@
 ﻿using Android.Graphics;
-using MvvmCross.Plugins.Color.Droid;
+using MvvmCross.Plugin.Color.Platforms.Android;
 using FoundationColor = Toggl.Foundation.MvvmCross.Helper.Color;
 
 namespace Toggl.Giskard.Autocomplete

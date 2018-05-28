@@ -10,6 +10,8 @@ namespace Toggl.Giskard.TemplateSelectors
         public const int Header = 0;
         public const int Item = 1;
 
+        public int ItemTemplateId { get; set; }
+
         public int GetItemLayoutId(int fromViewType)
         {
             switch (fromViewType)

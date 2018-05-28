@@ -7,7 +7,7 @@ using Android.Text;
 using Android.Util;
 using Android.Views;
 using MvvmCross.UI;
-using MvvmCross.Plugins.Color.Droid;
+using MvvmCross.Plugin.Color.Platforms.Android;
 using Toggl.Foundation.Reports;
 using Toggl.Giskard.Extensions;
 using System.Collections.Generic;
@@ -79,7 +79,7 @@ namespace Toggl.Giskard.Views
             foreach (var segment in Segments)
             {
                 var segmentPaint = new Paint();
-                segmentPaint.Color = MvxColor.ParseHexString(segment.Color).ToAndroidColor();
+                segmentPaint.Color = MvxColor.ParseHexString(segment.Color).ToNativeColor();
 
                 var percent = (float)segment.TrackedTime.TotalSeconds / totalSeconds;
                 var sweepDegrees = fullCircle * percent;

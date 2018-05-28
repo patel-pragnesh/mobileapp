@@ -5,7 +5,7 @@ using Android.Runtime;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
-using MvvmCross.Platform.Droid.Platform;
+using MvvmCross.Platforms.Android;
 using Toggl.Giskard.Extensions;
 using Toggl.Multivac;
 

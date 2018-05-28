@@ -1,13 +1,10 @@
 ﻿using System;
-using Android.Views;
 using Android.Widget;
 using MvvmCross.Binding;
-using MvvmCross.Binding.Droid.Target;
+using MvvmCross.Platforms.Android.Binding.Target;
 using Toggl.Giskard.Extensions;
-using MvvmCross.Platform.WeakSubscription;
-using System.ComponentModel;
+using MvvmCross.WeakSubscription;
 using static Android.Views.View;
-using Android.App;
 
 namespace Toggl.Giskard.Bindings
 {

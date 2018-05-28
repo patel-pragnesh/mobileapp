@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
@@ -10,8 +10,8 @@ using Android.Support.Design.Widget;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MvvmCross.Droid.Support.V7.AppCompat;
-using MvvmCross.Droid.Views.Attributes;
-using MvvmCross.Platform.WeakSubscription;
+using MvvmCross.Platforms.Android.Presenters.Attributes;
+using MvvmCross.WeakSubscription;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using Toggl.Giskard.Extensions;

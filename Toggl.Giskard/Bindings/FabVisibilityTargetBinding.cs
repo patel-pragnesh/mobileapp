@@ -1,6 +1,6 @@
 ﻿using Android.Support.Design.Widget;
 using MvvmCross.Binding;
-using MvvmCross.Binding.Droid.Target;
+using MvvmCross.Platforms.Android.Binding.Target;
 
 namespace Toggl.Giskard.Bindings
 {

@@ -1,10 +1,10 @@
 ﻿using System;
 using Android.Runtime;
 using Android.Views;
-using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Droid.Support.V7.RecyclerView;
-using MvvmCross.Platform;
-using MvvmCross.Platform.Droid;
+using MvvmCross;
+using MvvmCross.Platforms.Android;
 using Toggl.Giskard.Extensions;
 
 namespace Toggl.Giskard.Views

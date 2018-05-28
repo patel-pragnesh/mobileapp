@@ -5,9 +5,9 @@ using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Util;
 using Android.Views;
-using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Platforms.Android.Binding.BindingContext;
 using MvvmCross.Droid.Support.V4;
-using MvvmCross.Droid.Views.Attributes;
+using MvvmCross.Platforms.Android.Presenters.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
 

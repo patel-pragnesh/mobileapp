@@ -17,6 +17,8 @@ namespace Toggl.Giskard.TemplateSelectors
         public const int CreateEntity = 7;
         public const int TimeEntrySuggestionWithPartialContent = 8;
 
+        public int ItemTemplateId { get; set; }
+
         public int GetItemLayoutId(int fromViewType)
         {
             switch (fromViewType)

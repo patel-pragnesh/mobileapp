@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Android.App;
 using Android.Content.PM;
@@ -8,7 +8,7 @@ using Android.OS;
 using Android.Views;
 using Android.Widget;
 using MvvmCross.Droid.Support.V7.AppCompat;
-using MvvmCross.Droid.Views.Attributes;
+using MvvmCross.Platforms.Android.Presenters.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
 using Toolbar = Android.Support.V7.Widget.Toolbar;

@@ -5,7 +5,7 @@ using Android.Runtime;
 using Android.Support.V4.Graphics;
 using Android.Util;
 using Android.Views;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 using Toggl.Giskard.Extensions;
 using Toggl.Multivac.Extensions;
 using static System.Math;

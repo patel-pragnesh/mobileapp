@@ -2,9 +2,11 @@
 using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Views;
-using MvvmCross.Binding.Droid.BindingContext;
+using MvvmCross.Platforms.Android.Binding.BindingContext;
+using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
+using MvvmCross.ViewModels;
 
 namespace Toggl.Giskard.Adapters
 {

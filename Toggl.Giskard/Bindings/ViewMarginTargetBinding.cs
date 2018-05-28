@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.Views;
 using MvvmCross.Binding;
-using MvvmCross.Binding.Droid.Target;
+using MvvmCross.Platforms.Android.Binding.Target;
 using Toggl.Giskard.Extensions;
 
 namespace Toggl.Giskard.Bindings
