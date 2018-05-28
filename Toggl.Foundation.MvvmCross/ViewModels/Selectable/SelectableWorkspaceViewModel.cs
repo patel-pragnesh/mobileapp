@@ -1,7 +1,6 @@
 ﻿using MvvmCross.Core.ViewModels;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
-using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

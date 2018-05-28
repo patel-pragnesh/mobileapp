@@ -16,7 +16,6 @@ using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
