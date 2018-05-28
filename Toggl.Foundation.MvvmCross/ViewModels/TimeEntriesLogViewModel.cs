@@ -211,7 +211,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void onMidnight(DateTimeOffset midnight)
         {
-            ChangePresentation(new ReloadLogHint());
+            navigationService.ChangePresentation(new ReloadLogHint());
         }
 
         private void onPreferencesChanged(IThreadSafePreferences preferences)
