@@ -5,7 +5,7 @@ using MvvmCross.Binding;
 using MvvmCross.Binding.Droid.Target;
 using Toggl.Giskard.Extensions;
 using MvvmCross.Plugins.Color.Droid;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using Android.Graphics;
 using Android.Widget;
 using Toggl.Multivac;

@@ -1,11 +1,11 @@
-using Foundation;
+﻿using Foundation;
 using System;
 using UIKit;
 using ObjCRuntime;
 using CoreGraphics;
 using Toggl.Foundation.Suggestions;
 using MvvmCross.Plugins.Color.iOS;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 
 namespace Toggl.Daneel
 {

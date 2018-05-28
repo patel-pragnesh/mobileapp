@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using PropertyChanged;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.MvvmCross.Helper;

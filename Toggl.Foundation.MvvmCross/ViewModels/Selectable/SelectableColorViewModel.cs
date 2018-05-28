@@ -1,5 +1,5 @@
 ﻿using MvvmCross.ViewModels;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels

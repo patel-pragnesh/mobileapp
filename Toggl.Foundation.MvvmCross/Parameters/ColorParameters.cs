@@ -1,4 +1,4 @@
-﻿using MvvmCross.Platform.UI;
+﻿using MvvmCross.UI;
 
 namespace Toggl.Foundation.MvvmCross.Parameters
 {

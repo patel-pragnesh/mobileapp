@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 
 namespace Toggl.Foundation.MvvmCross.Helper
 {

@@ -1,4 +1,4 @@
-﻿using MvvmCross.Platform.UI;
+﻿using MvvmCross.UI;
 using static System.Math;
 
 namespace Toggl.Foundation.MvvmCross.Extensions

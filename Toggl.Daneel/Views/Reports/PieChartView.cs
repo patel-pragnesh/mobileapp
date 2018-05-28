@@ -5,7 +5,7 @@ using System.Linq;
 using CoreGraphics;
 using Foundation;
 using Toggl.Foundation.Reports;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using MvvmCross.Plugins.Color.iOS;
 using static Toggl.Multivac.Math;
 

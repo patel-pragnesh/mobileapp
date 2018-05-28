@@ -6,7 +6,7 @@ using Android.Runtime;
 using Android.Text;
 using Android.Util;
 using Android.Views;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using MvvmCross.Plugins.Color.Droid;
 using Toggl.Foundation.Reports;
 using Toggl.Giskard.Extensions;

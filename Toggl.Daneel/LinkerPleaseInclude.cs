@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -8,7 +8,7 @@ using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS.Target;
 using MvvmCross.iOS.Views;
 using MvvmCross.Platform.IoC;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using MvvmCross.Plugins.Color;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;

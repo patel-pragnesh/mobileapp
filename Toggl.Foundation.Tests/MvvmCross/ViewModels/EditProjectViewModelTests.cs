@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using MvvmCross.Platform.UI;
+using MvvmCross.UI;
 using NSubstitute;
 using Toggl.Foundation.DTOs;
 using Toggl.Foundation.Models.Interfaces;

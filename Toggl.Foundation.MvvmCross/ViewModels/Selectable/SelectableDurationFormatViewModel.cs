@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MvvmCross.ViewModels;
+﻿using MvvmCross.ViewModels;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
