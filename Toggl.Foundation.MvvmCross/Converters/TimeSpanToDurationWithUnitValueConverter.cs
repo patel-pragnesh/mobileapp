@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Text;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.Converters

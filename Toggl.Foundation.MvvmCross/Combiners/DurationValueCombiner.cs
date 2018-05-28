@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MvvmCross.Binding.Bindings.SourceSteps;
 using MvvmCross.Binding.Combiners;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using Toggl.Foundation.Extensions;
 using Toggl.Multivac;
 

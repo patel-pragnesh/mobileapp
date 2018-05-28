@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using FluentAssertions;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Multivac;
 using Xunit;

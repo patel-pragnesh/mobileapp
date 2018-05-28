@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using static Toggl.Multivac.Extensions.ClampExtension;
 
 namespace Toggl.Foundation.MvvmCross.Converters

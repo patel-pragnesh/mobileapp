@@ -3,7 +3,7 @@ using System.Globalization;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS.Views;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using MvvmCross.Plugins.Color.iOS;
 using Toggl.Daneel.Extensions;
 using Toggl.Foundation.MvvmCross.Helper;

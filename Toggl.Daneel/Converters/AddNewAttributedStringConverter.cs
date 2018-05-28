@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Foundation;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using Toggl.Daneel.Extensions;
 
 namespace Toggl.Foundation.MvvmCross.Converters

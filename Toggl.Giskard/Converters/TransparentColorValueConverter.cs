@@ -2,7 +2,7 @@
 using System.Globalization;
 using Android.Graphics;
 using Android.Support.V4.Graphics;
-using MvvmCross.Platform.Converters;
+using MvvmCross.Converters;
 using Toggl.Multivac.Extensions;
 using Int = Java.Lang.Integer;
 
