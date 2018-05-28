@@ -307,7 +307,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async ThreadingTask NavigatesToTheEditTimeEntryViewModel()
             {
-                var databaseTimeEntry = Substitute.For<IDatabaseTimeEntry>();
+                var databaseTimeEntry = Substitute.For<IThreadSafeTimeEntry>();
                 databaseTimeEntry.Duration.Returns(100);
                 var timeEntryViewModel = new TimeEntryViewModel(databaseTimeEntry, DurationFormat.Improved);
 
@@ -385,7 +385,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             private TimeEntryViewModel createTimeEntryViewModel()
             {
-                var timeEntry = Substitute.For<IDatabaseTimeEntry>();
+                var timeEntry = Substitute.For<IThreadSafeTimeEntry>();
                 timeEntry.Duration.Returns(100);
                 timeEntry.WorkspaceId.Returns(10);
                 return new TimeEntryViewModel(timeEntry, DurationFormat.Improved);
@@ -412,7 +412,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public async ThreadingTask TracksTheEventUsingTheAnaltyticsService()
             {
-                var timeEntry = Substitute.For<IDatabaseTimeEntry>();
+                var timeEntry = Substitute.For<IThreadSafeTimeEntry>();
                 timeEntry.Id.Returns(1);
                 timeEntry.Duration.Returns(100);
                 timeEntry.WorkspaceId.Returns(10);

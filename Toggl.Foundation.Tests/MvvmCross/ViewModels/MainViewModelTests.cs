@@ -605,7 +605,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 DataSource.TimeEntries.IsEmpty.Returns(Observable.Return(false));
                 var suggestionProvider = Substitute.For<ISuggestionProvider>();
-                var timeEntry = Substitute.For<IDatabaseTimeEntry>();
+                var timeEntry = Substitute.For<IThreadSafeTimeEntry>();
                 timeEntry.Id.Returns(123);
                 timeEntry.Start.Returns(DateTimeOffset.Now);
                 timeEntry.Duration.Returns((long?)null);

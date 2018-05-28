@@ -1041,7 +1041,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 prepareNavigationService(newProjectId, null);
                 var timeEntry = prepareTimeEntry(timeEntryId);
                 var tags = createTags(initialTagCount);
-                timeEntry.ThreadSafeTags.Returns(tags);
+                timeEntry.Tags.Returns(tags);
                 ViewModel.Prepare(timeEntryId);
                 await ViewModel.Initialize();
                 ViewModel.Tags.Should().HaveCount(initialTagCount);
@@ -1098,7 +1098,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var timeEntry = Substitute.For<IThreadSafeTimeEntry>();
 
                 timeEntry.Id.Returns(13);
-                timeEntry.ThreadSafeTags.Returns(new IThreadSafeTag[] { tag });
+                timeEntry.Tags.Returns(new IThreadSafeTag[] { tag });
 
                 DataSource.TimeEntries.GetById(Arg.Is(timeEntry.Id))
                     .Returns(Observable.Return(timeEntry));
