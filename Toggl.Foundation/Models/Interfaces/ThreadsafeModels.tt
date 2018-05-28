@@ -56,7 +56,7 @@ namespace Toggl.Foundation.Models.Interfaces
             var name = match.Groups["name"].Captures[0].Value;
 
             isFirst = false;
-            WriteLine($"        {type} ThreadSafe{name} {{ get; }}");
+            WriteLine($"        new {type} {name} {{ get; }}");
         }
         
         WriteLine( "    }");

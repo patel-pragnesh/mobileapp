@@ -81,9 +81,8 @@ namespace Toggl.Foundation.Models
                 }
                 
                 var assignment = requiresWrapping ? $"entity.{propName} == null ? null : {wrapping}" : $"entity.{propName}";
-                var prefix = requiresWrapping ? "ThreadSafe" : "";
 
-                WriteLine($"            {prefix}{propName} = {assignment};");
+                WriteLine($"            {propName} = {assignment};");
             }
 
             if (implementsIDatabaseSyncable)

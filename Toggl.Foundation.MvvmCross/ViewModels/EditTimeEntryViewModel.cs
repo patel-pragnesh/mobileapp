@@ -252,7 +252,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             workspaceId = timeEntry.WorkspaceId;
             SyncErrorMessageVisible = !string.IsNullOrEmpty(SyncErrorMessage);
 
-            onTags(timeEntry.ThreadSafeTags);
+            onTags(timeEntry.Tags);
             foreach (var tagId in timeEntry.TagIds)
                 tagIds.Add(tagId);
 

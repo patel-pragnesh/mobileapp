@@ -10,7 +10,7 @@ namespace Toggl.Foundation.Models
         private Client(IDatabaseClient entity)
             : this(entity as IClient, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
         {
-            ThreadSafeWorkspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
+            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
             SyncStatus = entity.SyncStatus;
             LastSyncErrorMessage = entity.LastSyncErrorMessage;
             IsDeleted = entity.IsDeleted;
@@ -98,9 +98,9 @@ namespace Toggl.Foundation.Models
         private Project(IDatabaseProject entity)
             : this(entity as IProject, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
         {
-            ThreadSafeClient = entity.Client == null ? null : Models.Client.From(entity.Client);
-            ThreadSafeWorkspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
-            ThreadSafeTasks = entity.Tasks == null ? null : entity.Tasks.Select(Models.Task.From);
+            Client = entity.Client == null ? null : Models.Client.From(entity.Client);
+            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
+            Tasks = entity.Tasks == null ? null : entity.Tasks.Select(Models.Task.From);
             SyncStatus = entity.SyncStatus;
             LastSyncErrorMessage = entity.LastSyncErrorMessage;
             IsDeleted = entity.IsDeleted;
@@ -156,7 +156,7 @@ namespace Toggl.Foundation.Models
         private Tag(IDatabaseTag entity)
             : this(entity as ITag, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
         {
-            ThreadSafeWorkspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
+            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
             SyncStatus = entity.SyncStatus;
             LastSyncErrorMessage = entity.LastSyncErrorMessage;
             IsDeleted = entity.IsDeleted;
@@ -201,9 +201,9 @@ namespace Toggl.Foundation.Models
         private Task(IDatabaseTask entity)
             : this(entity as ITask, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
         {
-            ThreadSafeUser = entity.User == null ? null : Models.User.From(entity.User);
-            ThreadSafeProject = entity.Project == null ? null : Models.Project.From(entity.Project);
-            ThreadSafeWorkspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
+            User = entity.User == null ? null : Models.User.From(entity.User);
+            Project = entity.Project == null ? null : Models.Project.From(entity.Project);
+            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
             SyncStatus = entity.SyncStatus;
             LastSyncErrorMessage = entity.LastSyncErrorMessage;
             IsDeleted = entity.IsDeleted;
@@ -252,11 +252,11 @@ namespace Toggl.Foundation.Models
         private TimeEntry(IDatabaseTimeEntry entity)
             : this(entity as ITimeEntry, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
         {
-            ThreadSafeTask = entity.Task == null ? null : Models.Task.From(entity.Task);
-            ThreadSafeUser = entity.User == null ? null : Models.User.From(entity.User);
-            ThreadSafeProject = entity.Project == null ? null : Models.Project.From(entity.Project);
-            ThreadSafeWorkspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
-            ThreadSafeTags = entity.Tags == null ? null : entity.Tags.Select(Models.Tag.From);
+            Task = entity.Task == null ? null : Models.Task.From(entity.Task);
+            User = entity.User == null ? null : Models.User.From(entity.User);
+            Project = entity.Project == null ? null : Models.Project.From(entity.Project);
+            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
+            Tags = entity.Tags == null ? null : entity.Tags.Select(Models.Tag.From);
             SyncStatus = entity.SyncStatus;
             LastSyncErrorMessage = entity.LastSyncErrorMessage;
             IsDeleted = entity.IsDeleted;
@@ -428,8 +428,8 @@ namespace Toggl.Foundation.Models
         private WorkspaceFeatureCollection(IDatabaseWorkspaceFeatureCollection entity)
             : this(entity as IWorkspaceFeatureCollection)
         {
-            ThreadSafeWorkspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
-            ThreadSafeDatabaseFeatures = entity.DatabaseFeatures == null ? null : entity.DatabaseFeatures.Select(Models.WorkspaceFeature.From);
+            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
+            DatabaseFeatures = entity.DatabaseFeatures == null ? null : entity.DatabaseFeatures.Select(Models.WorkspaceFeature.From);
         }
 
         public static WorkspaceFeatureCollection From(IDatabaseWorkspaceFeatureCollection entity)

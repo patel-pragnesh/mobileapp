@@ -6,7 +6,7 @@ namespace Toggl.Foundation.Models.Interfaces
     public partial interface IThreadSafeClient
         : IThreadSafeModel, IDatabaseClient
     {
-        IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        new IThreadSafeWorkspace Workspace { get; }
     }
 
     public partial interface IThreadSafePreferences
@@ -17,41 +17,41 @@ namespace Toggl.Foundation.Models.Interfaces
     public partial interface IThreadSafeProject
         : IThreadSafeModel, IDatabaseProject
     {
-        IThreadSafeClient ThreadSafeClient { get; }
+        new IThreadSafeClient Client { get; }
 
-        IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        new IThreadSafeWorkspace Workspace { get; }
 
-        IEnumerable<IThreadSafeTask> ThreadSafeTasks { get; }
+        new IEnumerable<IThreadSafeTask> Tasks { get; }
     }
 
     public partial interface IThreadSafeTag
         : IThreadSafeModel, IDatabaseTag
     {
-        IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        new IThreadSafeWorkspace Workspace { get; }
     }
 
     public partial interface IThreadSafeTask
         : IThreadSafeModel, IDatabaseTask
     {
-        IThreadSafeUser ThreadSafeUser { get; }
+        new IThreadSafeUser User { get; }
 
-        IThreadSafeProject ThreadSafeProject { get; }
+        new IThreadSafeProject Project { get; }
 
-        IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        new IThreadSafeWorkspace Workspace { get; }
     }
 
     public partial interface IThreadSafeTimeEntry
         : IThreadSafeModel, IDatabaseTimeEntry
     {
-        IThreadSafeTask ThreadSafeTask { get; }
+        new IThreadSafeTask Task { get; }
 
-        IThreadSafeUser ThreadSafeUser { get; }
+        new IThreadSafeUser User { get; }
 
-        IThreadSafeProject ThreadSafeProject { get; }
+        new IThreadSafeProject Project { get; }
 
-        IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        new IThreadSafeWorkspace Workspace { get; }
 
-        IEnumerable<IThreadSafeTag> ThreadSafeTags { get; }
+        new IEnumerable<IThreadSafeTag> Tags { get; }
     }
 
     public partial interface IThreadSafeUser
@@ -72,8 +72,8 @@ namespace Toggl.Foundation.Models.Interfaces
     public partial interface IThreadSafeWorkspaceFeatureCollection
         : IThreadSafeModel, IDatabaseWorkspaceFeatureCollection
     {
-        IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        new IThreadSafeWorkspace Workspace { get; }
 
-        IEnumerable<IThreadSafeWorkspaceFeature> ThreadSafeDatabaseFeatures { get; }
+        new IEnumerable<IThreadSafeWorkspaceFeature> DatabaseFeatures { get; }
     }
 }

@@ -16,9 +16,9 @@ namespace Toggl.Foundation.Models
 
         public string Name { get; }
 
-        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+        IDatabaseWorkspace IDatabaseClient.Workspace => Workspace;
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; }
 
         public bool IsDeleted { get; }
 
@@ -78,17 +78,17 @@ namespace Toggl.Foundation.Models
 
         public int? ActualHours { get; }
 
-        public IDatabaseClient Client => ThreadSafeClient;
+        IDatabaseClient IDatabaseProject.Client => Client;
 
-        public IThreadSafeClient ThreadSafeClient { get; }
+        public IThreadSafeClient Client { get; }
 
-        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+        IDatabaseWorkspace IDatabaseProject.Workspace => Workspace;
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; }
 
-        public IEnumerable<IDatabaseTask> Tasks => ThreadSafeTasks;
+        IEnumerable<IDatabaseTask> IDatabaseProject.Tasks => Tasks;
 
-        public IEnumerable<IThreadSafeTask> ThreadSafeTasks { get; }
+        public IEnumerable<IThreadSafeTask> Tasks { get; }
 
         public bool IsDeleted { get; }
 
@@ -109,9 +109,9 @@ namespace Toggl.Foundation.Models
 
         public string Name { get; }
 
-        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+        IDatabaseWorkspace IDatabaseTag.Workspace => Workspace;
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; }
 
         public bool IsDeleted { get; }
 
@@ -142,17 +142,17 @@ namespace Toggl.Foundation.Models
 
         public long TrackedSeconds { get; }
 
-        public IDatabaseUser User => ThreadSafeUser;
+        IDatabaseUser IDatabaseTask.User => User;
 
-        public IThreadSafeUser ThreadSafeUser { get; }
+        public IThreadSafeUser User { get; }
 
-        public IDatabaseProject Project => ThreadSafeProject;
+        IDatabaseProject IDatabaseTask.Project => Project;
 
-        public IThreadSafeProject ThreadSafeProject { get; }
+        public IThreadSafeProject Project { get; }
 
-        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+        IDatabaseWorkspace IDatabaseTask.Workspace => Workspace;
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; }
 
         public bool IsDeleted { get; }
 
@@ -185,25 +185,25 @@ namespace Toggl.Foundation.Models
 
         public long UserId { get; }
 
-        public IDatabaseTask Task => ThreadSafeTask;
+        IDatabaseTask IDatabaseTimeEntry.Task => Task;
 
-        public IThreadSafeTask ThreadSafeTask { get; }
+        public IThreadSafeTask Task { get; }
 
-        public IDatabaseUser User => ThreadSafeUser;
+        IDatabaseUser IDatabaseTimeEntry.User => User;
 
-        public IThreadSafeUser ThreadSafeUser { get; }
+        public IThreadSafeUser User { get; }
 
-        public IDatabaseProject Project => ThreadSafeProject;
+        IDatabaseProject IDatabaseTimeEntry.Project => Project;
 
-        public IThreadSafeProject ThreadSafeProject { get; }
+        public IThreadSafeProject Project { get; }
 
-        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+        IDatabaseWorkspace IDatabaseTimeEntry.Workspace => Workspace;
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; }
 
-        public IEnumerable<IDatabaseTag> Tags => ThreadSafeTags;
+        IEnumerable<IDatabaseTag> IDatabaseTimeEntry.Tags => Tags;
 
-        public IEnumerable<IThreadSafeTag> ThreadSafeTags { get; }
+        public IEnumerable<IThreadSafeTag> Tags { get; }
 
         public bool IsDeleted { get; }
 
@@ -296,13 +296,13 @@ namespace Toggl.Foundation.Models
 
         public IEnumerable<IWorkspaceFeature> Features { get; }
 
-        public IDatabaseWorkspace Workspace => ThreadSafeWorkspace;
+        IDatabaseWorkspace IDatabaseWorkspaceFeatureCollection.Workspace => Workspace;
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; }
 
-        public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures => ThreadSafeDatabaseFeatures;
+        IEnumerable<IDatabaseWorkspaceFeature> IDatabaseWorkspaceFeatureCollection.DatabaseFeatures => DatabaseFeatures;
 
-        public IEnumerable<IThreadSafeWorkspaceFeature> ThreadSafeDatabaseFeatures { get; }
+        public IEnumerable<IThreadSafeWorkspaceFeature> DatabaseFeatures { get; }
 
     }
 }

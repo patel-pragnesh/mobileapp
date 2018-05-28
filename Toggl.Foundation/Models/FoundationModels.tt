@@ -87,8 +87,8 @@ namespace Toggl.Foundation.Models
                     var type = match.Groups["type"].Captures[0].Value;
                     var threadSafeType = type.Replace("IDatabase", "IThreadSafe");
 
-                    WriteLine($"        public {type} {name} => ThreadSafe{name};\n");
-                    WriteLine($"        public {threadSafeType} ThreadSafe{name} {{ get; }}\n");
+                    WriteLine($"        {type} IDatabase{className}.{name} => {name};\n");
+                    WriteLine($"        public {threadSafeType} {name} {{ get; }}\n");
                 }
                 else
                 {
