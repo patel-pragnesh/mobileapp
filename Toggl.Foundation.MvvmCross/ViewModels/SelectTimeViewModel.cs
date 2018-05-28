@@ -11,6 +11,9 @@ using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
 using System.Reactive.Subjects;
 using static Toggl.Foundation.MvvmCross.ViewModels.SelectTimeViewModel.TemporalInconsistency;
+using Toggl.Foundation.DataSources;
+using Toggl.PrimeRadiant.Models;
+using Toggl.Foundation.Models.Interfaces;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
@@ -30,7 +33,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         }
 
         private readonly ISubject<TemporalInconsistency> temporalInconsistencySubject = new Subject<TemporalInconsistency>();
+        private readonly ISubject<bool> is24HoursModeSubject = new BehaviorSubject<bool>(false);
 
+        private readonly ITogglDataSource dataSource;
         private readonly IMvxNavigationService navigationService;
         private readonly ITimeService timeService;
         private IDisposable timeServiceDisposable;
@@ -59,6 +64,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public DateTimeOffset StopTimeOrCurrent => StopTime ?? CurrentDateTime;
 
         public IObservable<TemporalInconsistency> TemporalInconsistencyDetected { get; }
+        public IObservable<bool> Is24HoursModeObservable { get; }
 
         [DependsOn(nameof(StartTime))]
         public DateTime StartDatePart
@@ -190,6 +196,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public int CurrentTab { get; set; }
 
+        public bool Is24HoursMode { get; set; }
+
         public bool IsOnStartTimeTab => CurrentTab == StartTimeTab;
 
         public bool IsOnStopTimeTab => CurrentTab == StopTimeTab;
@@ -224,16 +232,20 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public bool IsRunningTimeEntryAM => CurrentDateTime.Hour < 12;
 
         public SelectTimeViewModel(
+            ITogglDataSource dataSource,
             IMvxNavigationService navigationService,
             ITimeService timeService)
         {
+            Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
             TemporalInconsistencyDetected = temporalInconsistencySubject.AsObservable();
+            Is24HoursModeObservable = is24HoursModeSubject.AsObservable();
 
             this.navigationService = navigationService;
             this.timeService = timeService;
+            this.dataSource = dataSource;
 
             CancelCommand = new MvxAsyncCommand(cancel);
             SaveCommand = new MvxAsyncCommand(save);
@@ -274,6 +286,16 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                                .StartWith(timeService.CurrentDateTime)
                                .Subscribe(currentDateTime => CurrentDateTime = currentDateTime);
             }
+
+            dataSource
+                .Preferences.Current
+                .Subscribe(onPreferencesChanged);
+        }
+
+        private void onPreferencesChanged(IThreadSafePreferences preferences) 
+        {
+            Is24HoursMode = preferences.TimeOfDayFormat.IsTwentyFourHoursFormat;
+            is24HoursModeSubject.OnNext(Is24HoursMode);
         }
 
         private void increaseDuration(int minutes)

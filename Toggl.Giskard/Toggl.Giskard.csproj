@@ -394,6 +394,7 @@
     <Compile Include="Activities\SignUpActivity.cs" />
     <Compile Include="TemplateSelectors\SelecCountryTemplateSelector.cs" />
     <Compile Include="Fragments\TermsOfServiceFragment.cs" />
+    <Compile Include="Views\TogglDroidTimePicker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

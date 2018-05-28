@@ -26,6 +26,7 @@ namespace Toggl.Giskard.Fragments
     using System.Reactive.Linq;
     using MvvmCross.Binding.BindingContext;
     using Toggl.Giskard.Helper;
+    using Toggl.Giskard.Views;
     using static SelectTimeFragment.EditorMode;
     using static SelectTimeViewModel;
     using static SelectTimeViewModel.TemporalInconsistency;
@@ -48,6 +49,10 @@ namespace Toggl.Giskard.Fragments
 
         private IDisposable onModeChangedDisposable;
         private IDisposable onTemporalInconsistencyDisposable;
+        private IDisposable onPreferencesChangedDisposable;
+
+        private TogglDroidTimePicker startTimePicker;
+        private TogglDroidTimePicker stopTimePicker;
 
         private LinearLayout controlButtons;
         private TabLayout tabLayout;
@@ -94,6 +99,11 @@ namespace Toggl.Giskard.Fragments
             {
                 tabLayout.SetupWithViewPager(pager, true);
 
+                startTimePicker = view.FindViewById<TogglDroidTimePicker>(Resource.Id.SelectStartTimeClockView);
+                stopTimePicker = view.FindViewById<TogglDroidTimePicker>(Resource.Id.SelectStopTimeClockView);
+
+                onPreferencesChangedDisposable = ViewModel.Is24HoursModeObservable.Subscribe(on24HourModeChanged);
+
                 tabLayout.GetTabAt(StartTimeTab).SetCustomView(startPageView);
                 tabLayout.GetTabAt(StopTimeTab).SetCustomView(stopPageView);
                 tabLayout.GetTabAt(DurationTab).SetCustomView(durationPageView);
@@ -102,6 +112,12 @@ namespace Toggl.Giskard.Fragments
             });
 
             return view;
+        }
+
+        private void on24HourModeChanged(bool is24HoursMode) 
+        {
+            startTimePicker?.Update24HourMode(is24HoursMode);
+            stopTimePicker?.Update24HourMode(is24HoursMode);
         }
 
         private Dictionary<TemporalInconsistency, int> inconsistencyMessages = new Dictionary<TemporalInconsistency, int>
