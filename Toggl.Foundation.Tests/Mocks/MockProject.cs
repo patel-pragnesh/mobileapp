@@ -8,11 +8,11 @@ namespace Toggl.Foundation.Tests.Mocks
 {
     public sealed class MockProject : IThreadSafeProject
     {
-        public IDatabaseClient Client { get; set; }
+        IDatabaseClient IDatabaseProject.Client => Client;
 
-        public IDatabaseWorkspace Workspace { get; set; }
+        IDatabaseWorkspace IDatabaseProject.Workspace => Workspace;
 
-        public IEnumerable<IDatabaseTask> Tasks { get; set; }
+        IEnumerable<IDatabaseTask> IDatabaseProject.Tasks => Tasks;
 
         public long WorkspaceId { get; set; }
 
@@ -52,10 +52,10 @@ namespace Toggl.Foundation.Tests.Mocks
 
         public bool IsDeleted { get; set; }
 
-        public IThreadSafeClient ThreadSafeClient { get; }
+        public IThreadSafeClient Client { get; set; }
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; set; }
 
-        public IEnumerable<IThreadSafeTask> ThreadSafeTasks { get; }
+        public IEnumerable<IThreadSafeTask> Tasks { get; set; }
     }
 }

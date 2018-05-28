@@ -7,7 +7,7 @@ namespace Toggl.Foundation.Tests.Mocks
 {
     public sealed class MockClient : IThreadSafeClient
     {
-        public IDatabaseWorkspace Workspace { get; set; }
+        IDatabaseWorkspace IDatabaseClient.Workspace => Workspace;
 
         public long WorkspaceId { get; set; }
 
@@ -25,6 +25,6 @@ namespace Toggl.Foundation.Tests.Mocks
 
         public bool IsDeleted { get; set; }
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; set; }
+        public IThreadSafeWorkspace Workspace { get; set; }
     }
 }

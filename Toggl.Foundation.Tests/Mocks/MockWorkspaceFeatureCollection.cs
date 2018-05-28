@@ -11,19 +11,19 @@ namespace Toggl.Foundation.Tests.Mocks
     {
         public long Id => WorkspaceId;
 
-        public IDatabaseWorkspace Workspace { get; set; }
+        IDatabaseWorkspace IDatabaseWorkspaceFeatureCollection.Workspace => Workspace;
 
-        public IEnumerable<IDatabaseWorkspaceFeature> DatabaseFeatures { get; set; }
+        IEnumerable<IDatabaseWorkspaceFeature> IDatabaseWorkspaceFeatureCollection.DatabaseFeatures => DatabaseFeatures;
 
         public long WorkspaceId { get; set; }
 
         public IEnumerable<IWorkspaceFeature> Features { get; set; }
 
+        public IThreadSafeWorkspace Workspace { get; set; }
+
+        public IEnumerable<IThreadSafeWorkspaceFeature> DatabaseFeatures { get; set; }
+
         public bool IsEnabled(WorkspaceFeatureId feature)
             => Features.Any(f => f.FeatureId == feature && f.Enabled);
-
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
-
-        public IEnumerable<IThreadSafeWorkspaceFeature> ThreadSafeDatabaseFeatures { get; }
     }
 }

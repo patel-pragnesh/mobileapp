@@ -7,11 +7,11 @@ namespace Toggl.Foundation.Tests.Mocks
 {
     public sealed class MockTask : IThreadSafeTask
     {
-        public IDatabaseUser User { get; set; }
+        IDatabaseUser IDatabaseTask.User => User;
 
-        public IDatabaseProject Project { get; set; }
+        IDatabaseProject IDatabaseTask.Project => Project;
 
-        public IDatabaseWorkspace Workspace { get; set; }
+        IDatabaseWorkspace IDatabaseTask.Workspace => Workspace;
 
         public string Name { get; set; }
 
@@ -37,10 +37,10 @@ namespace Toggl.Foundation.Tests.Mocks
 
         public bool IsDeleted { get; set; }
 
-        public IThreadSafeUser ThreadSafeUser { get; }
+        public IThreadSafeUser User { get; set; }
 
-        public IThreadSafeProject ThreadSafeProject { get; }
+        public IThreadSafeProject Project { get; set; }
 
-        public IThreadSafeWorkspace ThreadSafeWorkspace { get; }
+        public IThreadSafeWorkspace Workspace { get; set; }
     }
 }
