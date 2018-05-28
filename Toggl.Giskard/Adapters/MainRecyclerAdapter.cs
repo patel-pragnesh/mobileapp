@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Linq;
 using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Views;
 using MvvmCross.Binding.Droid.BindingContext;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.ViewModels;

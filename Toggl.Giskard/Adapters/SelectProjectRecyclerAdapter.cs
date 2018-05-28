@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Linq;
 using Android.Runtime;
@@ -6,7 +6,7 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Widget;
 using MvvmCross.Binding.Droid.BindingContext;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using Toggl.Foundation;
 using Toggl.Foundation.Autocomplete.Suggestions;

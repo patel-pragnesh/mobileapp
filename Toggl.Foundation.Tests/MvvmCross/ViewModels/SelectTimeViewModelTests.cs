@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using NSubstitute;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels;

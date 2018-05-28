@@ -2,7 +2,7 @@
 using CoreGraphics;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.iOS.Views;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;

@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Reactive.Concurrency;
 using Android.Content;
 using MvvmCross.Binding;
 using MvvmCross.Core.Navigation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views;
 using MvvmCross.Platform;

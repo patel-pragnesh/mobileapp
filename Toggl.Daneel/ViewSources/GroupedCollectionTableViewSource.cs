@@ -6,7 +6,7 @@ using System.Linq;
 using Foundation;
 using MvvmCross.Binding.ExtensionMethods;
 using MvvmCross.Binding.iOS.Views;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using Toggl.Daneel.Views.Interfaces;
 using Toggl.Foundation.MvvmCross.Collections;
 using UIKit;

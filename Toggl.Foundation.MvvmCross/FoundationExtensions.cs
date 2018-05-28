@@ -15,7 +15,7 @@ using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 
 namespace Toggl.Foundation.MvvmCross
 {

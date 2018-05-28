@@ -2,7 +2,7 @@
 using System.Linq;
 using Foundation;
 using MvvmCross.Binding.ExtensionMethods;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Plugins.Color.iOS;
 using Toggl.Daneel.Views;
 using Toggl.Daneel.Views.StartTimeEntry;

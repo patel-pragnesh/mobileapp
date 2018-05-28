@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Windows.Input;
 using Android.App;
@@ -8,7 +8,7 @@ using Android.Widget;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.Droid.Target;
 using MvvmCross.Core.Navigation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using V4Space = Android.Support.V4.Widget.Space;
 using Newtonsoft.Json.Converters;
 using Firebase.Provider;

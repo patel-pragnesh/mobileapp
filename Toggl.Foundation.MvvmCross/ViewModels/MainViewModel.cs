@@ -5,7 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation;
 using Toggl.Foundation.DataSources;

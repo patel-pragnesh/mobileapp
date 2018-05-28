@@ -3,7 +3,7 @@ using System.Linq;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
 using MvvmCross.Binding.iOS.Views;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Foundation;

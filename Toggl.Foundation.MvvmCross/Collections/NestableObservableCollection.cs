@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 
 namespace Toggl.Foundation.MvvmCross.Collections

@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Platform.Core;
 using PropertyChanged;
 using Toggl.Foundation.Helper;

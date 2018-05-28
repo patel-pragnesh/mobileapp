@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Selectable;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;

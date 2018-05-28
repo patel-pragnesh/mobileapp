@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Foundation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using Toggl.Daneel.Views;
 using Toggl.Foundation.MvvmCross.Collections;
 using UIKit;

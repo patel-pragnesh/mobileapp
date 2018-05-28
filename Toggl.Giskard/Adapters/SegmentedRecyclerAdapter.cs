@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Android.Runtime;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using MvvmCross.Platform.Core;
 using Toggl.Foundation.MvvmCross.Collections;

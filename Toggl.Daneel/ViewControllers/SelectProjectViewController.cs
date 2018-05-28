@@ -1,6 +1,6 @@
 ﻿using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using Toggl.Daneel.Extensions;
 using Toggl.Daneel.Presentation.Attributes;
 using Toggl.Daneel.ViewSources;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Android.Content;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;

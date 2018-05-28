@@ -1,7 +1,7 @@
 ﻿using System;
 using MvvmCross.Binding;
 using MvvmCross.Binding.Bindings.Target;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using UIKit;
 
 namespace Toggl.Daneel.Binding

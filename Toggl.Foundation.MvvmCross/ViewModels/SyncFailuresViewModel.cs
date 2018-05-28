@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using Toggl.Multivac;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Models;

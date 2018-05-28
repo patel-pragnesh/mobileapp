@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.Reactive.Linq;
 using Foundation;
 using MvvmCross.Core.Navigation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.iOS.Platform;
 using MvvmCross.Platform;
 using Toggl.Foundation.Analytics;

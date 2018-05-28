@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoreAnimation;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Core.Views;
 using MvvmCross.iOS.Views;
 using MvvmCross.iOS.Views.Presenters;

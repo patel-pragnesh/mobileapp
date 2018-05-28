@@ -6,7 +6,7 @@ using System.Reactive.Subjects;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Platform.WeakSubscription;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;

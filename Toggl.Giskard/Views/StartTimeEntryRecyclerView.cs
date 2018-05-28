@@ -3,7 +3,7 @@ using Android.Content;
 using Android.Runtime;
 using Android.Util;
 using Android.Views;
-using MvvmCross.Core.ViewModels;
+using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.RecyclerView;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Giskard.Adapters;
