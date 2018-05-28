@@ -17,6 +17,7 @@ using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Foundation.Analytics;
 using static Toggl.Foundation.Helper.Constants;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

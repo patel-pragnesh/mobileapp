@@ -8,6 +8,7 @@ using Toggl.Foundation.Analytics;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Settings;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

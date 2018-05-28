@@ -11,6 +11,7 @@ using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
 using System.Reactive.Subjects;
 using static Toggl.Foundation.MvvmCross.ViewModels.SelectTimeViewModel.TemporalInconsistency;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

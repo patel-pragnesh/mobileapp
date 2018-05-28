@@ -9,6 +9,7 @@ using Toggl.Multivac.Models;
 using Toggl.Multivac.Extensions;
 using static Toggl.Multivac.Extensions.StringExtensions;
 using Toggl.Foundation.Interactors;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

@@ -18,6 +18,7 @@ using Toggl.Multivac.Extensions;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.Helper;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

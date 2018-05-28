@@ -3,6 +3,7 @@ using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using Toggl.Multivac;
 using Toggl.Foundation.MvvmCross.Parameters;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels.Settings
 {

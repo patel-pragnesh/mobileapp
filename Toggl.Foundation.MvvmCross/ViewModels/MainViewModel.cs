@@ -20,6 +20,7 @@ using Toggl.PrimeRadiant.Settings;
 using System.Reactive;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Suggestions;
+using MvvmCross.Commands;
 
 [assembly: MvxNavigation(typeof(MainViewModel), ApplicationUrls.Main.Regex)]
 namespace Toggl.Foundation.MvvmCross.ViewModels

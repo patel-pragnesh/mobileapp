@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using MvvmCross.Commands;
 using MvvmCross.ViewModels;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Interactors;

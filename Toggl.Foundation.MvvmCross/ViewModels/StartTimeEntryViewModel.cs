@@ -23,6 +23,7 @@ using Toggl.Foundation;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Foundation.Analytics;
 using Toggl.PrimeRadiant.Models;
+using MvvmCross.Commands;
 
 [assembly: MvxNavigation(typeof(StartTimeEntryViewModel), ApplicationUrls.StartTimeEntry)]
 namespace Toggl.Foundation.MvvmCross.ViewModels

@@ -13,6 +13,7 @@ using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Models;
 using static Toggl.Foundation.Helper.Constants;
+using MvvmCross.Commands;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {

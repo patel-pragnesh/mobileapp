@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using PropertyChanged;
