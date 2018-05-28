@@ -1,4 +1,4 @@
-﻿using MvvmCross.Platform;
+﻿using MvvmCross;
 using Toggl.Foundation.DataSources;
 
 namespace Toggl.Foundation.MvvmCross

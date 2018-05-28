@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using MvvmCross.Navigation;
-using MvvmCross.Platform;
+using MvvmCross;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.DataSources;
