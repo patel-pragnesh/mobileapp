@@ -1,4 +1,5 @@
 ﻿using MvvmCross.Core.ViewModels;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Models;
 
@@ -13,7 +14,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public bool Selected { get; set; }
 
-        public SelectableWorkspaceViewModel(IDatabaseWorkspace workspace, bool selected)
+        public SelectableWorkspaceViewModel(IThreadSafeWorkspace workspace, bool selected)
         {
             Ensure.Argument.IsNotNull(workspace, nameof(workspace));
 

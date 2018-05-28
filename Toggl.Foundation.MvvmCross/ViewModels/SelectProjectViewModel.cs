@@ -177,7 +177,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             return workspaces.Concat(unusedWorkspaces);
         }
 
-        private WorkspaceGroupedSuggestionsCollection workspaceGroupedSuggestionCollection(IDatabaseWorkspace workspace)
+        private WorkspaceGroupedSuggestionsCollection workspaceGroupedSuggestionCollection(IThreadSafeWorkspace workspace)
             => new WorkspaceGroupedSuggestionsCollection(
                 workspace.Name,
                 workspace.Id,
