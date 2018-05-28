@@ -557,7 +557,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsBillableAvailable = await interactorFactory.IsBillableAvailableForWorkspace(workspaceId).Execute();
         }
 
-        public override void ViewDestroy()
+        public override void ViewDestroy(bool viewFinishing)
         {
             base.ViewDestroy();
             confirmDisposable?.Dispose();

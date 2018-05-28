@@ -379,7 +379,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        public override void ViewDestroy()
+        public override void ViewDestroy(bool viewFinishing)
         {
             base.ViewDestroy();
             timeServiceDisposable?.Dispose();

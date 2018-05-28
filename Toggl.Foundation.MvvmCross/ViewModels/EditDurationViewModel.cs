@@ -259,7 +259,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             RaisePropertyChanged(nameof(DurationFormat));
         }
 
-        public override void ViewDestroy()
+        public override void ViewDestroy(bool viewFinishing)
         {
             base.ViewDestroy();
             runningTimeEntryDisposable?.Dispose();
