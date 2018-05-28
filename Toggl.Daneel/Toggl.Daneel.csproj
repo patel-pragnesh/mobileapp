@@ -685,7 +685,6 @@
     <Compile Include="Views\TextViewWithPlaceholder.cs" />
     <Compile Include="Binding\TextViewWithPlaceholderTextTargetBinding.cs" />
     <Compile Include="Binding\TextFieldPlaceholderTargetBinding.cs" />
-    <Compile Include="Startup\DebugTrace.cs" />
     <Compile Include="Startup\AppDelegate.cs" />
     <Compile Include="Startup\Main.cs" />
     <Compile Include="ViewControllers\OutdatedAppViewController.cs" />
