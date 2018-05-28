@@ -126,14 +126,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     .Current
                     .Select(user => user.DefaultWorkspaceId);
 
-            var currentDate = timeService.CurrentDateTime.Date;
-            startDate = currentDate.AddDays(1 - (int)currentDate.DayOfWeek);
-            endDate = startDate.AddDays(6);
             source = ReportsSource.Initial;
 
             disposeBag.Add(
                 reportSubject
-                    .StartWith(Unit.Default)
                     .AsObservable()
                     .Do(setLoadingState)
                     .SelectMany(_ => dataSource.ReportsProvider.GetProjectSummary(workspaceId, startDate, endDate))
@@ -150,6 +146,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Subscribe(onPreferencesChanged);
 
             disposeBag.Add(preferencesDisposable);
+
+            IsLoading = true;
         }
 
         public override void ViewAppeared()
@@ -224,6 +222,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private void updateCurrentDateRangeString()
         {
+            if (startDate == default(DateTimeOffset) || endDate == default(DateTimeOffset))
+                return;
+
             if (startDate == endDate)
             {
                 CurrentDateRangeString = $"{startDate.ToString(dateFormat.Short)} ▾";

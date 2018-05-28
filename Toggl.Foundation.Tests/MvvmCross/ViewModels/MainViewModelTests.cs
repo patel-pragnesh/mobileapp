@@ -757,7 +757,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public async ThreadingTask ExecutesTheContinueMostRecentTimeEntryInteractor()
                 {
-                    var interactor = Substitute.For<IInteractor<IObservable<IDatabaseTimeEntry>>>();
+                    var interactor = Substitute.For<IInteractor<IObservable<IThreadSafeTimeEntry>>>();
                     InteractorFactory.ContinueMostRecentTimeEntry().Returns(interactor);
                     ViewModel.Init(ApplicationUrls.Main.Action.Continue);
 

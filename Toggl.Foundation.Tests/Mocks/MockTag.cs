@@ -5,7 +5,7 @@ using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Tests.Mocks
 {
-    public sealed class MockTag : IDatabaseTag
+    public sealed class MockTag : IThreadSafeTag
     {
         public IDatabaseWorkspace Workspace { get; set; }
 

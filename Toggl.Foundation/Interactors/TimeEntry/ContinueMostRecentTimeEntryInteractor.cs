@@ -11,7 +11,7 @@ using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Interactors
 {
-    public class ContinueMostRecentTimeEntryInteractor : IInteractor<IObservable<IDatabaseTimeEntry>>
+    public class ContinueMostRecentTimeEntryInteractor : IInteractor<IObservable<IThreadSafeTimeEntry>>
     {
         private readonly IIdProvider idProvider;
         private readonly ITimeService timeService;
@@ -35,7 +35,7 @@ namespace Toggl.Foundation.Interactors
             this.analyticsService = analyticsService;
         }
 
-        public IObservable<IDatabaseTimeEntry> Execute()
+        public IObservable<IThreadSafeTimeEntry> Execute()
             => dataSource.TimeEntries
                 .GetAll(te => !te.IsDeleted)
                 .Select(timeEntries => timeEntries.MaxBy(te => te.Start))

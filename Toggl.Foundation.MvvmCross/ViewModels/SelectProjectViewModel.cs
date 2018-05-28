@@ -39,7 +39,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private long? projectId;
         private long workspaceId;
 
-        private List<IDatabaseWorkspace> allWorkspaces = new List<IDatabaseWorkspace>();
+        private List<IThreadSafeWorkspace> allWorkspaces = new List<IThreadSafeWorkspace>();
 
         public string Text { get; set; } = "";
 

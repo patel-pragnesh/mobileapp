@@ -84,10 +84,10 @@
         android:layout_below="@id/SignUpPassword" />
     <Button
         android:id="@+id/SignUpButton"
-        local:MvxBind="Click SignupCommand; Text If(IsLoading, '', 'Sign up for free'); TextColor ButtonEnabledTextColor(SignupEnabled)"
+        local:MvxBind="Click SignupCommand; Text If(IsLoading, '', 'Sign up for free')"
         android:text="@string/SignUpForFree"
         android:background="@color/buttonBlue"
-        android:textColor="@android:color/white"
+        android:textColor="@color/BlueButtonTextColor"
         android:foreground="?attr/selectableItemBackground"
         android:layout_height="36dp"
         android:layout_marginLeft="24dp"

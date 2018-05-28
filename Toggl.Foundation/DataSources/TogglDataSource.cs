@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.DataSources.Interfaces;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Reports;
@@ -81,8 +80,8 @@ namespace Toggl.Foundation.DataSources
         public IPreferencesSource Preferences { get; }
         public IProjectsSource Projects { get; }
         public ITimeEntriesSource TimeEntries { get; }
-        public IBaseDataSource<IThreadSafeWorkspace, IDatabaseWorkspace> Workspaces { get; }
-        public IBaseDataSource<IThreadSafeWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection> WorkspaceFeatures { get; }
+        public IDataSource<IThreadSafeWorkspace, IDatabaseWorkspace> Workspaces { get; }
+        public IDataSource<IThreadSafeWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection> WorkspaceFeatures { get; }
 
         public ISyncManager SyncManager { get; }
 

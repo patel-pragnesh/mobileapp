@@ -48,7 +48,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 project.Name.Returns(ProjectName);
                 project.WorkspaceId.Returns(isFromSameWorkspace ? WorkspaceId : otherWorkspaceId);
 
-                var defaultWorkspace = Substitute.For<IDatabaseWorkspace>();
+                var defaultWorkspace = Substitute.For<IThreadSafeWorkspace>();
                 defaultWorkspace.Id.Returns(WorkspaceId);
                 defaultWorkspace.Name.Returns(Guid.NewGuid().ToString());
 
@@ -70,12 +70,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             private void setupChangingWorkspaceScenario()
             {
-                List<IDatabaseWorkspace> workspaces = new List<IDatabaseWorkspace>();
+                List<IThreadSafeWorkspace> workspaces = new List<IThreadSafeWorkspace>();
                 List<IThreadSafeProject> projects = new List<IThreadSafeProject>();
 
                 for (long workspaceId = 0; workspaceId < 2; workspaceId++)
                 {
-                    var workspace = Substitute.For<IDatabaseWorkspace>();
+                    var workspace = Substitute.For<IThreadSafeWorkspace>();
                     workspace.Id.Returns(workspaceId);
                     workspace.Name.Returns(Guid.NewGuid().ToString());
                     workspaces.Add(workspace);

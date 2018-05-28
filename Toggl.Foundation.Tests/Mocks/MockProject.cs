@@ -6,7 +6,7 @@ using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Tests.Mocks
 {
-    public sealed class MockProject : IDatabaseProject
+    public sealed class MockProject : IThreadSafeProject
     {
         public IDatabaseClient Client { get; set; }
 
