@@ -1,5 +1,5 @@
 ﻿using Foundation;
-using MvvmCross.Binding.iOS.Views;
+using MvvmCross.Platforms.Ios.Binding.Views;
 using Toggl.Daneel.Views.Settings;
 using UIKit;
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Foundation;
-using MvvmCross.Binding.iOS.Views;
-using MvvmCross.ViewModels;
+using MvvmCross.Platforms.Ios.Binding.Views;
+using MvvmCross.Commands;
 using Toggl.Daneel.Views;
 using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 using UIKit;

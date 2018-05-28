@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Foundation;
-using MvvmCross.Binding.ExtensionMethods;
-using MvvmCross.ViewModels;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Daneel.Views;
 using Toggl.Daneel.Views.StartTimeEntry;
 using Toggl.Foundation;
@@ -11,6 +9,7 @@ using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.Helper;
 using UIKit;
+using MvvmCross.Commands;
 
 namespace Toggl.Daneel.ViewSources
 {

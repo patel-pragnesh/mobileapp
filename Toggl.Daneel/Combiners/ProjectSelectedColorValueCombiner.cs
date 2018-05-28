@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using MvvmCross.Binding.Bindings.SourceSteps;
 using MvvmCross.Binding.Combiners;
-using MvvmCross.Plugins.Color;
+using MvvmCross.Plugin.Color;
 using UIKit;
 
 namespace Toggl.Daneel.Combiners

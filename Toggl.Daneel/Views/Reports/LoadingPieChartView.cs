@@ -2,7 +2,7 @@
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Daneel.Extensions;
 using Toggl.Foundation.MvvmCross.Helper;
 using UIKit;

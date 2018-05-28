@@ -1,9 +1,9 @@
 ﻿using System;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS;
-using MvvmCross.Binding.iOS.Views;
-using MvvmCross.Plugins.Color;
+using MvvmCross.Platforms.Ios.Binding;
+using MvvmCross.Platforms.Ios.Binding.Views;
+using MvvmCross.Plugin.Color;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
 

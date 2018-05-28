@@ -2,7 +2,7 @@
 using CoreAnimation;
 using CoreGraphics;
 using Foundation;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 using Toggl.Multivac.Extensions;
 using UIKit;
 

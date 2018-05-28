@@ -6,7 +6,7 @@ using CoreGraphics;
 using Foundation;
 using Toggl.Foundation.Reports;
 using MvvmCross.UI;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using static Toggl.Multivac.Math;
 
 namespace Toggl.Daneel.Views.Reports

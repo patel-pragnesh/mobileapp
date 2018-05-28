@@ -1,16 +1,17 @@
 ﻿using System;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS;
-using MvvmCross.Binding.iOS.Views;
+using MvvmCross.Platforms.Ios.Binding;
+using MvvmCross.Platforms.Ios.Binding.Views;
 using MvvmCross.ViewModels;
-using MvvmCross.Plugins.Color.iOS;
-using MvvmCross.Plugins.Visibility;
+using MvvmCross.Plugin.Color.Platforms.Ios;
+using MvvmCross.Plugin.Visibility;
 using Toggl.Daneel.Combiners;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 using UIKit;
+using MvvmCross.Commands;
 
 namespace Toggl.Daneel.Views
 {

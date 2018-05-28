@@ -5,7 +5,7 @@ using CoreGraphics;
 using CoreMotion;
 using Foundation;
 using UIKit;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Foundation.MvvmCross.Helper;
 
 namespace Toggl.Daneel.Views

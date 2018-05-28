@@ -1,7 +1,7 @@
 ﻿using System;
 using Foundation;
 using MvvmCross.UI;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Multivac.Extensions;
 using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.MvvmCross.Helper;

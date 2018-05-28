@@ -1,11 +1,11 @@
 ﻿using System;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS.Views;
+using MvvmCross.Platforms.Ios.Binding.Views;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
-using MvvmCross.Binding.iOS;
-using MvvmCross.Plugins.Visibility;
+using MvvmCross.Platforms.Ios.Binding;
+using MvvmCross.Plugin.Visibility;
 
 namespace Toggl.Daneel.Views.CountrySelection
 {

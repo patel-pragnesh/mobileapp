@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
 using Foundation;
-using MvvmCross.Binding.iOS.Views;
+using MvvmCross.Platforms.Ios.Binding.Views;
 using MvvmCross.ViewModels;
 using Toggl.Daneel.Views;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.MvvmCross.Collections;
 using UIKit;
+using MvvmCross.Commands;
 
 namespace Toggl.Daneel.ViewSources
 {

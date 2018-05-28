@@ -1,10 +1,10 @@
 ﻿using System;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS;
-using MvvmCross.Binding.iOS.Views;
-using MvvmCross.Plugins.Color;
-using MvvmCross.Plugins.Visibility;
+using MvvmCross.Platforms.Ios.Binding;
+using MvvmCross.Platforms.Ios.Binding.Views;
+using MvvmCross.Plugin.Color;
+using MvvmCross.Plugin.Visibility;
 using Toggl.Daneel.Extensions;
 using Toggl.Foundation.MvvmCross.Combiners;
 using Toggl.Foundation.Reports;

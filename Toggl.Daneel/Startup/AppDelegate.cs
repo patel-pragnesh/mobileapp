@@ -3,18 +3,18 @@ using System.Reactive.Linq;
 using Foundation;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
-using MvvmCross.iOS.Platform;
-using MvvmCross.Platform;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.MvvmCross.ViewModels;
-using MvvmCross.Plugins.Color.iOS;
-using Toggl.Foundation.Analytics;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.Services;
 using Toggl.Foundation.Shortcuts;
 using UIKit;
-
+using MvvmCross.Platforms.Ios.Core;
+using MvvmCross;
+using Toggl.Daneel.Presentation;
+using Toggl.Foundation.MvvmCross;
 
 namespace Toggl.Daneel
 {
@@ -29,21 +29,7 @@ namespace Toggl.Daneel
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-            Window = new UIWindow(UIScreen.MainScreen.Bounds);
-
-            var setup = new Setup(this, Window);
-            setup.Initialize();
-
-            var startup = Mvx.Resolve<IMvxAppStart>();
-            startup.Start();
-
-            analyticsService = Mvx.Resolve<IAnalyticsService>();
-            backgroundService = Mvx.Resolve<IBackgroundService>();
-            navigationService = Mvx.Resolve<IMvxNavigationService>();
-
-            Window.MakeKeyAndVisible();
-
-            setupNavigationBar();
+            base.FinishedLaunching(application, launchOptions);
 
             #if ENABLE_TEST_CLOUD
             Xamarin.Calabash.Start();
@@ -62,7 +48,17 @@ namespace Toggl.Daneel
             return true;
         }
 
-        #if USE_ANALYTICS
+        protected override void RunAppStart(object hint = null)
+        {
+            base.RunAppStart(hint);
+
+            analyticsService = Mvx.Resolve<IAnalyticsService>();
+            backgroundService = Mvx.Resolve<IBackgroundService>();
+            navigationService = Mvx.Resolve<IMvxNavigationService>();
+            setupNavigationBar();
+        }
+
+#if USE_ANALYTICS
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
             var openUrlOptions = new UIApplicationOpenUrlOptions(options);
@@ -77,7 +73,7 @@ namespace Toggl.Daneel
         {
             Facebook.CoreKit.AppEvents.ActivateApp();
         }
-        #endif
+#endif
 
         public override void WillEnterForeground(UIApplication application)
         {

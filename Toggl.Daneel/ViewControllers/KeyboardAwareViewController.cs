@@ -1,5 +1,5 @@
 ﻿using MvvmCross.ViewModels;
-using MvvmCross.iOS.Views;
+using MvvmCross.Platforms.Ios.Views;
 using UIKit;
 
 namespace Toggl.Daneel.ViewControllers

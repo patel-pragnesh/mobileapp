@@ -1,7 +1,7 @@
 ﻿using System;
 using Foundation;
-using MvvmCross.Binding.ExtensionMethods;
-using MvvmCross.Binding.iOS.Views;
+using MvvmCross.Binding.Extensions;
+using MvvmCross.Platforms.Ios.Binding.Views;
 using Toggl.Daneel.Views.Settings;
 using Toggl.Multivac;
 using UIKit;

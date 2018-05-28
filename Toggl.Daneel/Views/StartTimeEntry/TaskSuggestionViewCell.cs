@@ -1,7 +1,7 @@
 ﻿using System;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS.Views;
+using MvvmCross.Platforms.Ios.Binding.Views;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using UIKit;
 

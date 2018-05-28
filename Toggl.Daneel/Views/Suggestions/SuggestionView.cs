@@ -4,7 +4,7 @@ using UIKit;
 using ObjCRuntime;
 using CoreGraphics;
 using Toggl.Foundation.Suggestions;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using MvvmCross.UI;
 
 namespace Toggl.Daneel

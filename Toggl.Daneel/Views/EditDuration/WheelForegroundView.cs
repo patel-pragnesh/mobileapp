@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using CoreAnimation;
 using CoreGraphics;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Foundation.MvvmCross.Helper;
 using Foundation;
 using UIKit;
-using MvvmCross.Platform.Core;
+using MvvmCross.Base;
 using static Toggl.Multivac.Math;
 using Toggl.Daneel.Extensions;
 using Toggl.Multivac.Extensions;

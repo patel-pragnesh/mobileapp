@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CoreAnimation;
 using MvvmCross.ViewModels;
-using MvvmCross.Core.Views;
-using MvvmCross.iOS.Views;
-using MvvmCross.iOS.Views.Presenters;
-using MvvmCross.iOS.Views.Presenters.Attributes;
 using Toggl.Daneel.Extensions;
 using Toggl.Daneel.Presentation.Attributes;
 using Toggl.Daneel.Presentation.Transition;
@@ -17,6 +13,11 @@ using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using UIKit;
+using MvvmCross.Platforms.Ios.Presenters;
+using MvvmCross.Presenters;
+using MvvmCross.Presenters.Attributes;
+using MvvmCross.Platforms.Ios.Views;
+using MvvmCross.Platforms.Ios.Presenters.Attributes;
 
 namespace Toggl.Daneel.Presentation
 {
@@ -38,6 +39,9 @@ namespace Toggl.Daneel.Presentation
             : base(applicationDelegate, window)
         {
             nestedPresentationInfo = createNestedPresentationInfo();
+
+            MvxRootPresentationAttribute.DefaultAnimationDuration = Animation.Timings.EnterTiming;
+            MvxRootPresentationAttribute.DefaultAnimationOptions = UIViewAnimationOptions.TransitionCrossDissolve;
         }
 
         public override void RegisterAttributeTypes()
@@ -124,18 +128,6 @@ namespace Toggl.Daneel.Presentation
             }
 
             base.ShowChildViewController(viewController, attribute, request);
-        }
-
-        protected override void SetWindowRootViewController(UIViewController controller)
-        {
-            UIView.Transition(
-                _window,
-                Animation.Timings.EnterTiming,
-                UIViewAnimationOptions.TransitionCrossDissolve,
-                () => _window.RootViewController = controller,
-                null
-            );
-
         }
 
         public override void Show(MvxViewModelRequest request)

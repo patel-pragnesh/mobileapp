@@ -5,15 +5,15 @@ using System.Windows.Input;
 using Foundation;
 using Google.SignIn;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS.Target;
-using MvvmCross.iOS.Views;
-using MvvmCross.Platform.IoC;
+using MvvmCross.Platforms.Ios.Views;
 using MvvmCross.UI;
-using MvvmCross.Plugins.Color;
-using MvvmCross.Plugins.Color.iOS;
-using MvvmCross.Plugins.Visibility;
+using MvvmCross.Plugin.Color;
+using MvvmCross.Plugin.Color.Platforms.Ios;
+using MvvmCross.Plugin.Visibility;
 using Newtonsoft.Json.Converters;
 using UIKit;
+using MvvmCross.Platforms.Ios.Binding.Target;
+using MvvmCross.IoC;
 
 namespace Toggl.Daneel
 {
@@ -153,7 +153,7 @@ namespace Toggl.Daneel
 
         public void Include(MvxUISwitchOnTargetBinding binding)
         {
-            binding = new MvxUISwitchOnTargetBinding(null, null);
+            binding = new MvxUISwitchOnTargetBinding(null);
         }
 
         public void Include(MvxVisibilityValueConverter converter)

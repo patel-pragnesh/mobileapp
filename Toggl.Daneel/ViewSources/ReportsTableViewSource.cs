@@ -1,8 +1,8 @@
 ﻿using System;
 using CoreGraphics;
 using Foundation;
-using MvvmCross.Binding.iOS.Views;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Platforms.Ios.Binding.Views;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Daneel.Views.Reports;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;

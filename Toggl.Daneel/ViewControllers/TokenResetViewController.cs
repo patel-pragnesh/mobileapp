@@ -1,9 +1,9 @@
 ﻿using CoreText;
 using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS;
-using MvvmCross.iOS.Views.Presenters.Attributes;
-using MvvmCross.Plugins.Visibility;
+using MvvmCross.Platforms.Ios.Binding;
+using MvvmCross.Platforms.Ios.Presenters.Attributes;
+using MvvmCross.Plugin.Visibility;
 using Toggl.Daneel.Extensions;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Converters;

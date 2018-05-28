@@ -1,10 +1,8 @@
 ﻿﻿using MvvmCross.Binding.Bindings.Target.Construction;
-using MvvmCross.iOS.Platform;
+using MvvmCross.Platforms.Ios.Core;
 using Toggl.Daneel.Binding;
 using UIKit;
 using Toggl.Daneel.Views;
-using System.Collections.Generic;
-using MvvmCross.Binding.iOS.Views;
 
 namespace Toggl.Daneel
 {

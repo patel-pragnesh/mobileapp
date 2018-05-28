@@ -4,7 +4,7 @@ using Foundation;
 using CoreAnimation;
 using CoreGraphics;
 using Toggl.Foundation.MvvmCross.Helper;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 
 namespace Toggl.Daneel.Views.Reports
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using CoreGraphics;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Multivac;
 using UIKit;

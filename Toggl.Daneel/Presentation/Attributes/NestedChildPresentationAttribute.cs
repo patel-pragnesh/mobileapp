@@ -1,4 +1,4 @@
-﻿using MvvmCross.Core.Views;
+﻿using MvvmCross.Presenters.Attributes;
 
 namespace Toggl.Daneel.Presentation.Attributes
 {

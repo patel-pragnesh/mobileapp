@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using MvvmCross.ViewModels;
-using MvvmCross.Plugins.Color.iOS;
+using MvvmCross.Plugin.Color.Platforms.Ios;
 using Toggl.Daneel.Views;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.Helper;
@@ -11,6 +11,7 @@ using Toggl.Foundation.Sync;
 using Toggl.Multivac;
 using UIKit;
 using static Toggl.Daneel.Extensions.TextExtensions;
+using MvvmCross.Commands;
 
 namespace Toggl.Daneel.ViewSources
 {
