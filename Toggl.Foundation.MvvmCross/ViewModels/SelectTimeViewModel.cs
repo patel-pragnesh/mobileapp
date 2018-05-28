@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using MvvmCross.Platform.Core;
 using PropertyChanged;

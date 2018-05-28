@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation.Analytics;

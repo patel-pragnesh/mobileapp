@@ -7,7 +7,7 @@ using Android.Views;
 using Android.Widget;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.Droid.Target;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using V4Space = Android.Support.V4.Widget.Space;
 using Newtonsoft.Json.Converters;

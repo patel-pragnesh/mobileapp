@@ -1,4 +1,4 @@
-using Android.App;
+﻿using Android.App;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
@@ -6,7 +6,7 @@ using Android.Support.V4.Content;
 using MvvmCross.Droid.Views;
 using Toggl.Giskard.Extensions;
 using MvvmCross.Platform;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 
 namespace Toggl.Giskard
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Concurrency;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using MvvmCross.Platform;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Autocomplete;

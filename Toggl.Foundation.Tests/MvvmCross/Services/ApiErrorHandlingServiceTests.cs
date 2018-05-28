@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentAssertions;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using NSubstitute;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels;

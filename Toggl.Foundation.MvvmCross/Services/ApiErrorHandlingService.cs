@@ -1,5 +1,5 @@
 ﻿using System;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;

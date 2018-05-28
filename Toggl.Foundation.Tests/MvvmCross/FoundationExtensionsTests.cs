@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using FluentAssertions;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Login;

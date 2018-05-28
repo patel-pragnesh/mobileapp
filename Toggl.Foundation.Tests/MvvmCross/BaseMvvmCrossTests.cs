@@ -1,5 +1,5 @@
 ﻿using MvvmCross.Core;
-using MvvmCross.Core.Navigation;
+using MvvmCross.Navigation;
 using MvvmCross.Core.Platform;
 using MvvmCross.Platform.Core;
 using MvvmCross.Platform.IoC;
