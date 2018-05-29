@@ -33,7 +33,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         }
 
         private readonly ISubject<TemporalInconsistency> temporalInconsistencySubject = new Subject<TemporalInconsistency>();
-        private readonly ISubject<bool> is24HoursModeSubject = new BehaviorSubject<bool>(false);
 
         private readonly ITogglDataSource dataSource;
         private readonly IMvxNavigationService navigationService;
@@ -241,7 +240,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
             TemporalInconsistencyDetected = temporalInconsistencySubject.AsObservable();
-            Is24HoursModeObservable = is24HoursModeSubject.AsObservable();
+
+            Is24HoursModeObservable = dataSource
+                .Preferences
+                .Current
+                .Select(prefs => prefs.TimeOfDayFormat.IsTwentyFourHoursFormat);
 
             this.navigationService = navigationService;
             this.timeService = timeService;
@@ -286,16 +289,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                                .StartWith(timeService.CurrentDateTime)
                                .Subscribe(currentDateTime => CurrentDateTime = currentDateTime);
             }
-
-            dataSource
-                .Preferences.Current
-                .Subscribe(onPreferencesChanged);
-        }
-
-        private void onPreferencesChanged(IThreadSafePreferences preferences) 
-        {
-            Is24HoursMode = preferences.TimeOfDayFormat.IsTwentyFourHoursFormat;
-            is24HoursModeSubject.OnNext(Is24HoursMode);
         }
 
         private void increaseDuration(int minutes)
