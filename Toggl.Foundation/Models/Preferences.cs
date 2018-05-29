@@ -1,5 +1,6 @@
 ﻿using System;
 using Toggl.Foundation.DTOs;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
@@ -22,7 +23,7 @@ namespace Toggl.Foundation.Models
 
         internal sealed class Builder
         {
-            public static Builder FromExisting(IDatabasePreferences preferences)
+            public static Builder FromExisting(IThreadSafePreferences preferences)
                 => new Builder(preferences);
 
             public static Builder Create()
@@ -42,7 +43,7 @@ namespace Toggl.Foundation.Models
             {
             }
 
-            private Builder(IDatabasePreferences preferences)
+            private Builder(IThreadSafePreferences preferences)
             {
                 DateFormat = preferences.DateFormat;
                 TimeOfDayFormat = preferences.TimeOfDayFormat;

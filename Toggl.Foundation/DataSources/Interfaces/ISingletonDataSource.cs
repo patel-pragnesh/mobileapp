@@ -6,7 +6,7 @@ namespace Toggl.Foundation.DataSources.Interfaces
 {
     public interface ISingletonDataSource<TThreadsafe, TDatabase> : IBaseDataSource<TThreadsafe, TDatabase>
         where TDatabase : IDatabaseSyncable
-        where TThreadsafe : IThreadSafeModel, TDatabase
+        where TThreadsafe : IThreadSafeModel
     {
         IObservable<TThreadsafe> Current { get; }
 

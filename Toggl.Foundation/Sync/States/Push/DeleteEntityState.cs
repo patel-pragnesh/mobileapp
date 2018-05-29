@@ -14,7 +14,7 @@ namespace Toggl.Foundation.Sync.States.Push
         : BasePushEntityState<TDatabaseModel, TThreadsafeModel>
         where TModel : IIdentifiable
         where TDatabaseModel : class, TModel, IDatabaseSyncable
-        where TThreadsafeModel : TDatabaseModel, IThreadSafeModel
+        where TThreadsafeModel : TModel, IThreadSafeModel
     {
         private readonly IDeletingApiClient<TModel> api;
 

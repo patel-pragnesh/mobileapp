@@ -8,7 +8,7 @@ namespace Toggl.Foundation.DataSources.Interfaces
 {
     public interface IDataSource<TThreadsafe, TDatabase> : IBaseDataSource<TThreadsafe, TDatabase>
         where TDatabase : IDatabaseModel
-        where TThreadsafe : TDatabase, IThreadSafeModel
+        where TThreadsafe : IThreadSafeModel
     {
         IObservable<TThreadsafe> GetById(long id);
 

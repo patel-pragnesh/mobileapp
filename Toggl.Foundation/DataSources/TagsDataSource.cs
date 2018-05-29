@@ -39,6 +39,11 @@ namespace Toggl.Foundation.DataSources
         protected override IThreadSafeTag Convert(IDatabaseTag entity)
             => Tag.From(entity);
 
+        protected override IDatabaseTag ToDatabase(IThreadSafeTag entity)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseTag first, IDatabaseTag second)
             => Resolver.ForTags.Resolve(first, second);
     }

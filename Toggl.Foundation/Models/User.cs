@@ -1,4 +1,5 @@
 ﻿using System;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
@@ -15,7 +16,7 @@ namespace Toggl.Foundation.Models
 
         public sealed class Builder
         {
-            public static Builder FromExisting(IDatabaseUser user)
+            public static Builder FromExisting(IThreadSafeUser user)
                 => new Builder(user);
 
             public long Id { get; private set; }
@@ -31,7 +32,7 @@ namespace Toggl.Foundation.Models
             public string LastSyncErrorMessage { get; private set; }
             public bool IsDeleted { get; private set; }
 
-            public Builder(IDatabaseUser user)
+            public Builder(IThreadSafeUser user)
             {
                 Id = user.Id;
                 ApiToken = user.ApiToken;

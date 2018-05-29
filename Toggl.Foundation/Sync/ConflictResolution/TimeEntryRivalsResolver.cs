@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Toggl.Foundation.Models;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac.Extensions;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
@@ -45,7 +46,7 @@ namespace Toggl.Foundation.Sync.ConflictResolution
                 .DefaultIfEmpty(timeService.CurrentDateTime)
                 .Min();
             long duration = (long)(stopTime - toBeStopped.Start).TotalSeconds; // truncates towards zero (floor)
-            return new TimeEntry(toBeStopped, duration);
+            return toDatabase(new TimeEntry(toBeStopped, duration)); // TODO
         }
 
         private Expression<Func<TDatabaseObject, bool>> startsAfter<TDatabaseObject>(DateTimeOffset start)
@@ -56,6 +57,11 @@ namespace Toggl.Foundation.Sync.ConflictResolution
             var startDate = Expression.Constant(start, typeof(DateTimeOffset));
             var expression = Expression.GreaterThan(otherStart, startDate);
             return Expression.Lambda<Func<TDatabaseObject, bool>>(expression, new[] { other });
+        }
+
+        private IDatabaseTimeEntry toDatabase(IThreadSafeTimeEntry entry)
+        {
+            throw new NotImplementedException();
         }
     }
 }

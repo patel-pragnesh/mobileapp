@@ -14,7 +14,7 @@ namespace Toggl.Foundation.DataSources
     public abstract class ObservableDataSource<TThreadsafe, TDatabase>
         : DataSource<TThreadsafe, TDatabase>, IObservableDataSource<TThreadsafe, TDatabase>
         where TDatabase : IDatabaseSyncable
-        where TThreadsafe : IThreadSafeModel, IIdentifiable, TDatabase
+        where TThreadsafe : IThreadSafeModel, IIdentifiable
     {
         public IObservable<TThreadsafe> Created { get; }
 

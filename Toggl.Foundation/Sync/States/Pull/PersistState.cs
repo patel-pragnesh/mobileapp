@@ -13,7 +13,7 @@ namespace Toggl.Foundation.Sync.States
 {
     internal sealed class PersistState<TInterface, TDatabaseInterface, TThreadsafeInterface>
         where TDatabaseInterface : TInterface
-        where TThreadsafeInterface : TDatabaseInterface, IThreadSafeModel
+        where TThreadsafeInterface : TInterface, IThreadSafeModel
     {
         private readonly IBaseDataSource<TThreadsafeInterface, TDatabaseInterface> dataSource;
 

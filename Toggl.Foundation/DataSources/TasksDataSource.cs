@@ -17,6 +17,11 @@ namespace Toggl.Foundation.DataSources
         protected override IThreadSafeTask Convert(IDatabaseTask entity)
             => Task.From(entity);
 
+        protected override IDatabaseTask ToDatabase(IThreadSafeTask entity)
+        {
+            throw new System.NotImplementedException();
+        }
+
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseTask first, IDatabaseTask second)
             => Resolver.ForTasks.Resolve(first, second);
     }

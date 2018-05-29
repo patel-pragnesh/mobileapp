@@ -12,12 +12,12 @@ namespace Toggl.Foundation.Extensions
     {
         public static IObservable<IEnumerable<IConflictResolutionResult<TThreadsafe>>> ToThreadSafeResult<TThreadsafe, TDatabase>(
             this IObservable<IEnumerable<IConflictResolutionResult<TDatabase>>> resultsObservable, Func<TDatabase, TThreadsafe> from)
-            where TThreadsafe : IThreadSafeModel, TDatabase
+            where TThreadsafe : IThreadSafeModel
             where TDatabase : IDatabaseModel
             => resultsObservable.Select(results => results.Select(result => result.ToThreadSafeResult(from)));
 
         public static IConflictResolutionResult<TThreadsafe> ToThreadSafeResult<TThreadsafe, TDatabase>(this IConflictResolutionResult<TDatabase> result, Func<TDatabase, TThreadsafe> from)
-            where TThreadsafe : IThreadSafeModel, TDatabase
+            where TThreadsafe : IThreadSafeModel
             where TDatabase : IDatabaseModel
         {
             switch (result)

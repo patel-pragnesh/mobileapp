@@ -23,17 +23,17 @@ namespace Toggl.Foundation.DataSources
             this.timeService = timeService;
         }
 
-        public IObservable<IDatabaseUser> UpdateWorkspace(long workspaceId)
+        public IObservable<IThreadSafeUser> UpdateWorkspace(long workspaceId)
             => Get()
-                .Select(user => user.With(workspaceId))
+                .Select(user => ToDatabase(user).With(workspaceId))
                 .SelectMany(Update);
 
-        public IObservable<IDatabaseUser> Update(EditUserDTO dto)
+        public IObservable<IThreadSafeUser> Update(EditUserDTO dto)
             => Get()
                 .Select(user => updatedUser(user, dto))
                 .SelectMany(Update);
 
-        public IThreadSafeUser updatedUser(IThreadSafeUser existing, EditUserDTO dto)
+        private IThreadSafeUser updatedUser(IThreadSafeUser existing, EditUserDTO dto)
             => User.Builder
                    .FromExisting(existing)
                    .SetBeginningOfWeek(dto.BeginningOfWeek)
@@ -43,6 +43,11 @@ namespace Toggl.Foundation.DataSources
 
         protected override IThreadSafeUser Convert(IDatabaseUser entity)
             => User.From(entity);
+
+        protected override IDatabaseUser ToDatabase(IThreadSafeUser entity)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseUser first, IDatabaseUser second)
             => Resolver.ForUser.Resolve(first, second);

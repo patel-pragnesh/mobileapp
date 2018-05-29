@@ -36,7 +36,7 @@ namespace Toggl.Foundation.Interactors
         private IObservable<SyncFailureItem> getUnsyncedItems<TThreadsafe, TDatabase>(
             IDataSource<TThreadsafe, TDatabase> source)
             where TDatabase : IDatabaseSyncable
-            where TThreadsafe : TDatabase, IThreadSafeModel
+            where TThreadsafe : IThreadSafeModel, IDatabaseSyncable
         {
             return source
                 .GetAll(p => p.SyncStatus == SyncStatus.SyncFailed)

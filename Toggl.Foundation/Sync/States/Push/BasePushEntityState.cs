@@ -8,7 +8,7 @@ using Toggl.Ultrawave.Exceptions;
 namespace Toggl.Foundation.Sync.States.Push
 {
     public abstract class BasePushEntityState<TDatabaseModel, TThreadsafeModel> : IPushEntityState<TThreadsafeModel>
-        where TThreadsafeModel : IThreadSafeModel, TDatabaseModel
+        where TThreadsafeModel : IThreadSafeModel
     {
         private readonly IBaseDataSource<TThreadsafeModel, TDatabaseModel> dataSource;
 

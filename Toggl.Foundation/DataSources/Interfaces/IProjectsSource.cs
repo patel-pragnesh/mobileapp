@@ -9,6 +9,6 @@ namespace Toggl.Foundation.DataSources
     public interface IProjectsSource
         : IDataSource<IThreadSafeProject, IDatabaseProject>
     {
-        IObservable<IDatabaseProject> Create(CreateProjectDTO dto);
+        IObservable<IThreadSafeProject> Create(CreateProjectDTO dto);
     }
 }

@@ -42,6 +42,11 @@ namespace Toggl.Foundation.DataSources
         protected override IThreadSafeClient Convert(IDatabaseClient entity)
             => Client.From(entity);
 
+        protected override IDatabaseClient ToDatabase(IThreadSafeClient entity)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseClient first, IDatabaseClient second)
             => Resolver.ForClients.Resolve(first, second);
     }

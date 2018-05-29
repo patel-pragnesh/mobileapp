@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using Toggl.Foundation.DataSources;
-using Toggl.PrimeRadiant.Models;
+using Toggl.Foundation.Models.Interfaces;
 
 namespace Toggl.Foundation.Shortcuts
 {
@@ -48,7 +47,7 @@ namespace Toggl.Foundation.Shortcuts
         public void OnLogout()
             => ClearAllShortCuts();
 
-        private void onCurrentTimeEntryChanged(IDatabaseTimeEntry timeEntry)
+        private void onCurrentTimeEntryChanged(IThreadSafeTimeEntry timeEntry)
         {
             var shortcuts = new List<ApplicationShortcut> { startTimeEntryShortcut };
 

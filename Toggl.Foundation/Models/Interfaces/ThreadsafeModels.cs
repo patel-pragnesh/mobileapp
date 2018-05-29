@@ -1,79 +1,81 @@
 ﻿using System.Collections.Generic;
+using Toggl.Multivac.Models;
+using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Models.Interfaces
 {
     public partial interface IThreadSafeClient
-        : IThreadSafeModel, IDatabaseClient
+        : IThreadSafeModel, IDatabaseSyncable, IClient
     {
-        new IThreadSafeWorkspace Workspace { get; }
+        IThreadSafeWorkspace Workspace { get; }
     }
 
     public partial interface IThreadSafePreferences
-        : IThreadSafeModel, IDatabasePreferences
+        : IThreadSafeModel, IDatabaseSyncable, IPreferences, IIdentifiable
     {
     }
 
     public partial interface IThreadSafeProject
-        : IThreadSafeModel, IDatabaseProject
+        : IThreadSafeModel, IDatabaseSyncable, IProject
     {
-        new IThreadSafeClient Client { get; }
+        IThreadSafeClient Client { get; }
 
-        new IThreadSafeWorkspace Workspace { get; }
+        IThreadSafeWorkspace Workspace { get; }
 
-        new IEnumerable<IThreadSafeTask> Tasks { get; }
+        IEnumerable<IThreadSafeTask> Tasks { get; }
     }
 
     public partial interface IThreadSafeTag
-        : IThreadSafeModel, IDatabaseTag
+        : IThreadSafeModel, IDatabaseSyncable, ITag
     {
-        new IThreadSafeWorkspace Workspace { get; }
+        IThreadSafeWorkspace Workspace { get; }
     }
 
     public partial interface IThreadSafeTask
-        : IThreadSafeModel, IDatabaseTask
+        : IThreadSafeModel, IDatabaseSyncable, ITask
     {
-        new IThreadSafeUser User { get; }
+        IThreadSafeUser User { get; }
 
-        new IThreadSafeProject Project { get; }
+        IThreadSafeProject Project { get; }
 
-        new IThreadSafeWorkspace Workspace { get; }
+        IThreadSafeWorkspace Workspace { get; }
     }
 
     public partial interface IThreadSafeTimeEntry
-        : IThreadSafeModel, IDatabaseTimeEntry
+        : IThreadSafeModel, IDatabaseSyncable, ITimeEntry
     {
-        new IThreadSafeTask Task { get; }
+        IThreadSafeTask Task { get; }
 
-        new IThreadSafeUser User { get; }
+        IThreadSafeUser User { get; }
 
-        new IThreadSafeProject Project { get; }
+        IThreadSafeProject Project { get; }
 
-        new IThreadSafeWorkspace Workspace { get; }
+        IThreadSafeWorkspace Workspace { get; }
 
-        new IEnumerable<IThreadSafeTag> Tags { get; }
+        IEnumerable<IThreadSafeTag> Tags { get; }
     }
 
     public partial interface IThreadSafeUser
-        : IThreadSafeModel, IDatabaseUser
+        : IThreadSafeModel, IDatabaseSyncable, IUser
     {
     }
 
     public partial interface IThreadSafeWorkspace
-        : IThreadSafeModel, IDatabaseWorkspace
+        : IThreadSafeModel, IDatabaseSyncable, IWorkspace
     {
     }
 
     public partial interface IThreadSafeWorkspaceFeature
-        : IThreadSafeModel, IDatabaseWorkspaceFeature
+        : IThreadSafeModel, IWorkspaceFeature
     {
     }
 
     public partial interface IThreadSafeWorkspaceFeatureCollection
-        : IThreadSafeModel, IDatabaseWorkspaceFeatureCollection
+        : IThreadSafeModel, IWorkspaceFeatureCollection
     {
-        new IThreadSafeWorkspace Workspace { get; }
+        IThreadSafeWorkspace Workspace { get; }
 
-        new IEnumerable<IThreadSafeWorkspaceFeature> DatabaseFeatures { get; }
+        IEnumerable<IThreadSafeWorkspaceFeature> DatabaseFeatures { get; }
     }
 }

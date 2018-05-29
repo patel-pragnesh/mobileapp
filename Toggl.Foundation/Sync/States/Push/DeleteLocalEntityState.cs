@@ -10,7 +10,7 @@ namespace Toggl.Foundation.Sync.States.Push
 {
     internal sealed class DeleteLocalEntityState<TDatabaseModel, TThreadsafeModel>
         where TDatabaseModel : class, IDatabaseSyncable
-        where TThreadsafeModel : TDatabaseModel, IThreadSafeModel, IIdentifiable
+        where TThreadsafeModel : IThreadSafeModel, IIdentifiable
     {
         private IDataSource<TThreadsafeModel, TDatabaseModel> dataSource { get; }
 

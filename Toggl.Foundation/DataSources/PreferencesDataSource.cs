@@ -25,6 +25,11 @@ namespace Toggl.Foundation.DataSources
         protected override IThreadSafePreferences Convert(IDatabasePreferences entity)
             => Preferences.From(entity);
 
+        protected override IDatabasePreferences ToDatabase(IThreadSafePreferences entity)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override ConflictResolutionMode ResolveConflicts(IDatabasePreferences first, IDatabasePreferences second)
             => Resolver.ForPreferences.Resolve(first, second);
 

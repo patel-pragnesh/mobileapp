@@ -8,8 +8,8 @@ namespace Toggl.Foundation.DataSources
 {
     public interface IUserSource : ISingletonDataSource<IThreadSafeUser, IDatabaseUser>
     {
-        IObservable<IDatabaseUser> UpdateWorkspace(long workspaceId);
+        IObservable<IThreadSafeUser> UpdateWorkspace(long workspaceId);
 
-        IObservable<IDatabaseUser> Update(EditUserDTO dto);
+        IObservable<IThreadSafeUser> Update(EditUserDTO dto);
     }
 }

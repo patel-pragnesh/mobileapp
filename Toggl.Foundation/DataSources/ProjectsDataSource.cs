@@ -26,7 +26,7 @@ namespace Toggl.Foundation.DataSources
             this.timeService = timeService;
         }
 
-        public IObservable<IDatabaseProject> Create(CreateProjectDTO dto)
+        public IObservable<IThreadSafeProject> Create(CreateProjectDTO dto)
             => idProvider.GetNextIdentifier()
                 .Apply(Project.Builder.Create)
                 .SetName(dto.Name)
@@ -41,6 +41,11 @@ namespace Toggl.Foundation.DataSources
 
         protected override IThreadSafeProject Convert(IDatabaseProject entity)
             => Project.From(entity);
+
+        protected override IDatabaseProject ToDatabase(IThreadSafeProject entity)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseProject first, IDatabaseProject second)
             => Resolver.ForProjects.Resolve(first, second);

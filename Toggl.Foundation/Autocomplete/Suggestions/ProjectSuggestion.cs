@@ -57,7 +57,7 @@ namespace Toggl.Foundation.Autocomplete.Suggestions
             ClientName = project.Client?.Name ?? "";
             WorkspaceId = project.WorkspaceId;
             WorkspaceName = project.Workspace?.Name ?? "";
-            Tasks = project.Tasks?.Select(task => new TaskSuggestion(Task.From(task))).ToList() ?? new List<TaskSuggestion>();
+            Tasks = project.Tasks?.Select(task => new TaskSuggestion(task)).ToList() ?? new List<TaskSuggestion>();
         }
 
         public override int GetHashCode()

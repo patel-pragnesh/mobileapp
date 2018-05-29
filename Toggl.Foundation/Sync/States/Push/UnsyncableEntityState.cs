@@ -10,7 +10,7 @@ namespace Toggl.Foundation.Sync.States.Push
 {
     internal sealed class UnsyncableEntityState<TDatabaseModel, TThreadsafeModel>
         where TDatabaseModel : IDatabaseSyncable
-        where TThreadsafeModel : TDatabaseModel, IThreadSafeModel
+        where TThreadsafeModel : IThreadSafeModel
     {
         private readonly IBaseDataSource<TThreadsafeModel, TDatabaseModel> dataSource;
 

@@ -13,7 +13,7 @@ namespace Toggl.Foundation.DataSources
         : BaseDataSource<TThreadsafe, TDatabase>,
           ISingletonDataSource<TThreadsafe, TDatabase>
         where TDatabase : IDatabaseSyncable
-        where TThreadsafe : IThreadSafeModel, IIdentifiable, TDatabase
+        where TThreadsafe : IThreadSafeModel, IIdentifiable
     {
         private readonly ISingleObjectStorage<TDatabase> storage;
 

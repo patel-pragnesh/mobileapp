@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
-using Toggl.PrimeRadiant;
-using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Interactors
 {
@@ -26,7 +25,7 @@ namespace Toggl.Foundation.Interactors
 
                     return DataSource.Workspaces
                         .GetById(workspaceId)
-                        .Select<IDatabaseWorkspace, bool?>(workspace => workspace.ProjectsBillableByDefault);
+                        .Select<IThreadSafeWorkspace, bool?>(workspace => workspace.ProjectsBillableByDefault);
                 });
 
     }

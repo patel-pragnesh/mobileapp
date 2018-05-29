@@ -50,7 +50,7 @@ namespace Toggl.Foundation.DataSources
                     .ConnectedReplay();
 
             IsEmpty =
-                Observable.Return(default(IDatabaseTimeEntry))
+                Observable.Return(default(IThreadSafeTimeEntry))
                     .StartWith()
                     .Merge(Updated.Select(tuple => tuple.Entity))
                     .Merge(Created)
@@ -61,7 +61,7 @@ namespace Toggl.Foundation.DataSources
         }
 
         public override IObservable<IThreadSafeTimeEntry> Create(IThreadSafeTimeEntry entity)
-            => Repository.UpdateWithConflictResolution(entity.Id, entity, alwaysCreate)
+            => Repository.UpdateWithConflictResolution(entity.Id, ToDatabase(entity), alwaysCreate)
                 .OfType<CreateResult<IDatabaseTimeEntry>>()
                 .Select(result => result.Entity)
                 .Select(Convert)
@@ -70,13 +70,14 @@ namespace Toggl.Foundation.DataSources
         public IObservable<IThreadSafeTimeEntry> Stop(DateTimeOffset stopTime)
             => GetAll(te => te.IsDeleted == false && te.Duration == null)
                 .Select(timeEntries => timeEntries.SingleOrDefault() ?? throw new NoRunningTimeEntryException())
-                .SelectMany(timeEntry => timeEntry
+                .SelectMany(timeEntry => ToDatabase(timeEntry)
                     .With((long)(stopTime - timeEntry.Start).TotalSeconds)
                     .Apply(Update));
 
         public IObservable<Unit> SoftDelete(IThreadSafeTimeEntry timeEntry)
             => Observable.Return(timeEntry)
                 .Select(TimeEntry.DirtyDeleted)
+                .Select(ToDatabase)
                 .SelectMany(Repository.Update)
                 .Do(entity => DeletedSubject.OnNext(entity.Id))
                 .Select(_ => Unit.Default);
@@ -88,6 +89,11 @@ namespace Toggl.Foundation.DataSources
 
         protected override IThreadSafeTimeEntry Convert(IDatabaseTimeEntry entity)
             => TimeEntry.From(entity);
+
+        protected override IDatabaseTimeEntry ToDatabase(IThreadSafeTimeEntry entity)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseTimeEntry first, IDatabaseTimeEntry second)
             => Resolver.ForTimeEntries.Resolve(first, second);

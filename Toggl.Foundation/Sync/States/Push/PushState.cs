@@ -12,7 +12,7 @@ namespace Toggl.Foundation.Sync.States.Push
 {
     internal sealed class PushState<TDatabaseModel, TThreadsafeModel> : IPushState<TThreadsafeModel>
         where TDatabaseModel : IDatabaseSyncable
-        where TThreadsafeModel : class, TDatabaseModel, ILastChangedDatable, IThreadSafeModel
+        where TThreadsafeModel : class, ILastChangedDatable, IThreadSafeModel
     {
         private readonly IDataSource<TThreadsafeModel, TDatabaseModel> dataSource;
 

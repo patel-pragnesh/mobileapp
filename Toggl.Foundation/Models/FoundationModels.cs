@@ -16,8 +16,6 @@ namespace Toggl.Foundation.Models
 
         public string Name { get; }
 
-        IDatabaseWorkspace IDatabaseClient.Workspace => Workspace;
-
         public IThreadSafeWorkspace Workspace { get; }
 
         public bool IsDeleted { get; }
@@ -78,15 +76,9 @@ namespace Toggl.Foundation.Models
 
         public int? ActualHours { get; }
 
-        IDatabaseClient IDatabaseProject.Client => Client;
-
         public IThreadSafeClient Client { get; }
 
-        IDatabaseWorkspace IDatabaseProject.Workspace => Workspace;
-
         public IThreadSafeWorkspace Workspace { get; }
-
-        IEnumerable<IDatabaseTask> IDatabaseProject.Tasks => Tasks;
 
         public IEnumerable<IThreadSafeTask> Tasks { get; }
 
@@ -108,8 +100,6 @@ namespace Toggl.Foundation.Models
         public long WorkspaceId { get; }
 
         public string Name { get; }
-
-        IDatabaseWorkspace IDatabaseTag.Workspace => Workspace;
 
         public IThreadSafeWorkspace Workspace { get; }
 
@@ -142,15 +132,9 @@ namespace Toggl.Foundation.Models
 
         public long TrackedSeconds { get; }
 
-        IDatabaseUser IDatabaseTask.User => User;
-
         public IThreadSafeUser User { get; }
 
-        IDatabaseProject IDatabaseTask.Project => Project;
-
         public IThreadSafeProject Project { get; }
-
-        IDatabaseWorkspace IDatabaseTask.Workspace => Workspace;
 
         public IThreadSafeWorkspace Workspace { get; }
 
@@ -185,23 +169,13 @@ namespace Toggl.Foundation.Models
 
         public long UserId { get; }
 
-        IDatabaseTask IDatabaseTimeEntry.Task => Task;
-
         public IThreadSafeTask Task { get; }
-
-        IDatabaseUser IDatabaseTimeEntry.User => User;
 
         public IThreadSafeUser User { get; }
 
-        IDatabaseProject IDatabaseTimeEntry.Project => Project;
-
         public IThreadSafeProject Project { get; }
 
-        IDatabaseWorkspace IDatabaseTimeEntry.Workspace => Workspace;
-
         public IThreadSafeWorkspace Workspace { get; }
-
-        IEnumerable<IDatabaseTag> IDatabaseTimeEntry.Tags => Tags;
 
         public IEnumerable<IThreadSafeTag> Tags { get; }
 
@@ -296,11 +270,7 @@ namespace Toggl.Foundation.Models
 
         public IEnumerable<IWorkspaceFeature> Features { get; }
 
-        IDatabaseWorkspace IDatabaseWorkspaceFeatureCollection.Workspace => Workspace;
-
         public IThreadSafeWorkspace Workspace { get; }
-
-        IEnumerable<IDatabaseWorkspaceFeature> IDatabaseWorkspaceFeatureCollection.DatabaseFeatures => DatabaseFeatures;
 
         public IEnumerable<IThreadSafeWorkspaceFeature> DatabaseFeatures { get; }
 

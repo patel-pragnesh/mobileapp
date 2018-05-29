@@ -13,7 +13,7 @@ namespace Toggl.Foundation.DataSources
 {
     public abstract class DataSource<TThreadsafe, TDatabase> : BaseDataSource<TThreadsafe, TDatabase>, IDataSource<TThreadsafe, TDatabase>
         where TDatabase : IDatabaseModel
-        where TThreadsafe : TDatabase, IThreadSafeModel, IIdentifiable
+        where TThreadsafe : IThreadSafeModel, IIdentifiable
     {
         protected DataSource(IRepository<TDatabase> repository)
             : base(repository)

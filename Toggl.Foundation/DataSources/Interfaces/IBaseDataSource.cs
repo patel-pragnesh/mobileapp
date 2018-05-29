@@ -6,7 +6,7 @@ using Toggl.PrimeRadiant;
 namespace Toggl.Foundation.DataSources.Interfaces
 {
     public interface IBaseDataSource<TThreadsafe, TDatabase>
-        where TThreadsafe : IThreadSafeModel, TDatabase
+        where TThreadsafe : IThreadSafeModel
     {
         IObservable<TThreadsafe> Create(TThreadsafe entity);
 

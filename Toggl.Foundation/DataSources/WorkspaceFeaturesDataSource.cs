@@ -16,6 +16,11 @@ namespace Toggl.Foundation.DataSources
         protected override IThreadSafeWorkspaceFeatureCollection Convert(IDatabaseWorkspaceFeatureCollection entity)
             => WorkspaceFeatureCollection.From(entity);
 
+        protected override IDatabaseWorkspaceFeatureCollection ToDatabase(IThreadSafeWorkspaceFeatureCollection entity)
+        {
+            throw new System.NotImplementedException();
+        }
+
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseWorkspaceFeatureCollection first,
             IDatabaseWorkspaceFeatureCollection second)
             => Resolver.ForWorkspaceFeatures.Resolve(first, second);

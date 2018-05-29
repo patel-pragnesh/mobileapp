@@ -16,6 +16,11 @@ namespace Toggl.Foundation.DataSources
         protected override IThreadSafeWorkspace Convert(IDatabaseWorkspace entity)
             => Workspace.From(entity);
 
+        protected override IDatabaseWorkspace ToDatabase(IThreadSafeWorkspace entity)
+        {
+            throw new System.NotImplementedException();
+        }
+
         protected override ConflictResolutionMode ResolveConflicts(IDatabaseWorkspace first, IDatabaseWorkspace second)
             => Resolver.ForWorkspaces.Resolve(first, second);
     }

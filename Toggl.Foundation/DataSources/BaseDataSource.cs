@@ -14,7 +14,7 @@ namespace Toggl.Foundation.DataSources
 {
     public abstract class BaseDataSource<T, U> : IBaseDataSource<T, U>
         where U : IDatabaseModel
-        where T : IThreadSafeModel, IIdentifiable, U
+        where T : IThreadSafeModel, IIdentifiable
     {
         protected readonly IRepository<U> Repository;
 
@@ -28,16 +28,16 @@ namespace Toggl.Foundation.DataSources
         }
 
         public virtual IObservable<T> Create(T entity)
-            => Repository.Create(entity).Select(Convert);
+            => Repository.Create(ToDatabase(entity)).Select(Convert);
 
         public virtual IObservable<T> Update(T entity)
-            => Repository.Update(entity.Id, entity).Select(Convert);
+            => Repository.Update(entity.Id, ToDatabase(entity)).Select(Convert);
         
         public virtual IObservable<T> Overwrite(T original, T entity)
-            => Repository.Update(original.Id, entity).Select(Convert);
+            => Repository.Update(original.Id, ToDatabase(entity)).Select(Convert);
 
         public virtual IObservable<IConflictResolutionResult<T>> OverwriteIfOriginalDidNotChange(T original, T entity)
-            => Repository.UpdateWithConflictResolution(original.Id, entity, ignoreIfChangedLocally(original), RivalsResolver)
+            => Repository.UpdateWithConflictResolution(original.Id, ToDatabase(entity), ignoreIfChangedLocally(ToDatabase(original)), RivalsResolver)
                 .Select(result => result.ToThreadSafeResult(Convert));
 
         public virtual IObservable<IEnumerable<IConflictResolutionResult<T>>> BatchUpdate(IEnumerable<T> entities)
@@ -47,16 +47,18 @@ namespace Toggl.Foundation.DataSources
                     RivalsResolver)
                 .ToThreadSafeResult(Convert);
 
-        private Func<U, U, ConflictResolutionMode> ignoreIfChangedLocally(T localEntity)
+        private Func<U, U, ConflictResolutionMode> ignoreIfChangedLocally(U localEntity)
             => (currentLocal, serverEntity) => localEntity.DiffersFrom(currentLocal)
                 ? ConflictResolutionMode.Ignore
                 : ConflictResolutionMode.Update;
 
         private IEnumerable<(long, U)> convertEntitiesForBatchUpdate(
             IEnumerable<T> entities)
-            => entities.Select(entity => (entity.Id, (U)entity));
+            => entities.Select(entity => (entity.Id, ToDatabase(entity)));
 
         protected abstract T Convert(U entity);
+
+        protected abstract U ToDatabase(T entity);
 
         protected abstract ConflictResolutionMode ResolveConflicts(U first, U second);
     }

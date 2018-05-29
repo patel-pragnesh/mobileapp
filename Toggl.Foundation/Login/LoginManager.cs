@@ -2,10 +2,12 @@
 using System.Reactive.Linq;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Models;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Shortcuts;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
+using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
 using Toggl.Ultrawave.Network;
@@ -57,6 +59,7 @@ namespace Toggl.Foundation.Login
                     .Clear()
                     .SelectMany(_ => apiFactory.CreateApiWith(credentials).User.Get())
                     .Select(User.Clean)
+                    .Select(toDatabaseUser)
                     .SelectMany(database.User.Create)
                     .Select(dataSourceFromUser)
                     .Do(shortcutCreator.OnLogin);
@@ -70,6 +73,7 @@ namespace Toggl.Foundation.Login
                 .Select(apiFactory.CreateApiWith)
                 .SelectMany(api => api.User.GetWithGoogle())
                 .Select(User.Clean)
+                .Select(toDatabaseUser)
                 .SelectMany(database.User.Create)
                 .Select(dataSourceFromUser)
                 .Do(shortcutCreator.OnLogin);
@@ -85,6 +89,7 @@ namespace Toggl.Foundation.Login
                     .Clear()
                     .SelectMany(_ => signUp(email, password, termsAccepted, countryId))
                     .Select(User.Clean)
+                    .Select(toDatabaseUser)
                     .SelectMany(database.User.Create)
                     .Select(dataSourceFromUser)
                     .Do(shortcutCreator.OnLogin);
@@ -96,6 +101,7 @@ namespace Toggl.Foundation.Login
                 .SelectMany(_ => googleService.GetAuthToken())
                 .SelectMany(apiFactory.CreateApiWith(Credentials.None).User.SignUpWithGoogle)
                 .Select(User.Clean)
+                .Select(toDatabaseUser)
                 .SelectMany(database.User.Create)
                 .Select(dataSourceFromUser)
                 .Do(shortcutCreator.OnLogin);
@@ -129,6 +135,7 @@ namespace Toggl.Foundation.Login
                 .Select(apiFactory.CreateApiWith)
                 .SelectMany(api => api.User.Get())
                 .Select(User.Clean)
+                .Select(toDatabaseUser)
                 .SelectMany(database.User.Update)
                 .Select(dataSourceFromUser)
                 .Do(shortcutCreator.OnLogin);
@@ -147,6 +154,11 @@ namespace Toggl.Foundation.Login
                 .CreateApiWith(Credentials.None)
                 .User
                 .SignUp(email, password, termsAccepted, countryId);
+        }
+
+        private IDatabaseUser toDatabaseUser(IThreadSafeUser user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

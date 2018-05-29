@@ -145,7 +145,7 @@ namespace Toggl.Foundation
             IObservable<Unit> delayCancellation)
             where TModel : class, IIdentifiable, ILastChangedDatable
             where TDatabase : class, TModel, IDatabaseSyncable
-            where TThreadsafe : class, TDatabase, IThreadSafeModel
+            where TThreadsafe : class, TModel, IThreadSafeModel, IDatabaseSyncable
         {
             var rnd = new Random();
             var statusDelay = new RetryDelayService(rnd);
@@ -209,7 +209,7 @@ namespace Toggl.Foundation
             IObservable<Unit> delayCancellation)
             where TModel : IIdentifiable, ILastChangedDatable
             where TDatabase : class, TModel, IDatabaseSyncable
-            where TThreadsafe : class, TDatabase, IThreadSafeModel
+            where TThreadsafe : class, TModel, IThreadSafeModel, IDatabaseSyncable
         {
             var rnd = new Random();
             var apiDelay = new RetryDelayService(rnd);
@@ -260,7 +260,7 @@ namespace Toggl.Foundation
             IObservable<Unit> delayCancellation)
             where TModel : class
             where TDatabase : class, TModel, IDatabaseSyncable
-            where TThreadsafe : class, TDatabase, IThreadSafeModel
+            where TThreadsafe : class, TModel, IThreadSafeModel, IDatabaseSyncable
         {
             var rnd = new Random();
             var apiDelay = new RetryDelayService(rnd);
