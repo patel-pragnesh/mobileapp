@@ -23,7 +23,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class SelectTimeViewModelTest : BaseViewModelTests<SelectTimeViewModel>
         {
             protected override SelectTimeViewModel CreateViewModel()
-                => new SelectTimeViewModel(NavigationService, TimeService);
+                => new SelectTimeViewModel(DataSource, NavigationService, TimeService);
 
             protected SelectTimeParameters CreateParameter(DateTimeOffset start, DateTimeOffset? stop)
             {
@@ -99,13 +99,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         {
             [Theory, LogIfTooSlow]
             [ClassData(typeof(TwoParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService)
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useDataSource, bool useNavigationService, bool useTimeService)
             {
+                var dataSource = useDataSource ? DataSource : null;
                 var navigationService = useNavigationService ? NavigationService : null;
                 var timeService = useTimeService ? TimeService : null;
 
                 Action constructingWithEmptyParameters =
-                    () => new SelectTimeViewModel(navigationService, timeService);
+                    () => new SelectTimeViewModel(dataSource, navigationService, timeService);
 
                 constructingWithEmptyParameters.ShouldThrow<ArgumentNullException>();
             }
