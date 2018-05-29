@@ -24,6 +24,7 @@ namespace Toggl.Giskard.Fragments
     using System.Collections.Generic;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading;
     using MvvmCross.Binding.BindingContext;
     using Toggl.Giskard.Helper;
     using Toggl.Giskard.Views;
@@ -102,7 +103,10 @@ namespace Toggl.Giskard.Fragments
                 startTimePicker = view.FindViewById<TogglDroidTimePicker>(Resource.Id.SelectStartTimeClockView);
                 stopTimePicker = view.FindViewById<TogglDroidTimePicker>(Resource.Id.SelectStopTimeClockView);
 
-                onPreferencesChangedDisposable = ViewModel.Is24HoursModeObservable.Subscribe(on24HourModeChanged);
+                onPreferencesChangedDisposable = ViewModel
+                    .Is24HoursModeObservable
+                    .ObserveOn(SynchronizationContext.Current)
+                    .Subscribe(on24HourModeChanged);
 
                 tabLayout.GetTabAt(StartTimeTab).SetCustomView(startPageView);
                 tabLayout.GetTabAt(StopTimeTab).SetCustomView(stopPageView);
