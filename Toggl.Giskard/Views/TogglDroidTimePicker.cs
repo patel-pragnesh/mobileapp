@@ -38,44 +38,46 @@ namespace Toggl.Giskard.Views
         {
         }
 
-        private DateTimeOffset originalValue;
-        public DateTimeOffset Value
+        public TimeSpan Value
         {
-            get => originalValue;
+            get
+            {
+                if (Build.VERSION.SdkInt <= BuildVersionCodes.LollipopMr1)
+                #pragma warning disable CS0618
+                    return new TimeSpan((int)CurrentHour, (int)CurrentMinute, 0);
+                else
+                    return new TimeSpan(Hour, Minute, 0);
+            }
             set
             {
-                if (!isInitialized)
+                if (isInitialized)
                 {
                     SetOnTimeChangedListener(this);
                     isInitialized = true;
                 }
 
-                if (originalValue == value)
-                    return;
-
-                originalValue = value;
-
-                var localTime = value.ToLocalTime();
-
-                if (MarshmallowApis.AreAvailable)
+                if (Build.VERSION.SdkInt <= BuildVersionCodes.LollipopMr1)
                 {
-                    if (Hour != localTime.Hour)
-                        Hour = localTime.Hour;
-
-                    if (Minute != localTime.Minute)
-                        Minute = localTime.Minute;
+                    #pragma warning disable CS0618
+                    if ((int)CurrentHour != value.Hours)
+                    {
+                        CurrentHour = (Java.Lang.Integer)value.Hours;
+                    }
+                    if ((int)CurrentMinute != value.Minutes)
+                    {
+                        CurrentMinute = (Java.Lang.Integer)value.Minutes;
+                    }
                 }
                 else
                 {
-                    #pragma warning disable 0618
-
-                    if ((int)CurrentHour != localTime.Hour)
-                        CurrentHour = (Integer)localTime.Hour;
-
-                    if ((int)CurrentMinute != localTime.Minute)
-                        CurrentMinute = (Integer)localTime.Minute;
-                    
-                    #pragma warning restore 0618
+                    if (Hour != value.Hours)
+                    {
+                        Hour = value.Hours;
+                    }
+                    if (Minute != value.Minutes)
+                    {
+                        Minute = value.Minutes;
+                    }
                 }
             }
         }
@@ -89,14 +91,6 @@ namespace Toggl.Giskard.Views
 
         public void OnTimeChanged(TimePicker view, int hourOfDay, int minute)
         {
-            var localTime = originalValue.ToLocalTime();
-
-            var changedDateTimeOffset = new DateTimeOffset(
-                localTime.Year, localTime.Month, localTime.Day,
-                hourOfDay, minute, localTime.Second, localTime.Offset);
-
-            originalValue = changedDateTimeOffset;
-
             ValueChanged?.Invoke(this, null);
         }
     }
