@@ -78,7 +78,7 @@ namespace Toggl.Foundation.Tests.Sync
         {
             var builder = new StringBuilder();
 
-            builder.AppendLine("digraph");
+            builder.AppendLine("digraph SyncGraph {");
 
             foreach (var node in nodes)
             {
@@ -89,6 +89,8 @@ namespace Toggl.Foundation.Tests.Sync
             {
                 builder.AppendLine($"{edge.From.Id} -> {edge.To.Id} [label={edge.Label}];");
             }
+
+            builder.AppendLine("}");
 
             return builder.ToString();
         }
@@ -124,7 +126,7 @@ namespace Toggl.Foundation.Tests.Sync
             {
                 var node = new Node
                 {
-                    Label = "Dead End"
+                    Label = "DeadEnd"
                 };
                 nodes.Add(node);
 
