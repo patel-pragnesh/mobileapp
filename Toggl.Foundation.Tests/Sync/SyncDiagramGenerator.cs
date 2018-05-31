@@ -209,7 +209,7 @@ namespace Toggl.Foundation.Tests.Sync
                 .Select(state => (state, state.GetType()
                     .GetProperties()
                     .Where(isStateResultProperty)
-                    .Select(p => ((IStateResult) p.GetValue(state), p.Name))
+                    .Select(p => ((IStateResult)p.GetValue(state), p.Name))
                     .ToList())
                 ).ToList();
         }
