@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.Sync
@@ -38,15 +39,14 @@ namespace Toggl.Foundation.Sync
         public void Start(ITransition transition)
         {
             Ensure.Argument.IsNotNull(transition, nameof(transition));
-            
+
             if (isRunning)
                 throw new InvalidOperationException("Cannot start state machine if it is already running.");
 
             if (isFrozen)
                 throw new InvalidOperationException("Cannot start state machine again if it was frozen.");
 
-            isRunning = true;
-            onTransition(transition);
+            start(transition);
         }
 
         public void Freeze()
@@ -56,33 +56,51 @@ namespace Toggl.Foundation.Sync
             isFrozen = true;
         }
 
-        private void performTransition(ITransition transition, TransitionHandler transitionHandler)
+        private async void start(ITransition transition)
         {
-            stateTransitions.OnNext(new StateMachineTransition(transition));
-
-            transitionHandler(transition)
-                .SingleAsync()
-                .Subscribe(onTransition, onError);
-        }
-
-        private void onTransition(ITransition transition)
-        {
-            var transitionHandler = transitionHandlerProvider.GetTransitionHandler(transition.Result);
-
-            if (transitionHandler == null || isFrozen == true)
+            StateMachineEvent result = null;
+            try
+            {
+                isRunning = true;
+                result = await run(transition).ConfigureAwait(false);
+            }
+            finally
             {
                 isRunning = false;
-                stateTransitions.OnNext(new StateMachineDeadEnd(transition));
-                return;
             }
 
-            performTransition(transition, transitionHandler);
+            if (result == null)
+            {
+                var exception = new InvalidOperationException("State machine finished and did not return any valid event.");
+                result = new StateMachineError(exception);
+            }
+
+            stateTransitions.OnNext(result);
         }
 
-        private void onError(Exception exception)
+        private async Task<StateMachineEvent> run(ITransition transition)
         {
-            isRunning = false;
-            stateTransitions.OnNext(new StateMachineError(exception));
+            var transitionHandler = getHandler(transition);
+            while (transitionHandler != null && isFrozen == false)
+            {
+                stateTransitions.OnNext(new StateMachineTransition(transition));
+
+                try
+                {
+                    transition = await transitionHandler(transition).SingleAsync();
+                }
+                catch (Exception exception)
+                {
+                    return new StateMachineError(exception);
+                }
+
+                transitionHandler = getHandler(transition);
+            }
+
+            return new StateMachineDeadEnd(transition);
         }
+
+        private TransitionHandler getHandler(ITransition transition)
+            => transitionHandlerProvider.GetTransitionHandler(transition.Result);
     }
 }
