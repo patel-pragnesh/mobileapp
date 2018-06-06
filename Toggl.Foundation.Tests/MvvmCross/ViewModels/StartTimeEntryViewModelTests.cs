@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -39,6 +40,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected const long TaskId = 30;
             protected const long ProjectId = 10;
             protected const long WorkspaceId = 40;
+            protected const string WorkspaceName = "The best workspace ever";
             protected const string ProjectName = "Toggl";
             protected const string ProjectColor = "#F41F19";
             protected const string Description = "Testing Toggl mobile apps";
@@ -608,6 +610,26 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(Observable.Return(suggestions));
             }
 
+            private List<ProjectSuggestion> createProjects(int count)
+                => Enumerable
+                    .Range(0, count)
+                    .Select(i =>
+                    {
+                        var workspace = Substitute.For<IThreadSafeWorkspace>();
+                        workspace.Id.Returns(WorkspaceId);
+                        workspace.Name.Returns(WorkspaceName);
+
+                        var project = Substitute.For<IThreadSafeProject>();
+                        project.Workspace.Returns(workspace);
+                        project.WorkspaceId.Returns(WorkspaceId);
+                        project.Id.Returns(ProjectId + i);
+                        project.Name.Returns($"{ProjectName}-{i}");
+                        project.Color.Returns(ProjectColor);
+                        return project;
+                    })
+                    .Apply(ProjectSuggestion.FromProjects)
+                    .ToList();
+
             [Fact, LogIfTooSlow]
             public void StartProjectSuggestionEvenIfTheProjectHasAlreadyBeenSelected()
             {
@@ -630,6 +652,42 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
                 ViewModel.IsSuggestingProjects.Should().BeTrue();
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ShowsCorrectProjectSuggestionsAfterProjectHasAlreadyBeenSelected()
+            {
+                const int noProjectCount = 1;
+                var projects = createProjects(5);
+                var chosenProject = projects.First();
+                AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(Observable.Return(projects));
+                ViewModel.Prepare();
+                ViewModel.Prepare(DefaultParameter);
+                ViewModel.TextFieldInfo = TextFieldInfo.Empty(WorkspaceId).WithTextAndCursor(Description, Description.Length);
+
+                ViewModel.ToggleProjectSuggestionsCommand.Execute();
+                ViewModel.SelectSuggestionCommand.Execute(chosenProject);
+                ViewModel.ToggleProjectSuggestionsCommand.Execute();
+
+                ViewModel.Suggestions.Should().HaveCount(1);
+                ViewModel.Suggestions.First().Should().HaveCount(projects.Count + noProjectCount);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ProjectSuggestionsAreClearedOnProjectSelection()
+            {
+                var projects = createProjects(5);
+                var chosenProject = projects.First();
+                AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(Observable.Return(projects));
+                ViewModel.Prepare();
+                ViewModel.Prepare(DefaultParameter);
+                ViewModel.TextFieldInfo = TextFieldInfo.Empty(WorkspaceId).WithTextAndCursor(Description, Description.Length);
+
+                ViewModel.ToggleProjectSuggestionsCommand.Execute();
+                ViewModel.SelectSuggestionCommand.Execute(chosenProject);
+
+                ViewModel.IsSuggestingProjects.Should().BeFalse();
+                ViewModel.Suggestions.Should().HaveCount(0);
             }
 
             [Fact, LogIfTooSlow]
