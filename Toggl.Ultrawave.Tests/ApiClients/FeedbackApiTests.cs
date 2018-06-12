@@ -73,6 +73,22 @@ namespace Toggl.Ultrawave.Tests.ApiClients
                 await apiClient.Received().Send(Arg.Is<IRequest>(req =>
                     req.Body.Left == serializedJson));
             }
+
+            [Fact]
+            public async Task SerializesTheJsonCorrectlyWithoutAnyAdditionalData()
+            {
+                var email = Email.From($"{Guid.NewGuid()}@toggl.space");
+                var message = "XYZ.";
+                var serializedJson = $"{{\"email\":\"{email}\",\"message\":\"{message}\",\"data\":[]}}";
+                var response = Substitute.For<IResponse>();
+                response.IsSuccess.Returns(true);
+                apiClient.Send(Arg.Any<IRequest>()).Returns(Task.FromResult(response));
+
+                await feedbackApiClient.Send(email, message, null);
+
+                await apiClient.Received().Send(Arg.Is<IRequest>(req =>
+                    req.Body.Left == serializedJson));
+            }
         }
     }
 }
