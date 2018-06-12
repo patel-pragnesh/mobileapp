@@ -35,7 +35,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
             {
                 var invalidEmail = Email.From($"{Guid.NewGuid()}@toggl.");
 
-                Action sendingFeedback = async () => await feedbackApiClient.Send(invalidEmail, "ABC.", new Dictionary<string, string>());
+                Func<Task> sendingFeedback = async () => await feedbackApiClient.Send(invalidEmail, "ABC.", new Dictionary<string, string>());
 
                 sendingFeedback.Should().Throw<ArgumentException>();
             }
@@ -48,7 +48,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
             {
                 var invalidEmail = Email.From($"{Guid.NewGuid()}@toggl.space");
 
-                Action sendingFeedback = async () => await feedbackApiClient.Send(invalidEmail, message, new Dictionary<string, string>());
+                Func<Task> sendingFeedback = async () => await feedbackApiClient.Send(invalidEmail, message, new Dictionary<string, string>());
 
                 sendingFeedback.Should().Throw<ArgumentException>();
             }
@@ -57,11 +57,11 @@ namespace Toggl.Ultrawave.Tests.ApiClients
             public async Task SerializesTheJsonCorrectly()
             {
                 var email = Email.From($"{Guid.NewGuid()}@toggl.space");
-                var message = "XYZ.\nIJK!";
+                var message = "XYZ.";
                 var data = new Dictionary<string, string>
                 {
                     ["device"] = "SomePhone",
-                    ["some random key"] = "some also radnom value"
+                    ["some random key"] = "some also random value"
                 };
                 var serializedJson = $"{{\"email\":\"{email}\",\"message\":\"{message}\",\"data\":{{\"device\":\"SomePhone\",\"some random key\":\"some also random value\"}}}}";
                 var response = Substitute.For<IResponse>();
