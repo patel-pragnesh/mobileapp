@@ -25,11 +25,14 @@ namespace Toggl.Ultrawave.ApiClients
 
         public IObservable<Unit> Send(Email email, string message, IDictionary<string, string> data)
         {
+            Ensure.Argument.IsValidEmail(email, nameof(email));
+            Ensure.Argument.IsNotNullOrWhiteSpaceString(message, nameof(message));
+
             var feedback = new Feedback
             {
                 Email = email,
                 Message = message,
-                Data = data
+                Data = data ?? new Dictionary<string, string>()
             };
 
             var json = serializer.Serialize(feedback, SerializationReason.Post, null);
