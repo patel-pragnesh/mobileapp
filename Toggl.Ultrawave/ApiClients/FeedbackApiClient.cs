@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive;
 using Newtonsoft.Json;
 using Toggl.Multivac;
@@ -32,7 +33,7 @@ namespace Toggl.Ultrawave.ApiClients
             {
                 Email = email,
                 Message = message,
-                Data = data ?? new Dictionary<string, string>()
+                Data = data?.Select(CommonFunctions.Identity) ?? Enumerable.Empty<KeyValuePair<string, string>>()
             };
 
             var json = serializer.Serialize(feedback, SerializationReason.Post, null);
@@ -48,7 +49,7 @@ namespace Toggl.Ultrawave.ApiClients
 
             public string Message { get; set; }
 
-            public IDictionary<string, string> Data { get; set; }
+            public IEnumerable<KeyValuePair<string, string>> Data { get; set; }
         }
     }
 }

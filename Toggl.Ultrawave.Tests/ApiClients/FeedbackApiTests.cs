@@ -63,7 +63,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
                     ["device"] = "SomePhone",
                     ["some random key"] = "some also random value"
                 };
-                var serializedJson = $"{{\"email\":\"{email}\",\"message\":\"{message}\",\"data\":{{\"device\":\"SomePhone\",\"some random key\":\"some also random value\"}}}}";
+                var serializedJson = $"{{\"email\":\"{email}\",\"message\":\"{message}\",\"data\":[{{\"key\":\"device\",\"value\":\"SomePhone\"}},{{\"key\":\"some random key\",\"value\":\"some also random value\"}}]}}";
                 var response = Substitute.For<IResponse>();
                 response.IsSuccess.Returns(true);
                 apiClient.Send(Arg.Any<IRequest>()).Returns(Task.FromResult(response));
