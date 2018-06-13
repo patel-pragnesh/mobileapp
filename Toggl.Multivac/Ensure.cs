@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices.WindowsRuntime;
+using Toggl.Multivac.Extensions;
 
 namespace Toggl.Multivac
 {
@@ -53,6 +53,13 @@ namespace Toggl.Multivac
                 if (Enum.IsDefined(typeof(T), value)) return;
 
                 throw new ArgumentException("Invalid enum value.", argumentName);
+            }
+
+            public static void IsNotTooLong(string value, long maxLength, string argumentName)
+            {
+                if (value.LengthInBytes() <= maxLength) return;
+
+                throw new ArgumentException("String is too long.", argumentName);
             }
         }
     }
