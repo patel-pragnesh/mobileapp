@@ -5,64 +5,6 @@ using Toggl.PrimeRadiant.Models;
 
 namespace Toggl.Foundation.Models
 {
-    internal partial class Project
-    {
-        private Project(IDatabaseProject entity)
-            : this(entity as IProject, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
-        {
-            Client = entity.Client == null ? null : Models.Client.From(entity.Client);
-            Workspace = entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace);
-            Tasks = entity.Tasks == null ? null : entity.Tasks.Select(Models.Task.From);
-            SyncStatus = entity.SyncStatus;
-            LastSyncErrorMessage = entity.LastSyncErrorMessage;
-            IsDeleted = entity.IsDeleted;
-        }
-
-        public static Project From(IDatabaseProject entity)
-            => new Project(entity);
-
-        private Project(IProject entity, SyncStatus syncStatus, string lastSyncErrorMessage, bool isDeleted = false)
-        {
-            Id = entity.Id;
-            WorkspaceId = entity.WorkspaceId;
-            ClientId = entity.ClientId;
-            Name = entity.Name;
-            IsPrivate = entity.IsPrivate;
-            Active = entity.Active;
-            Color = entity.Color;
-            Billable = entity.Billable;
-            Template = entity.Template;
-            AutoEstimates = entity.AutoEstimates;
-            EstimatedHours = entity.EstimatedHours;
-            Rate = entity.Rate;
-            Currency = entity.Currency;
-            ActualHours = entity.ActualHours;
-            At = entity.At;
-            ServerDeletedAt = entity.ServerDeletedAt;
-            SyncStatus = syncStatus;
-            LastSyncErrorMessage = lastSyncErrorMessage;
-            IsDeleted = isDeleted;
-        }
-
-        public static Project Clean(IProject entity)
-            => new Project(entity, SyncStatus.InSync, null);
-
-        public static Project Dirty(IProject entity)
-            => new Project(entity, SyncStatus.SyncNeeded, null);
-
-        public static Project Unsyncable(IProject entity, string errorMessage)
-            => new Project(entity, SyncStatus.SyncFailed, errorMessage);
-
-        public static Project CleanDeleted(IProject entity)
-            => new Project(entity, SyncStatus.InSync, null, true);
-
-        public static Project DirtyDeleted(IProject entity)
-            => new Project(entity, SyncStatus.SyncNeeded, null, true);
-
-        public static Project UnsyncableDeleted(IProject entity, string errorMessage)
-            => new Project(entity, SyncStatus.SyncFailed, errorMessage, true);
-    }
-
     internal partial class Tag
     {
         private Tag(IDatabaseTag entity)

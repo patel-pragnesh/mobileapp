@@ -8,59 +8,6 @@ using Toggl.Multivac.Models;
 
 namespace Toggl.Foundation.Models
 {
-    internal partial class Project : IThreadSafeProject
-    {
-        public long Id { get; }
-
-        public long WorkspaceId { get; }
-
-        public long? ClientId { get; }
-
-        public string Name { get; }
-
-        public bool IsPrivate { get; }
-
-        public bool Active { get; }
-
-        public string Color { get; }
-
-        public bool? Billable { get; }
-
-        public bool? Template { get; }
-
-        public bool? AutoEstimates { get; }
-
-        public long? EstimatedHours { get; }
-
-        public double? Rate { get; }
-
-        public string Currency { get; }
-
-        public int? ActualHours { get; }
-
-        IDatabaseClient IDatabaseProject.Client => Client;
-
-        public IThreadSafeClient Client { get; }
-
-        IDatabaseWorkspace IDatabaseProject.Workspace => Workspace;
-
-        public IThreadSafeWorkspace Workspace { get; }
-
-        IEnumerable<IDatabaseTask> IDatabaseProject.Tasks => Tasks;
-
-        public IEnumerable<IThreadSafeTask> Tasks { get; }
-
-        public bool IsDeleted { get; }
-
-        public SyncStatus SyncStatus { get; }
-
-        public string LastSyncErrorMessage { get; }
-
-        public DateTimeOffset At { get; }
-
-        public DateTimeOffset? ServerDeletedAt { get; }
-    }
-
     internal partial class Tag : IThreadSafeTag
     {
         public long Id { get; }

@@ -1,160 +1,96 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using Toggl.Foundation.Models.Interfaces;
+using Toggl.Multivac;
+using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
+using Toggl.PrimeRadiant.Models;
 using static Toggl.Foundation.Helper.Constants;
-using static Toggl.Multivac.Extensions.StringExtensions;
 
 namespace Toggl.Foundation.Models
 {
-    internal partial class Project
+    internal class Project : IThreadSafeProject
     {
-        internal sealed class Builder
+        public long Id { get; }
+        public string Name { get; }
+        public bool IsPrivate { get; }
+        public bool Active { get; }
+        public string Color { get; }
+        public bool? Billable { get; }
+        public bool? Template { get; }
+        public bool? AutoEstimates { get; }
+        public long? EstimatedHours { get; }
+        public double? Rate { get; }
+        public string Currency { get; }
+        public int? ActualHours { get; }
+        public long WorkspaceId { get; }
+        public long? ClientId { get; }
+        public SyncStatus SyncStatus { get; }
+        public string LastSyncErrorMessage { get; }
+        public bool IsDeleted { get; }
+        public DateTimeOffset At { get; }
+        public DateTimeOffset? ServerDeletedAt { get; }
+
+        public IThreadSafeWorkspace Workspace { get; }
+        IDatabaseWorkspace IDatabaseProject.Workspace => Workspace;
+        public IThreadSafeClient Client { get; }
+        IDatabaseClient IDatabaseProject.Client => Client;
+        public IEnumerable<IThreadSafeTask> Tasks { get; }
+        IEnumerable<IDatabaseTask> IDatabaseProject.Tasks => Tasks;
+
+        private Project(IProject entity, SyncStatus syncStatus, string lastSyncErrorMessage = "", bool isDeleted = false,
+            Client client = null, Workspace workspace = null, IEnumerable<Task> taks = null)
         {
-            private const string errorMessage = "You need to set the {0} before building a project";
+            Ensure.Argument.IsNotNullOrEmpty(entity.Name, nameof(entity.Name));
+            Ensure.Argument.IsNotNullOrEmpty(entity.Color, nameof(entity.Color));
+            Ensure.Argument.IsNotZero(entity.WorkspaceId, nameof(entity.WorkspaceId));
+            Ensure.Argument.IsNotNull(entity.At, nameof(entity.At));
+            Ensure.Argument.IsNotTooLong(entity.Name, MaxClientNameLengthInBytes, nameof(entity.Name));
 
-            public static Builder Create(long id) => new Builder(id);
+            Id = entity.Id;
+            Name = entity.Name;
+            IsPrivate = entity.IsPrivate;
+            Active = entity.Active;
+            Color = entity.Color;
+            Billable = entity.Billable;
+            Template = entity.Template;
+            AutoEstimates = entity.AutoEstimates;
+            EstimatedHours = entity.EstimatedHours;
+            Rate = entity.Rate;
+            Currency = entity.Currency;
+            ActualHours = entity.ActualHours;
+            WorkspaceId = entity.WorkspaceId;
+            ClientId = entity.ClientId;
+            At = entity.At;
+            ServerDeletedAt = entity.ServerDeletedAt;
 
-            public static Builder From(IThreadSafeProject project)
-                => new Builder(project.Id)
-                {
-                    Name = project.Name,
-                    Color = project.Color,
-                    Billable = project.Billable,
-                    SyncStatus = project.SyncStatus,
-                    WorkspaceId = project.WorkspaceId,
-                    At = project.At,
-                    ServerDeletedAt = project.ServerDeletedAt,
-                    IsDeleted = project.IsDeleted,
-                    ClientId = project.ClientId,
-                    Active = project.Active
-                };
+            Workspace = workspace;
+            Client = client;
+            Tasks = taks;
 
-            public long Id { get; }
-
-            public string Name { get; private set; }
-
-            public string Color { get; private set; }
-
-            public bool? Billable { get; private set; }
-
-            public SyncStatus SyncStatus { get; private set; }
-
-            public long? WorkspaceId { get; private set; }
-
-            public DateTimeOffset? At { get; private set; }
-
-            public DateTimeOffset? ServerDeletedAt { get; private set; }
-
-            public bool IsDeleted { get; private set; }
-
-            public long? ClientId { get; private set; }
-
-            public bool Active { get; private set; } = true;
-
-            private Builder(long id)
-            {
-                Id = id;
-            }
-
-            public Project Build()
-            {
-                ensureValidity();
-                return new Project(this);
-            }
-
-            public Builder SetSyncStatus(SyncStatus syncStatus)
-            {
-                SyncStatus = syncStatus;
-                return this;
-            }
-
-            public Builder SetWorkspaceId(long workspaceId)
-            {
-                WorkspaceId = workspaceId;
-                return this;
-            }
-
-            internal Builder SetClientId(long? clientId)
-            {
-                ClientId = clientId;
-                return this;
-            }
-
-            internal Builder SetBillable(bool? billable)
-            {
-                Billable = billable;
-                return this;
-            }
-
-            internal Builder SetColor(string color)
-            {
-                Color = color;
-                return this;
-            }
-
-            public Builder SetName(string name)
-            {
-                Name = name;
-                return this;
-            }
-
-            public Builder SetAt(DateTimeOffset at)
-            {
-                At = at;
-                return this;
-            }
-
-            public Builder SetServerDeletedAt(DateTimeOffset? serverDeleteAt)
-            {
-                ServerDeletedAt = serverDeleteAt;
-                return this;
-            }
-
-            public Builder SetIsDeleted(bool isDeleted)
-            {
-                IsDeleted = isDeleted;
-                return this;
-            }
-
-            public Builder SetActive(bool active)
-            {
-                Active = active;
-                return this;
-            }
-
-            private void ensureValidity()
-            {
-                if (string.IsNullOrEmpty(Name))
-                    throw new InvalidOperationException(string.Format(errorMessage, "name"));
-
-                if (string.IsNullOrEmpty(Color))
-                    throw new InvalidOperationException(string.Format(errorMessage, "color"));
-
-                if (WorkspaceId == null || WorkspaceId == 0)
-                    throw new InvalidOperationException(string.Format(errorMessage, "workspace id"));
-
-                if (At == null)
-                    throw new InvalidOperationException(string.Format(errorMessage, "at"));
-
-                if (Name.LengthInBytes() > MaxClientNameLengthInBytes)
-                    throw new InvalidOperationException("Client name must have less than {MaxClientNameLengthInBytes} bytes");
-            }
+            SyncStatus = syncStatus;
+            LastSyncErrorMessage = lastSyncErrorMessage;
+            IsDeleted = isDeleted;
         }
 
-        private Project(Builder builder)
+        public static Project From(IDatabaseProject entity)
         {
-            Id = builder.Id;
-            Name = builder.Name;
-            At = builder.At.Value;
-            Color = builder.Color;
-            Billable = builder.Billable;
-            ClientId = builder.ClientId;
-            IsDeleted = builder.IsDeleted;
-            SyncStatus = builder.SyncStatus;
-            WorkspaceId = builder.WorkspaceId.Value;
-            ServerDeletedAt = builder.ServerDeletedAt;
-            Active = builder.Active;
+            return new Project(
+                entity,
+                entity.SyncStatus,
+                entity.LastSyncErrorMessage,
+                entity.IsDeleted,
+                entity.Client == null ? null : Models.Client.From(entity.Client),
+                entity.Workspace == null ? null : Models.Workspace.From(entity.Workspace),
+                entity.Tasks == null ? null : entity.Tasks.Select(Models.Task.From)
+            );
         }
+
+        public static Project Clean(IProject entity)
+            => new Project(entity, SyncStatus.InSync, null);
+
+        public static Project Unsyncable(IProject entity, string errorMessage)
+            => new Project(entity, SyncStatus.SyncFailed, errorMessage);
     }
 }
