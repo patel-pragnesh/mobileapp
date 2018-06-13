@@ -74,6 +74,19 @@ namespace Toggl.Foundation.Models
             IsDeleted = isDeleted;
         }
 
+        public Project(long id, string name, DateTimeOffset at, SyncStatus syncStatus, string color, long workspaceId, long? clientId = null, bool active = false, bool? billable = null)
+        {
+            Id = id;
+            Name = name;
+            At = at;
+            SyncStatus = syncStatus;
+            Color = color;
+            Active = active;
+            Billable = billable;
+            ClientId = clientId;
+            WorkspaceId = workspaceId;
+        }
+
         public static Project From(IDatabaseProject entity)
         {
             return new Project(

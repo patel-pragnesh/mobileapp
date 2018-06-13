@@ -27,17 +27,20 @@ namespace Toggl.Foundation.DataSources
         }
 
         public IObservable<IDatabaseProject> Create(CreateProjectDTO dto)
-            => idProvider.GetNextIdentifier()
-                .Apply(Project.Builder.Create)
-                .SetName(dto.Name)
-                .SetColor(dto.Color)
-                .SetClientId(dto.ClientId)
-                .SetBillable(dto.Billable)
-                .SetWorkspaceId(dto.WorkspaceId)
-                .SetAt(timeService.CurrentDateTime)
-                .SetSyncStatus(SyncStatus.SyncNeeded)
-                .Build()
-                .Apply(Create);
+        {
+            var project = new Project(
+                idProvider.GetNextIdentifier(),
+                dto.Name,
+                timeService.CurrentDateTime,
+                SyncStatus.SyncNeeded,
+                dto.Color,
+                dto.WorkspaceId,
+                dto.ClientId,
+                billable: dto.Billable
+            );
+
+            return Create(project);
+        }
 
         protected override IThreadSafeProject Convert(IDatabaseProject entity)
             => Project.From(entity);
