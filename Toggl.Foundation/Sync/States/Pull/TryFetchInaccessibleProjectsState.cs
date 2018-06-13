@@ -73,9 +73,8 @@ namespace Toggl.Foundation.Sync.States.Pull
 
         private IObservable<IThreadSafeProject> updateAtValue(IThreadSafeProject project)
         {
-            var updatedProject = Project.Builder.From(project)
-                .SetAt(timeService.CurrentDateTime)
-                .Build();
+            var updatedProject = Project.From(project)
+                .With(timeService.CurrentDateTime);
 
             return dataSource.Update(updatedProject);
         }

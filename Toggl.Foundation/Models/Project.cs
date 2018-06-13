@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
@@ -40,40 +41,53 @@ namespace Toggl.Foundation.Models
         IEnumerable<IDatabaseTask> IDatabaseProject.Tasks => Tasks;
 
         private Project(IProject entity, SyncStatus syncStatus, string lastSyncErrorMessage = "", bool isDeleted = false,
-            Client client = null, Workspace workspace = null, IEnumerable<Task> taks = null)
+            Client client = null, Workspace workspace = null, IEnumerable<Task> tasks = null)
+            : this(entity.Id, entity.Name, entity.IsPrivate, entity.Active, entity.Color, entity.Billable, entity.Template, entity.AutoEstimates,
+                entity.EstimatedHours, entity.Rate, entity.Currency, entity.ActualHours, entity.WorkspaceId, entity.ClientId, syncStatus,
+                lastSyncErrorMessage, isDeleted, entity.At, entity.ServerDeletedAt, workspace, client, tasks)
         {
-            Ensure.Argument.IsNotNullOrEmpty(entity.Name, nameof(entity.Name));
-            Ensure.Argument.IsNotNullOrEmpty(entity.Color, nameof(entity.Color));
-            Ensure.Argument.IsNotZero(entity.WorkspaceId, nameof(entity.WorkspaceId));
-            Ensure.Argument.IsNotNull(entity.At, nameof(entity.At));
-            Ensure.Argument.IsNotTooLong(entity.Name, MaxClientNameLengthInBytes, nameof(entity.Name));
 
-            Id = entity.Id;
-            Name = entity.Name;
-            IsPrivate = entity.IsPrivate;
-            Active = entity.Active;
-            Color = entity.Color;
-            Billable = entity.Billable;
-            Template = entity.Template;
-            AutoEstimates = entity.AutoEstimates;
-            EstimatedHours = entity.EstimatedHours;
-            Rate = entity.Rate;
-            Currency = entity.Currency;
-            ActualHours = entity.ActualHours;
-            WorkspaceId = entity.WorkspaceId;
-            ClientId = entity.ClientId;
-            At = entity.At;
-            ServerDeletedAt = entity.ServerDeletedAt;
+        }
+
+        public Project(long id, string name, bool isPrivate, bool active, string color, bool? billable, bool? template,
+            bool? autoEstimates, long? estimatedHours, double? rate, string currency, int? actualHours,
+            long workspaceId, long? clientId, SyncStatus syncStatus, string lastSyncErrorMessage, bool isDeleted,
+            DateTimeOffset at, DateTimeOffset? serverDeletedAt,
+            IThreadSafeWorkspace workspace, IThreadSafeClient client, IEnumerable<IThreadSafeTask> tasks)
+        {
+           /* Ensure.Argument.IsNotNullOrEmpty(name, nameof(name));
+            Ensure.Argument.IsNotNullOrEmpty(color, nameof(color));
+            Ensure.Argument.IsNotZero(workspaceId, nameof(workspaceId));
+            Ensure.Argument.IsNotNull(at, nameof(at));
+            Ensure.Argument.IsNotTooLong(name, MaxClientNameLengthInBytes, nameof(name));
+            */
+            Id = id;
+            Name = name;
+            IsPrivate = isPrivate;
+            Active = active;
+            Color = color;
+            Billable = billable;
+            Template = template;
+            AutoEstimates = autoEstimates;
+            EstimatedHours = estimatedHours;
+            Rate = rate;
+            Currency = currency;
+            ActualHours = actualHours;
+            WorkspaceId = workspaceId;
+            ClientId = clientId;
+            At = at;
+            ServerDeletedAt = serverDeletedAt;
 
             Workspace = workspace;
             Client = client;
-            Tasks = taks;
+            Tasks = tasks;
 
             SyncStatus = syncStatus;
             LastSyncErrorMessage = lastSyncErrorMessage;
             IsDeleted = isDeleted;
         }
 
+        // Bad constructor, for creation
         public Project(long id, string name, DateTimeOffset at, SyncStatus syncStatus, string color, long workspaceId, long? clientId = null, bool active = false, bool? billable = null)
         {
             Id = id;
@@ -105,5 +119,38 @@ namespace Toggl.Foundation.Models
 
         public static Project Unsyncable(IProject entity, string errorMessage)
             => new Project(entity, SyncStatus.SyncFailed, errorMessage);
+
+        public static Project Dirty(IProject entity)
+            => new Project(entity, SyncStatus.SyncNeeded, null);
+
+        public class ProjectBuilder
+        {
+            internal IList<Action<Project>> actions = new List<Action<Project>>();
+
+            internal ProjectBuilder With(Action<Project> with)
+            {
+                actions.Add(with);
+                return this;
+            }
+
+            public Project build()
+            {
+                ensureValidity();
+                return new Project(this);
+            }
+
+            private void ensureValidity()
+            {
+
+            }
+        }
+
+        private Project(ProjectBuilder builder)
+        {
+            foreach (var action in builder.actions)
+            {
+                action(this);
+            }
+        }
     }
 }

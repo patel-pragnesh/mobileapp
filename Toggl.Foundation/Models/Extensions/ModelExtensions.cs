@@ -1,4 +1,5 @@
-﻿using Toggl.Foundation.Models.Interfaces;
+﻿using System;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 
@@ -24,6 +25,35 @@ namespace Toggl.Foundation.Models
                 syncStatus.ValueOr(original.SyncStatus),
                 lastSyncErrorMessage.ValueOr(original.LastSyncErrorMessage),
                 isDeleted.ValueOr(original.IsDeleted)
+            );
+
+        public static IThreadSafeProject With(
+            this IThreadSafeProject original,
+            New<DateTimeOffset> at = default(New<DateTimeOffset>)
+        )
+            => new Project(
+                original.Id,
+                original.Name,
+                original.IsPrivate,
+                original.Active,
+                original.Color,
+                original.Billable,
+                original.Template,
+                original.AutoEstimates,
+                original.EstimatedHours,
+                original.Rate,
+                original.Currency,
+                original.ActualHours,
+                original.WorkspaceId,
+                original.ClientId,
+                original.SyncStatus,
+                original.LastSyncErrorMessage,
+                original.IsDeleted,
+                at.ValueOr(original.At),
+                original.ServerDeletedAt,
+                original.Workspace,
+                original.Client,
+                original.Tasks
             );
     }
 }
