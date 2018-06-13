@@ -62,7 +62,7 @@ namespace Toggl.Foundation.DataSources
             Preferences = new PreferencesDataSource(database.Preferences);
             Projects = new ProjectsDataSource(database.IdProvider, database.Projects, timeService);
             TimeEntries = new TimeEntriesDataSource(database.TimeEntries, timeService);
-            Workspaces = new WorkspacesDataSource(database.Workspaces);
+            Workspaces = new WorkspacesDataSource(database.IdProvider, database.Workspaces, timeService);
             WorkspaceFeatures = new WorkspaceFeaturesDataSource(database.WorkspaceFeatures);
 
             SyncManager = createSyncManager(this);
@@ -80,7 +80,7 @@ namespace Toggl.Foundation.DataSources
         public IPreferencesSource Preferences { get; }
         public IProjectsSource Projects { get; }
         public ITimeEntriesSource TimeEntries { get; }
-        public IDataSource<IThreadSafeWorkspace, IDatabaseWorkspace> Workspaces { get; }
+        public IWorkspacesSource Workspaces { get; }
         public IDataSource<IThreadSafeWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection> WorkspaceFeatures { get; }
 
         public ISyncManager SyncManager { get; }
