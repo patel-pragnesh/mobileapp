@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Disposables;
+﻿using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using Toggl.Foundation.DataSources;
-using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
-using Toggl.Multivac.Extensions;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
-    public class NoWorkspaceViewModel : MvxViewModel
+    public sealed class NoWorkspaceViewModel : MvxViewModel
     {
         private IMvxNavigationService navigationService;
         private ITogglDataSource dataSource;
