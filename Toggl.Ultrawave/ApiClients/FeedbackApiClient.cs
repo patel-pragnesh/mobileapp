@@ -11,7 +11,7 @@ using Toggl.Ultrawave.Serialization.Converters;
 
 namespace Toggl.Ultrawave.ApiClients
 {
-    internal class FeedbackApiClient : BaseApi, IFeedbackApiClient
+    internal class FeedbackApiClient : BaseApi, IFeedbackApi
     {
         private readonly FeedbackEndpoints endPoints;
 

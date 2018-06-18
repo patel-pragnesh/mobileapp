@@ -5,7 +5,7 @@ using Toggl.Multivac;
 
 namespace Toggl.Ultrawave.ApiClients
 {
-    public interface IFeedbackApiClient
+    public interface IFeedbackApi
     {
         IObservable<Unit> Send(Email email, string message, IDictionary<string, string> data);
     }

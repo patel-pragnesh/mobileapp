@@ -19,7 +19,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
         {
             private readonly IApiClient apiClient;
 
-            private readonly IFeedbackApiClient feedbackApiClient;
+            private readonly IFeedbackApi feedbackApi;
 
             public TheSendMethod()
             {
@@ -27,7 +27,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
                 var serializer = new JsonSerializer();
                 var credentials = Credentials.WithPassword("some@email.com".ToEmail(), "123456".ToPassword());
                 apiClient = Substitute.For<IApiClient>();
-                feedbackApiClient = new FeedbackApiClient(endpoints, apiClient, serializer, credentials);
+                feedbackApi = new FeedbackApiClient(endpoints, apiClient, serializer, credentials);
             }
 
             [Fact]
@@ -35,7 +35,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
             {
                 var invalidEmail = Email.From($"{Guid.NewGuid()}@toggl.");
 
-                Func<Task> sendingFeedback = async () => await feedbackApiClient.Send(invalidEmail, "ABC.", new Dictionary<string, string>());
+                Func<Task> sendingFeedback = async () => await feedbackApi.Send(invalidEmail, "ABC.", new Dictionary<string, string>());
 
                 sendingFeedback.Should().Throw<ArgumentException>();
             }
@@ -48,7 +48,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
             {
                 var invalidEmail = Email.From($"{Guid.NewGuid()}@toggl.space");
 
-                Func<Task> sendingFeedback = async () => await feedbackApiClient.Send(invalidEmail, message, new Dictionary<string, string>());
+                Func<Task> sendingFeedback = async () => await feedbackApi.Send(invalidEmail, message, new Dictionary<string, string>());
 
                 sendingFeedback.Should().Throw<ArgumentException>();
             }
@@ -68,7 +68,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
                 response.IsSuccess.Returns(true);
                 apiClient.Send(Arg.Any<IRequest>()).Returns(Task.FromResult(response));
 
-                await feedbackApiClient.Send(email, message, data);
+                await feedbackApi.Send(email, message, data);
 
                 await apiClient.Received().Send(Arg.Is<IRequest>(req =>
                     req.Body.Left == serializedJson));
@@ -84,7 +84,7 @@ namespace Toggl.Ultrawave.Tests.ApiClients
                 response.IsSuccess.Returns(true);
                 apiClient.Send(Arg.Any<IRequest>()).Returns(Task.FromResult(response));
 
-                await feedbackApiClient.Send(email, message, null);
+                await feedbackApi.Send(email, message, null);
 
                 await apiClient.Received().Send(Arg.Is<IRequest>(req =>
                     req.Body.Left == serializedJson));

@@ -52,6 +52,6 @@ namespace Toggl.Ultrawave
         public IPreferencesApi Preferences { get; }
         public IProjectsSummaryApi ProjectsSummary { get; }
         public IWorkspaceFeaturesApi WorkspaceFeatures { get; }
-        public IFeedbackApiClient Feedback { get; }
+        public IFeedbackApi Feedback { get; }
     }
 }

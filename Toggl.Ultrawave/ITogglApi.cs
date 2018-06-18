@@ -18,6 +18,6 @@ namespace Toggl.Ultrawave
         ITimeEntriesApi TimeEntries { get; }
         IProjectsSummaryApi ProjectsSummary { get; }
         IWorkspaceFeaturesApi WorkspaceFeatures { get; }
-        IFeedbackApiClient Feedback { get; }
+        IFeedbackApi Feedback { get; }
     }
 }
