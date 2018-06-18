@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using Toggl.Foundation.DataSources;
+using Toggl.Foundation.DataSources.Interfaces;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
@@ -14,10 +16,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
     public sealed class NoWorkspaceViewModelTests
     {
-        public abstract class NoWorkspaceViewModelTest : BaseViewModelTests<NoWorksaceViewModel>
+        public abstract class NoWorkspaceViewModelTest : BaseViewModelTests<NoWorkspaceViewModel>
         {
-            protected override NoWorksaceViewModel CreateViewModel()
-                => new NoWorksaceViewModel(NavigationService, DataSource);
+            protected override NoWorkspaceViewModel CreateViewModel()
+                => new NoWorkspaceViewModel(NavigationService, DataSource);
         }
 
         public sealed class TheConstructor : NoWorkspaceViewModelTest
@@ -30,7 +32,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var dataSource = useDataSource ? DataSource : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new NoWorksaceViewModel(navigationService, dataSource);
+                    () => new NoWorkspaceViewModel(navigationService, dataSource);
 
                 tryingToConstructWithEmptyParameters.Should().Throw<ArgumentNullException>();
             }
@@ -44,7 +46,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var workspace = Substitute.For<IThreadSafeWorkspace>();
                 DataSource.Workspaces.GetAll().Returns(Observable.Return(new List<IThreadSafeWorkspace>() { workspace }));
 
-                ViewModel.TryAgainCommand.Execute();
+                await ViewModel.TryAgainCommand.ExecuteAsync();
 
                 await NavigationService.Received().Close(Arg.Is(ViewModel));
             }
@@ -52,9 +54,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task DoesNothingWhenNoWorkspacesAreFetched()
             {
-                var workspace = Substitute.For<IThreadSafeWorkspace>();
+                DataSource.Workspaces.GetAll().Returns(Observable.Return(new List<IThreadSafeWorkspace>()));
 
-                ViewModel.TryAgainCommand.Execute();
+                await ViewModel.TryAgainCommand.ExecuteAsync();
 
                 await NavigationService.DidNotReceive().Close(Arg.Is(ViewModel));
             }
@@ -62,6 +64,22 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheCreateWorkspaceCommand : NoWorkspaceViewModelTest
         {
+            [Fact, LogIfTooSlow]
+            public async Task CreatesNewWorkspaceWithDefaultName()
+            {
+                var name = "Rick Sanchez";
+                var user = Substitute.For<IThreadSafeUser>();
+                user.Fullname.Returns(name);
+                DataSource.User.Current.Returns(Observable.Return(user));
+
+                var workspacesDataSource = Substitute.For<IWorkspacesSource>();
+                DataSource.Workspaces.Returns(workspacesDataSource);
+
+                await ViewModel.CreateWorkspaceCommand.ExecuteAsync();
+
+                workspacesDataSource.Received().Create(Arg.Is($"{name}'s Workspace"));
+            }
+
             [Fact, LogIfTooSlow]
             public async Task ClosesAfterNewWorkspaceIsCreated()
             {
