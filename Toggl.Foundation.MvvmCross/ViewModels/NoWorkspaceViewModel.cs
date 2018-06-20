@@ -32,7 +32,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.dataSource = dataSource;
 
             TryAgainCommand = new MvxAsyncCommand(tryAgain);
-            CreateWorkspaceCommand = new MvxAsyncCommand(createWorkspace);
+            CreateWorkspaceCommand = new MvxAsyncCommand(createWorkspaceWithDefaultName);
         }
 
         private async Task tryAgain()
@@ -53,7 +53,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        private async Task createWorkspace()
+        private async Task createWorkspaceWithDefaultName()
         {
             IsLoading = true;
 
