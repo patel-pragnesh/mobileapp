@@ -12,37 +12,14 @@
     <OutputPath>..\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Analytics\ComplexEvents\StartTimeEntryEvent.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Models\FoundationConstructors.cs">
-      <DependentUpon>FoundationConstructors.tt</DependentUpon>
-    </Compile>
-    <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Models\FoundationModels.cs">
-      <DependentUpon>FoundationModels.tt</DependentUpon>
-    </Compile>
-    <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Models\Interfaces\ThreadsafeModels.cs">
-      <DependentUpon>ThreadsafeModels.tt</DependentUpon>
-    </Compile>
-    <None Remove="Models\FoundationConstructors.tt" />
-    <None Remove="Models\FoundationModels.tt" />
-    <None Remove="Models\Interfaces\ThreadsafeModels.tt" />
-    <None Include="Models\FoundationModels.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>FoundationModels.cs</LastGenOutput>
-    </None>
-    <None Include="Models\FoundationConstructors.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>FoundationConstructors.cs</LastGenOutput>
-    </None>
-    <None Include="Models\Interfaces\ThreadsafeModels.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ThreadsafeModels.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources.resx">
@@ -54,5 +31,8 @@
     <ProjectReference Include="..\Toggl.Multivac\Toggl.Multivac.csproj" />
     <ProjectReference Include="..\Toggl.PrimeRadiant\Toggl.PrimeRadiant.csproj" />
     <ProjectReference Include="..\Toggl.Ultrawave\Toggl.Ultrawave.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
   </ItemGroup>
 </Project>

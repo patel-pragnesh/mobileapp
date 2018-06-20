@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Android.App;
 using Android.OS;
 using Firebase.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Toggl.Foundation.Analytics;
 using AppCenterAnalytics = Microsoft.AppCenter.Analytics.Analytics;
 
@@ -10,10 +11,6 @@ namespace Toggl.Giskard.Services
 {
     public sealed class AnalyticsService : BaseAnalyticsService
     {
-        private const string exceptionEventName = "HandledException";
-        private const string exceptionTypeParameter = "ExceptionType";
-        private const string exceptionMessageParameter = "ExceptionMessage";
-
         private const int maxAppCenterStringLength = 64;
 
         private FirebaseAnalytics firebaseAnalytics { get; }
@@ -25,7 +22,7 @@ namespace Toggl.Giskard.Services
             #endif
         }
 
-        protected override void NativeTrackEvent(string eventName, Dictionary<string, string> parameters)
+        public override void Track(string eventName, Dictionary<string, string> parameters)
         {
             #if USE_ANALYTICS
             var bundle = bundleFromParameters(parameters);
@@ -34,13 +31,9 @@ namespace Toggl.Giskard.Services
             #endif
         }
 
-        protected override void NativeTrackException(Exception exception)
+        protected override void TrackException(Exception exception)
         {
-            NativeTrackEvent(exceptionEventName, new Dictionary<string, string>
-            {
-                [exceptionTypeParameter] = exception.GetType().FullName,
-                [exceptionMessageParameter] = exception.Message
-            });
+            Crashes.TrackError(exception);
         }
 
         private Bundle bundleFromParameters(Dictionary<string, string> parameters)

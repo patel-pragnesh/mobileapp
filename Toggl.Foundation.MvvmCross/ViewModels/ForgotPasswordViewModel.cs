@@ -5,6 +5,7 @@ using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Login;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
@@ -70,7 +71,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             loginManager
                 .ResetPassword(Email)
-                .Do(_ => analyticsService.TrackResetPassword())
+                .Track(analyticsService.ResetPassword)
                 .Subscribe(onPasswordResetSuccess, onPasswordResetError);
         }
 

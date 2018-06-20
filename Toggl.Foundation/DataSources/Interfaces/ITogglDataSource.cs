@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.DataSources.Interfaces;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Reports;

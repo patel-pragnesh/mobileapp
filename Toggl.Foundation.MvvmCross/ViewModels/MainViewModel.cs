@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using PropertyChanged;
 using Toggl.Foundation;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Interactors;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels;
-using Toggl.Foundation.MvvmCross.ViewModels.Hints;
+using Toggl.Foundation.Suggestions;
 using Toggl.Foundation.Sync;
 using Toggl.Multivac;
-using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
-using System.Reactive;
-using Toggl.Foundation.Analytics;
-using Toggl.Foundation.Suggestions;
-using MvvmCross.Commands;
 
 [assembly: MvxNavigation(typeof(MainViewModel), ApplicationUrls.Main.Regex)]
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -180,7 +180,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Throttle(currentTimeEntryDueTime, scheduler) // avoid overwhelming the UI with frequent updates
                 .Do(setRunningEntry)
                 .Select(timeEntry => timeEntry != null);
-            
+
             var tickDisposable = timeService
                 .CurrentDateTimeObservable
                 .Where(_ => currentTimeEntryStart != null)
@@ -236,10 +236,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             base.ViewAppearing();
 
-            IsInManualMode = userPreferences.IsManualModeEnabled();
+            IsInManualMode = userPreferences.IsManualModeEnabled;
         }
 
-        private void setRunningEntry(IDatabaseTimeEntry timeEntry)
+        private void setRunningEntry(IThreadSafeTimeEntry timeEntry)
         {
             CurrentTimeEntryId = timeEntry?.Id;
             currentTimeEntryStart = timeEntry?.Start;
@@ -247,8 +247,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             CurrentTimeEntryElapsedTime = timeService.CurrentDateTime - currentTimeEntryStart ?? TimeSpan.Zero;
 
             CurrentTimeEntryTask = timeEntry?.Task?.Name ?? "";
-            CurrentTimeEntryProject = timeEntry?.Project?.Name ?? "";
-            CurrentTimeEntryProjectColor = timeEntry?.Project?.Color ?? "";
+            CurrentTimeEntryProject = timeEntry?.Project?.DisplayName() ?? "";
+            CurrentTimeEntryProjectColor = timeEntry?.Project?.DisplayColor() ?? "";
             CurrentTimeEntryClient = timeEntry?.Project?.Client?.Name ?? "";
 
             isStopButtonEnabled = timeEntry != null;
@@ -270,8 +270,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async Task openReports()
         {
-            var user = await dataSource.User.Current.FirstAsync();
-            await navigationService.Navigate<ReportsViewModel, long>(user.DefaultWorkspaceId);
+            var workspace = await interactorFactory.GetDefaultWorkspace().Execute();
+            await navigationService.Navigate<ReportsViewModel, long>(workspace.Id);
         }
 
         private Task openSyncFailures()

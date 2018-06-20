@@ -8,7 +8,6 @@ using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using PropertyChanged;
-using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Extensions;
@@ -20,7 +19,6 @@ using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 using static Toggl.Foundation.Helper.Constants;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -89,9 +87,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             = new NestableObservableCollection<WorkspaceGroupedCollection<AutocompleteSuggestion>, AutocompleteSuggestion>();
 
         public SelectProjectViewModel(
-            ITogglDataSource dataSource, 
+            ITogglDataSource dataSource,
             IInteractorFactory interactorFactory,
-            IMvxNavigationService navigationService, 
+            IMvxNavigationService navigationService,
             IDialogService dialogService)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
@@ -179,7 +177,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             return workspaces.Concat(unusedWorkspaces);
         }
 
-        private WorkspaceGroupedSuggestionsCollection workspaceGroupedSuggestionCollection(IDatabaseWorkspace workspace)
+        private WorkspaceGroupedSuggestionsCollection workspaceGroupedSuggestionCollection(IThreadSafeWorkspace workspace)
             => new WorkspaceGroupedSuggestionsCollection(
                 workspace.Name,
                 workspace.Id,

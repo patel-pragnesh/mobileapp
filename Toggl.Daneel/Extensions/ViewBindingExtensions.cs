@@ -6,7 +6,6 @@ namespace Toggl.Daneel.Extensions
 {  
     public static class ViewBindingExtensions
     {
-
         public static string BindTextFieldInfo(this AutocompleteTextView self)
             => AutocompleteTextViewTextInfoTargetBinding.BindingName;
 

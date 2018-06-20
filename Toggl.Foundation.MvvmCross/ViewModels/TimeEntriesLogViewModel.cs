@@ -17,7 +17,6 @@ using Toggl.Foundation.MvvmCross.Collections;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -119,7 +118,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private async Task fetchSectionedTimeEntries()
         {
             var timeEntries = await interactorFactory.GetAllNonDeletedTimeEntries().Execute();
-            if (timeEntries == null) 
+            if (timeEntries == null)
             {
                 TimeEntries.Clear();
                 return;
@@ -227,6 +226,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     timeEntry.DurationFormat = durationFormat;
                 }
             }
+
+            fetchSectionedTimeEntries();
         }
 
         private bool isNotRunning(IThreadSafeTimeEntry timeEntry) => !timeEntry.IsRunning();
@@ -242,7 +243,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await interactorFactory.DeleteTimeEntry(timeEntryViewModel.Id).Execute();
 
-            analyticsService.TrackDeletingTimeEntry();
+            analyticsService.DeleteTimeEntry.Track();
             dataSource.SyncManager.PushSync();
         }
 

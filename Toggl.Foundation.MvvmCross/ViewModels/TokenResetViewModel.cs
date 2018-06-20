@@ -101,7 +101,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             if (!shouldLogout) return;
 
-            analyticsService.TrackLogoutEvent(LogoutSource.TokenReset);
+            analyticsService.Logout.Track(LogoutSource.TokenReset);
             userPreferences.Reset();
             await dataSource.Logout();
             await navigationService.Navigate<LoginViewModel>();
@@ -112,7 +112,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             if (!NextIsEnabled) return;
 
             IsLoading = true;
-            
+
             loginManager
                 .RefreshToken(Password)
                 .Subscribe(onDataSource, onError);

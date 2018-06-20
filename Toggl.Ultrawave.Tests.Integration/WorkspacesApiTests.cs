@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
+using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Exceptions;
+using Toggl.Ultrawave.Models;
 using Toggl.Ultrawave.Tests.Integration.BaseTests;
-using Toggl.Ultrawave.Tests.Integration.Helper;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace Toggl.Ultrawave.Tests.Integration
 {
@@ -22,7 +24,8 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ReturnsAllWorkspaces()
             {
                 var (togglClient, user) = await SetupTestUser();
-                var secondWorkspace = await WorkspaceHelper.CreateFor(user);
+                var secondWorkspace =
+                    await togglClient.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 var workspaces = await CallEndpointWith(togglClient);
 
@@ -38,7 +41,7 @@ namespace Toggl.Ultrawave.Tests.Integration
                 => Observable.Defer(async () =>
                 {
                     var user = await togglApi.User.Get();
-                    return CallEndpointWith(togglApi, user.DefaultWorkspaceId);
+                    return CallEndpointWith(togglApi, user.DefaultWorkspaceId.Value);
                 });
 
             private Func<Task> CallingEndpointWith(ITogglApi togglApi, long id)
@@ -52,7 +55,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             {
                 var (togglClient, user) = await SetupTestUser();
 
-                var workspace = await CallEndpointWith(togglClient, user.DefaultWorkspaceId);
+                var workspace = await CallEndpointWith(togglClient, user.DefaultWorkspaceId.Value);
 
                 workspace.Id.Should().Be(user.DefaultWorkspaceId);
             }
@@ -61,7 +64,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ReturnsCreatedWorkspace()
             {
                 var (togglClient, user) = await SetupTestUser();
-                var secondWorkspace = await WorkspaceHelper.CreateFor(user);
+                var secondWorkspace = await togglClient.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 var workspace = await CallEndpointWith(togglClient, secondWorkspace.Id);
 
@@ -74,7 +77,39 @@ namespace Toggl.Ultrawave.Tests.Integration
             {
                 var (togglClient, user) = await SetupTestUser();
 
-                CallingEndpointWith(togglClient, user.DefaultWorkspaceId - 1).ShouldThrow<ForbiddenException>();
+                CallingEndpointWith(togglClient, user.DefaultWorkspaceId.Value - 1).Should().Throw<ForbiddenException>();
+            }
+        }
+
+        public sealed class TheCreateMethod : AuthenticatedPostEndpointBaseTests<IWorkspace>
+        {
+            protected override IObservable<IWorkspace> CallEndpointWith(ITogglApi togglApi)
+                => togglApi.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
+
+            [Fact, LogTestInfo]
+            public async Task CreatesWorkspaceWithGivenName()
+            {
+                var (api, user) = await SetupTestUser();
+                var name = Guid.NewGuid().ToString();
+
+                var workspace = await api.Workspaces.Create(new Workspace { Name = name });
+
+                workspace.Name.Should().Be(name);
+            }
+
+            [Fact, LogTestInfo]
+            public async Task CreatesWorkspaceWithTheFreePlan()
+            {
+                var (api, user) = await SetupTestUser();
+                var name = Guid.NewGuid().ToString();
+
+                var workspace = await api.Workspaces.Create(new Workspace { Name = name });
+                var features = await api.WorkspaceFeatures.GetAll()
+                    .SelectMany(all => all.Where(workspaceFeatures => workspaceFeatures.WorkspaceId == workspace.Id))
+                    .SingleAsync();
+
+                features.Features.Should().Contain(feature =>
+                    feature.FeatureId == WorkspaceFeatureId.Pro && feature.Enabled == false);
             }
         }
     }

@@ -46,7 +46,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     () => new SelectWorkspaceViewModel(interactorFactory, navigationService);
 
                 tryingToConstructWithEmptyParameters
-                    .ShouldThrow<ArgumentNullException>();
+                    .Should().Throw<ArgumentNullException>();
             }
         }
 
@@ -137,7 +137,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheSelectWorkspaceCommand : SelectWorkspaceViewModelTest
         {
-            private readonly IDatabaseWorkspace Workspace = Substitute.For<IDatabaseWorkspace>();
+            private readonly IThreadSafeWorkspace Workspace = Substitute.For<IThreadSafeWorkspace>();
 
             [Fact, LogIfTooSlow]
             public async Task ClosesTheViewModel()

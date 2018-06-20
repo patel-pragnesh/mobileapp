@@ -1,10 +1,4 @@
-﻿using MvvmCross.Core;
 using MvvmCross.Navigation;
-using MvvmCross.Core.Platform;
-using MvvmCross.Platform.Core;
-using MvvmCross.Platform.IoC;
-using MvvmCross.Platform.Platform;
-using MvvmCross.Test.Core;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;

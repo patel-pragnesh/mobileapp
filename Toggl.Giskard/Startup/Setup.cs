@@ -10,14 +10,18 @@ using MvvmCross.Plugin;
 using MvvmCross.ViewModels;
 using Toggl.Foundation;
 using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Login;
 using Toggl.Foundation.MvvmCross;
+using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels;
+using Toggl.Foundation.Services;
 using Toggl.Foundation.Suggestions;
 using Toggl.Giskard.Presenters;
 using Toggl.Giskard.Services;
 using Toggl.PrimeRadiant.Realm;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
+using Toggl.Ultrawave.Network;
 
 namespace Toggl.Giskard
 {
@@ -67,12 +71,14 @@ namespace Toggl.Giskard
                 new MostUsedTimeEntrySuggestionProvider(database, timeService, maxNumberOfSuggestions)
             );
 
+            var appVersion = Version.Parse(version);
+            var userAgent = new UserAgent(clientName, version);
             var keyValueStorage = new SharedPreferencesStorage(sharedPreferences);
             var settingsStorage = new SettingsStorage(Version.Parse(version), keyValueStorage);
 
-            var foundation = 
+            var foundation =
                 TogglFoundation
-                    .ForClient(clientName, version)
+                    .ForClient(userAgent, appVersion)
                     .WithDatabase(database)
                     .WithScheduler(scheduler)
                     .WithTimeService(timeService)
@@ -82,6 +88,8 @@ namespace Toggl.Giskard
                     .WithAnalyticsService(analyticsService)
                     .WithPlatformConstants<PlatformConstants>()
                     .WithMailService(new MailService(ApplicationContext))
+                    .WithApiFactory(new ApiFactory(environment, userAgent))
+                    .WithBackgroundService(new BackgroundService(timeService))
                     .WithSuggestionProviderContainer(suggestionProviderContainer)
                     .WithApplicationShortcutCreator(new ApplicationShortcutCreator(ApplicationContext))
 
@@ -89,14 +97,14 @@ namespace Toggl.Giskard
                     .WithDialogService<DialogService>()
                     .WithBrowserService<BrowserService>()
                     .WithKeyValueStorage(keyValueStorage)
-                    .WithOnboardingStorage(settingsStorage)
-                    .WithAccessRestrictionStorage(settingsStorage)
                     .WithUserPreferences(settingsStorage)
+                    .WithOnboardingStorage(settingsStorage)
                     .WithNavigationService(navigationService)
+                    .WithAccessRestrictionStorage(settingsStorage)
                     .WithPasswordManagerService<OnePasswordService>()
+                    .WithErrorHandlingService(new ErrorHandlingService(navigationService, settingsStorage))
                     .Build();
-
-            foundation.Initialize();
+            
             base.InitializeApp(pluginManager, app);
         }
     }

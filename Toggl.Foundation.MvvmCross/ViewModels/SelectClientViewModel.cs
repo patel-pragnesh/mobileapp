@@ -6,10 +6,10 @@ using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
-using Toggl.PrimeRadiant.Models;
 using static Toggl.Foundation.Helper.Constants;
 using static Toggl.Multivac.Extensions.StringExtensions;
 
@@ -25,7 +25,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private long workspaceId;
         private long selectedClientId;
         private SelectableClientViewModel noClient;
-        private IEnumerable<IDatabaseClient> allClients;
+        private IEnumerable<IThreadSafeClient> allClients;
 
         public string Text { get; set; } = "";
 
@@ -34,7 +34,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             get
             {
                 var text = Text.Trim();
-                return !string.IsNullOrEmpty(text) 
+                return !string.IsNullOrEmpty(text)
                     && !Suggestions.Any(s => s.Name == text)
                     && text.LengthInBytes() <= MaxClientNameLengthInBytes;
             }
@@ -46,7 +46,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxAsyncCommand<string> SelectClientCommand { get; }
 
-        public MvxObservableCollection<SelectableClientViewModel> Suggestions { get; } 
+        public MvxObservableCollection<SelectableClientViewModel> Suggestions { get; }
             = new MvxObservableCollection<SelectableClientViewModel>();
 
         public SelectClientViewModel(ITogglDataSource dataSource, IMvxNavigationService navigationService)
@@ -105,7 +105,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private async Task createClient()
         {
             if (!SuggestCreation) return;
-            
+
             var client = await dataSource.Clients.Create(Text.Trim(), workspaceId);
             await navigationService.Close(this, client.Id);
         }

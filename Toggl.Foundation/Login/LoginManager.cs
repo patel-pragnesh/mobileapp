@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Models;
 using Toggl.Foundation.Shortcuts;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
+using Toggl.Ultrawave.Exceptions;
 using Toggl.Ultrawave.Network;
+using Math = System.Math;
 
 namespace Toggl.Foundation.Login
 {
@@ -20,6 +25,8 @@ namespace Toggl.Foundation.Login
         private readonly IApplicationShortcutCreator shortcutCreator;
         private readonly IAccessRestrictionStorage accessRestrictionStorage;
         private readonly Func<ITogglApi, ITogglDataSource> createDataSource;
+        private readonly IScheduler scheduler;
+        private readonly TimeSpan delayBeforeTryingToLogin = TimeSpan.FromSeconds(2);
 
         public LoginManager(
             IApiFactory apiFactory,
@@ -27,7 +34,9 @@ namespace Toggl.Foundation.Login
             IGoogleService googleService,
             IApplicationShortcutCreator shortcutCreator,
             IAccessRestrictionStorage accessRestrictionStorage,
-            Func<ITogglApi, ITogglDataSource> createDataSource)
+            Func<ITogglApi, ITogglDataSource> createDataSource,
+            IScheduler scheduler
+        )
         {
             Ensure.Argument.IsNotNull(database, nameof(database));
             Ensure.Argument.IsNotNull(apiFactory, nameof(apiFactory));
@@ -35,6 +44,7 @@ namespace Toggl.Foundation.Login
             Ensure.Argument.IsNotNull(googleService, nameof(googleService));
             Ensure.Argument.IsNotNull(shortcutCreator, nameof(shortcutCreator));
             Ensure.Argument.IsNotNull(createDataSource, nameof(createDataSource));
+            Ensure.Argument.IsNotNull(scheduler, nameof(scheduler));
 
             this.database = database;
             this.apiFactory = apiFactory;
@@ -42,6 +52,7 @@ namespace Toggl.Foundation.Login
             this.googleService = googleService;
             this.shortcutCreator = shortcutCreator;
             this.createDataSource = createDataSource;
+            this.scheduler = scheduler;
         }
 
         public IObservable<ITogglDataSource> Login(Email email, Password password)
@@ -54,25 +65,20 @@ namespace Toggl.Foundation.Login
             var credentials = Credentials.WithPassword(email, password);
 
             return database
-                    .Clear()
-                    .SelectMany(_ => apiFactory.CreateApiWith(credentials).User.Get())
-                    .Select(User.Clean)
-                    .SelectMany(database.User.Create)
-                    .Select(dataSourceFromUser)
-                    .Do(shortcutCreator.OnLogin);
+                .Clear()
+                .SelectMany(_ => apiFactory.CreateApiWith(credentials).User.Get())
+                .Select(User.Clean)
+                .SelectMany(database.User.Create)
+                .Select(dataSourceFromUser)
+                .Do(shortcutCreator.OnLogin)
+                .RetryWhenUserIsMissingApiToken(scheduler);
         }
 
         public IObservable<ITogglDataSource> LoginWithGoogle()
             => database
                 .Clear()
                 .SelectMany(_ => googleService.GetAuthToken())
-                .Select(Credentials.WithGoogleToken)
-                .Select(apiFactory.CreateApiWith)
-                .SelectMany(api => api.User.GetWithGoogle())
-                .Select(User.Clean)
-                .SelectMany(database.User.Create)
-                .Select(dataSourceFromUser)
-                .Do(shortcutCreator.OnLogin);
+                .SelectMany(loginWithGoogle);
 
         public IObservable<ITogglDataSource> SignUp(Email email, Password password, bool termsAccepted, int countryId)
         {
@@ -82,23 +88,20 @@ namespace Toggl.Foundation.Login
                 throw new ArgumentException($"A valid {nameof(password)} must be provided when trying to signup");
 
             return database
-                    .Clear()
-                    .SelectMany(_ => signUp(email, password, termsAccepted, countryId))
-                    .Select(User.Clean)
-                    .SelectMany(database.User.Create)
-                    .Select(dataSourceFromUser)
-                    .Do(shortcutCreator.OnLogin);
+                .Clear()
+                .SelectMany(_ => signUp(email, password, termsAccepted, countryId))
+                .Select(User.Clean)
+                .SelectMany(database.User.Create)
+                .Select(dataSourceFromUser)
+                .Do(shortcutCreator.OnLogin)
+                .Catch<ITogglDataSource, UserIsMissingApiTokenException>(_ => delayedLogin(email, password));
         }
 
         public IObservable<ITogglDataSource> SignUpWithGoogle()
             => database
                 .Clear()
                 .SelectMany(_ => googleService.GetAuthToken())
-                .SelectMany(apiFactory.CreateApiWith(Credentials.None).User.SignUpWithGoogle)
-                .Select(User.Clean)
-                .SelectMany(database.User.Create)
-                .Select(dataSourceFromUser)
-                .Do(shortcutCreator.OnLogin);
+                .SelectMany(signUpWithGoogle);
 
         public IObservable<string> ResetPassword(Email email)
         {
@@ -141,6 +144,20 @@ namespace Toggl.Foundation.Login
             return createDataSource(api);
         }
 
+        private IObservable<ITogglDataSource> loginWithGoogle(string googleToken)
+        {
+            var credentials = Credentials.WithGoogleToken(googleToken);
+
+            return Observable
+                .Return(apiFactory.CreateApiWith(credentials))
+                .SelectMany(api => api.User.GetWithGoogle())
+                .Select(User.Clean)
+                .SelectMany(database.User.Create)
+                .Select(dataSourceFromUser)
+                .Do(shortcutCreator.OnLogin)
+                .RetryWhenUserIsMissingApiToken(scheduler);
+        }
+
         private IObservable<IUser> signUp(Email email, Password password, bool termsAccepted, int countryId)
         {
             return apiFactory
@@ -148,5 +165,23 @@ namespace Toggl.Foundation.Login
                 .User
                 .SignUp(email, password, termsAccepted, countryId);
         }
+
+        private IObservable<ITogglDataSource> delayedLogin(Email email, Password password)
+            => Login(email, password).DelaySubscription(delayBeforeTryingToLogin, scheduler);
+
+        private IObservable<ITogglDataSource> signUpWithGoogle(string googleToken)
+        {
+            return Observable
+                .Return(googleToken)
+                .SelectMany(apiFactory.CreateApiWith(Credentials.None).User.SignUpWithGoogle)
+                .Select(User.Clean)
+                .SelectMany(database.User.Create)
+                .Select(dataSourceFromUser)
+                .Do(shortcutCreator.OnLogin)
+                .Catch<ITogglDataSource, UserIsMissingApiTokenException>(_ => delayedLoginWithGoogle(googleToken));
+        }
+
+        private IObservable<ITogglDataSource> delayedLoginWithGoogle(string googleToken)
+            => loginWithGoogle(googleToken).DelaySubscription(delayBeforeTryingToLogin, scheduler);
     }
 }

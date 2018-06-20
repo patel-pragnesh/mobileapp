@@ -13,6 +13,7 @@ using Toggl.Multivac;
 using Toggl.Foundation.Tests.Generators;
 using Toggl.Foundation.Helper;
 using Xunit;
+using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -23,7 +24,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class SelectTimeViewModelTest : BaseViewModelTests<SelectTimeViewModel>
         {
             protected override SelectTimeViewModel CreateViewModel()
-                => new SelectTimeViewModel(NavigationService, TimeService);
+                => new SelectTimeViewModel(DataSource, NavigationService, InteractorFactory, TimeService);
 
             protected SelectTimeParameters CreateParameter(DateTimeOffset start, DateTimeOffset? stop)
             {
@@ -31,7 +32,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var timeFormat = TimeFormat.FromLocalizedTimeFormat("H:mm");
 
                 return SelectTimeParameters
-                    .CreateFromBindingString("StartTime", start, stop)
+                    .CreateFromOrigin(StartTime, start, stop)
                     .WithFormats(dateFormat, timeFormat);
             }
         }
@@ -98,16 +99,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheConstructor : SelectTimeViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(TwoParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService)
+            [ClassData(typeof(FourParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useDataSource, bool useNavigationService, bool useInteractorFactory, bool useTimeService)
             {
+                var dataSource = useDataSource ? DataSource : null;
                 var navigationService = useNavigationService ? NavigationService : null;
+                var interactorFactory = useInteractorFactory ? InteractorFactory : null;
                 var timeService = useTimeService ? TimeService : null;
 
                 Action constructingWithEmptyParameters =
-                    () => new SelectTimeViewModel(navigationService, timeService);
+                    () => new SelectTimeViewModel(dataSource, navigationService, interactorFactory, timeService);
 
-                constructingWithEmptyParameters.ShouldThrow<ArgumentNullException>();
+                constructingWithEmptyParameters.Should().Throw<ArgumentNullException>();
             }
         }
 
@@ -192,7 +195,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.StopTimeBoundaries.Should().Be(oldBoundaries);
             }
         }
-                    
+
         public sealed class ThePrepareMethod : SelectTimeViewModelTest
         {
             [Fact, LogIfTooSlow]
