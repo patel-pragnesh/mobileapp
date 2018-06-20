@@ -6,15 +6,21 @@ using UIKit;
 
 namespace Toggl.Daneel
 {
+    [Preserve(AllMembers = true)]
     public sealed class ApplicationShortcutCreator : BaseApplicationShortcutCreator
     {
-        private readonly IReadOnlyDictionary<ShortcutType, UIApplicationShortcutIcon> icons = new Dictionary<ShortcutType, UIApplicationShortcutIcon>
-        {
-            { ShortcutType.Reports, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Time) },
-            { ShortcutType.StopTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Pause) },
-            { ShortcutType.StartTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) },
-            { ShortcutType.ContinueLastTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) }
-        };
+        private IReadOnlyDictionary<ShortcutType, UIApplicationShortcutIcon> icons;
+        internal IReadOnlyDictionary<ShortcutType, UIApplicationShortcutIcon> Icons
+            => icons ?? (icons = createIcons());
+
+        private IReadOnlyDictionary<ShortcutType, UIApplicationShortcutIcon> createIcons()
+            => new Dictionary<ShortcutType, UIApplicationShortcutIcon>
+            {
+                { ShortcutType.Reports, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Time) },
+                { ShortcutType.StopTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Pause) },
+                { ShortcutType.StartTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) },
+                { ShortcutType.ContinueLastTimeEntry, UIApplicationShortcutIcon.FromType(UIApplicationShortcutIconType.Play) }
+            };
 
         protected override void ClearAllShortCuts()
         {
@@ -39,7 +45,7 @@ namespace Toggl.Daneel
                 shortcut.Type.ToString(),
                 shortcut.Title,
                 shortcut.Subtitle,
-                icons[shortcut.Type],
+                Icons[shortcut.Type],
                 userInfoFor(shortcut)
             );
 
