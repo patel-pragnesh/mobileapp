@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using Foundation;
+using MvvmCross;
 using MvvmCross.Navigation;
+using MvvmCross.Platforms.Ios.Core;
+using MvvmCross.Platforms.Ios.Presenters;
+using MvvmCross.Plugin;
 using MvvmCross.ViewModels;
-using MvvmCross.iOS.Platform;
-using MvvmCross.iOS.Views.Presenters;
-using MvvmCross.Platform;
-using MvvmCross.Platform.Platform;
-using MvvmCross.Platform.Plugins;
 using Toggl.Daneel.Presentation;
 using Toggl.Daneel.Services;
 using Toggl.Foundation;
@@ -18,7 +17,6 @@ using Toggl.Foundation.Suggestions;
 using Toggl.PrimeRadiant.Realm;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
-using UIKit;
 
 namespace Toggl.Daneel
 {
@@ -35,17 +33,7 @@ namespace Toggl.Daneel
         private const ApiEnvironment environment = ApiEnvironment.Staging;
 #endif
 
-        public Setup(MvxApplicationDelegate applicationDelegate, UIWindow window)
-            : this(applicationDelegate, new TogglPresenter(applicationDelegate, window))
-        {
-        }
-
-        private Setup(MvxApplicationDelegate applicationDelegate, IMvxIosViewPresenter presenter)
-            : base(applicationDelegate, presenter)
-        {
-        }
-
-        protected override IMvxTrace CreateDebugTrace() => new DebugTrace();
+        protected override IMvxIosViewPresenter CreateViewPresenter() => new TogglPresenter(ApplicationDelegate, Window);
 
         protected override IMvxApplication CreateApp() => new App<OnboardingViewModel>();
 
@@ -54,18 +42,22 @@ namespace Toggl.Daneel
             analyticsService = new AnalyticsService();
 
             var loader = CreateViewModelLoader(collection);
-            Mvx.RegisterSingleton<IMvxViewModelLoader>(loader);
+            Mvx.RegisterSingleton(loader);
 
             navigationService = new TrackingNavigationService(null, loader, analyticsService);
 
-            Mvx.RegisterSingleton<IMvxNavigationService>(navigationService);
+            Mvx.RegisterSingleton(navigationService);
             return navigationService;
+        }
+
+        protected override void RegisterViewTypeFinder()
+        {
+            var typeFinder = new MvxViewModelViewTypeFinder(CreateViewModelByNameLookup(), CreateViewToViewModelNaming());
+            Mvx.RegisterSingleton<IMvxViewModelTypeFinder>(typeFinder);
         }
 
         protected override void InitializeApp(IMvxPluginManager pluginManager, IMvxApplication app)
         {
-            base.InitializeApp(pluginManager, app);
-
 #if !USE_PRODUCTION_API
             System.Net.ServicePointManager.ServerCertificateValidationCallback
                   += (sender, certificate, chain, sslPolicyErrors) => true;
@@ -83,34 +75,35 @@ namespace Toggl.Daneel
             var keyValueStorage = new UserDefaultsStorage();
             var settingsStorage = new SettingsStorage(Version.Parse(version), keyValueStorage);
 
-            var foundation = Foundation.Foundation.Create(
-                clientName,
-                version,
-                database,
-                timeService,
-                scheduler,
-                new MailService((ITopViewControllerProvider)Presenter),
-                new GoogleService(),
-                environment,
-                new LicenseProvider(),
-                analyticsService,
-                new PlatformConstants(),
-                new ApplicationShortcutCreator(),
-                suggestionProviderContainer
-            );
+            var foundation =
+                TogglFoundation
+                    .ForClient(clientName, version)
+                    .WithDatabase(database)
+                    .WithScheduler(scheduler)
+                    .WithTimeService(timeService)
+                    .WithApiEnvironment(environment)
+                    .WithGoogleService<GoogleService>()
+                    .WithLicenseProvider<LicenseProvider>()
+                    .WithAnalyticsService(analyticsService)
+                    .WithPlatformConstants<PlatformConstants>()
+                    .WithApplicationShortcutCreator<ApplicationShortcutCreator>()
+                    .WithSuggestionProviderContainer(suggestionProviderContainer)
+                    .WithMailService(new MailService((ITopViewControllerProvider)Presenter))
 
-            foundation
-                .RegisterServices(
-                    new DialogService((ITopViewControllerProvider)Presenter),
-                    new BrowserService(),
-                    keyValueStorage,
-                    settingsStorage,
-                    settingsStorage,
-                    settingsStorage,
-                    navigationService,
-                    new OnePasswordService())
-                .RevokeNewUserIfNeeded()
-                .Initialize(app as App<OnboardingViewModel>, Scheduler.Default);
+                    .StartRegisteringPlatformServices()
+                    .WithDialogService(new DialogService((ITopViewControllerProvider)Presenter))
+                    .WithBrowserService<BrowserService>()
+                    .WithKeyValueStorage(keyValueStorage)
+                    .WithOnboardingStorage(settingsStorage)
+                    .WithAccessRestrictionStorage(settingsStorage)
+                    .WithUserPreferences(settingsStorage)
+                    .WithNavigationService(navigationService)
+                    .WithPasswordManagerService<OnePasswordService>()
+                    .Build();
+
+            foundation.Initialize();
+
+            base.InitializeApp(pluginManager, app);
         }
     }
 }

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using Android.Content;
+using MvvmCross;
 using MvvmCross.Binding;
-using MvvmCross.Navigation;
-using MvvmCross.ViewModels;
 using MvvmCross.Droid.Support.V7.AppCompat;
-using MvvmCross.Droid.Views;
-using MvvmCross.Platform;
-using MvvmCross.Platform.Platform;
-using MvvmCross.Platform.Plugins;
+using MvvmCross.Navigation;
+using MvvmCross.Platforms.Android.Presenters;
+using MvvmCross.Plugin;
+using MvvmCross.ViewModels;
 using Toggl.Foundation;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.MvvmCross;
@@ -35,14 +34,7 @@ namespace Toggl.Giskard
         private const ApiEnvironment environment = ApiEnvironment.Staging;
 #endif
 
-        public Setup(Context applicationContext) 
-            : base(applicationContext)
-        {
-        }
-
         protected override IMvxApplication CreateApp() => new App<LoginViewModel>();
-
-        protected override IMvxTrace CreateDebugTrace() => new DebugTrace();
 
         protected override MvxBindingBuilder CreateBindingBuilder() => new TogglBindingBuilder();
 
@@ -51,11 +43,11 @@ namespace Toggl.Giskard
             analyticsService = new AnalyticsService();
 
             var loader = CreateViewModelLoader(collection);
-            Mvx.RegisterSingleton<IMvxViewModelLoader>(loader);
+            Mvx.RegisterSingleton(loader);
 
             navigationService = new TrackingNavigationService(null, loader, analyticsService);
 
-            Mvx.RegisterSingleton<IMvxNavigationService>(navigationService);
+            Mvx.RegisterSingleton(navigationService);
             return navigationService;
         }
 
@@ -64,8 +56,6 @@ namespace Toggl.Giskard
 
         protected override void InitializeApp(IMvxPluginManager pluginManager, IMvxApplication app)
         {
-            base.InitializeApp(pluginManager, app);
-
             const string clientName = "Giskard";
             var packageInfo = ApplicationContext.PackageManager.GetPackageInfo(ApplicationContext.PackageName, 0);
             var version = packageInfo.VersionName;
@@ -80,34 +70,34 @@ namespace Toggl.Giskard
             var keyValueStorage = new SharedPreferencesStorage(sharedPreferences);
             var settingsStorage = new SettingsStorage(Version.Parse(version), keyValueStorage);
 
-            var foundation = Foundation.Foundation.Create(
-                clientName,
-                version,
-                database,
-                timeService,
-                scheduler,
-                new MailService(ApplicationContext),
-                new GoogleService(),
-                environment,
-                new LicenseProvider(),
-                analyticsService,
-                new PlatformConstants(),
-                new ApplicationShortcutCreator(ApplicationContext),
-                suggestionProviderContainer
-            );
+            var foundation = 
+                TogglFoundation
+                    .ForClient(clientName, version)
+                    .WithDatabase(database)
+                    .WithScheduler(scheduler)
+                    .WithTimeService(timeService)
+                    .WithApiEnvironment(environment)
+                    .WithGoogleService<GoogleService>()
+                    .WithLicenseProvider<LicenseProvider>()
+                    .WithAnalyticsService(analyticsService)
+                    .WithPlatformConstants<PlatformConstants>()
+                    .WithMailService(new MailService(ApplicationContext))
+                    .WithSuggestionProviderContainer(suggestionProviderContainer)
+                    .WithApplicationShortcutCreator(new ApplicationShortcutCreator(ApplicationContext))
 
-            foundation
-                .RegisterServices(
-                    new DialogService(),
-                    new BrowserService(), 
-                    keyValueStorage,
-                    settingsStorage,
-                    settingsStorage,
-                    settingsStorage,
-                    navigationService,
-                    new OnePasswordService())
-               .RevokeNewUserIfNeeded()
-               .Initialize(app as App<LoginViewModel>, Scheduler.Default);
+                    .StartRegisteringPlatformServices()
+                    .WithDialogService<DialogService>()
+                    .WithBrowserService<BrowserService>()
+                    .WithKeyValueStorage(keyValueStorage)
+                    .WithOnboardingStorage(settingsStorage)
+                    .WithAccessRestrictionStorage(settingsStorage)
+                    .WithUserPreferences(settingsStorage)
+                    .WithNavigationService(navigationService)
+                    .WithPasswordManagerService<OnePasswordService>()
+                    .Build();
+
+            foundation.Initialize();
+            base.InitializeApp(pluginManager, app);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Reactive.Linq;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
-using MvvmCross.Platform;
 using Toggl.Foundation.Login;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
@@ -14,27 +13,20 @@ namespace Toggl.Foundation.MvvmCross
     {
         public override void Initialize()
         {
-
-        }
-
-        public void Initialize(ILoginManager loginManager, IMvxNavigationService navigationService, IAccessRestrictionStorage accessRestrictionStorage)
-        {
-            Ensure.Argument.IsNotNull(loginManager, nameof(loginManager));
-            Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
-            Ensure.Argument.IsNotNull(accessRestrictionStorage, nameof(accessRestrictionStorage));
-
-            RegisterAppStart(new AppStart<TFirstViewModelWhenNotLoggedIn>(loginManager, navigationService, accessRestrictionStorage));
+            RegisterCustomAppStart<AppStart<TFirstViewModelWhenNotLoggedIn>>();
         }
     }
 
-    public sealed class AppStart<TFirstViewModelWhenNotLoggedIn> : IMvxAppStart
+    [Preserve(AllMembers = true)]
+    public sealed class AppStart<TFirstViewModelWhenNotLoggedIn> : MvxAppStart
         where TFirstViewModelWhenNotLoggedIn : MvxViewModel
     {
         private readonly ILoginManager loginManager;
         private readonly IMvxNavigationService navigationService;
         private readonly IAccessRestrictionStorage accessRestrictionStorage;
 
-        public AppStart(ILoginManager loginManager, IMvxNavigationService navigationService, IAccessRestrictionStorage accessRestrictionStorage)
+        public AppStart(IMvxApplication app, ILoginManager loginManager, IMvxNavigationService navigationService, IAccessRestrictionStorage accessRestrictionStorage)
+            : base(app)
         {
             Ensure.Argument.IsNotNull(loginManager, nameof(loginManager));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
@@ -45,8 +37,10 @@ namespace Toggl.Foundation.MvvmCross
             this.accessRestrictionStorage = accessRestrictionStorage;
         }
 
-        public async void Start(object hint = null)
+        protected override async void ApplicationStartup(object hint = null)
         {
+            base.ApplicationStartup(hint);
+
             if (accessRestrictionStorage.IsApiOutdated() || accessRestrictionStorage.IsClientOutdated())
             {
                 await navigationService.Navigate<OnboardingViewModel>();
