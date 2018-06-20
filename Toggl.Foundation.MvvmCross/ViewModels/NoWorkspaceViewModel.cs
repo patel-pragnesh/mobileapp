@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Sync;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -41,6 +42,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             var workspaces = await dataSource
                 .SyncManager
                 .ForceFullSync()
+                .Where(state => state == SyncState.Sleep)
                 .SelectMany(dataSource.Workspaces.GetAll());
 
             IsLoading = false;
