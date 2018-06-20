@@ -159,7 +159,7 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.EditTimeEntryCommand);
             
             bindingSet.Bind(source)
-                      .For(v => v.SelectionChangedCommand)
+                      .For(v => v.OnSelectionChangedCommand)
                       .To(vm => vm.TimeEntriesLogViewModel.EditCommand);
             
             bindingSet.Bind(source)
@@ -178,7 +178,7 @@ namespace Toggl.Daneel.ViewControllers
                       .For(v => v.SuggestionTappedCommad)
                       .To(vm => vm.SuggestionsViewModel.StartTimeEntryCommand);
 
-            //Visibility
+            // Visibility
             bindingSet.Bind(WelcomeBackView)
                       .For(v => v.BindVisibility())
                       .To(vm => vm.ShouldShowWelcomeBack)
@@ -198,7 +198,7 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.ShouldShowEmptyState)
                       .WithConversion(visibilityConverter);
 
-            //Text
+            // Text
             bindingSet.Bind(CurrentTimeEntryDescriptionLabel).To(vm => vm.CurrentTimeEntryDescription);
             bindingSet.Bind(CurrentTimeEntryElapsedTimeLabel)
                       .To(vm => vm.CurrentTimeEntryElapsedTime)

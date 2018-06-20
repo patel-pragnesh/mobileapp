@@ -67,7 +67,7 @@ namespace Toggl.Daneel.ViewSources
             set => timeEntriesLogViewSource.DeleteTimeEntryCommand = value;
         }
 
-        public new IMvxCommand<TimeEntryViewModel> SelectionChangedCommand
+        public IMvxCommand<TimeEntryViewModel> OnSelectionChangedCommand
         {
             get => timeEntriesLogViewSource.SelectionChangedCommand;
             set => timeEntriesLogViewSource.SelectionChangedCommand = value;
