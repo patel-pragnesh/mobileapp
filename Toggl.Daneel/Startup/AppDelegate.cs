@@ -13,7 +13,6 @@ using Toggl.Foundation.Shortcuts;
 using UIKit;
 using MvvmCross.Platforms.Ios.Core;
 using MvvmCross;
-using Toggl.Daneel.Presentation;
 using Toggl.Foundation.MvvmCross;
 
 namespace Toggl.Daneel

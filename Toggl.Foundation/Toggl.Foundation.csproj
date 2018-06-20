@@ -55,9 +55,4 @@
     <ProjectReference Include="..\Toggl.PrimeRadiant\Toggl.PrimeRadiant.csproj" />
     <ProjectReference Include="..\Toggl.Ultrawave\Toggl.Ultrawave.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Analytics\" />
-    <Folder Include="Interactors\Sync\" />
-    <Folder Include="Serialization\" />
-  </ItemGroup>
 </Project>
