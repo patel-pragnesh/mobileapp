@@ -1,25 +1,25 @@
-﻿using Foundation;
-using MvvmCross.Binding;
+﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
+using Foundation;
 using MvvmCross.Binding.BindingContext;
-using MvvmCross.Binding.iOS;
 using MvvmCross.iOS.Views;
 using MvvmCross.iOS.Views.Presenters.Attributes;
 using MvvmCross.Plugins.Color.iOS;
-using Toggl.Daneel.Extensions;
 using Toggl.Foundation;
-using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
-using UIKit;
-using System;
-using Toggl.Daneel.Views;
 using Toggl.Multivac;
+using UIKit;
+using static Toggl.Daneel.Extensions.LoginSignupViewExtensions;
+using static Toggl.Daneel.Extensions.UIExtensions;
+using static Toggl.Daneel.Extensions.ViewExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
     [MvxRootPresentation(WrapInNavigationController = true)]
     [MvxFromStoryboard("Login")]
-    public sealed partial class LoginViewController : MvxViewController<LoginViewModel>
+    public sealed partial class LoginViewController : ReactiveViewController<LoginViewModel>
     {
         private const int iPhoneSeScreenHeight = 568;
         private const int topConstraintForBiggerScreens = 92;
@@ -34,69 +34,39 @@ namespace Toggl.Daneel.ViewControllers
 
             NavigationController.NavigationBarHidden = true;
 
-            var loginButtonColorConverter = new BoolToConstantValueConverter<UIColor>(UIColor.White, UIColor.Black);
-            var loginButtonTitleConverter = new BoolToConstantValueConverter<string>("", Resources.LoginTitle);
-
-            var bindingSet = this.CreateBindingSet<LoginViewController, LoginViewModel>();
-
             //Text
-            bindingSet.Bind(ErrorLabel).To(vm => vm.ErrorMessage);
-            bindingSet.Bind(EmailTextField)
-                      .To(vm => vm.Email)
-                      .WithConversion(new EmailToStringValueConverter());
+            this.Bind(ViewModel.ErrorMessage, ErrorLabel.BindText());
+            this.Bind(EmailTextField.Text().Select(Email.From), ViewModel.SetEmail);
+            this.Bind(PasswordTextField.Text().Select(Password.From), ViewModel.SetPassword);
+            this.Bind(ViewModel.Email.Select(email => email.ToString()), EmailTextField.BindText());
+            this.Bind(ViewModel.IsLoading.Select(loginButtonTitle), LoginButton.BindAnimatedTitle());
+            this.Bind(ViewModel.Password.Select(password => password.ToString()), PasswordTextField.BindText());
 
-            bindingSet.Bind(PasswordTextField)
-                      .To(vm => vm.Password)
-                      .WithConversion(new PasswordToStringValueConverter());
-
-            bindingSet.Bind(LoginButton)
-                      .For(v => v.BindAnimatedTitle())
-                      .To(vm => vm.IsLoading)
-                      .WithConversion(loginButtonTitleConverter);
+            //Visibility
+            this.Bind(ViewModel.HasError, ErrorLabel.BindAnimatedIsVisible());
+            this.Bind(ViewModel.IsLoading, ActivityIndicator.BindIsVisibleWithFade());
+            this.Bind(ViewModel.IsPasswordMasked, PasswordTextField.BindSecureTextEntry());
+            this.Bind(ViewModel.IsShowPasswordButtonVisible, ShowPasswordButton.BindIsVisible());
+            this.Bind(ViewModel.IsPasswordManagerAvailable, PasswordManagerButton.BindIsVisible());
+            this.Bind(PasswordTextField.FirstResponder(), ViewModel.SetIsShowPasswordButtonVisible);
+            this.Bind(
+                ViewModel
+                    .LoginEnabled
+                    .Select(enabled => enabled
+                            ? Color.Login.EnabledButtonColor.ToNativeColor()
+                            : Color.Login.DisabledButtonColor.ToNativeColor()),
+                LoginButton.BindTitleColor());
 
             //Commands
-            bindingSet.Bind(LoginButton).To(vm => vm.LoginCommand);
-            bindingSet.Bind(GoogleLoginButton).To(vm => vm.GoogleLoginCommand);
-            bindingSet.Bind(ForgotPasswordButton).To(vm => vm.ForgotPasswordCommand);
-            bindingSet.Bind(PasswordManagerButton).To(vm => vm.StartPasswordManagerCommand);
-            bindingSet.Bind(ShowPasswordButton).To(vm => vm.TogglePasswordVisibilityCommand);
+            this.Bind(SignupCard.Tapped(), ViewModel.Signup);
+            this.BindVoid(LoginButton.Tapped(), ViewModel.Login);
+            this.BindVoid(GoogleLoginButton.Tapped(), ViewModel.GoogleLogin);
+            this.Bind(ForgotPasswordButton.Tapped(), ViewModel.ForgotPassword);
+            this.Bind(PasswordManagerButton.Tapped(), ViewModel.StartPasswordManager);
+            this.BindVoid(ShowPasswordButton.Tapped(), ViewModel.TogglePasswordVisibility);
 
-            bindingSet.Bind(SignupCard)
-                      .For(v => v.BindTap())
-                      .To(vm => vm.SignupCommand);
-
-            //Visibilty
-            bindingSet.Bind(ErrorLabel)
-                      .For(v => v.BindAnimatedVisibility())
-                      .To(vm => vm.HasError);
-
-            bindingSet.Bind(ActivityIndicator)
-                     .For(v => v.BindVisibilityWithFade())
-                     .To(vm => vm.IsLoading);
-
-            bindingSet.Bind(PasswordManagerButton)
-                      .For(v => v.BindVisible())
-                      .To(vm => vm.IsPasswordManagerAvailable);
-
-            bindingSet.Bind(PasswordTextField)
-                      .For(v => v.BindSecureTextEntry())
-                      .To(vm => vm.IsPasswordMasked);
-
-            bindingSet.Bind(ShowPasswordButton)
-                      .For(v => v.BindVisible())
-                      .To(vm => vm.IsShowPasswordButtonVisible);
-
-            bindingSet.Bind(PasswordTextField)
-                      .For(v => v.BindFirstResponder())
-                      .To(vm => vm.IsShowPasswordButtonVisible)
-                      .Mode(MvxBindingMode.OneWayToSource);
             //Color
-            bindingSet.Bind(LoginButton)
-                      .For(v => v.TintColor)
-                      .To(vm => vm.HasError)
-                      .WithConversion(loginButtonColorConverter);
-
-            bindingSet.Apply();
+            this.Bind(ViewModel.HasError.Select(loginButtonTintColor), LoginButton.BindTintColor());
 
             prepareViews();
         }
@@ -120,6 +90,10 @@ namespace Toggl.Daneel.ViewControllers
             ActivityIndicator.StartAnimation();
         }
 
+        public void ShakeEmailField() => EmailTextField.Shake();
+
+        public void ShakePasswordField() => PasswordTextField.Shake();
+
         private void prepareViews()
         {
             NavigationController.NavigationBarHidden = true;
@@ -136,7 +110,7 @@ namespace Toggl.Daneel.ViewControllers
 
             PasswordTextField.ShouldReturn += _ =>
             {
-                ViewModel.LoginCommand.Execute();
+                ViewModel.Login();
                 PasswordTextField.ResignFirstResponder();
                 return false;
             };
@@ -146,18 +120,6 @@ namespace Toggl.Daneel.ViewControllers
                 EmailTextField.ResignFirstResponder();
                 PasswordTextField.ResignFirstResponder();
             }));
-
-            LoginShakeTriggerButton.TouchUpInside += (sender, e) =>
-            {
-                if (!ViewModel.Email.IsValid)
-                {
-                    EmailTextField.Shake();
-                }
-                if (!ViewModel.Password.IsValid)
-                {
-                    PasswordTextField.Shake();
-                }
-            };
 
             PasswordTextField.ResignFirstResponder();
 
@@ -178,6 +140,12 @@ namespace Toggl.Daneel.ViewControllers
             text.Append(boldText);
             ForgotPasswordButton.SetAttributedTitle(text, UIControlState.Normal);
         }
+
+        private string loginButtonTitle(bool isLoading)
+            => isLoading ? "" : Resources.LoginTitle;
+
+        private UIColor loginButtonTintColor(bool hasError)
+            => hasError ? UIColor.White : UIColor.Black;
     }
 }
 

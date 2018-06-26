@@ -28,6 +28,7 @@ namespace Toggl.Daneel.Views
         private readonly CATextLayer placeholderLayer = new CATextLayer();
 
         private bool placeholderDrawn;
+        private bool placeholderIsUp;
 
         public override string Text
         {
@@ -36,7 +37,7 @@ namespace Toggl.Daneel.Views
             {
                 if (string.IsNullOrEmpty(base.Text))
                     movePlaceholderUp();
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value) && !IsFirstResponder)
                     movePlaceholderDown();
                 base.Text = value;
             }
@@ -129,6 +130,9 @@ namespace Toggl.Daneel.Views
 
         private void movePlaceholderUp()
         {
+            if (placeholderIsUp) return;
+            placeholderIsUp = true;
+
             var yOffset = -placeholderLayer.Frame.Top;
             CATransaction.Begin();
             CATransaction.AnimationDuration = placeholderAnimationDuration;
@@ -139,6 +143,9 @@ namespace Toggl.Daneel.Views
 
         private void movePlaceholderDown()
         {
+            if (!placeholderIsUp) return;
+            placeholderIsUp = false;
+
             CATransaction.Begin();
             CATransaction.AnimationDuration = placeholderAnimationDuration;
             placeholderLayer.AffineTransform = CGAffineTransform.MakeIdentity();

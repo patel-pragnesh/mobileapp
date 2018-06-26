@@ -14,6 +14,9 @@ namespace Toggl.Daneel.ViewControllers
         protected ReactiveViewController(string nibName)
             : base(nibName, null) { }
 
+        protected ReactiveViewController(IntPtr handle)
+            : base(handle) { }
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

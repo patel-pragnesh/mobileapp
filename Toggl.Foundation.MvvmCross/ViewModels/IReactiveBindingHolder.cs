@@ -4,6 +4,7 @@ using Toggl.Multivac.Extensions;
 using Toggl.Foundation.MvvmCross.Extensions;
 using System.Reactive;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
@@ -19,6 +20,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             observable
                 .AsDriver()
                 .Subscribe(onNext)
+                .DisposedBy(holder.DisposeBag);
+        }
+
+        public static void Bind<T>(this IReactiveBindingHolder holder, IObservable<T> observable, (Action<T> onNext, IDisposable disposable) tuple)
+        {
+            observable
+                .AsDriver()
+                .Do(_ => holder.DisposeBag.Add(tuple.disposable))
+                .Subscribe(tuple.onNext)
                 .DisposedBy(holder.DisposeBag);
         }
 
