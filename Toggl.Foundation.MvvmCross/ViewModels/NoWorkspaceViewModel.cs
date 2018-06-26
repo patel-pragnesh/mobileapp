@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
@@ -13,12 +15,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     {
         private IMvxNavigationService navigationService;
         private ITogglDataSource dataSource;
+        private Subject<bool> isLoading = new Subject<bool>();
 
-        public bool IsLoading { get; private set; }
-
-        public IMvxAsyncCommand TryAgainCommand { get; }
-
-        public IMvxAsyncCommand CreateWorkspaceCommand { get; }
+        public IObservable<bool> IsLoading => isLoading.AsObservable();
 
         public NoWorkspaceViewModel(
             IMvxNavigationService navigationService,
@@ -30,14 +29,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             this.navigationService = navigationService;
             this.dataSource = dataSource;
-
-            TryAgainCommand = new MvxAsyncCommand(tryAgain);
-            CreateWorkspaceCommand = new MvxAsyncCommand(createWorkspaceWithDefaultName);
         }
 
-        private async Task tryAgain()
+        public async Task TryAgain()
         {
-            IsLoading = true;
+            isLoading.OnNext(true);
 
             var workspaces = await dataSource
                 .SyncManager
@@ -45,7 +41,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Where(state => state == SyncState.Sleep)
                 .SelectMany(dataSource.Workspaces.GetAll());
 
-            IsLoading = false;
+            isLoading.OnNext(false);
 
             if (workspaces.Any())
             {
@@ -53,9 +49,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             }
         }
 
-        private async Task createWorkspaceWithDefaultName()
+        public async Task CreateWorkspaceWithDefaultName()
         {
-            IsLoading = true;
+            isLoading.OnNext(true);
 
             var workspaces = await dataSource.Workspaces.GetAll();
             if (!workspaces.Any())
@@ -64,7 +60,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 await dataSource.Workspaces.Create($"{user.Fullname}'s Workspace");
             }
 
-            IsLoading = false;
+            isLoading.OnNext(false);
             close();
         }
 
