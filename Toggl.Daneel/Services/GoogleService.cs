@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Foundation;
@@ -49,6 +50,16 @@ namespace Toggl.Daneel.Services
             }
 
             return tokenSubject.AsObservable();
+        }
+
+        public IObservable<Unit> LogOutIfNeeded()
+        {
+            if (SignIn.SharedInstance.CurrentUser != null)
+            {
+                SignIn.SharedInstance.SignOutUser();
+            }
+
+            return Observable.Return(Unit.Default);
         }
 
         [Export("signIn:presentViewController:")]

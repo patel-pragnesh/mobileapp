@@ -1,54 +1,44 @@
 ﻿using System;
+using System.Collections.Immutable;
 using Foundation;
-using MvvmCross.Binding.ExtensionMethods;
-using MvvmCross.Binding.iOS.Views;
-using Toggl.Daneel.Views.Settings;
+using Toggl.Daneel.Cells;
+using Toggl.Daneel.Cells.Settings;
 using Toggl.Multivac;
 using UIKit;
 
 namespace Toggl.Daneel.ViewSources
 {
-    public sealed class LicensesTableViewSource : MvxTableViewSource
+    public sealed class LicensesTableViewSource : UITableViewSource
     {
-        private const string cellIdentifier = nameof(LicensesViewCell);
-        private const string headerIdentifier = nameof(LicensesHeaderViewCell);
+        public const string CellIdentifier = nameof(LicensesViewCell);
+        public const string HeaderIdentifier = nameof(LicensesHeaderViewCell);
 
-        public LicensesTableViewSource(UITableView tableView) : base(tableView)
+        private readonly IImmutableList<License> items;
+
+        public LicensesTableViewSource(IImmutableList<License> items)
         {
-            tableView.RegisterNibForCellReuse(LicensesViewCell.Nib, cellIdentifier);
-            tableView.RegisterNibForHeaderFooterViewReuse(LicensesHeaderViewCell.Nib, headerIdentifier);
+            this.items = items;
         }
-
-        protected override UITableViewCell GetOrCreateCellFor(UITableView tableView, NSIndexPath indexPath, object item)
-            => tableView.DequeueReusableCell(cellIdentifier, indexPath);
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            var item = (License)GetItemAt(indexPath);
-            var cell = (LicensesViewCell)GetOrCreateCellFor(tableView, indexPath, item);
-
-            cell.Text = item.Text;
-
+            var cell = tableView.DequeueReusableCell(CellIdentifier, indexPath) as BaseTableViewCell<License>;
+            cell.Item = items[indexPath.Row];
             return cell;
         }
 
         public override UIView GetViewForHeader(UITableView tableView, nint section)
         {
-            var item = ItemsSource.ElementAt((int)section);
+            var item = items[(int)section];
 
-            var header = tableView.DequeueReusableHeaderFooterView(headerIdentifier);
-            if (header is IMvxBindable bindable)
-                bindable.DataContext = item;
+            var header = tableView.DequeueReusableHeaderFooterView(HeaderIdentifier) as LicensesHeaderViewCell;
+            header.Item = item;
 
             return header;
         }
 
-        protected override object GetItemAt(NSIndexPath indexPath)
-            => ItemsSource.ElementAt(indexPath.Section);
+        public override nint NumberOfSections(UITableView tableView) => items.Count;
 
-        public override nint NumberOfSections(UITableView tableView) => ItemsSource.Count();
-
-        public override nint RowsInSection(UITableView tableview, nint section)
-            => 1;
+        public override nint RowsInSection(UITableView tableview, nint section) => 1;
     }
 }

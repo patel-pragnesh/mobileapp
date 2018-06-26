@@ -4,9 +4,9 @@ using UIKit;
 using Toggl.Foundation.Models;
 using static Toggl.PrimeRadiant.SyncStatus;
 
-namespace Toggl.Daneel.Views.SyncFailures
+namespace Toggl.Daneel.Cells
 {
-    public partial class SyncFailureCell : UITableViewCell
+    public partial class SyncFailureCell : BaseTableViewCell<SyncFailureItem>
     {
         public static readonly string Identifier = "syncFailureCell";
 
@@ -23,20 +23,20 @@ namespace Toggl.Daneel.Views.SyncFailures
             // Note: this .ctor should not contain any initialization logic.
         }
 
-        public void Update(SyncFailureItem model)
+        protected override void UpdateView()
         {
-            typeLabel.Text = $"{model.Type}: ";
-            nameLabel.Text = model.Name;
-            syncStatusLabel.Text = model.SyncStatus.ToString();
-            errorMessageLabel.Text = model.SyncErrorMessage;
-            switch (model.SyncStatus) {
+            nameLabel.Text = Item.Name;
+            typeLabel.Text = $"{Item.Type}: ";
+            errorMessageLabel.Text = Item.SyncErrorMessage;
+            syncStatusLabel.Text = Item.SyncStatus.ToString();
+
+            switch (Item.SyncStatus) 
+            {
                 case SyncFailed:
                     syncStatusLabel.TextColor = UIColor.Red;
                     break;
                 case SyncNeeded:
                     syncStatusLabel.TextColor = UIColor.DarkGray;
-                    break;
-                default:
                     break;
             }
         }

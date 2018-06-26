@@ -1,25 +1,23 @@
-﻿using System;
+﻿using System.Reactive.Disposables;
 using Android.App;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.V4.Content;
-using Android.Support.V7.Widget;
 using Android.Views;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
-using Toggl.Giskard.Fragments;
-using Toggl.Giskard.Views;
-using static Android.Support.V7.Widget.Toolbar;
-using TextView = Android.Widget.TextView;
+using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 
 namespace Toggl.Giskard.Activities
 {
     [MvxActivityPresentation]
     [Activity(Theme = "@style/AppTheme")]
-    public sealed class EditTimeEntryActivity : MvxAppCompatActivity<EditTimeEntryViewModel>
+    public sealed partial class EditTimeEntryActivity : MvxAppCompatActivity<EditTimeEntryViewModel>, IReactiveBindingHolder
     {
+        public CompositeDisposable DisposeBag { get; private set; } = new CompositeDisposable();
+
         protected override void OnCreate(Bundle bundle)
         {
             this.ChangeStatusBarColor(new Color(ContextCompat.GetColor(this, Resource.Color.blueStatusBarBackground)));
@@ -28,6 +26,16 @@ namespace Toggl.Giskard.Activities
             SetContentView(Resource.Layout.EditTimeEntryActivity);
 
             OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
+
+            initializeViews();
+            setupBindings();
+        }
+
+        private void setupBindings()
+        {
+            this.Bind(startTimeArea.Tapped(), _ => ViewModel.SelectTimeCommand.Execute(StartTime));
+            this.Bind(stopTimeArea.Tapped(), _ => ViewModel.StopTimeEntryCommand.Execute(StopTime));
+            this.Bind(durationArea.Tapped(), _ => ViewModel.SelectTimeCommand.Execute(Duration));
         }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -39,6 +47,15 @@ namespace Toggl.Giskard.Activities
             }
 
             return base.OnKeyDown(keyCode, e);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (!isDisposing) return;
+
+            DisposeBag?.Dispose();
         }
     }
 }

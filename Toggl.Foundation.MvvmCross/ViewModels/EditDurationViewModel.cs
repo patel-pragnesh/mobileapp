@@ -7,6 +7,7 @@ using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.Platform.Core;
 using PropertyChanged;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.Parameters;
@@ -22,6 +23,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly ITimeService timeService;
         private readonly IMvxNavigationService navigationService;
         private readonly ITogglDataSource dataSource;
+        private readonly IAnalyticsService analyticsService;
 
         private IDisposable runningTimeEntryDisposable;
         private IDisposable preferencesDisposable;
@@ -31,6 +33,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private DurationFormat durationFormat;
 
         private EditMode editMode;
+
+        private EditDurationEvent analyticsEvent;
 
         [DependsOn(nameof(IsRunning))]
         public DurationFormat DurationFormat => IsRunning ? DurationFormat.Improved : durationFormat;
@@ -129,15 +133,17 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxCommand StopEditingTimeCommand { get; }
 
-        public EditDurationViewModel(IMvxNavigationService navigationService, ITimeService timeService, ITogglDataSource dataSource)
+        public EditDurationViewModel(IMvxNavigationService navigationService, ITimeService timeService, ITogglDataSource dataSource, IAnalyticsService analyticsService)
         {
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
+            Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
 
             this.timeService = timeService;
             this.navigationService = navigationService;
             this.dataSource = dataSource;
+            this.analyticsService = analyticsService;
 
             SaveCommand = new MvxAsyncCommand(save);
             CloseCommand = new MvxAsyncCommand(close);
@@ -151,6 +157,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             defaultResult = parameter.DurationParam;
             IsRunning = defaultResult.Duration.HasValue == false;
+
+            analyticsEvent = new EditDurationEvent(IsRunning,
+                parameter.IsStartingNewEntry
+                    ? EditDurationEvent.NavigationOrigin.Start
+                    : EditDurationEvent.NavigationOrigin.Edit);
 
             if (IsRunning)
             {
@@ -178,11 +189,22 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             editMode = EditMode.None;
         }
 
+        public void TimeEditedWithSource(EditTimeSource source)
+        {
+            analyticsEvent = analyticsEvent.UpdateWith(source);
+        }
+
         private Task close()
-            => navigationService.Close(this, defaultResult);
+        {
+            analyticsEvent = analyticsEvent.With(result: EditDurationEvent.Result.Cancel);
+            analyticsService.Track(analyticsEvent);
+            return navigationService.Close(this, defaultResult);
+        }
 
         private Task save()
         {
+            analyticsEvent = analyticsEvent.With(result: EditDurationEvent.Result.Save);
+            analyticsService.Track(analyticsEvent);
             var result = DurationParameter.WithStartAndDuration(StartTime, IsRunning ? (TimeSpan?)null : Duration);
             return navigationService.Close(this, result);
         }
@@ -215,6 +237,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 runningTimeEntryDisposable?.Dispose();
                 StopTime = timeService.CurrentDateTime;
                 IsRunning = false;
+                analyticsEvent = analyticsEvent.With(stoppedRunningEntry: true);
             }
 
             if (IsEditingStopTime)

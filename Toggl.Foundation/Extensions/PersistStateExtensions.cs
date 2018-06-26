@@ -1,4 +1,5 @@
-﻿using Toggl.Foundation.Sync.States;
+﻿using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Sync.States;
 using Toggl.Foundation.Sync.States.Pull;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
@@ -18,5 +19,8 @@ namespace Toggl.Foundation.Extensions
             where TInterface : ILastChangedDatable
             where TDatabaseInterface : TInterface, IDatabaseSyncable
             => new SinceDateUpdatingPersistState<TInterface, TDatabaseInterface>(sinceParameterRepository, state);
+
+        internal static TrackNoDefaultWorkspaceState TrackNoDefaultWorkspace(this IPersistState state, IAnalyticsService analyticsService)
+            => new TrackNoDefaultWorkspaceState(state, analyticsService);
     }
 }

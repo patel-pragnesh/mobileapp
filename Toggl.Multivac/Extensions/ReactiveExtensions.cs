@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -108,6 +109,28 @@ namespace Toggl.Multivac.Extensions
         public static void DisposedBy(this IDisposable disposable, CompositeDisposable disposeBag)
         {
             disposeBag.Add(disposable);
+        }
+
+        public static IObservable<T> ConditionalRetryWithBackoffStrategy<T>(
+            this IObservable<T> source,
+            int maxRetries,
+            Func<int, TimeSpan> backOffStrategy,
+            Func<Exception, bool> shouldRetryOn,
+            IScheduler scheduler)
+        {
+            return source.RetryWhen(errorSignal =>
+            {
+                return errorSignal.SelectMany((error, retryCount) =>
+                {
+                    var currentTry = retryCount + 1;
+                    if (!shouldRetryOn(error) || currentTry > maxRetries)
+                    {
+                        throw error;
+                    }
+
+                    return Observable.Return(Unit.Default).Delay(backOffStrategy(currentTry), scheduler);
+                });
+            });
         }
     }
 }

@@ -42,7 +42,7 @@ namespace Toggl.Foundation.MvvmCross
             initializeInversionOfControl(foundation);
 
             Func<ITogglDataSource, ISyncManager> createSyncManager(ITogglApi api) => dataSource =>
-                TogglSyncManager.CreateSyncManager(foundation.Database, api, dataSource, foundation.TimeService, foundation.AnalyticsService, retryDelayLimit, foundation.Scheduler);
+                TogglSyncManager.CreateSyncManager(foundation.Database, api, dataSource, foundation.TimeService, foundation.AnalyticsService, foundation.LastTimeUsageStorage, retryDelayLimit, foundation.Scheduler);
 
             ITogglDataSource createDataSource(ITogglApi api)
             {
@@ -56,7 +56,7 @@ namespace Toggl.Foundation.MvvmCross
             }
 
             var loginManager =
-                new LoginManager(foundation.ApiFactory, foundation.Database, foundation.GoogleService, foundation.ShortcutCreator, foundation.AccessRestrictionStorage, createDataSource);
+                new LoginManager(foundation.ApiFactory, foundation.Database, foundation.GoogleService, foundation.ShortcutCreator, foundation.AccessRestrictionStorage, foundation.AnalyticsService, createDataSource, foundation.Scheduler);
 
             Mvx.RegisterSingleton<ILoginManager>(loginManager);
         }
@@ -72,16 +72,20 @@ namespace Toggl.Foundation.MvvmCross
             Mvx.RegisterSingleton(foundation.ApiFactory);
             Mvx.RegisterSingleton(foundation.TimeService);
             Mvx.RegisterSingleton(foundation.MailService);
+            Mvx.RegisterSingleton(foundation.RatingService);
             Mvx.RegisterSingleton(foundation.ShortcutCreator);
             Mvx.RegisterSingleton(foundation.LicenseProvider);
+            Mvx.RegisterSingleton(foundation.FeedbackService);
             Mvx.RegisterSingleton(foundation.ShortcutCreator);
             Mvx.RegisterSingleton(foundation.AnalyticsService);
             Mvx.RegisterSingleton(foundation.PlatformConstants);
             Mvx.RegisterSingleton(foundation.Database.IdProvider);
+            Mvx.RegisterSingleton(foundation.RemoteConfigService);
             Mvx.RegisterSingleton(foundation.SuggestionProviderContainer);
             Mvx.RegisterSingleton(foundation.UserPreferences);
             Mvx.RegisterSingleton(foundation.OnboardingStorage);
             Mvx.RegisterSingleton(foundation.AccessRestrictionStorage);
+            Mvx.RegisterSingleton(foundation.LastTimeUsageStorage);
             Mvx.RegisterSingleton(foundation.ErrorHandlingService);
             Mvx.RegisterSingleton(foundation.PasswordManagerService ?? new StubPasswordManagerService());
         }

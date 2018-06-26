@@ -16,6 +16,7 @@ namespace Toggl.Foundation.Sync.States.Pull
         private readonly ITimeService timeService;
         private const int sinceDateLimitMonths = 2;
         private const int fetchTimeEntriesForMonths = 2;
+        private const int timeEntriesEndDateInclusiveExtraDaysCount = 2;
 
         public StateResult<IFetchObservables> FetchStarted { get; } = new StateResult<IFetchObservables>();
 
@@ -50,7 +51,7 @@ namespace Toggl.Foundation.Sync.States.Pull
         private IObservable<List<ITimeEntry>> fetchTwoMonthsOfTimeEntries()
             => api.TimeEntries.GetAll(
                 start: timeService.CurrentDateTime.AddMonths(-fetchTimeEntriesForMonths),
-                end: timeService.CurrentDateTime);
+                end: timeService.CurrentDateTime.AddDays(timeEntriesEndDateInclusiveExtraDaysCount));
 
         private IObservable<T> getSinceOrAll<T>(DateTimeOffset? threshold,
             Func<DateTimeOffset, IObservable<T>> since, Func<IObservable<T>> all)

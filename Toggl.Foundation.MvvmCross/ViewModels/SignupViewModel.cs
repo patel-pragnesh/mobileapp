@@ -32,6 +32,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IOnboardingStorage onboardingStorage;
         private readonly IMvxNavigationService navigationService;
         private readonly IErrorHandlingService errorHandlingService;
+        private readonly ILastTimeUsageStorage lastTimeUsageStorage;
+        private readonly ITimeService timeService;
 
         private IDisposable getCountrySubscription;
         private IDisposable signupDisposable;
@@ -81,7 +83,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IAnalyticsService analyticsService,
             IOnboardingStorage onboardingStorage,
             IMvxNavigationService navigationService,
-            IErrorHandlingService errorHandlingService)
+            IErrorHandlingService errorHandlingService,
+            ILastTimeUsageStorage lastTimeUsageStorage,
+            ITimeService timeService)
         {
             Ensure.Argument.IsNotNull(apiFactory, nameof(apiFactory));
             Ensure.Argument.IsNotNull(loginManager, nameof(loginManager));
@@ -89,6 +93,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(errorHandlingService, nameof(errorHandlingService));
+            Ensure.Argument.IsNotNull(lastTimeUsageStorage, nameof(lastTimeUsageStorage));
+            Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
             this.apiFactory = apiFactory;
             this.loginManager = loginManager;
@@ -96,6 +102,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.onboardingStorage = onboardingStorage;
             this.navigationService = navigationService;
             this.errorHandlingService = errorHandlingService;
+            this.lastTimeUsageStorage = lastTimeUsageStorage;
+            this.timeService = timeService;
 
             LoginCommand = new MvxAsyncCommand(login);
             GoogleSignupCommand = new MvxCommand(googleSignup);
@@ -165,6 +173,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async void onDataSource(ITogglDataSource dataSource)
         {
+            lastTimeUsageStorage.SetLogin(timeService.CurrentDateTime);
+
             await dataSource.StartSyncing();
 
             onboardingStorage.SetIsNewUser(true);

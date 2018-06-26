@@ -7,7 +7,7 @@
 using Foundation;
 using System.CodeDom.Compiler;
 
-namespace Toggl.Daneel.Views.SyncFailures
+namespace Toggl.Daneel.Cells
 {
 	[Register ("SyncFailureCell")]
 	partial class SyncFailureCell

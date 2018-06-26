@@ -21,11 +21,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         protected ITogglDatabase Database { get; } = Substitute.For<ITogglDatabase>();
         protected ILoginManager LoginManager { get; } = Substitute.For<ILoginManager>();
         protected UserAgent UserAgent { get; } = new UserAgent("Foundation.Tests", "1.0");
+        protected IRatingService RatingService { get; } = Substitute.For<IRatingService>();
         protected IDialogService DialogService { get; } = Substitute.For<IDialogService>();
         protected IBrowserService BrowserService { get; } = Substitute.For<IBrowserService>();
         protected ILicenseProvider LicenseProvider { get; } = Substitute.For<ILicenseProvider>();
+        protected IFeedbackService FeedbackService { get; } = Substitute.For<IFeedbackService>();
         protected IPlatformConstants PlatformConstants { get; } = Substitute.For<IPlatformConstants>();
         protected IOnboardingStorage OnboardingStorage { get; } = Substitute.For<IOnboardingStorage>();
+        protected IRemoteConfigService RemoteConfigService { get; } = Substitute.For<IRemoteConfigService>();
         protected IPasswordManagerService PasswordManagerService { get; } = Substitute.For<IPasswordManagerService>();
         protected IErrorHandlingService ErrorHandlingService { get; } = Substitute.For<IErrorHandlingService>();
         protected ISuggestionProviderContainer SuggestionProviderContainer { get; } = Substitute.For<ISuggestionProviderContainer>();

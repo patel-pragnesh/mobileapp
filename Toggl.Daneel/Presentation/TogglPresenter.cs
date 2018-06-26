@@ -201,6 +201,18 @@ namespace Toggl.Daneel.Presentation
                         }
                     }
                     return;
+
+                case ToggleRatingViewVisibilityHint ratingViewVisibilityHint:
+                    {
+                        if (MasterNavigationController?.TopViewController is MainViewController mainViewController)
+                        {
+                            if (ratingViewVisibilityHint.ForceHide)
+                                mainViewController.HideRatingView();
+                            else
+                                mainViewController.ShowRatingView();
+                        }
+                    }
+                    break;
             }
 
             base.ChangePresentation(hint);

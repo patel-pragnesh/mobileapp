@@ -162,6 +162,53 @@ namespace Toggl.Multivac.Tests
                 };
         }
 
+        public sealed class ThePingPongClampMethod
+        {
+            [Theory]
+            [MemberData(nameof(PingPongTestData))]
+            public void ConvertsPositiveNumberToPingPongIndex(int number, int length, int expectedIndex)
+            {
+                var index = number.PingPongClamp(length);
+
+                index.Should().Be(expectedIndex);
+            }
+
+            [Property]
+            public void DifferenceBetweenTwoConsequentNonNegativeNumbersIsAlwaysOne(NonNegativeInt a, PositiveInt length)
+            {
+                if (length.Get == 1) return; // for a loop of length 1 all of the indexes will be 0
+
+                var b = a.Get + 1;
+
+                var indexA = a.Get.PingPongClamp(length.Get);
+                var indexB = b.PingPongClamp(length.Get);
+
+                System.Math.Abs(indexA - indexB).Should().Be(1);
+            }
+
+            public static IEnumerable<object[]> PingPongTestData()
+                => new[]
+                {
+                    new object[] { 0, 2, 0 },
+                    new object[] { 1, 2, 1 },
+                    new object[] { 2, 2, 0 },
+                    new object[] { 3, 2, 1 },
+                    new object[] { 4, 2, 0 },
+
+                    new object[] { 0, 5, 0 },
+                    new object[] { 1, 5, 1 },
+                    new object[] { 2, 5, 2 },
+                    new object[] { 3, 5, 3 },
+                    new object[] { 4, 5, 4 },
+                    new object[] { 5, 5, 3 },
+                    new object[] { 6, 5, 2 },
+                    new object[] { 7, 5, 1 },
+                    new object[] { 8, 5, 0 },
+                    new object[] { 9, 5, 1 },
+                    new object[] { 10, 5, 2 },
+                };
+        }
+
         public static IEnumerable<object[]> TimeToAngleTestData()
         {
             var oneSecondAngle = FullCircle / (60.0 * 60.0);

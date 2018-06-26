@@ -60,5 +60,12 @@ namespace Toggl.Multivac
                 ? startAngle <= angle || angle <= endAngle
                 : startAngle <= angle && angle <= endAngle;
         }
+
+        public static int PingPongClamp(this int number, int length)
+        {
+            var lengthOfFoldedSequence = 2 * length - 2;
+            var indexInFoldedSequence = number % lengthOfFoldedSequence;
+            return indexInFoldedSequence < length ? indexInFoldedSequence : lengthOfFoldedSequence - indexInFoldedSequence;
+        }
     }
 }

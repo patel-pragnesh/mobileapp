@@ -19,11 +19,12 @@ using Toggl.Foundation.Sync;
 using Toggl.Foundation.Tests.Generators;
 using Toggl.Foundation.Tests.Mocks;
 using Toggl.PrimeRadiant;
-using Toggl.PrimeRadiant.Models;
 using Toggl.PrimeRadiant.Settings;
 using Xunit;
 using ThreadingTask = System.Threading.Tasks.Task;
 using static Toggl.Foundation.Helper.Constants;
+using Toggl.Multivac;
+using Toggl.Foundation.Extensions;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -35,13 +36,23 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             protected ISubject<SyncProgress> ProgressSubject { get; } = new Subject<SyncProgress>();
 
-            protected IUserPreferences UserPreferences { get; } = Substitute.For<IUserPreferences>();
-
             protected TestScheduler Scheduler { get; } = new TestScheduler();
 
             protected override MainViewModel CreateViewModel()
             {
-                var vm = new MainViewModel(Scheduler, DataSource, TimeService, UserPreferences, OnboardingStorage, AnalyticsService, InteractorFactory, NavigationService, SuggestionProviderContainer);
+                var vm = new MainViewModel(
+                    Scheduler,
+                    DataSource,
+                    TimeService,
+                    RatingService,
+                    UserPreferences,
+                    FeedbackService,
+                    AnalyticsService,
+                    OnboardingStorage,
+                    InteractorFactory,
+                    NavigationService,
+                    RemoteConfigService,
+                    SuggestionProviderContainer);
                 vm.Prepare();
 
                 return vm;
@@ -54,36 +65,58 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var syncManager = Substitute.For<ISyncManager>();
                 syncManager.ProgressObservable.Returns(ProgressSubject.AsObservable());
                 DataSource.SyncManager.Returns(syncManager);
+
+                RemoteConfigService
+                    .RatingViewConfiguration
+                    .Returns(Observable.Never<RatingViewConfiguration>());
             }
         }
 
         public sealed class TheConstructor : MainViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(NineParameterConstructorTestData))]
+            [ClassData(typeof(TwelveParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool useScheduler,
                 bool useDataSource,
                 bool useTimeService,
+                bool useRatingService,
                 bool useUserPreferences,
-                bool useOnboardingStorage,
+                bool useFeedbackService,
                 bool useAnalyticsService,
+                bool useOnboardingStorage,
                 bool useInteractorFactory,
                 bool useNavigationService,
+                bool useRemoteConfigService,
                 bool useSuggestionProviderContainer)
             {
                 var scheduler = useScheduler ? Scheduler : null;
                 var dataSource = useDataSource ? DataSource : null;
                 var timeService = useTimeService ? TimeService : null;
+                var ratingService = useRatingService ? RatingService : null;
                 var userPreferences = useUserPreferences ? UserPreferences : null;
+                var feedbackService = useFeedbackService ? FeedbackService : null;
+                var analyticsService = useAnalyticsService ? AnalyticsService : null;
                 var navigationService = useNavigationService ? NavigationService : null;
                 var interactorFactory = useInteractorFactory ? InteractorFactory : null;
                 var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
-                var analyticsService = useAnalyticsService ? AnalyticsService : null;
+                var remoteConfigService = useRemoteConfigService ? RemoteConfigService : null;
                 var suggestionProviderContainer = useSuggestionProviderContainer ? SuggestionProviderContainer : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new MainViewModel(scheduler, dataSource, timeService, userPreferences, onboardingStorage, analyticsService, interactorFactory, navigationService, suggestionProviderContainer);
+                    () => new MainViewModel(
+                        scheduler,
+                        dataSource,
+                        timeService,
+                        ratingService,
+                        userPreferences,
+                        feedbackService,
+                        analyticsService,
+                        onboardingStorage,
+                        interactorFactory,
+                        navigationService,
+                        remoteConfigService,
+                        suggestionProviderContainer);
 
                 tryingToConstructWithEmptyParameters
                     .Should().Throw<ArgumentNullException>();
@@ -441,6 +474,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected string Task = "Some task";
             protected string Client = "Some client";
             protected string ProjectColor = "0000AF";
+            protected bool Active = true;
             protected DateTimeOffset StartTime = new DateTimeOffset(2018, 01, 02, 03, 04, 05, TimeSpan.Zero);
             protected DateTimeOffset Now = new DateTimeOffset(2018, 01, 02, 06, 04, 05, TimeSpan.Zero);
 
@@ -451,6 +485,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 timeEntry.Description.Returns(Description);
                 timeEntry.Project.Name.Returns(Project);
                 timeEntry.Project.Color.Returns(ProjectColor);
+                timeEntry.Project.Active.Returns(Active);
                 timeEntry.Task.Name.Returns(Task);
                 timeEntry.Project.Client.Name.Returns(Client);
                 timeEntry.Start.Returns(StartTime);

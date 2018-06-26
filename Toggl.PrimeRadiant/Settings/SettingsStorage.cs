@@ -6,7 +6,7 @@ using Toggl.PrimeRadiant.Onboarding;
 
 namespace Toggl.PrimeRadiant.Settings
 {
-    public sealed class SettingsStorage : IAccessRestrictionStorage, IOnboardingStorage, IUserPreferences
+    public sealed class SettingsStorage : IAccessRestrictionStorage, IOnboardingStorage, IUserPreferences, ILastTimeUsageStorage
     {
         private const string outdatedApiKey = "OutdatedApi";
         private const string outdatedClientKey = "OutdatedClient";
@@ -15,6 +15,7 @@ namespace Toggl.PrimeRadiant.Settings
         private const string userSignedUpUsingTheAppKey = "UserSignedUpUsingTheApp";
         private const string isNewUserKey = "IsNewUser";
         private const string lastAccessDateKey = "LastAccessDate";
+        private const string firstAccessDateKey = "FirstAccessDate";
         private const string completedOnboardingKey = "CompletedOnboarding";
 
         private const string preferManualModeKey = "PreferManualMode";
@@ -27,6 +28,13 @@ namespace Toggl.PrimeRadiant.Settings
         private const string hasSelectedProjectKey = "HasSelectedProject";
 
         private const string onboardingPrefix = "Onboarding_";
+
+        private const string ratingViewOutcomeKey = "RatingViewOutcome";
+        private const string ratingViewOutcomeTimeKey = "RatingViewOutcomeTime";
+        
+        private const string lastSyncAttemptKey = "LastSyncAttempt";
+        private const string lastSuccessfulSyncKey = "LastSuccessfulSync";
+        private const string lastLoginKey = "LastLogin";
 
         private readonly Version version;
         private readonly IKeyValueStorage keyValueStorage;
@@ -123,6 +131,12 @@ namespace Toggl.PrimeRadiant.Settings
             keyValueStorage.SetString(lastAccessDateKey, dateString);
         }
 
+        public void SetFirstOpened(DateTimeOffset dateTime)
+        {
+            if (GetFirstOpened() == null)
+                keyValueStorage.SetString(firstAccessDateKey, dateTime.ToString());
+        }
+
         public void SetUserSignedUp()
         {
             userSignedUpUsingTheAppSubject.OnNext(true);
@@ -143,6 +157,16 @@ namespace Toggl.PrimeRadiant.Settings
         public bool CompletedOnboarding() => keyValueStorage.GetBool(completedOnboardingKey);
 
         public string GetLastOpened() => keyValueStorage.GetString(lastAccessDateKey);
+
+        public DateTimeOffset? GetFirstOpened()
+        {
+            var dateString = keyValueStorage.GetString(firstAccessDateKey);
+
+            if (string.IsNullOrEmpty(dateString))
+                return null;
+
+            return DateTimeOffset.Parse(dateString);
+        }
 
         public void StartButtonWasTapped()
         {
@@ -179,6 +203,24 @@ namespace Toggl.PrimeRadiant.Settings
             hasEditedTimeEntrySubject.OnNext(true);
             keyValueStorage.SetBool(hasEditedTimeEntryKey, true);
         }
+
+        public void SetRatingViewOutcome(RatingViewOutcome outcome, DateTimeOffset dateTime)
+        {
+            keyValueStorage.SetInt(ratingViewOutcomeKey, (int)outcome);
+            keyValueStorage.SetDateTimeOffset(ratingViewOutcomeTimeKey, dateTime);
+        }
+
+        public RatingViewOutcome? RatingViewOutcome()
+        {
+            var defaultIntValue = -1;
+            var intValue = keyValueStorage.GetInt(ratingViewOutcomeKey, defaultIntValue);
+            if (intValue == defaultIntValue)
+                return null;
+            return (RatingViewOutcome)intValue;
+        }
+
+        public DateTimeOffset? RatingViewOutcomeTime()
+            => keyValueStorage.GetDateTimeOffset(ratingViewOutcomeTimeKey);
 
         public bool WasDismissed(IDismissable dismissable) => keyValueStorage.GetBool(onboardingPrefix + dismissable.Key);
 
@@ -229,6 +271,31 @@ namespace Toggl.PrimeRadiant.Settings
         {
             EnableTimerMode();
             isManualModeEnabledSubject.OnNext(false);
+        }
+
+        #endregion
+
+        #region ILastTimeUsageStorage
+
+        public DateTimeOffset? LastSyncAttempt => keyValueStorage.GetDateTimeOffset(lastSyncAttemptKey);
+
+        public DateTimeOffset? LastSuccessfulSync => keyValueStorage.GetDateTimeOffset(lastSuccessfulSyncKey);
+
+        public DateTimeOffset? LastLogin => keyValueStorage.GetDateTimeOffset(lastLoginKey);
+
+        public void SetFullSyncAttempt(DateTimeOffset now)
+        {
+            keyValueStorage.SetDateTimeOffset(lastSyncAttemptKey, now);
+        }
+
+        public void SetSuccessfulFullSync(DateTimeOffset now)
+        {
+            keyValueStorage.SetDateTimeOffset(lastSuccessfulSyncKey, now);
+        }
+
+        public void SetLogin(DateTimeOffset now)
+        {
+            keyValueStorage.SetDateTimeOffset(lastLoginKey, now);
         }
 
         #endregion

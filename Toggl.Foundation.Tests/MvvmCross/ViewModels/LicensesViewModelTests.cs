@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
-using FsCheck.Xunit;
 using NSubstitute;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
@@ -21,6 +20,20 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheConstructor : LicensesViewModelTest
         {
+            private readonly Dictionary<string, string> licenses = new Dictionary<string, string>
+            {
+                { "Something", "Some long license" },
+                { "Something else", "Some other license" },
+                { "Third one", "Another even longer license" }
+            };
+
+            protected override LicensesViewModel CreateViewModel()
+            {
+                LicenseProvider.GetAppLicenses().Returns(licenses);
+
+                return base.CreateViewModel();
+            }
+
             [Fact, LogIfTooSlow]
             public void ThrowsIfTheArgumentIsNull()
             {
@@ -30,26 +43,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 tryingToConstructWithEmptyParameters
                     .Should().Throw<ArgumentNullException>();
             }
-        }
 
-        public sealed class TheInitializeMethod : LicensesViewModelTest
-        {
             [Fact, LogIfTooSlow]
-            public async Task InitializesTheLicenses()
+            public void InitializesTheLicenses()
             {
-                var licenses = new Dictionary<string, string>
-                {
-                    { "Something", "Some long license" },
-                    { "Something else", "Some other license" },
-                    { "Third one", "Another even longer license" }
-                };
                 var expectedLicenses = licenses
                     .Select(license => new License(license.Key, license.Value))
-                    .ToList();
-                LicenseProvider.GetAppLicenses().Returns(licenses);
-
-                await ViewModel.Initialize();
-
+                    .ToImmutableList();
+                
                 ViewModel.Licenses.Should().BeEquivalentTo(expectedLicenses);
             }
         }

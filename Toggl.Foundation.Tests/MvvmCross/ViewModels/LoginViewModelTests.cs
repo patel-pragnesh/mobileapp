@@ -18,6 +18,7 @@ using Xunit;
 using Toggl.Foundation.Tests.TestExtensions;
 using FsCheck;
 using Toggl.Foundation.MvvmCross.Parameters;
+using Toggl.PrimeRadiant.Settings;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -31,6 +32,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected Password ValidPassword { get; } = Password.From("T0t4lly s4afe p4$$");
             protected Password InvalidPassword { get; } = Password.From("123");
 
+            protected ILastTimeUsageStorage LastTimeUsageStorage { get; } = Substitute.For<ILastTimeUsageStorage>();
+
             protected override LoginViewModel CreateViewModel()
                 => new LoginViewModel(
                     LoginManager,
@@ -38,20 +41,24 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     OnboardingStorage,
                     NavigationService,
                     PasswordManagerService,
-                    ErrorHandlingService);
+                    ErrorHandlingService,
+                    LastTimeUsageStorage,
+                    TimeService);
         }
 
         public sealed class TheConstructor : LoginViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(SixParameterConstructorTestData))]
+            [ClassData(typeof(EightParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool userLoginManager,
                 bool useAnalyticsService,
                 bool useOnboardingStorage,
                 bool userNavigationService,
                 bool usePasswordManagerService,
-                bool useApiErrorHandlingService)
+                bool useApiErrorHandlingService,
+                bool useLastTimeUsageStorage,
+                bool useTimeService)
             {
                 var loginManager = userLoginManager ? LoginManager : null;
                 var analyticsSerivce = useAnalyticsService ? AnalyticsService : null;
@@ -59,6 +66,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var navigationService = userNavigationService ? NavigationService : null;
                 var passwordManagerService = usePasswordManagerService ? PasswordManagerService : null;
                 var apiErrorHandlingService = useApiErrorHandlingService ? ErrorHandlingService : null;
+                var lastTimeUsageStorage = useLastTimeUsageStorage ? LastTimeUsageStorage : null;
+                var timeService = useTimeService ? TimeService : null;
 
                 Action tryingToConstructWithEmptyParameters =
                     () => new LoginViewModel(loginManager,
@@ -66,7 +75,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                                              onboardingStorage,
                                              navigationService,
                                              passwordManagerService,
-                                             apiErrorHandlingService);
+                                             apiErrorHandlingService,
+                                             lastTimeUsageStorage,
+                                             timeService);
 
                 tryingToConstructWithEmptyParameters
                     .Should().Throw<ArgumentNullException>();
@@ -158,14 +169,17 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             public sealed class WhenLoginSucceeds : LoginViewModelTest
             {
-                [Fact, LogIfTooSlow]
-                public async Task StartsSyncing()
+                public WhenLoginSucceeds()
                 {
                     ViewModel.Email = ValidEmail;
                     ViewModel.Password = ValidPassword;
                     LoginManager.Login(Arg.Any<Email>(), Arg.Any<Password>())
                         .Returns(Observable.Return(DataSource));
+                }
 
+                [Fact, LogIfTooSlow]
+                public async Task StartsSyncing()
+                {
                     ViewModel.LoginCommand.Execute();
 
                     await DataSource.Received().StartSyncing();
@@ -174,11 +188,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public void SetsIsNewUserToFalse()
                 {
-                    ViewModel.Email = ValidEmail;
-                    ViewModel.Password = ValidPassword;
-                    LoginManager.Login(Arg.Any<Email>(), Arg.Any<Password>())
-                        .Returns(Observable.Return(Substitute.For<ITogglDataSource>()));
-
                     ViewModel.LoginCommand.Execute();
 
                     OnboardingStorage.Received().SetIsNewUser(false);
@@ -187,11 +196,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public void SetsIsLoadingToFalse()
                 {
-                    ViewModel.Email = ValidEmail;
-                    ViewModel.Password = ValidPassword;
-                    LoginManager.Login(Arg.Any<Email>(), Arg.Any<Password>())
-                        .Returns(Observable.Return(Substitute.For<ITogglDataSource>()));
-
                     ViewModel.LoginCommand.Execute();
 
                     ViewModel.IsLoading.Should().BeFalse();
@@ -200,11 +204,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public void NavigatesToTheTimeEntriesViewModel()
                 {
-                    ViewModel.Email = ValidEmail;
-                    ViewModel.Password = ValidPassword;
-                    LoginManager.Login(Arg.Any<Email>(), Arg.Any<Password>())
-                        .Returns(Observable.Return(Substitute.For<ITogglDataSource>()));
-
                     ViewModel.LoginCommand.Execute();
 
                     NavigationService.Received().Navigate<MainViewModel>();
@@ -213,14 +212,19 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public void TracksTheLoginEvent()
                 {
-                    ViewModel.Email = ValidEmail;
-                    ViewModel.Password = ValidPassword;
-                    LoginManager.Login(Arg.Any<Email>(), Arg.Any<Password>())
-                        .Returns(Observable.Return(Substitute.For<ITogglDataSource>()));
-
                     ViewModel.LoginCommand.Execute();
 
                     AnalyticsService.Received().Login.Track(AuthenticationMethod.EmailAndPassword);
+                }
+
+                [Property]
+                public void SavesTheTimeOfLastLogin(DateTimeOffset now)
+                {
+                    TimeService.CurrentDateTime.Returns(now);
+
+                    ViewModel.LoginCommand.Execute();
+
+                    LastTimeUsageStorage.Received().SetLogin(Arg.Is(now));
                 }
             }
 
@@ -399,6 +403,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.GoogleLoginCommand.Execute();
 
                 ViewModel.ErrorMessage.Should().BeEmpty();
+            }
+
+            [Property]
+            public void SavesTheTimeOfLastLogin(DateTimeOffset now)
+            {
+                TimeService.CurrentDateTime.Returns(now);
+                LoginManager.LoginWithGoogle()
+                    .Returns(Observable.Return(Substitute.For<ITogglDataSource>()));
+
+                ViewModel.GoogleLoginCommand.Execute();
+
+                LastTimeUsageStorage.Received().SetLogin(Arg.Is(now));
             }
         }
 

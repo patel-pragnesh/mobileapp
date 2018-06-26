@@ -38,7 +38,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ReturnsTagsForAllWorkspaces()
             {
                 var (togglApi, user) = await SetupTestUser();
-                var otherWorkspace = await togglApi.Workspaces.Create(Guid.NewGuid().ToString());
+                var otherWorkspace = await togglApi.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 await pushTags(togglApi, tags1, user.DefaultWorkspaceId.Value);
                 await pushTags(togglApi, tags2, otherWorkspace.Id);

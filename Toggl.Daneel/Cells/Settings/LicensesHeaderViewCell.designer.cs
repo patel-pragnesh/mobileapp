@@ -7,7 +7,7 @@
 using Foundation;
 using System.CodeDom.Compiler;
 
-namespace Toggl.Daneel.Views.Settings
+namespace Toggl.Daneel.Cells.Settings
 {
 	[Register ("LicensesHeaderViewCell")]
 	partial class LicensesHeaderViewCell

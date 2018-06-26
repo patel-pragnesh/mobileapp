@@ -208,7 +208,8 @@ namespace Toggl.Foundation.Tests.Interactors
             {
                 await interactor.Execute();
 
-                AnalyticsService.Received().TimeEntryStarted.Track(TimeEntryStartOrigin.ContinueMostRecent);
+                AnalyticsService.Received().Track(Arg.Is<StartTimeEntryEvent>(
+                    startTimeEntryEvent => startTimeEntryEvent.Origin == TimeEntryStartOrigin.ContinueMostRecent));
             }
         }
     }

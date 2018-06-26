@@ -186,11 +186,33 @@ namespace Toggl.Foundation.MvvmCross.Helper
             public static class Wheel
             {
                 public static readonly MvxColor Background = new MvxColor(244, 244, 244);
-                public static readonly MvxColor Shadow = new MvxColor(0, 0, 0);
-                public static readonly MvxColor Duration = new MvxColor(181, 188, 192);
+                public static readonly MvxColor Shadow = new MvxColor(94, 91, 91);
+                public static readonly MvxColor CapBackground = new MvxColor(181, 188, 192);
                 public static readonly MvxColor Cap = new MvxColor(255, 255, 255);
                 public static readonly MvxColor ThickMinuteSegment = new MvxColor(188, 196, 199);
                 public static readonly MvxColor ThinMinuteSegment = new MvxColor(230, 235, 237);
+
+                public static readonly MvxColor[] Rainbow =
+                {
+                    MvxColor.ParseHexString("F1F2F3"),
+                    MvxColor.ParseHexString("EDE4F0"),
+                    MvxColor.ParseHexString("DFC3E6"),
+                    MvxColor.ParseHexString("CA99D7"),
+                    MvxColor.ParseHexString("B599D7"),
+                    MvxColor.ParseHexString("8799E5"),
+                    MvxColor.ParseHexString("5168C5"),
+                    MvxColor.ParseHexString("55BBDF"),
+                    MvxColor.ParseHexString("95D0E5"),
+                    MvxColor.ParseHexString("B0DCEC"),
+                    MvxColor.ParseHexString("BFDBD7"),
+                    MvxColor.ParseHexString("7FC5BC"),
+                    MvxColor.ParseHexString("E5F0BA"),
+                    MvxColor.ParseHexString("F0E3BA"),
+                    MvxColor.ParseHexString("F8DAB8"),
+                    MvxColor.ParseHexString("F0D06C"),
+                    MvxColor.ParseHexString("EFBA7A"),
+                    MvxColor.ParseHexString("F1ACAE")
+                };
             }
         }
 

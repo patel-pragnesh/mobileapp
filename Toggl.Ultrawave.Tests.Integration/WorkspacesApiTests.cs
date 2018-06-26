@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Exceptions;
+using Toggl.Ultrawave.Models;
 using Toggl.Ultrawave.Tests.Integration.BaseTests;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace Toggl.Ultrawave.Tests.Integration
 {
@@ -23,7 +24,8 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ReturnsAllWorkspaces()
             {
                 var (togglClient, user) = await SetupTestUser();
-                var secondWorkspace = await togglClient.Workspaces.Create(Guid.NewGuid().ToString());
+                var secondWorkspace =
+                    await togglClient.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 var workspaces = await CallEndpointWith(togglClient);
 
@@ -62,7 +64,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ReturnsCreatedWorkspace()
             {
                 var (togglClient, user) = await SetupTestUser();
-                var secondWorkspace = await togglClient.Workspaces.Create(Guid.NewGuid().ToString());
+                var secondWorkspace = await togglClient.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 var workspace = await CallEndpointWith(togglClient, secondWorkspace.Id);
 
@@ -82,7 +84,7 @@ namespace Toggl.Ultrawave.Tests.Integration
         public sealed class TheCreateMethod : AuthenticatedPostEndpointBaseTests<IWorkspace>
         {
             protected override IObservable<IWorkspace> CallEndpointWith(ITogglApi togglApi)
-                => togglApi.Workspaces.Create(Guid.NewGuid().ToString());
+                => togglApi.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
             [Fact, LogTestInfo]
             public async Task CreatesWorkspaceWithGivenName()
@@ -90,7 +92,7 @@ namespace Toggl.Ultrawave.Tests.Integration
                 var (api, user) = await SetupTestUser();
                 var name = Guid.NewGuid().ToString();
 
-                var workspace = await api.Workspaces.Create(name);
+                var workspace = await api.Workspaces.Create(new Workspace { Name = name });
 
                 workspace.Name.Should().Be(name);
             }
@@ -101,7 +103,7 @@ namespace Toggl.Ultrawave.Tests.Integration
                 var (api, user) = await SetupTestUser();
                 var name = Guid.NewGuid().ToString();
 
-                var workspace = await api.Workspaces.Create(name);
+                var workspace = await api.Workspaces.Create(new Workspace { Name = name });
                 var features = await api.WorkspaceFeatures.GetAll()
                     .SelectMany(all => all.Where(workspaceFeatures => workspaceFeatures.WorkspaceId == workspace.Id))
                     .SingleAsync();

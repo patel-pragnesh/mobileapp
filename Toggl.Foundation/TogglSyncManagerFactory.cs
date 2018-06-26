@@ -16,6 +16,7 @@ using Toggl.Foundation.Sync.States.Push;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
+using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
 using Toggl.Ultrawave.ApiClients;
 using Toggl.Ultrawave.ApiClients.Interfaces;
@@ -30,6 +31,7 @@ namespace Toggl.Foundation
             ITogglDataSource dataSource,
             ITimeService timeService,
             IAnalyticsService analyticsService,
+            ILastTimeUsageStorage lastTimeUsageStorage,
             TimeSpan? retryLimit,
             IScheduler scheduler)
         {
@@ -44,7 +46,7 @@ namespace Toggl.Foundation
             var stateMachine = new StateMachine(transitions, scheduler, delayCancellation);
             var orchestrator = new StateMachineOrchestrator(stateMachine, entryPoints);
 
-            return new SyncManager(queue, orchestrator, analyticsService);
+            return new SyncManager(queue, orchestrator, analyticsService, lastTimeUsageStorage, timeService);
         }
 
         public static void ConfigureTransitions(
@@ -93,6 +95,7 @@ namespace Toggl.Foundation
 
             var persistUser =
                 new PersistSingletonState<IUser, IDatabaseUser, IThreadSafeUser>(dataSource.User, User.Clean)
+                    .TrackNoDefaultWorkspace(analyticsService)
                     .CatchApiExceptions();
 
             var persistTags =
@@ -179,7 +182,8 @@ namespace Toggl.Foundation
             StateResult entryPoint,
             IObservable<Unit> delayCancellation)
         {
-            var pushingUsersFinished = configurePushSingleton(transitions, entryPoint, dataSource.User, api.User, User.Clean, User.Unsyncable, api, scheduler, delayCancellation);
+            var pushingWorkspacesFinished = configureCreateOnlyPush(transitions, entryPoint, dataSource.Workspaces, api.Workspaces, Workspace.Clean, Workspace.Unsyncable, api, scheduler, delayCancellation);
+            var pushingUsersFinished = configurePushSingleton(transitions, pushingWorkspacesFinished, dataSource.User, api.User, User.Clean, User.Unsyncable, api, scheduler, delayCancellation);
             var pushingPreferencesFinished = configurePushSingleton(transitions, pushingUsersFinished, dataSource.Preferences, api.Preferences, Preferences.Clean, Preferences.Unsyncable, api, scheduler, delayCancellation);
             var pushingTagsFinished = configureCreateOnlyPush(transitions, pushingPreferencesFinished, dataSource.Tags, api.Tags, Tag.Clean, Tag.Unsyncable, api, scheduler, delayCancellation);
             var pushingClientsFinished = configureCreateOnlyPush(transitions, pushingTagsFinished, dataSource.Clients, api.Clients, Client.Clean, Client.Unsyncable, api, scheduler, delayCancellation);

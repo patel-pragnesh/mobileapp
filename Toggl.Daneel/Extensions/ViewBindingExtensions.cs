@@ -75,6 +75,9 @@ namespace Toggl.Daneel.Extensions
         public static string BindAnimatedVisibility(this UIView self)
             => ViewAnimatedVisibilityTargetBinding.BindingName;
 
+        public static string BindLongPress(this UIView self)
+            => ViewLongPressCommandTargetBinding.BindingName;
+
         public static string BindVisibilityWithFade(this UIView self)
             => ViewVisibilityWithFadeTargetBinding.BindingName;
     }

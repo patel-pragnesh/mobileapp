@@ -28,6 +28,8 @@ namespace Toggl.PrimeRadiant.Tests.Settings
             {
                 private readonly Dictionary<string, bool> bools = new Dictionary<string, bool>();
                 private readonly Dictionary<string, string> strings = new Dictionary<string, string>();
+                private readonly Dictionary<string, int> ints = new Dictionary<string, int>();
+                private readonly Dictionary<string, DateTimeOffset> dates = new Dictionary<string, DateTimeOffset>();
 
                 public bool GetBool(string key)
                 {
@@ -41,6 +43,9 @@ namespace Toggl.PrimeRadiant.Tests.Settings
                     return value;
                 }
 
+                public DateTimeOffset? GetDateTimeOffset(string key)
+                    => dates.TryGetValue(key, out var value) ? value : (DateTimeOffset?)null;
+
                 public void SetBool(string key, bool value)
                 {
                     bools[key] = value;
@@ -49,6 +54,23 @@ namespace Toggl.PrimeRadiant.Tests.Settings
                 public void SetString(string key, string value)
                 {
                     strings[key] = value;
+                }
+
+                public void SetInt(string key, int value)
+                {
+                    ints[key] = value;
+                }
+
+                public int GetInt(string key, int defaultValue)
+                {
+                    int value;
+                    if (ints.TryGetValue(key, out value))
+                        return value;
+                    return defaultValue;
+                }
+                public void SetDateTimeOffset(string key, DateTimeOffset value)
+                {
+                    dates[key] = value;
                 }
 
                 public void Remove(string key)

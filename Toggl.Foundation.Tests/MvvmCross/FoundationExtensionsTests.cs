@@ -29,22 +29,26 @@ namespace Toggl.Foundation.Tests.MvvmCross
         private readonly ITimeService timeService = Substitute.For<ITimeService>();
         private readonly IMailService mailService = Substitute.For<IMailService>();
         private readonly ITogglDatabase database = Substitute.For<ITogglDatabase>();
+        private readonly IRatingService ratingService = Substitute.For<IRatingService>();
         private readonly IGoogleService googleService = Substitute.For<IGoogleService>();
         private readonly ILicenseProvider licenseProvider = Substitute.For<ILicenseProvider>();
         private readonly IAnalyticsService analyticsService = Substitute.For<IAnalyticsService>();
         private readonly IBackgroundService backgroundService = Substitute.For<IBackgroundService>();
         private readonly IPlatformConstants platformConstants = Substitute.For<IPlatformConstants>();
+        private readonly IRemoteConfigService remoteConfigService = Substitute.For<IRemoteConfigService>();
         private readonly IApplicationShortcutCreator applicationShortcutCreator = Substitute.For<IApplicationShortcutCreator>();
         private readonly ISuggestionProviderContainer suggestionProviderContainer = Substitute.For<ISuggestionProviderContainer>();
 
         private readonly IDialogService dialogService = Substitute.For<IDialogService>();
         private readonly IBrowserService browserService = Substitute.For<IBrowserService>();
         private readonly IKeyValueStorage keyValueStorage = Substitute.For<IKeyValueStorage>();
+        private readonly IFeedbackService feedbackService = Substitute.For<IFeedbackService>();
         private readonly IUserPreferences userPreferences = Substitute.For<IUserPreferences>();
         private readonly IOnboardingStorage onboardingStorage = Substitute.For<IOnboardingStorage>();
         private readonly IMvxNavigationService navigationService = Substitute.For<IMvxNavigationService>();
         private readonly IErrorHandlingService errorHandlingService = Substitute.For<IErrorHandlingService>();
         private readonly IAccessRestrictionStorage accessRestrictionStorage = Substitute.For<IAccessRestrictionStorage>();
+        private readonly ILastTimeUsageStorage lastTimeUsageStorage = Substitute.For<ILastTimeUsageStorage>();
 
         public FoundationExtensionsTests()
         {
@@ -53,47 +57,55 @@ namespace Toggl.Foundation.Tests.MvvmCross
                     .WithDialogService(dialogService)
                     .WithBrowserService(browserService)
                     .WithKeyValueStorage(keyValueStorage)
+                    .WithFeedbackService(feedbackService)
                     .WithUserPreferences(userPreferences)
                     .WithOnboardingStorage(onboardingStorage)
                     .WithNavigationService(navigationService)
                     .WithErrorHandlingService(errorHandlingService)
                     .WithAccessRestrictionStorage(accessRestrictionStorage)
+                    .WithLastTimeUsageStorage(lastTimeUsageStorage)
                     .Build();
         }
 
         [Theory, LogIfTooSlow]
-        [ClassData(typeof(NineParameterConstructorTestData))]
+        [ClassData(typeof(ElevenParameterConstructorTestData))]
         public void ThrowsIfAnyOfTheParametersIsNull(
             bool useFoundation,
             bool useDialogService,
             bool useBrowserService,
             bool useKeyValueStorage,
             bool useUserPreferences,
+            bool useFeedbackService,
             bool useOnboardingStorage,
             bool useNavigationService,
             bool useApiErrorHandlingService,
-            bool useAccessRestrictionStorage)
+            bool useAccessRestrictionStorage,
+            bool useLastTimeUsageStorage)
         {
             var foundation = useFoundation ? constructFoundation() : null;
             var actualDialogService = useDialogService ? Substitute.For<IDialogService>() : null;
             var actualBrowserService = useBrowserService ? Substitute.For<IBrowserService>() : null;
             var actualKeyValueStorage = useKeyValueStorage ? Substitute.For<IKeyValueStorage>() : null;
             var actualUserPreferences = useUserPreferences ? Substitute.For<IUserPreferences>() : null;
+            var actualFeedbackService = useFeedbackService ? Substitute.For<IFeedbackService>() : null;
             var actualOnboardingStorage = useOnboardingStorage ? Substitute.For<IOnboardingStorage>() : null;
             var actualNavigationService = useNavigationService ? Substitute.For<IMvxNavigationService>() : null;
             var actualApiErrorHandlingService = useApiErrorHandlingService ? Substitute.For<IErrorHandlingService>() : null;
             var actualAccessRestrictionStorage = useAccessRestrictionStorage ? Substitute.For<IAccessRestrictionStorage>() : null;
+            var actualLastTimeUsageStorage = useLastTimeUsageStorage ? Substitute.For<ILastTimeUsageStorage>() : null;
 
             Action tryingToConstructWithEmptyParameters = () =>
                 foundation.StartRegisteringPlatformServices()
                     .WithDialogService(actualDialogService)
                     .WithBrowserService(actualBrowserService)
                     .WithKeyValueStorage(actualKeyValueStorage)
+                    .WithFeedbackService(actualFeedbackService)
                     .WithUserPreferences(actualUserPreferences)
                     .WithOnboardingStorage(actualOnboardingStorage)
                     .WithNavigationService(actualNavigationService)
                     .WithErrorHandlingService(actualApiErrorHandlingService)
                     .WithAccessRestrictionStorage(actualAccessRestrictionStorage)
+                    .WithLastTimeUsageStorage(actualLastTimeUsageStorage)
                     .Build();
 
             tryingToConstructWithEmptyParameters
@@ -107,22 +119,26 @@ namespace Toggl.Foundation.Tests.MvvmCross
             var actualDialogService = Substitute.For<IDialogService>();
             var actualBrowserService = Substitute.For<IBrowserService>();
             var actualKeyValueStorage = Substitute.For<IKeyValueStorage>();
+            var actualFeedbackService = Substitute.For<IFeedbackService>();
             var actualUserPreferences = Substitute.For<IUserPreferences>();
             var actualOnboardingStorage = Substitute.For<IOnboardingStorage>();
             var actualNavigationService = Substitute.For<IMvxNavigationService>();
             var actualApiErrorHandlingService = Substitute.For<IErrorHandlingService>();
             var actualAccessRestrictionStorage = Substitute.For<IAccessRestrictionStorage>();
+            var actualLastTimeUsageStorage = Substitute.For<ILastTimeUsageStorage>();
 
             Action tryingToConstructWithEmptyParameters = () =>
                 foundation.StartRegisteringPlatformServices()
                     .WithDialogService(actualDialogService)
                     .WithBrowserService(actualBrowserService)
+                    .WithFeedbackService(actualFeedbackService)
                     .WithKeyValueStorage(actualKeyValueStorage)
                     .WithUserPreferences(actualUserPreferences)
                     .WithOnboardingStorage(actualOnboardingStorage)
                     .WithNavigationService(actualNavigationService)
                     .WithErrorHandlingService(actualApiErrorHandlingService)
                     .WithAccessRestrictionStorage(actualAccessRestrictionStorage)
+                    .WithLastTimeUsageStorage(actualLastTimeUsageStorage)
                     .Build();
 
             tryingToConstructWithEmptyParameters.Should().NotThrow<Exception>();
@@ -149,11 +165,13 @@ namespace Toggl.Foundation.Tests.MvvmCross
                     .WithApiFactory(apiFactory)
                     .WithTimeService(timeService)
                     .WithMailService(mailService)
+                    .WithRatingService(ratingService)
                     .WithGoogleService(googleService)
                     .WithLicenseProvider(licenseProvider)
                     .WithAnalyticsService(analyticsService)
                     .WithBackgroundService(backgroundService)
                     .WithPlatformConstants(platformConstants)
+                    .WithRemoteConfigService(remoteConfigService)
                     .WithApplicationShortcutCreator(applicationShortcutCreator)
                     .WithSuggestionProviderContainer(suggestionProviderContainer)
                     .Build();

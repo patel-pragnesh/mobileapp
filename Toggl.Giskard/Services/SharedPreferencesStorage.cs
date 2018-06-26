@@ -20,6 +20,12 @@ namespace Toggl.Giskard.Services
         public string GetString(string key)
             => sharedPreferences.GetString(key, null);
 
+        public DateTimeOffset? GetDateTimeOffset(string key)
+        {
+            var serialized = GetString(key);
+            return DateTimeOffset.TryParse(serialized, out var parsed) ? parsed : (DateTimeOffset?)null;
+        }
+
         public void SetBool(string key, bool value)
         {
             var editor = sharedPreferences.Edit();
@@ -32,6 +38,21 @@ namespace Toggl.Giskard.Services
             var editor = sharedPreferences.Edit();
             editor.PutString(key, value);
             editor.Commit();
+        }
+
+        public void SetInt(string key, int value)
+        {
+            var editor = sharedPreferences.Edit();
+            editor.PutInt(key, value);
+            editor.Commit();
+        }
+
+        public int GetInt(string key, int defaultValue)
+        => sharedPreferences.GetInt(key, defaultValue);
+
+        public void SetDateTimeOffset(string key, DateTimeOffset value)
+        {
+            SetString(key, value.ToString());
         }
 
         public void Remove(string key)

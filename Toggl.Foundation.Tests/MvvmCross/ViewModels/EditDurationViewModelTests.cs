@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using FluentAssertions;
 using FsCheck.Xunit;
 using NSubstitute;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
@@ -18,21 +20,22 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class EditDurationViewModelTest : BaseViewModelTests<EditDurationViewModel>
         {
             protected override EditDurationViewModel CreateViewModel()
-                => new EditDurationViewModel(NavigationService, TimeService, DataSource);
+                => new EditDurationViewModel(NavigationService, TimeService, DataSource, AnalyticsService);
         }
 
         public sealed class TheConstructor : EditDurationViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(ThreeParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService, bool useDataSource)
+            [ClassData(typeof(FourParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService, bool useDataSource, bool useAnalyticsService)
             {
                 var navigationService = useNavigationService ? NavigationService : null;
                 var timeService = useTimeService ? TimeService : null;
                 var dataSource = useDataSource ? DataSource : null;
+                var analyticsService = useAnalyticsService ? AnalyticsService : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new EditDurationViewModel(navigationService, timeService, dataSource);
+                    () => new EditDurationViewModel(navigationService, timeService, dataSource, analyticsService);
 
                 tryingToConstructWithEmptyParameters.Should().Throw<ArgumentNullException>();
             }
@@ -185,6 +188,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task ClosesTheViewModel()
             {
+                var parameter = DurationParameter.WithStartAndDuration(DateTimeOffset.UtcNow, null);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
                 await ViewModel.CloseCommand.ExecuteAsync();
 
                 await NavigationService.Received().Close(Arg.Is(ViewModel), Arg.Any<DurationParameter>());
@@ -206,6 +212,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task ClosesTheViewModel()
             {
+                var parameter = DurationParameter.WithStartAndDuration(DateTimeOffset.UtcNow, null);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
                 await ViewModel.SaveCommand.ExecuteAsync();
 
                 await NavigationService.Received().Close(Arg.Is(ViewModel), Arg.Any<DurationParameter>());
@@ -591,8 +600,73 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ShouldBeSetProperly()
             {
-                ViewModel.Prepare(new EditDurationParameters(parameter, true));
+                ViewModel.Prepare(new EditDurationParameters(parameter, isStartingNewEntry: true, isDurationInitiallyFocused: true));
                 ViewModel.IsDurationInitiallyFocused.Should().Be(true);
+            }
+        }
+
+        public sealed class TheAnalyticsService : EditDurationViewModelTest
+        {
+            private static readonly DurationParameter parameter = DurationParameter.WithStartAndDuration(
+                new DateTimeOffset(2018, 01, 13, 0, 0, 0, TimeSpan.Zero),
+                TimeSpan.FromMinutes(7));
+
+            [Fact, LogIfTooSlow]
+            public void ReceivesEventWhenViewModelCloses()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
+                ViewModel.CloseCommand.Execute();
+
+                AnalyticsService.Received().Track(
+                    Arg.Is<ITrackableEvent>(trackableEvent =>
+                        trackableEvent.EventName == "EditDuration"
+                        && trackableEvent.ToDictionary().ContainsKey("navigationOrigin")
+                        && trackableEvent.ToDictionary().ContainsKey("result")
+                        && trackableEvent.ToDictionary()["navigationOrigin"] == EditDurationEvent.NavigationOrigin.Edit.ToString()
+                        && trackableEvent.ToDictionary()["result"] == EditDurationEvent.Result.Cancel.ToString()
+                    )
+                );
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ReceivesEventWhenViewModelSaves()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter, isStartingNewEntry: true));
+
+                ViewModel.SaveCommand.Execute();
+
+                AnalyticsService.Received().Track(
+                    Arg.Is<ITrackableEvent>(trackableEvent =>
+                        trackableEvent.EventName == "EditDuration"
+                        && trackableEvent.ToDictionary().ContainsKey("navigationOrigin")
+                        && trackableEvent.ToDictionary().ContainsKey("result")
+                        && trackableEvent.ToDictionary()["navigationOrigin"] == EditDurationEvent.NavigationOrigin.Start.ToString()
+                        && trackableEvent.ToDictionary()["result"] == EditDurationEvent.Result.Save.ToString()
+                    )
+                );
+            }
+
+            [Fact, LogIfTooSlow]
+            public void SetsCorrectParametersOnEdition()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
+                ViewModel.TimeEditedWithSource(EditTimeSource.WheelBothTimes);
+                ViewModel.TimeEditedWithSource(EditTimeSource.BarrelStartDate);
+                ViewModel.SaveCommand.Execute();
+
+                AnalyticsService.Received().Track(
+                    Arg.Is<ITrackableEvent>(trackableEvent =>
+                        trackableEvent.EventName == "EditDuration"
+                        && trackableEvent.ToDictionary().ContainsKey("changedBothTimesWithWheel")
+                        && trackableEvent.ToDictionary().ContainsKey("changedStartDateWithBarrel")
+                        && trackableEvent.ToDictionary().ContainsKey("changedEndDateWithBarrel")
+                        && trackableEvent.ToDictionary()["changedBothTimesWithWheel"] == true.ToString()
+                        && trackableEvent.ToDictionary()["changedStartDateWithBarrel"] == true.ToString()
+                        && trackableEvent.ToDictionary()["changedEndDateWithBarrel"] == false.ToString()
+                    )
+                );
             }
         }
     }

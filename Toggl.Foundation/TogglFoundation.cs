@@ -22,11 +22,13 @@ namespace Toggl.Foundation
         public IScheduler Scheduler { get; }
         public IMailService MailService { get; }
         public IGoogleService GoogleService { get; }
+        public IRatingService RatingService { get; }
         public ApiEnvironment ApiEnvironment { get; }
         public ILicenseProvider LicenseProvider { get; }
         public IAnalyticsService AnalyticsService { get; }
         public IBackgroundService BackgroundService { get; }
         public IPlatformConstants PlatformConstants { get; }
+        public IRemoteConfigService RemoteConfigService { get; }
         public IApplicationShortcutCreator ShortcutCreator { get; }
         public ISuggestionProviderContainer SuggestionProviderContainer { get; }
 
@@ -45,12 +47,14 @@ namespace Toggl.Foundation
             TimeService = builder.TimeService;
             MailService = builder.MailService;
             GoogleService = builder.GoogleService;
+            RatingService = builder.RatingService;
             ApiEnvironment = builder.ApiEnvironment;
             LicenseProvider = builder.LicenseProvider;
             ShortcutCreator = builder.ShortcutCreator;
             AnalyticsService = builder.AnalyticsService;
             PlatformConstants = builder.PlatformConstants;
             BackgroundService = builder.BackgroundService;
+            RemoteConfigService = builder.RemoteConfigService;
             SuggestionProviderContainer = builder.SuggestionProviderContainer;
         }
 
@@ -63,11 +67,13 @@ namespace Toggl.Foundation
             public ITimeService TimeService { get; internal set; }
             public IScheduler Scheduler { get; internal set; }
             public IMailService MailService { get; internal set; }
+            public IRatingService RatingService { get; internal set; }
             public IGoogleService GoogleService { get; internal set; }
             public ApiEnvironment ApiEnvironment { get; internal set; }
 
             public ILicenseProvider LicenseProvider { get; internal set; }
             public IAnalyticsService AnalyticsService { get; internal set; }
+            public IRemoteConfigService RemoteConfigService { get; internal set; }
             public IApplicationShortcutCreator ShortcutCreator { get; internal set; }
             public IBackgroundService BackgroundService { get; internal set; }
             public IPlatformConstants PlatformConstants { get; internal set; }
@@ -75,8 +81,6 @@ namespace Toggl.Foundation
 
             public Builder(UserAgent agent, Version version)
             {
-
-
                 UserAgent = agent;
                 Version = version;
             }
@@ -159,6 +163,18 @@ namespace Toggl.Foundation
                 return this;
             }
 
+            public Builder WithRemoteConfigService(IRemoteConfigService remoteConfigService)
+            {
+                RemoteConfigService = remoteConfigService;
+                return this;
+            }
+
+            public Builder WithRatingService(IRatingService ratingService)
+            {
+                RatingService = ratingService;
+                return this;
+            }
+
             public Builder WithDatabase<TDatabase>()
                 where TDatabase : ITogglDatabase, new()
                 => WithDatabase(new TDatabase());
@@ -203,6 +219,14 @@ namespace Toggl.Foundation
                 where TSuggestionProviderContainer : ISuggestionProviderContainer, new()
                 => WithSuggestionProviderContainer(new TSuggestionProviderContainer());
 
+            public Builder WithRemoteConfigService<TRemoteConfigService>()
+                where TRemoteConfigService : IRemoteConfigService, new()
+                => WithRemoteConfigService(new TRemoteConfigService());
+
+            public Builder WithRatingService<TRatingService>()
+                where TRatingService : IRatingService, new()
+                => WithRatingService(new TRatingService());
+
             public TogglFoundation Build()
                 => new TogglFoundation(this);
 
@@ -216,11 +240,13 @@ namespace Toggl.Foundation
                 Ensure.Argument.IsNotNull(TimeService, nameof(TimeService));
                 Ensure.Argument.IsNotNull(MailService, nameof(MailService));
                 Ensure.Argument.IsNotNull(GoogleService, nameof(GoogleService));
+                Ensure.Argument.IsNotNull(RatingService, nameof(RatingService));
                 Ensure.Argument.IsNotNull(LicenseProvider, nameof(LicenseProvider));
                 Ensure.Argument.IsNotNull(ShortcutCreator, nameof(ShortcutCreator));
                 Ensure.Argument.IsNotNull(AnalyticsService, nameof(AnalyticsService));
                 Ensure.Argument.IsNotNull(BackgroundService, nameof(BackgroundService));
                 Ensure.Argument.IsNotNull(PlatformConstants, nameof(PlatformConstants));
+                Ensure.Argument.IsNotNull(RemoteConfigService, nameof(RemoteConfigService));
                 Ensure.Argument.IsNotNull(SuggestionProviderContainer, nameof(SuggestionProviderContainer));
             }
         }

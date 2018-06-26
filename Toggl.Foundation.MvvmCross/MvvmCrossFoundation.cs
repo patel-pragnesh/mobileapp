@@ -25,11 +25,13 @@ namespace Toggl.Foundation.MvvmCross
         public IScheduler Scheduler { get; }
         public IMailService MailService { get; }
         public IGoogleService GoogleService { get; }
+        public IRatingService RatingService { get; }
         public ApiEnvironment ApiEnvironment { get; }
         public ILicenseProvider LicenseProvider { get; }
         public IAnalyticsService AnalyticsService { get; }
         public IBackgroundService BackgroundService { get; }
         public IPlatformConstants PlatformConstants { get; }
+        public IRemoteConfigService RemoteConfigService { get; }
         public IApplicationShortcutCreator ShortcutCreator { get; }
         public ISuggestionProviderContainer SuggestionProviderContainer { get; }
 
@@ -37,11 +39,13 @@ namespace Toggl.Foundation.MvvmCross
         public IBrowserService BrowserService { get; }
         public IKeyValueStorage KeyValueStorage { get; }
         public IUserPreferences UserPreferences { get; }
+        public IFeedbackService FeedbackService { get; }
         public IOnboardingStorage OnboardingStorage { get; }
         public IMvxNavigationService NavigationService { get; }
         public IPasswordManagerService PasswordManagerService { get; }
         public IErrorHandlingService ErrorHandlingService { get; }
         public IAccessRestrictionStorage AccessRestrictionStorage { get; }
+        public ILastTimeUsageStorage LastTimeUsageStorage { get; }
 
         private MvvmCrossFoundation(Builder builder)
         {
@@ -51,11 +55,13 @@ namespace Toggl.Foundation.MvvmCross
             BrowserService = builder.BrowserService;
             KeyValueStorage = builder.KeyValueStorage;
             UserPreferences = builder.UserPreferences;
+            FeedbackService = builder.FeedbackService;
             OnboardingStorage = builder.OnboardingStorage;
             NavigationService = builder.NavigationService;
             PasswordManagerService = builder.PasswordManagerService;
             ErrorHandlingService = builder.ErrorHandlingService;
             AccessRestrictionStorage = builder.AccessRestrictionStorage;
+            LastTimeUsageStorage = builder.LastTimeUsageStorage;
 
             Version = builder.Foundation.Version;
             Database = builder.Foundation.Database;
@@ -64,6 +70,7 @@ namespace Toggl.Foundation.MvvmCross
             ApiFactory = builder.Foundation.ApiFactory;
             TimeService = builder.Foundation.TimeService;
             MailService = builder.Foundation.MailService;
+            RatingService = builder.Foundation.RatingService;
             GoogleService = builder.Foundation.GoogleService;
             ApiEnvironment = builder.Foundation.ApiEnvironment;
             LicenseProvider = builder.Foundation.LicenseProvider;
@@ -71,6 +78,7 @@ namespace Toggl.Foundation.MvvmCross
             AnalyticsService = builder.Foundation.AnalyticsService;
             PlatformConstants = builder.Foundation.PlatformConstants;
             BackgroundService = builder.Foundation.BackgroundService;
+            RemoteConfigService = builder.Foundation.RemoteConfigService;
             SuggestionProviderContainer = builder.Foundation.SuggestionProviderContainer;
         }
 
@@ -81,11 +89,13 @@ namespace Toggl.Foundation.MvvmCross
             public IBrowserService BrowserService { get; private set; }
             public IKeyValueStorage KeyValueStorage { get; private set; }
             public IUserPreferences UserPreferences { get; private set; }
+            public IFeedbackService FeedbackService { get; private set; }
             public IOnboardingStorage OnboardingStorage { get; private set; }
             public IMvxNavigationService NavigationService { get; private set; }
             public IPasswordManagerService PasswordManagerService { get; private set; }
             public IErrorHandlingService ErrorHandlingService { get; private set; }
             public IAccessRestrictionStorage AccessRestrictionStorage { get; private set; }
+            public ILastTimeUsageStorage LastTimeUsageStorage { get; private set; }
 
             public Builder(TogglFoundation foundation)
             {
@@ -118,6 +128,12 @@ namespace Toggl.Foundation.MvvmCross
                 return this;
             }
 
+            public Builder WithLastTimeUsageStorage(ILastTimeUsageStorage lastTimeUsageStorage)
+            {
+                LastTimeUsageStorage = lastTimeUsageStorage;
+                return this;
+            }
+
             public Builder WithUserPreferences(IUserPreferences userPreferences)
             {
                 UserPreferences = userPreferences;
@@ -145,6 +161,12 @@ namespace Toggl.Foundation.MvvmCross
             public Builder WithErrorHandlingService(IErrorHandlingService errorHandlingService)
             {
                 ErrorHandlingService = errorHandlingService;
+                return this;
+            }
+
+            public Builder WithFeedbackService(IFeedbackService feedbackService)
+            {
+                FeedbackService = feedbackService;
                 return this;
             }
 
@@ -184,6 +206,10 @@ namespace Toggl.Foundation.MvvmCross
                 where TErrorHandlingService : IErrorHandlingService, new()
                 => WithErrorHandlingService(new TErrorHandlingService());
 
+            public Builder WithFeedbackService<TFeedbackService>()
+                where TFeedbackService : IFeedbackService, new()
+                => WithFeedbackService(new TFeedbackService());
+
             public MvvmCrossFoundation Build()
                 => new MvvmCrossFoundation(this);
 
@@ -193,10 +219,12 @@ namespace Toggl.Foundation.MvvmCross
                 Ensure.Argument.IsNotNull(BrowserService, nameof(BrowserService));
                 Ensure.Argument.IsNotNull(KeyValueStorage, nameof(KeyValueStorage));
                 Ensure.Argument.IsNotNull(UserPreferences, nameof(UserPreferences));
+                Ensure.Argument.IsNotNull(FeedbackService, nameof(FeedbackService));
                 Ensure.Argument.IsNotNull(OnboardingStorage, nameof(OnboardingStorage));
                 Ensure.Argument.IsNotNull(NavigationService, nameof(NavigationService));
                 Ensure.Argument.IsNotNull(ErrorHandlingService, nameof(ErrorHandlingService));
                 Ensure.Argument.IsNotNull(AccessRestrictionStorage, nameof(AccessRestrictionStorage));
+                Ensure.Argument.IsNotNull(LastTimeUsageStorage, nameof(LastTimeUsageStorage));
             }
         }
     }
