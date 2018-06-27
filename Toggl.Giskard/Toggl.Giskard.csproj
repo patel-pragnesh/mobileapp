@@ -800,6 +800,7 @@
     <AndroidResource Include="Resources\layout\TooltipWithLeftTopArrow.axml" />
     <AndroidResource Include="Resources\layout\TooltipWithRightTopArrow.axml" />
     <AndroidResource Include="Resources\layout\TooltipWithRightBottomArrow.axml" />
+    <AndroidResource Include="Resources\layout\TooltipWithRightArrow.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">
