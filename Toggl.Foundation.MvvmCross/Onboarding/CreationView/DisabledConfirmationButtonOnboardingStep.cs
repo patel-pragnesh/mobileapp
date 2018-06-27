@@ -4,7 +4,7 @@ using Toggl.Multivac;
 using Toggl.PrimeRadiant.Onboarding;
 using Toggl.PrimeRadiant.Settings;
 
-namespace Toggl.Daneel.Onboarding.CreationView
+namespace Toggl.Foundation.MvvmCross.Onboarding.CreationView
 {
     public sealed class DisabledConfirmationButtonOnboardingStep : IOnboardingStep
     {

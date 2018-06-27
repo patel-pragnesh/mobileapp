@@ -15,12 +15,12 @@ using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Combiners;
 using Toggl.Daneel.Extensions;
-using Toggl.Daneel.Onboarding.MainView;
 using Toggl.Daneel.Suggestions;
 using Toggl.Daneel.Views;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Extensions;
@@ -88,7 +88,7 @@ namespace Toggl.Daneel.ViewControllers
         private readonly UIView tableHeader = new UIView();
         private readonly UIView suggestionsContaier = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
         private readonly UIView ratingViewContainer = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
-        private readonly SuggestionsView suggestionsView = new SuggestionsView{ TranslatesAutoresizingMaskIntoConstraints = false };
+        private readonly SuggestionsView suggestionsView = new SuggestionsView { TranslatesAutoresizingMaskIntoConstraints = false };
 
         public MainViewController()
             : base(nameof(MainViewController), null)
@@ -539,7 +539,11 @@ namespace Toggl.Daneel.ViewControllers
 
             timeEntriesCountDisposable = ViewModel.WeakSubscribe(() => ViewModel.TimeEntriesCount, onTimeEntriesCountChanged);
 
-            var swipeRightCanBeShown = tapToEditStepIsVisible.Select(isVisible => !isVisible);
+            var swipeRightCanBeShown =
+                UIDevice.CurrentDevice.CheckSystemVersion(11, 0)
+                    ? tapToEditStepIsVisible.Select(isVisible => !isVisible)
+                    : Observable.Return(false);
+
             swipeRightStep = new SwipeRightOnboardingStep(swipeRightCanBeShown, timeEntriesCountSubject.AsObservable())
                 .ToDismissable(nameof(SwipeRightOnboardingStep), storage);
 

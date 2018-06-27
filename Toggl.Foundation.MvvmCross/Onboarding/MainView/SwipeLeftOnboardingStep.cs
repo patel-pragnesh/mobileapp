@@ -4,7 +4,7 @@ using Toggl.Multivac;
 using Toggl.PrimeRadiant.Onboarding;
 using Toggl.Multivac.Extensions;
 
-namespace Toggl.Daneel.Onboarding.MainView
+namespace Toggl.Foundation.MvvmCross.Onboarding.MainView
 {
     public sealed class SwipeLeftOnboardingStep : IOnboardingStep
     {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props" Condition="Exists('..\packages\Xamarin.Build.Download.0.4.11\build\Xamarin.Build.Download.props')" />
   <PropertyGroup>
@@ -951,14 +951,6 @@
     <Compile Include="ViewSources\LicensesTableViewSource.cs" />
     <Compile Include="Binding\ViewVisibilityWithFadeTargetBinding.cs" />
     <Compile Include="Binding\ImageViewAnimatedImageTargetBinding.cs" />
-    <Compile Include="Onboarding\MainView\StartTimeEntryOnboardingStep.cs" />
-    <Compile Include="Onboarding\MainView\EditTimeEntryOnboardingStep.cs" />
-    <Compile Include="Onboarding\StartTimeEntryView\AddProjectOrTagOnboardingStep.cs" />
-    <Compile Include="Onboarding\MainView\StopTimeEntryOnboardingStep.cs" />
-    <Compile Include="Onboarding\CreationView\DisabledConfirmationButtonOnboardingStep.cs" />
-    <Compile Include="Onboarding\MainView\SwipeLeftOnboardingStep.cs" />
-    <Compile Include="Onboarding\MainView\SwipeRightOnboardingStep.cs" />
-    <Compile Include="Onboarding\EditView\CategorizeTimeUsingProjectsOnboardingStep.cs" />
     <Compile Include="Extensions\TimeEntriesLogViewCellExtensions.cs" />
     <Compile Include="ViewControllers\SelectCountryViewController.cs" />
     <Compile Include="ViewControllers\SelectCountryViewController.designer.cs">

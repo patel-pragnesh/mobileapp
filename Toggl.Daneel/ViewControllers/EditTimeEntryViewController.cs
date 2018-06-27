@@ -1,28 +1,27 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CoreGraphics;
+using Foundation;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.iOS.Views;
+using MvvmCross.Platform.WeakSubscription;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Combiners;
 using Toggl.Daneel.Extensions;
 using Toggl.Daneel.Presentation.Attributes;
+using Toggl.Daneel.Presentation.Transition;
 using Toggl.Foundation;
-using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Combiners;
+using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Onboarding.EditView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
-using Toggl.Daneel.Presentation.Transition;
-using System.Reactive.Subjects;
-using System.ComponentModel;
-using MvvmCross.Platform.WeakSubscription;
-using System.Reactive.Linq;
-using Toggl.Daneel.Onboarding.EditView;
-using Toggl.PrimeRadiant.Extensions;
-using Foundation;
 
 namespace Toggl.Daneel.ViewControllers
 {
