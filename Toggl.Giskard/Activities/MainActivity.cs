@@ -67,6 +67,9 @@ namespace Toggl.Giskard.Activities
 
             if (!disposing) return;
 
+            disposeBag?.Dispose();
+            disposeBag = null;
+        }
         }
 
         private void onSyncChanged(object sender, PropertyChangedEventArgs args)
