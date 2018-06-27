@@ -29,7 +29,7 @@ namespace Toggl.Giskard.Activities
     {
         private const int snackbarDuration = 5000;
 
-        private IDisposable disposable;
+        private CompositeDisposable disposeBag;
         private View runningEntryCardFrame;
         private FloatingActionButton playButton;
         private FloatingActionButton stopButton;
@@ -55,12 +55,10 @@ namespace Toggl.Giskard.Activities
             stopButton = FindViewById<FloatingActionButton>(Resource.Id.MainStopButton);
             coordinatorLayout = FindViewById<CoordinatorLayout>(Resource.Id.MainCoordinatorLayout);
 
-            var disposeBag = new CompositeDisposable();
+            disposeBag = new CompositeDisposable();
 
             disposeBag.Add(ViewModel.TimeEntryCardVisibility.Subscribe(onTimeEntryCardVisibilityChanged));
             disposeBag.Add(ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.SyncingProgress), onSyncChanged));
-
-            disposable = disposeBag;
         }
 
         protected override void Dispose(bool disposing)
@@ -69,8 +67,6 @@ namespace Toggl.Giskard.Activities
 
             if (!disposing) return;
 
-            disposable?.Dispose();
-            disposable = null;
         }
 
         private void onSyncChanged(object sender, PropertyChangedEventArgs args)
