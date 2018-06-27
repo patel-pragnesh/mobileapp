@@ -7,17 +7,20 @@ using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
+using Android.Support.V4.Widget;
 using Android.Views;
+using Android.Widget;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using MvvmCross.Platform.WeakSubscription;
+using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using Toggl.Giskard.Extensions;
 using static Toggl.Foundation.Sync.SyncProgress;
 using static Toggl.Giskard.Extensions.CircularRevealAnimation.AnimationType;
 using FoundationResources = Toggl.Foundation.Resources;
+using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Toggl.Giskard.Activities
 {
@@ -34,6 +37,7 @@ namespace Toggl.Giskard.Activities
         private FloatingActionButton playButton;
         private FloatingActionButton stopButton;
         private CoordinatorLayout coordinatorLayout;
+        private PopupWindow playButtonTooltiPopupWindow;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -70,6 +74,36 @@ namespace Toggl.Giskard.Activities
             disposeBag?.Dispose();
             disposeBag = null;
         }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            var storage = ViewModel.OnboardingStorage;
+            if (playButtonTooltiPopupWindow == null)
+            {
+                playButtonTooltiPopupWindow = createPlayButtonTooltiPopupWindow();
+            }
+
+            new StartTimeEntryOnboardingStep(storage)
+                .ManageDismissableTooltip(playButtonTooltiPopupWindow, playButton, createPlayButtonTooltipPopupOffsets, storage)
+                .DisposedBy(disposeBag);
+        }
+
+        private PopupOffsets createPlayButtonTooltipPopupOffsets(PopupWindow window, View view)
+        {
+            var horizontalOffset = -(window.ContentView.MeasuredWidth + 8.DpToPixels(this));
+            var verticalOffset = -window.ContentView.MeasuredHeight;
+            return new PopupOffsets(horizontalOffset, verticalOffset);
+        }
+
+        private PopupWindow createPlayButtonTooltiPopupWindow()
+        {
+            var popupWindow = new PopupWindow(this);
+            var popupWindowContentView = LayoutInflater.From(this).Inflate(Resource.Layout.TooltipWithRightArrow, null, false);
+            popupWindowContentView.FindViewById<TextView>(Resource.Id.TooltipText).Text = GetString(Resource.String.OnboardingTapToStartTimer);
+            popupWindow.ContentView = popupWindowContentView;
+            popupWindow.SetBackgroundDrawable(null);
+            return popupWindow;
         }
 
         private void onSyncChanged(object sender, PropertyChangedEventArgs args)
