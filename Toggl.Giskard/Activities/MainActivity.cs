@@ -37,7 +37,7 @@ namespace Toggl.Giskard.Activities
         private FloatingActionButton playButton;
         private FloatingActionButton stopButton;
         private CoordinatorLayout coordinatorLayout;
-        private PopupWindow playButtonTooltiPopupWindow;
+        private PopupWindow playButtonTooltipPopupWindow;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -79,13 +79,13 @@ namespace Toggl.Giskard.Activities
         {
             base.OnResume();
             var storage = ViewModel.OnboardingStorage;
-            if (playButtonTooltiPopupWindow == null)
+            if (playButtonTooltipPopupWindow == null)
             {
-                playButtonTooltiPopupWindow = createPlayButtonTooltiPopupWindow();
+                playButtonTooltipPopupWindow = createPlayButtonTooltiPopupWindow();
             }
 
             new StartTimeEntryOnboardingStep(storage)
-                .ManageDismissableTooltip(playButtonTooltiPopupWindow, playButton, createPlayButtonTooltipPopupOffsets, storage)
+                .ManageDismissableTooltip(playButtonTooltipPopupWindow, playButton, createPlayButtonTooltipPopupOffsets, storage)
                 .DisposedBy(disposeBag);
         }
 
