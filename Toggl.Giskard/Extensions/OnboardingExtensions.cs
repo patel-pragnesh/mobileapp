@@ -17,7 +17,7 @@ namespace Toggl.Giskard.Extensions
             {
                 if (popupWindow == null || anchor == null) return;
 
-                if (!shouldBeVisible)
+                if (shouldBeVisible)
                 {
                     anchor.PostDelayed(() =>
                     {
