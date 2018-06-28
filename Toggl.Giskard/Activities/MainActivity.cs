@@ -81,7 +81,7 @@ namespace Toggl.Giskard.Activities
             var storage = ViewModel.OnboardingStorage;
             if (playButtonTooltipPopupWindow == null)
             {
-                playButtonTooltipPopupWindow = createPlayButtonTooltiPopupWindow();
+                playButtonTooltipPopupWindow = createPlayButtonTooltipPopupWindow();
             }
 
             new StartTimeEntryOnboardingStep(storage)
@@ -96,7 +96,7 @@ namespace Toggl.Giskard.Activities
             return new PopupOffsets(horizontalOffset, verticalOffset);
         }
 
-        private PopupWindow createPlayButtonTooltiPopupWindow()
+        private PopupWindow createPlayButtonTooltipPopupWindow()
         {
             var popupWindow = new PopupWindow(this);
             var popupWindowContentView = LayoutInflater.From(this).Inflate(Resource.Layout.TooltipWithRightArrow, null, false);
