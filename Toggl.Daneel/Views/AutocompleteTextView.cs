@@ -15,10 +15,13 @@ namespace Toggl.Daneel.Views
             get => base.AttributedText;
             set
             {
+                InputDelegate = inputDelegate;
                 base.AttributedText = value;
                 AutocompleteTextViewInfoDelegate.Changed(this);
             }
         }
+
+        private AutocompleteTextViewInputDelegate inputDelegate = new AutocompleteTextViewInputDelegate();
 
         public AutocompleteTextView(IntPtr handle) : base(handle)
         {
@@ -38,6 +41,25 @@ namespace Toggl.Daneel.Views
             if (!disposing) return;
 
             Delegate = null;
+        }
+    }
+
+    class AutocompleteTextViewInputDelegate : NSObject, IUITextInputDelegate
+    {
+        public void SelectionDidChange(IUITextInput uiTextInput)
+        {
+        }
+
+        public void SelectionWillChange(IUITextInput uiTextInput)
+        {
+        }
+
+        public void TextDidChange(IUITextInput textInput)
+        {
+        }
+
+        public void TextWillChange(IUITextInput textInput)
+        {
         }
     }
 }
