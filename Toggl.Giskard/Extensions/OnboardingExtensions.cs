@@ -50,16 +50,4 @@ namespace Toggl.Giskard.Extensions
             return dismissableStep.ManageVisibilityOf(tooltip, anchor, popupOffsetsGenerator);
         }
     }
-
-    public class PopupOffsets
-    {
-        public int HorizontalOffset { get; }
-        public int VerticalOffset { get; }
-
-        public PopupOffsets(int horizontalOffset, int verticalOffset)
-        {
-            HorizontalOffset = horizontalOffset;
-            VerticalOffset = verticalOffset;
-        }
-    }
 }
