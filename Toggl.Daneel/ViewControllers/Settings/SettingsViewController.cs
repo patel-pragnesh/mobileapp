@@ -63,7 +63,7 @@ namespace Toggl.Daneel.ViewControllers
             UIApplication.Notifications
                 .ObserveWillEnterForeground((sender, e) => startAnimations())
                 .DisposedBy(DisposeBag);
-
+            
             ExportFirebaseTokenView.AddGestureRecognizer(new UITapGestureRecognizer(() =>
             {
                 var token = Firebase.InstanceID.InstanceId.SharedInstance.Token;

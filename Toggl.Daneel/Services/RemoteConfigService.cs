@@ -14,7 +14,8 @@ namespace Toggl.Daneel.Services
             => Observable.Create<RatingViewConfiguration>( observer =>
             {
                 var remoteConfig = RemoteConfig.SharedInstance;
-                remoteConfig.Fetch((status, error) =>
+                remoteConfig.ConfigSettings = new RemoteConfigSettings(true);
+                remoteConfig.Fetch(0, (status, error) =>
                 {
                     if (error != null)
                         observer.OnError(
