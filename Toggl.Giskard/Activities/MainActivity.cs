@@ -63,6 +63,8 @@ namespace Toggl.Giskard.Activities
 
             disposeBag.Add(ViewModel.TimeEntryCardVisibility.Subscribe(onTimeEntryCardVisibilityChanged));
             disposeBag.Add(ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.SyncingProgress), onSyncChanged));
+
+            setupStartTimeEntryOnboardingStep();
         }
 
         protected override void Dispose(bool disposing)
@@ -73,20 +75,6 @@ namespace Toggl.Giskard.Activities
 
             disposeBag?.Dispose();
             disposeBag = null;
-        }
-
-        protected override void OnResume()
-        {
-            base.OnResume();
-            var storage = ViewModel.OnboardingStorage;
-            if (playButtonTooltipPopupWindow == null)
-            {
-                playButtonTooltipPopupWindow = createPlayButtonTooltipPopupWindow();
-            }
-
-            new StartTimeEntryOnboardingStep(storage)
-                .ManageDismissableTooltip(playButtonTooltipPopupWindow, playButton, createPlayButtonTooltipPopupOffsets, storage)
-                .DisposedBy(disposeBag);
         }
 
         private PopupOffsets createPlayButtonTooltipPopupOffsets(PopupWindow window, View view)
@@ -164,6 +152,20 @@ namespace Toggl.Giskard.Activities
                     .OnAnimationEnd(_ => playButton.Show())
                     .Start();
             }
+        }
+
+        private void setupStartTimeEntryOnboardingStep()
+        {
+            if (playButtonTooltipPopupWindow == null)
+            {
+                playButtonTooltipPopupWindow = createPlayButtonTooltipPopupWindow();
+            }
+
+            var storage = ViewModel.OnboardingStorage;
+
+            new StartTimeEntryOnboardingStep(storage)
+                .ManageDismissableTooltip(playButtonTooltipPopupWindow, playButton, createPlayButtonTooltipPopupOffsets, storage)
+                .DisposedBy(disposeBag);
         }
 
         private sealed class FabAsyncHideListener : FloatingActionButton.OnVisibilityChangedListener
