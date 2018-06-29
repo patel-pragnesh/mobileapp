@@ -1,15 +1,9 @@
-﻿using System.Linq;
-using Android.Content;
+﻿using Android.Content;
 using Android.Graphics;
-using Android.Graphics.Drawables;
-using Android.Support.V4.Content;
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
-using Android.Text;
 using Android.Views;
-using Toggl.Giskard.Extensions;
 using static Android.Support.V7.Widget.RecyclerView;
-using static Toggl.Foundation.Resources;
 
 namespace Toggl.Giskard.Views
 {
