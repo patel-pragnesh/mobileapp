@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Firebase.RemoteConfig;
+using MvvmCross.Platform;
 using Toggl.Foundation.Exceptions;
+using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;
 
@@ -28,6 +31,7 @@ namespace Toggl.Daneel.Services
                     );
                     observer.OnNext(configuration);
                     observer.OnCompleted();
+                    showAlert(configuration);
                 });
                 return Disposable.Empty;
             });
@@ -45,6 +49,17 @@ namespace Toggl.Daneel.Services
                 default:
                     return RatingViewCriterion.None;
             }
+        }
+
+        private void showAlert(RatingViewConfiguration configuration)
+        {
+            var dialogService = Mvx.Resolve<IDialogService>();
+            dialogService
+                .Alert(
+                    "Got remote config!",
+                    $"Day count: {configuration.DayCount}, criterion: {configuration.Criterion.ToString()}",
+                    "Fo shizzle, ma nizzle")
+                .Subscribe((Unit _) => { });
         }
     }
 }
