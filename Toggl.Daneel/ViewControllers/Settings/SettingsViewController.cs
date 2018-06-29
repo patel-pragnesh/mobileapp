@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Reactive;
+using Foundation;
 using MvvmCross.iOS.Views.Presenters.Attributes;
+using MvvmCross.Platform;
 using MvvmCross.Plugins.Color.iOS;
 using Toggl.Daneel.Extensions;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using UIKit;
@@ -59,6 +63,19 @@ namespace Toggl.Daneel.ViewControllers
             UIApplication.Notifications
                 .ObserveWillEnterForeground((sender, e) => startAnimations())
                 .DisposedBy(DisposeBag);
+
+            ExportFirebaseTokenView.AddGestureRecognizer(new UITapGestureRecognizer(() =>
+            {
+                var token = Firebase.InstanceID.InstanceId.SharedInstance.Token;
+                if (string.IsNullOrEmpty(token))
+                {
+                    var dialogService = Mvx.Resolve<IDialogService>();
+                    dialogService.Alert("Sorry :(", "Failed to get the token", "Fine, i guess").Subscribe((Unit _) => { });
+                    return;
+                }
+                var shareActionSheet = new UIActivityViewController(new NSObject[] { new NSString(token) }, null);
+                NavigationController.PresentViewController(shareActionSheet, true, null);
+            }));
         }
 
         public override void ViewWillAppear(bool animated)

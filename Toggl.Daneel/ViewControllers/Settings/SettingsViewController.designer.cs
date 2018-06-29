@@ -40,6 +40,9 @@ namespace Toggl.Daneel.ViewControllers
 		UIKit.UIView EmailView { get; set; }
 
 		[Outlet]
+		UIKit.UIView ExportFirebaseTokenView { get; set; }
+
+		[Outlet]
 		UIKit.UIView FeedbackView { get; set; }
 
 		[Outlet]
@@ -175,6 +178,11 @@ namespace Toggl.Daneel.ViewControllers
 				FormatSettingsTitle = null;
 			}
 
+			if (HelpView != null) {
+				HelpView.Dispose ();
+				HelpView = null;
+			}
+
 			if (LoggingOutActivityIndicatorView != null) {
 				LoggingOutActivityIndicatorView.Dispose ();
 				LoggingOutActivityIndicatorView = null;
@@ -245,11 +253,6 @@ namespace Toggl.Daneel.ViewControllers
 				SyncingActivityIndicatorView = null;
 			}
 
-			if (HelpView != null) {
-				HelpView.Dispose ();
-				HelpView = null;
-			}
-
 			if (SyncingIndicator != null) {
 				SyncingIndicator.Dispose ();
 				SyncingIndicator = null;
@@ -268,6 +271,11 @@ namespace Toggl.Daneel.ViewControllers
 			if (TopConstraint != null) {
 				TopConstraint.Dispose ();
 				TopConstraint = null;
+			}
+
+			if (ExportFirebaseTokenView != null) {
+				ExportFirebaseTokenView.Dispose ();
+				ExportFirebaseTokenView = null;
 			}
 
 			if (TwentyFourHourClockSwitch != null) {
