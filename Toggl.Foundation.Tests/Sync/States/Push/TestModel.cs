@@ -17,12 +17,48 @@ namespace Toggl.Foundation.Tests.Sync.States
     {
     }
 
+    public interface IThreadSafeWorkspaceTestModel : IThreadSafeTestModel, IThreadSafeWorkspace
+    {
+    }
+
+    public interface IThreadSafeUserTestModel : IThreadSafeTestModel, IThreadSafeUser
+    {
+    }
+
+    public interface IThreadSafeWorkspaceFeatureTestModel : IThreadSafeTestModel, IThreadSafeWorkspaceFeature
+    {
+    }
+
+    public interface IThreadSafePreferencesTestModel : IThreadSafeTestModel, IThreadSafePreferences
+    {
+    }
+
+    public interface IThreadSafeTagTestModel : IThreadSafeTestModel, IThreadSafeTag
+    {
+    }
+
+    public interface IThreadSafeClientTestModel : IThreadSafeTestModel, IThreadSafeClient
+    {
+    }
+
+    public interface IThreadSafeProjectTestModel : IThreadSafeTestModel, IThreadSafeProject
+    {
+    }
+
+    public interface IThreadSafeTaskTestModel : IThreadSafeTestModel, IThreadSafeTask
+    {
+    }
+
+    public interface IThreadSafeTimeEntryTestModel : IThreadSafeTestModel, IThreadSafeTimeEntry
+    {
+    }
+
     public sealed class TestModel : IThreadSafeTestModel
     {
         public long Id { get; set; }
-        
+
         public DateTimeOffset At { get; set; }
-        
+
         public DateTimeOffset? ServerDeletedAt { get; set; }
 
         public SyncStatus SyncStatus { get; set; }

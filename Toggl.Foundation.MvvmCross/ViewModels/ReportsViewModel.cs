@@ -20,6 +20,7 @@ using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Foundation.Reports;
 using Toggl.Multivac;
+using static Toggl.Multivac.Extensions.EnumerableExtensions;
 
 [assembly: MvxNavigation(typeof(ReportsViewModel), ApplicationUrls.Reports)]
 namespace Toggl.Foundation.MvvmCross.ViewModels
@@ -73,7 +74,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public IReadOnlyList<ChartSegment> GroupedSegments
             => groupedSegments ?? (groupedSegments = groupSegments());
 
-        public bool ShowEmptyState => !segments.Any() && !IsLoading;
+        public bool ShowEmptyState => segments.None() && !IsLoading;
 
         public string CurrentDateRangeString { get; private set; }
 

@@ -67,7 +67,7 @@ namespace Toggl.Foundation.DataSources
                     .Merge(Updated.Select(tuple => tuple.Entity))
                     .Merge(Created)
                     .SelectMany(_ => GetAll(te => te.IsDeleted == false))
-                    .Select(timeEntries => !timeEntries.Any());
+                    .Select(timeEntries => timeEntries.None());
 
             RivalsResolver = new TimeEntryRivalsResolver(timeService);
 

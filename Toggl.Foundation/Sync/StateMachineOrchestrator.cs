@@ -59,7 +59,9 @@ namespace Toggl.Foundation.Sync
                 completeCurrentSync(new Success(State));
 
             if (@event is StateMachineError error)
+            {
                 completeCurrentSync(new Error(error.Exception));
+            }
         }
 
         private void completeCurrentSync(SyncResult result)

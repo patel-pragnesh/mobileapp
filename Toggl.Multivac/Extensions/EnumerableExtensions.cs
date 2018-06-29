@@ -39,7 +39,7 @@ namespace Toggl.Multivac.Extensions
         {
             Ensure.Argument.IsNotNull(collection, nameof(collection));
 
-            if (!collection.Any())
+            if (collection.None())
                 throw new InvalidOperationException("The collection is empty");
 
             var maxItem = collection.First();

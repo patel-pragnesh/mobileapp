@@ -69,7 +69,7 @@ namespace Toggl.Foundation.Sync.States.Pull
 
         private Func<IList<IThreadSafeProject>, IEnumerable<IThreadSafeProject>> projectsWhichWereNotFetched(IEnumerable<IThreadSafeProject> searchedProjects)
             => foundProjects => searchedProjects.Where(
-                searchedProject => !foundProjects.Any(foundProject => foundProject.Id == searchedProject.Id));
+                searchedProject => foundProjects.None(foundProject => foundProject.Id == searchedProject.Id));
 
         private IObservable<IThreadSafeProject> updateAtValue(IThreadSafeProject project)
         {

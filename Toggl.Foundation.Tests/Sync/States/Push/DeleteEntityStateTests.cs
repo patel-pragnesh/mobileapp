@@ -3,22 +3,36 @@ using System.Reactive;
 using System.Reactive.Linq;
 using FluentAssertions;
 using NSubstitute;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources.Interfaces;
+using Toggl.Foundation.Extensions;
+using Toggl.Foundation.Sync;
 using Toggl.Foundation.Sync.States.Push;
 using Toggl.Foundation.Tests.Sync.States.Push.BaseStates;
 using Toggl.PrimeRadiant;
 using Toggl.Ultrawave.ApiClients.Interfaces;
 using Xunit;
+using static Toggl.Foundation.Sync.PushSyncOperation;
 
 namespace Toggl.Foundation.Tests.Sync.States.Push
 {
     public sealed class DeleteEntityStateTests : BasePushEntityStateTests
     {
+        private readonly ITestAnalyticsService analyticsService 
+            = Substitute.For<ITestAnalyticsService>();
+
         private readonly IDeletingApiClient<ITestModel> api
             = Substitute.For<IDeletingApiClient<ITestModel>>();
 
         private readonly IDataSource<IThreadSafeTestModel, IDatabaseTestModel> dataSource
             = Substitute.For<IDataSource<IThreadSafeTestModel, IDatabaseTestModel>>();
+
+        protected override PushSyncOperation Operation => PushSyncOperation.Delete;
+
+        public DeleteEntityStateTests()
+        {
+            SyncAnalyticsExtensions.SearchStrategy = TestSyncAnalyticsExtensionsSearchStrategy;
+        }
 
         [Fact, LogIfTooSlow]
         public void ReturnsSuccessfulTransitionWhenEverythingWorks()
@@ -79,8 +93,69 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             calledDelete.Should().BeTrue();
         }
 
+        [Fact, LogIfTooSlow]
+        public void TracksEntitySyncStatusInCaseOfSuccess()
+        {
+            var state = CreateState();
+            var entity = new TestModel(-1, SyncStatus.SyncFailed);
+            api.Delete(entity)
+                .Returns(Observable.Return(Unit.Default));
+
+            state.Start(entity).Wait();
+
+            analyticsService.EntitySyncStatus.Received().Track(
+                entity.GetSafeTypeName(),
+                $"{Delete}:{Resources.Success}");
+        }
+
+        [Fact, LogIfTooSlow]
+        public void TracksEntitySyncedInCaseOfSuccess()
+        {
+            var state = CreateState();
+            var entity = new TestModel(-1, SyncStatus.SyncFailed);
+            api.Delete(entity)
+                .Returns(Observable.Return(Unit.Default));
+
+            state.Start(entity).Wait();
+
+            analyticsService.EntitySynced.Received().Track(Delete, entity.GetSafeTypeName());
+        }
+
+        [Fact, LogIfTooSlow]
+        public void TracksEntitySyncStatusInCaseOfFailure()
+        {
+            var exception = new Exception();
+            var state = CreateState();
+            var entity = new TestModel(-1, SyncStatus.SyncFailed);
+            api.Delete(entity)
+                .Returns(Observable.Return(Unit.Default));
+            PrepareApiCallFunctionToThrow(exception);
+
+            state.Start(entity).Wait();
+
+            analyticsService.EntitySyncStatus.Received().Track(
+                entity.GetSafeTypeName(),
+                $"{Delete}:{Resources.Failure}");
+        }
+
+        [Theory, LogIfTooSlow]
+        [MemberData(nameof(EntityTypes), MemberType = typeof(BasePushEntityStateTests))]
+        public void TracksEntitySyncErrorInCaseOfFailure(Type entityType)
+        {
+            var exception = new Exception("SomeRandomMessage");
+            var entity = (IThreadSafeTestModel)Substitute.For(new[] { entityType }, new object[0]);
+            var state = new DeleteEntityState<ITestModel, IDatabaseTestModel, IThreadSafeTestModel>(api, dataSource, analyticsService);
+            var expectedMessage = $"{Delete}:{exception.Message}";
+            var analyticsEvent = entity.GetType().ToSyncErrorAnalyticsEvent(analyticsService);
+            PrepareApiCallFunctionToThrow(exception);
+
+            state.Start(entity).Wait();
+
+            analyticsEvent.Received().Track(expectedMessage);
+        }
+
         protected override BasePushEntityState<IThreadSafeTestModel> CreateState()
-            => new DeleteEntityState<ITestModel, IDatabaseTestModel, IThreadSafeTestModel>(api, dataSource);
+            => new DeleteEntityState<ITestModel, IDatabaseTestModel, IThreadSafeTestModel>(api, dataSource, analyticsService);
 
         protected override void PrepareApiCallFunctionToThrow(Exception e)
         {

@@ -808,5 +808,17 @@ namespace Toggl.Foundation {
                 return ResourceManager.GetString("ArchivedProjectDecorator", resourceCulture);
             }
         }
+        
+        public static string Failure {
+            get {
+                return ResourceManager.GetString("Failure", resourceCulture);
+            }
+        }
+        
+        public static string Success {
+            get {
+                return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
     }
 }

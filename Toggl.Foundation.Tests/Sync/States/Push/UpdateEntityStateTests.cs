@@ -2,7 +2,9 @@
 using System.Reactive.Linq;
 using FluentAssertions;
 using NSubstitute;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources.Interfaces;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Sync.ConflictResolution;
 using Toggl.Foundation.Sync.States.Push;
@@ -12,16 +14,27 @@ using Toggl.PrimeRadiant;
 using Toggl.Ultrawave.ApiClients;
 using Toggl.Ultrawave.Exceptions;
 using Xunit;
+using static Toggl.Foundation.Sync.PushSyncOperation;
 
 namespace Toggl.Foundation.Tests.Sync.States.Push
 {
     public sealed class UpdateEntityStateTests : BasePushEntityStateTests
     {
+        private readonly ITestAnalyticsService analyticsService
+            = Substitute.For<ITestAnalyticsService>();
+
         private readonly IUpdatingApiClient<ITestModel> api
             = Substitute.For<IUpdatingApiClient<ITestModel>>();
 
         private readonly IDataSource<IThreadSafeTestModel, IDatabaseTestModel> dataSource
             = Substitute.For<IDataSource<IThreadSafeTestModel, IDatabaseTestModel>>();
+
+        protected override PushSyncOperation Operation => PushSyncOperation.Update;
+
+        public UpdateEntityStateTests()
+        {
+            SyncAnalyticsExtensions.SearchStrategy = TestSyncAnalyticsExtensionsSearchStrategy;
+        }
 
         [Fact, LogIfTooSlow]
         public void ReturnsTheFailTransitionWhenEntityIsNull()
@@ -160,8 +173,91 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
                     Arg.Is<IThreadSafeTestModel>(theOriginalEntity => theOriginalEntity.Id == entity.Id), Arg.Is<IThreadSafeTestModel>(theUpdatedEntity => theUpdatedEntity.Id == serverEntity.Id));
         }
 
+        [Fact, LogIfTooSlow]
+        public void TracksEntitySyncStatusInCaseOfSuccess()
+        {
+            var state = (UpdateEntityState<ITestModel, IThreadSafeTestModel>)CreateState();
+            var at = new DateTimeOffset(2017, 9, 1, 12, 34, 56, TimeSpan.Zero);
+            var entity = new TestModel { Id = 1, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var serverEntity = new TestModel { Id = 2, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var localEntity = new TestModel { Id = 3, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var updatedEntity = new TestModel { Id = 4, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            api.Update(entity)
+                .Returns(Observable.Return(serverEntity));
+            dataSource
+                .GetById(entity.Id)
+                .Returns(Observable.Return(localEntity));
+            dataSource
+                .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
+                .Returns(Observable.Return(new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity)));
+
+            state.Start(entity).Wait();
+
+            analyticsService.EntitySyncStatus.Received().Track(
+                entity.GetSafeTypeName(),
+                $"{Update}:{Resources.Success}");
+        }
+
+        [Fact, LogIfTooSlow]
+        public void TracksEntitySyncedInCaseOfSuccess()
+        {
+            var state = (UpdateEntityState<ITestModel, IThreadSafeTestModel>)CreateState();
+            var at = new DateTimeOffset(2017, 9, 1, 12, 34, 56, TimeSpan.Zero);
+            var entity = new TestModel { Id = 1, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var serverEntity = new TestModel { Id = 2, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var localEntity = new TestModel { Id = 3, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var updatedEntity = new TestModel { Id = 4, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            api.Update(entity)
+                .Returns(Observable.Return(serverEntity));
+            dataSource
+                .GetById(entity.Id)
+                .Returns(Observable.Return(localEntity));
+            dataSource
+                .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
+                .Returns(Observable.Return(new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity)));
+
+            state.Start(entity).Wait();
+
+            analyticsService.EntitySynced.Received().Track(Update, entity.GetSafeTypeName());
+        }
+
+        [Fact, LogIfTooSlow]
+        public void TracksEntitySyncStatusInCaseOfFailure()
+        {
+            var exception = new Exception();
+            var state = (UpdateEntityState<ITestModel, IThreadSafeTestModel>)CreateState();
+            var at = new DateTimeOffset(2017, 9, 1, 12, 34, 56, TimeSpan.Zero);
+            var entity = new TestModel { Id = 1, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            var serverEntity = new TestModel { Id = 2, At = at, SyncStatus = SyncStatus.SyncNeeded };
+            api.Update(entity)
+               .Returns(Observable.Return(serverEntity));
+            PrepareApiCallFunctionToThrow(exception);
+
+            state.Start(entity).Wait();
+
+            analyticsService.EntitySyncStatus.Received().Track(
+                entity.GetSafeTypeName(),
+                $"{Update}:{Resources.Failure}");
+        }
+
+        [Theory, LogIfTooSlow]
+        [MemberData(nameof(EntityTypes), MemberType = typeof(BasePushEntityStateTests))]
+        public void TracksEntitySyncErrorInCaseOfFailure(Type entityType)
+        {
+            var exception = new Exception("SomeRandomMessage");
+            var entity = (IThreadSafeTestModel)Substitute.For(new[] { entityType }, new object[0]);
+            var state = new UpdateEntityState<ITestModel, IThreadSafeTestModel>(api, dataSource, analyticsService, _ => null);
+            var expectedMessage = $"{Update}:{exception.Message}";
+            var analyticsEvent = entity.GetType().ToSyncErrorAnalyticsEvent(analyticsService);
+            PrepareApiCallFunctionToThrow(exception);
+
+            state.Start(entity).Wait();
+
+            analyticsEvent.Received().Track(expectedMessage);
+        }
+
         protected override BasePushEntityState<IThreadSafeTestModel> CreateState()
-            => new UpdateEntityState<ITestModel, IThreadSafeTestModel>(api, dataSource, TestModel.From);
+            => new UpdateEntityState<ITestModel, IThreadSafeTestModel>(api, dataSource, analyticsService, TestModel.From);
 
         protected override void PrepareApiCallFunctionToThrow(Exception e)
         {

@@ -79,11 +79,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     return false;
 
                 if (IsSuggestingProjects)
-                    return !Suggestions.Any(c => c.Any(s => s is ProjectSuggestion pS && pS.ProjectName == CurrentQuery))
+                    return Suggestions.None(c => c.Any(s => s is ProjectSuggestion pS && pS.ProjectName == CurrentQuery))
                            && CurrentQuery.LengthInBytes() <= MaxProjectNameLengthInBytes;
 
                 if (IsSuggestingTags)
-                    return !Suggestions.Any(c => c.Any(s => s is TagSuggestion tS && tS.Name == CurrentQuery))
+                    return Suggestions.None(c => c.Any(s => s is TagSuggestion tS && tS.Name == CurrentQuery))
                            && CurrentQuery.LengthInBytes() <= MaxTagNameLengthInBytes;
 
                 return false;

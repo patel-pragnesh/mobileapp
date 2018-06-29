@@ -7,6 +7,7 @@ using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Suggestions;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
@@ -23,7 +24,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public MvxObservableCollection<Suggestion> Suggestions { get; }
             = new MvxObservableCollection<Suggestion>();
 
-        public bool IsEmpty => !Suggestions.Any();
+        public bool IsEmpty => Suggestions.None();
 
         public MvxAsyncCommand<Suggestion> StartTimeEntryCommand { get; set; }
 
