@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Toggl.Foundation.Extensions;
+using Toggl.Foundation.Sync;
 using Toggl.Multivac;
 
 namespace Toggl.Foundation.Analytics
@@ -106,6 +107,39 @@ namespace Toggl.Foundation.Analytics
         [AnalyticsEvent("Origin")]
         public IAnalyticsEvent<TimeEntryStartOrigin> TimeEntryStarted { get; protected set; }
 
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> WorkspaceSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> UserSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> WorkspaceFeaturesSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> PreferencesSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> TagsSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> ClientsSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> ProjectsSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> TasksSyncError { get; protected set; }
+
+        [AnalyticsEvent("Reason")]
+        public IAnalyticsEvent<string> TimeEntrySyncError { get; protected set; }
+
+        [AnalyticsEvent("Method", "Entity")]
+        public IAnalyticsEvent<PushSyncOperation, string> EntitySynced { get; protected set; }
+
+        [AnalyticsEvent("Entity", "Status")]
+        public IAnalyticsEvent<string, string> EntitySyncStatus { get; protected set; }
+
         public void Track(Exception exception)
         {
             if (exception.IsAnonymized())
@@ -122,7 +156,7 @@ namespace Toggl.Foundation.Analytics
 
         public void Track(ITrackableEvent trackableEvent)
             => Track(trackableEvent.EventName, trackableEvent.ToDictionary());
-            
+
         protected abstract void TrackException(Exception exception);
     }
 }

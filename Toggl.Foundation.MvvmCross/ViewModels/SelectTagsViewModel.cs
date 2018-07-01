@@ -40,7 +40,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             {
                 var text = Text.Trim();
                 return !string.IsNullOrEmpty(text)
-                       && !Tags.Any(tag => tag.Name == text.Trim())
+                       && Tags.None(tag => tag.Name == text.Trim())
                        && Encoding.UTF8.GetByteCount(Text) <= MaxTagNameLengthInBytes;
             }
         }

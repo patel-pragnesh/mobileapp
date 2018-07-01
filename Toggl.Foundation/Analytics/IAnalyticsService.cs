@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Toggl.Foundation.Sync;
 
 namespace Toggl.Foundation.Analytics
 {
@@ -62,6 +63,28 @@ namespace Toggl.Foundation.Analytics
         IAnalyticsEvent<EditViewTapSource> EditViewTapped { get; }
 
         IAnalyticsEvent<StartViewTapSource> StartViewTapped { get; }
+
+        IAnalyticsEvent<string> WorkspaceSyncError { get; }
+
+        IAnalyticsEvent<string> UserSyncError { get; }
+
+        IAnalyticsEvent<string> WorkspaceFeaturesSyncError { get; }
+
+        IAnalyticsEvent<string> PreferencesSyncError { get; }
+
+        IAnalyticsEvent<string> TagsSyncError { get; }
+
+        IAnalyticsEvent<string> ClientsSyncError { get; }
+
+        IAnalyticsEvent<string> ProjectsSyncError { get; }
+
+        IAnalyticsEvent<string> TasksSyncError { get; }
+
+        IAnalyticsEvent<string> TimeEntrySyncError { get; }
+
+        IAnalyticsEvent<PushSyncOperation, string> EntitySynced { get; }
+
+        IAnalyticsEvent<string, string> EntitySyncStatus { get; }
 
         IAnalyticsEvent NoDefaultWorkspace { get; }
 

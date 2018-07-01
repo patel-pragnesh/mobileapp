@@ -402,4 +402,10 @@ account is not set up</value>
     <data name="ArchivedProjectDecorator">
         <value>(archived)</value>
     </data>
+    <data name="Failure">
+        <value>Failure</value>
+    </data>
+    <data name="Success">
+        <value>Success</value>
+    </data>
 </root>

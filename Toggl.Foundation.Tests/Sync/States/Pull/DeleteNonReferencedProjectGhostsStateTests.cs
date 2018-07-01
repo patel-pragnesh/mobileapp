@@ -10,6 +10,7 @@ using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Sync.States.Pull;
 using Toggl.Foundation.Tests.Mocks;
+using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 using Xunit;
@@ -80,7 +81,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
             await state.Start();
 
             await projectsDataSource.Received()
-                .DeleteAll(Arg.Is<IEnumerable<IThreadSafeProject>>(projects => !projects.Any()));
+                .DeleteAll(Arg.Is<IEnumerable<IThreadSafeProject>>(projects => projects.None()));
         }
 
         [Fact, LogIfTooSlow]

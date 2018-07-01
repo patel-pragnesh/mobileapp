@@ -62,7 +62,7 @@ namespace Toggl.Foundation
             IObservable<Unit> delayCancellation)
         {
             configurePullTransitions(transitions, database, api, dataSource, timeService, analyticsService, scheduler, entryPoints.StartPullSync, delayCancellation);
-            configurePushTransitions(transitions, api, dataSource, apiDelay, scheduler, entryPoints.StartPushSync, delayCancellation);
+            configurePushTransitions(transitions, api, dataSource, analyticsService, apiDelay, scheduler, entryPoints.StartPushSync, delayCancellation);
         }
 
         private static void configurePullTransitions(
@@ -177,24 +177,26 @@ namespace Toggl.Foundation
             TransitionHandlerProvider transitions,
             ITogglApi api,
             ITogglDataSource dataSource,
+            IAnalyticsService analyticsService,
             IRetryDelayService apiDelay,
             IScheduler scheduler,
             StateResult entryPoint,
             IObservable<Unit> delayCancellation)
         {
-            var pushingWorkspacesFinished = configureCreateOnlyPush(transitions, entryPoint, dataSource.Workspaces, api.Workspaces, Workspace.Clean, Workspace.Unsyncable, api, scheduler, delayCancellation);
-            var pushingUsersFinished = configurePushSingleton(transitions, pushingWorkspacesFinished, dataSource.User, api.User, User.Clean, User.Unsyncable, api, scheduler, delayCancellation);
-            var pushingPreferencesFinished = configurePushSingleton(transitions, pushingUsersFinished, dataSource.Preferences, api.Preferences, Preferences.Clean, Preferences.Unsyncable, api, scheduler, delayCancellation);
-            var pushingTagsFinished = configureCreateOnlyPush(transitions, pushingPreferencesFinished, dataSource.Tags, api.Tags, Tag.Clean, Tag.Unsyncable, api, scheduler, delayCancellation);
-            var pushingClientsFinished = configureCreateOnlyPush(transitions, pushingTagsFinished, dataSource.Clients, api.Clients, Client.Clean, Client.Unsyncable, api, scheduler, delayCancellation);
-            var pushingProjectsFinished = configureCreateOnlyPush(transitions, pushingClientsFinished, dataSource.Projects, api.Projects, Project.Clean, Project.Unsyncable, api, scheduler, delayCancellation);
-            configurePush(transitions, pushingProjectsFinished, dataSource.TimeEntries, api.TimeEntries, api.TimeEntries, api.TimeEntries, TimeEntry.Clean, TimeEntry.Unsyncable, api, apiDelay, scheduler, delayCancellation);
+            var pushingWorkspacesFinished = configureCreateOnlyPush(transitions, entryPoint, dataSource.Workspaces, analyticsService, api.Workspaces, Workspace.Clean, Workspace.Unsyncable, api, scheduler, delayCancellation);
+            var pushingUsersFinished = configurePushSingleton(transitions, pushingWorkspacesFinished, dataSource.User, analyticsService, api.User, User.Clean, User.Unsyncable, api, scheduler, delayCancellation);
+            var pushingPreferencesFinished = configurePushSingleton(transitions, pushingUsersFinished, dataSource.Preferences, analyticsService, api.Preferences, Preferences.Clean, Preferences.Unsyncable, api, scheduler, delayCancellation);
+            var pushingTagsFinished = configureCreateOnlyPush(transitions, pushingPreferencesFinished, dataSource.Tags, analyticsService, api.Tags, Tag.Clean, Tag.Unsyncable, api, scheduler, delayCancellation);
+            var pushingClientsFinished = configureCreateOnlyPush(transitions, pushingTagsFinished, dataSource.Clients, analyticsService, api.Clients, Client.Clean, Client.Unsyncable, api, scheduler, delayCancellation);
+            var pushingProjectsFinished = configureCreateOnlyPush(transitions, pushingClientsFinished, dataSource.Projects, analyticsService, api.Projects, Project.Clean, Project.Unsyncable, api, scheduler, delayCancellation);
+            configurePush(transitions, pushingProjectsFinished, dataSource.TimeEntries, analyticsService, api.TimeEntries, api.TimeEntries, api.TimeEntries, TimeEntry.Clean, TimeEntry.Unsyncable, api, apiDelay, scheduler, delayCancellation);
         }
 
         private static IStateResult configurePush<TModel, TDatabase, TThreadsafe>(
             TransitionHandlerProvider transitions,
             IStateResult entryPoint,
             IDataSource<TThreadsafe, TDatabase> dataSource,
+            IAnalyticsService analyticsService,
             ICreatingApiClient<TModel> creatingApi,
             IUpdatingApiClient<TModel> updatingApi,
             IDeletingApiClient<TModel> deletingApi,
@@ -213,9 +215,9 @@ namespace Toggl.Foundation
 
             var push = new PushState<TDatabase, TThreadsafe>(dataSource);
             var pushOne = new PushOneEntityState<TThreadsafe>();
-            var create = new CreateEntityState<TModel, TThreadsafe>(creatingApi, dataSource, toClean);
-            var update = new UpdateEntityState<TModel, TThreadsafe>(updatingApi, dataSource, toClean);
-            var delete = new DeleteEntityState<TModel, TDatabase, TThreadsafe>(deletingApi, dataSource);
+            var create = new CreateEntityState<TModel, TThreadsafe>(creatingApi, dataSource, analyticsService, toClean);
+            var update = new UpdateEntityState<TModel, TThreadsafe>(updatingApi, dataSource, analyticsService, toClean);
+            var delete = new DeleteEntityState<TModel, TDatabase, TThreadsafe>(deletingApi, dataSource, analyticsService);
             var deleteLocal = new DeleteLocalEntityState<TDatabase, TThreadsafe>(dataSource);
             var tryResolveClientError = new TryResolveClientErrorState<TThreadsafe>();
             var unsyncable = new UnsyncableEntityState<TThreadsafe>(dataSource, toUnsyncable);
@@ -262,6 +264,7 @@ namespace Toggl.Foundation
             TransitionHandlerProvider transitions,
             IStateResult entryPoint,
             IDataSource<TThreadsafe, TDatabase> dataSource,
+            IAnalyticsService analyticsService,
             ICreatingApiClient<TModel> creatingApi,
             Func<TModel, TThreadsafe> toClean,
             Func<TThreadsafe, string, TThreadsafe> toUnsyncable,
@@ -278,7 +281,7 @@ namespace Toggl.Foundation
 
             var push = new PushState<TDatabase, TThreadsafe>(dataSource);
             var pushOne = new PushOneEntityState<TThreadsafe>();
-            var create = new CreateEntityState<TModel, TThreadsafe>(creatingApi, dataSource, toClean);
+            var create = new CreateEntityState<TModel, TThreadsafe>(creatingApi, dataSource, analyticsService, toClean);
             var tryResolveClientError = new TryResolveClientErrorState<TThreadsafe>();
             var unsyncable = new UnsyncableEntityState<TThreadsafe>(dataSource, toUnsyncable);
             var checkServerStatus = new CheckServerStatusState(api, scheduler, apiDelay, statusDelay, delayCancellation);
@@ -313,6 +316,7 @@ namespace Toggl.Foundation
             TransitionHandlerProvider transitions,
             IStateResult entryPoint,
             ISingletonDataSource<TThreadsafe> dataSource,
+            IAnalyticsService analyticsService,
             IUpdatingApiClient<TModel> updatingApi,
             Func<TModel, TThreadsafe> toClean,
             Func<TThreadsafe, string, TThreadsafe> toUnsyncable,
@@ -328,7 +332,7 @@ namespace Toggl.Foundation
 
             var push = new PushSingleState<TThreadsafe>(dataSource);
             var pushOne = new PushOneEntityState<TThreadsafe>();
-            var update = new UpdateEntityState<TModel, TThreadsafe>(updatingApi, dataSource, toClean);
+            var update = new UpdateEntityState<TModel, TThreadsafe>(updatingApi, dataSource, analyticsService, toClean);
             var tryResolveClientError = new TryResolveClientErrorState<TThreadsafe>();
             var unsyncable = new UnsyncableEntityState<TThreadsafe>(dataSource, toUnsyncable);
             var checkServerStatus = new CheckServerStatusState(api, scheduler, apiDelay, statusDelay, delayCancellation);

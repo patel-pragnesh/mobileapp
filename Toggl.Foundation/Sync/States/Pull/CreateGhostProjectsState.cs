@@ -49,7 +49,7 @@ namespace Toggl.Foundation.Sync.States.Pull
             => timeEntry.ProjectId.HasValue
                 ? dataSource.GetAll(project => project.Id == timeEntry.ProjectId.Value)
                     .SingleAsync()
-                    .Select(projects => !projects.Any())
+                    .Select(projects => projects.None())
                 : Observable.Return(false);
 
         private IObservable<IThreadSafeProject> createGhostProject(ITimeEntry timeEntry)

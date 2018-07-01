@@ -794,6 +794,13 @@
     <AndroidResource Include="Resources\drawable-xhdpi\logo_splash.png" />
     <AndroidResource Include="Resources\drawable-xxhdpi\logo_splash.png" />
     <AndroidResource Include="Resources\drawable-xxxhdpi\logo_splash.png" />
+    <AndroidResource Include="Resources\drawable\black_diamond.xml" />
+    <AndroidResource Include="Resources\drawable\TooltipShape.xml" />
+    <AndroidResource Include="Resources\drawable\white_close.xml" />
+    <AndroidResource Include="Resources\layout\TooltipWithCenteredBottomArrow.axml" />
+    <AndroidResource Include="Resources\layout\TooltipWithLeftTopArrow.axml" />
+    <AndroidResource Include="Resources\layout\TooltipWithRightTopArrow.axml" />
+    <AndroidResource Include="Resources\layout\TooltipWithRightBottomArrow.axml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">
