@@ -91,7 +91,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Email = emailSubject.AsObservable();
             Password = passwordSubject.AsObservable();
             IsLoading = isLoadingSubject.AsObservable();
-            ErrorMessage = errorMessageSubject.AsObservable();
+            ErrorMessage = errorMessageSubject.AsObservable().DistinctUntilChanged();
             IsPasswordMasked = isPasswordMaskedSubject.AsObservable();
             IsShowPasswordButtonVisible = Password
                 .Select(password => password.Length > 1)
@@ -104,7 +104,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .CombineLatest(
                     Password,
                     IsLoading,
-                    (email, password, isLoading) => email.IsValid && password.IsValid && !isLoading);
+                    (email, password, isLoading) => email.IsValid && password.IsValid && !isLoading)
+                .DistinctUntilChanged();
             IsPasswordManagerAvailable = Observable.Create((IObserver<bool> observer) =>
             {
                 observer.OnNext(passwordManagerService.IsAvailable);
@@ -138,6 +139,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 navigationService.ChangePresentation(hint);
                 return;
             }
+
+            if (isLoadingSubject.Value == true) return;
 
             isLoadingSubject.OnNext(true);
             errorMessageSubject.OnNext("");
@@ -191,6 +194,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         }
         public async Task StartPasswordManager()
         {
+            if (!passwordManagerService.IsAvailable) return;
+            if (isLoadingSubject.Value) return;
+
             analyticsService.PasswordManagerButtonClicked.Track();
 
             var loginInfo = await passwordManagerService.GetLoginInformation();
