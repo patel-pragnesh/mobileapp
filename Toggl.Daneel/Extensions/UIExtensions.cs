@@ -51,13 +51,6 @@ namespace Toggl.Daneel.Extensions
                 .FromEventPattern(handler => textField.EditingChanged += handler, handler => textField.EditingChanged -= handler)
                 .Select(_ => textField.Text);
 
-        public static IObservable<bool> FirstResponder(this LoginTextField textField)
-            => Observable
-                .FromEventPattern(handler => textField.IsFirstResponderChanged += handler, handler => textField.IsFirstResponderChanged -= handler)
-                .Select(_ => textField.IsFirstResponder)
-                .StartWith(false)
-                .DistinctUntilChanged();
-
         public static Action<bool> BindIsVisible(this UIView view)
             => isVisible => view.Hidden = !isVisible;
 
@@ -127,27 +120,11 @@ namespace Toggl.Daneel.Extensions
                 );
             };
 
-        public static (Action<bool>, IDisposable) BindSecureTextEntry(this UITextField textField)
+        public static Action<bool> BindSecureTextEntry(this UITextField textField) => isSecure =>
         {
-            void onEditingDidBegin(object sender, EventArgs e)
-            {
-                if (!textField.SecureTextEntry) return;
-                textField.InsertText(textField.Text);
-            }
-
-            textField.EditingDidBegin += onEditingDidBegin;
-
-            Action<bool> onNext = isSecure =>
-            {
-                if (textField.SecureTextEntry == isSecure) return;
-
-                textField.ResignFirstResponder();
-                textField.SecureTextEntry = isSecure;
-                textField.BecomeFirstResponder();
-            };
-            var disposable = Disposable.Create(() => textField.EditingDidBegin -= onEditingDidBegin);
-
-            return (onNext, disposable);
-        }
+            textField.ResignFirstResponder();
+            textField.SecureTextEntry = isSecure;
+            textField.BecomeFirstResponder();
+        };
     }
 }

@@ -23,15 +23,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .DisposedBy(holder.DisposeBag);
         }
 
-        public static void Bind<T>(this IReactiveBindingHolder holder, IObservable<T> observable, (Action<T> onNext, IDisposable disposable) tuple)
-        {
-            observable
-                .AsDriver()
-                .Do(_ => holder.DisposeBag.Add(tuple.disposable))
-                .Subscribe(tuple.onNext)
-                .DisposedBy(holder.DisposeBag);
-        }
-
         public static void BindVoid(this IReactiveBindingHolder holder, IObservable<Unit> observable, Action onNext)
         {
             observable

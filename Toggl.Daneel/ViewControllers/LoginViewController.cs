@@ -144,9 +144,6 @@ namespace Toggl.Daneel.ViewControllers
 
         private string loginButtonTitle(bool isLoading)
             => isLoading ? "" : Resources.LoginTitle;
-
-        private UIColor loginButtonTintColor(bool hasError)
-            => hasError ? UIColor.White : UIColor.Black;
     }
 }
 
