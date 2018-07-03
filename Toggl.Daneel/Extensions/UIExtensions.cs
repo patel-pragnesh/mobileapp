@@ -102,8 +102,6 @@ namespace Toggl.Daneel.Extensions
         public static Action<bool> BindAnimatedIsVisible(this UIView view)
             => isVisible =>
             {
-                if (view.Hidden != isVisible) return;
-
                 view.Transform = CGAffineTransform.MakeTranslation(0, 20);
 
                 AnimationExtensions.Animate(
