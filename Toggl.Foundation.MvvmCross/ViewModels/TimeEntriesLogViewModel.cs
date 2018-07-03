@@ -42,7 +42,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             );
 
         [DependsOn(nameof(TimeEntries))]
-        public bool IsEmpty => !TimeEntries.Any();
+        public bool IsEmpty => TimeEntries.None();
 
         public bool IsWelcome { get; private set; }
 
@@ -225,6 +225,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     timeEntry.DurationFormat = durationFormat;
                 }
             }
+
+            fetchSectionedTimeEntries();
         }
 
         private bool isNotRunning(IThreadSafeTimeEntry timeEntry) => !timeEntry.IsRunning();

@@ -124,6 +124,40 @@ namespace Toggl.Ultrawave.Tests.Integration
                 item.Start.ToUnixTimeSeconds().Should().BeGreaterOrEqualTo(start.ToUnixTimeSeconds());
                 item.Start.ToUnixTimeSeconds().Should().BeLessThan(end.ToUnixTimeSeconds());
             }
+
+            [Fact]
+            public async Task ReturnsTimeEntriesOnlyUpToMidnightOfTheEndDate()
+            {
+                var endDateMidnight = midnightUTCFrom(end);
+                var (api, user) = await SetupTestUser();
+                var timeEntryThatWontBeReturned = createTimeEntry(user, endDateMidnight.AddSeconds(1));
+                var expectedTimeEntry = createTimeEntry(user, endDateMidnight.AddMinutes(-5));
+                await api.TimeEntries.Create(timeEntryThatWontBeReturned);
+                await api.TimeEntries.Create(expectedTimeEntry);
+
+                var list = await api.TimeEntries.GetAll(start, end);
+
+                list.Should().HaveCount(1);
+                var item = list[0];
+                item.Start.ToUnixTimeSeconds().Should().Be(expectedTimeEntry.Start.ToUnixTimeSeconds());
+            }
+
+            [Fact]
+            public async Task ReturnsTimeEntriesOnlyAfterMidnightOfTheStartDate()
+            {
+                var startDateMidnight = midnightUTCFrom(start);
+                var (api, user) = await SetupTestUser();
+                var expectedTimeEntry = createTimeEntry(user, startDateMidnight);
+                var timeEntryThatWontBeReturned = createTimeEntry(user, startDateMidnight.AddMinutes(-5));
+                await api.TimeEntries.Create(expectedTimeEntry);
+                await api.TimeEntries.Create(timeEntryThatWontBeReturned);
+
+                var list = await api.TimeEntries.GetAll(start, end);
+
+                list.Should().HaveCount(1);
+                var item = list[0];
+                item.Start.ToUnixTimeSeconds().Should().BeGreaterOrEqualTo(expectedTimeEntry.Start.ToUnixTimeSeconds());
+            }
         }
 
         public sealed class TheCreateMethod : AuthenticatedPostEndpointBaseTests<ITimeEntry>
@@ -505,5 +539,10 @@ namespace Toggl.Ultrawave.Tests.Integration
                 UserId = user.Id,
                 CreatedWith = "Ultraware Integration Tests"
             };
+
+        private static DateTimeOffset midnightUTCFrom(DateTimeOffset dateTimeOffset)
+        {
+            return new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, 0, 0, 0, 0, TimeSpan.Zero);
+        }
     }
 }

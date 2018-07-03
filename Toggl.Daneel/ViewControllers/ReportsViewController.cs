@@ -5,13 +5,12 @@ using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
 using MvvmCross.iOS.Views;
 using MvvmCross.iOS.Views.Presenters.Attributes;
-using Toggl.Daneel.Extensions;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using UIKit;
-using static Toggl.Daneel.Extensions.LayoutConstraintExtensions;
+using static Toggl.Daneel.Extensions.AnimationExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -55,7 +54,7 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(titleButton)
                       .For(v => v.BindTitle())
                       .To(vm => vm.CurrentDateRangeString);
-
+            
             bindingSet.Bind(source)
                       .For(v => v.ViewModel)
                       .To(vm => vm);
@@ -104,7 +103,7 @@ namespace Toggl.Daneel.ViewControllers
         internal void ShowCalendar()
         {
             TopCalendarConstraint.Constant = 0;
-            AnimationExtensions.Animate(
+            Animate(
                 Animation.Timings.EnterTiming,
                 Animation.Curves.SharpCurve,
                 () => View.LayoutSubviews(),
@@ -114,7 +113,7 @@ namespace Toggl.Daneel.ViewControllers
         internal void HideCalendar()
         {
             TopCalendarConstraint.Constant = calendarHeight;
-            AnimationExtensions.Animate(
+            Animate(
                 Animation.Timings.EnterTiming,
                 Animation.Curves.SharpCurve,
                 () => View.LayoutSubviews(),

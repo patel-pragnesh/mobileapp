@@ -1,7 +1,10 @@
 using System;
+using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Gms.Auth;
 using Android.Gms.Auth.Api;
 using Android.Gms.Auth.Api.SignIn;
@@ -22,35 +25,66 @@ namespace Toggl.Giskard.Services
         private readonly object lockable = new object();
 
         private bool isLoggingIn;
-        private Subject<string> subject = new Subject<string>();
+        private Subject<string> loginSubject = new Subject<string>();
+        private Subject<Unit> logoutSubject = new Subject<Unit>();
         private readonly string scope = $"oauth2:{Scopes.Profile}";
+
+        private GoogleApiClient googleApiClient;
+
+        public GoogleService()
+        {
+            var signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DefaultSignIn)
+                .RequestIdToken("{TOGGL_DROID_GOOGLE_SERVICES_CLIENT_ID}")
+                .RequestEmail()
+                .Build();
+
+            googleApiClient = new GoogleApiClient.Builder(Application.Context)
+                .AddConnectionCallbacks(login)
+                .AddOnConnectionFailedListener(onError)
+                .AddApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
+                .Build();
+        }
+
+        public IObservable<Unit> LogOutIfNeeded()
+        {
+            logoutSubject = new Subject<Unit>();
+
+            if (googleApiClient.IsConnected)
+            {
+                var logoutCallback = new LogOutCallback(() =>
+                {
+                    logoutSubject.OnNext(Unit.Default);
+                    logoutSubject.OnCompleted();
+                });
+                Auth.GoogleSignInApi.SignOut(googleApiClient).SetResultCallback(logoutCallback);
+                return logoutSubject.AsObservable();
+            }
+            else
+            {
+                return Observable.Return(Unit.Default);
+            }
+        }
 
         public IObservable<string> GetAuthToken()
         {
             lock (lockable)
             {
                 if (isLoggingIn)
-                    return subject.AsObservable();
+                    return loginSubject.AsObservable();
 
                 isLoggingIn = true;
-                subject = new Subject<string>();
+                loginSubject = new Subject<string>();
 
-                var activity = Mvx.Resolve<IMvxAndroidCurrentTopActivity>().Activity as FragmentActivity;
+                if (googleApiClient.IsConnected)
+                {
+                    login();
+                }
+                else
+                {
+                    googleApiClient.Connect();
+                }
 
-                var signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DefaultSignIn)
-                    .RequestIdToken("{TOGGL_DROID_GOOGLE_SERVICES_CLIENT_ID}")
-                    .RequestEmail()
-                    .Build();
-
-                var googleApiClient = new GoogleApiClient.Builder(activity)
-                    .EnableAutoManage(activity, onError)
-                    .AddApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
-                    .Build();
-
-                var intent = Auth.GoogleSignInApi.GetSignInIntent(googleApiClient);
-                StartActivityForResult(googleSignInResult, intent);
-
-                return subject.AsObservable();
+                return loginSubject.AsObservable();
             }
         }
 
@@ -66,19 +100,17 @@ namespace Toggl.Giskard.Services
                 var signInData = Auth.GoogleSignInApi.GetSignInResultFromIntent(result.Data);
                 if (signInData.IsSuccess)
                 {
-                    var activity = Mvx.Resolve<IMvxAndroidCurrentTopActivity>().Activity as FragmentActivity;
-
                     Task.Run(() =>
                     {
                         try
                         {
-                            var token = GoogleAuthUtil.GetToken(activity, signInData.SignInAccount.Account, scope);
-                            subject.OnNext(token);
-                            subject.OnCompleted();
+                            var token = GoogleAuthUtil.GetToken(Application.Context, signInData.SignInAccount.Account, scope);
+                            loginSubject.OnNext(token);
+                            loginSubject.OnCompleted();
                         }
                         catch (Exception e)
                         {
-                            subject.OnError(e);
+                            loginSubject.OnError(e);
                         }
                         finally
                         {
@@ -88,18 +120,44 @@ namespace Toggl.Giskard.Services
                 }
                 else
                 {
-                    subject.OnError(new GoogleLoginException(signInData.Status.IsCanceled));
+                    loginSubject.OnError(new GoogleLoginException(signInData.Status.IsCanceled));
                     isLoggingIn = false;
                 }
             }
+        }
+
+        private void login()
+        {
+            if (!googleApiClient.IsConnected)
+            {
+                throw new GoogleLoginException(false);
+            }
+
+            var intent = Auth.GoogleSignInApi.GetSignInIntent(googleApiClient);
+            StartActivityForResult(googleSignInResult, intent);
         }
 
         private void onError(ConnectionResult result)
         {
             lock (lockable)
             {
-                subject.OnError(new GoogleLoginException(false));
+                loginSubject.OnError(new GoogleLoginException(false));
                 isLoggingIn = false;
+            }
+        }
+
+        private class LogOutCallback : Java.Lang.Object, IResultCallback
+        {
+            private Action callback;
+
+            public LogOutCallback(Action callback)
+            {
+                this.callback = callback;
+            }
+
+            public void OnResult(Java.Lang.Object result)
+            {
+                callback();
             }
         }
     }

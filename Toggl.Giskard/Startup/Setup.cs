@@ -81,8 +81,12 @@ namespace Toggl.Giskard
 
             var appVersion = Version.Parse(version);
             var userAgent = new UserAgent(clientName, version);
+            var mailService = new MailService(ApplicationContext);
+            var dialogService = new DialogService();
+            var platformConstants = new PlatformConstants();
             var keyValueStorage = new SharedPreferencesStorage(sharedPreferences);
             var settingsStorage = new SettingsStorage(appVersion, keyValueStorage);
+            var feedbackService = new FeedbackService(userAgent, mailService, dialogService, platformConstants);
 
             var foundation =
                 TogglFoundation
@@ -90,19 +94,23 @@ namespace Toggl.Giskard
                     .WithDatabase(database)
                     .WithScheduler(scheduler)
                     .WithTimeService(timeService)
+                    .WithMailService(mailService)
                     .WithApiEnvironment(environment)
                     .WithGoogleService<GoogleService>()
+                    .WithRatingService<RatingService>()
                     .WithLicenseProvider<LicenseProvider>()
                     .WithAnalyticsService(analyticsService)
-                    .WithPlatformConstants<PlatformConstants>()
-                    .WithMailService(new MailService(ApplicationContext))
+                    .WithPlatformConstants(platformConstants)
+                    .WithRemoteConfigService<RemoteConfigService>()
                     .WithApiFactory(new ApiFactory(environment, userAgent))
                     .WithBackgroundService(new BackgroundService(timeService))
                     .WithSuggestionProviderContainer(suggestionProviderContainer)
                     .WithApplicationShortcutCreator(new ApplicationShortcutCreator(ApplicationContext))
 
                     .StartRegisteringPlatformServices()
-                    .WithDialogService<DialogService>()
+                    .WithDialogService(dialogService)
+                    .WithFeedbackService(feedbackService)
+                    .WithLastTimeUsageStorage(settingsStorage)
                     .WithBrowserService<BrowserService>()
                     .WithKeyValueStorage(keyValueStorage)
                     .WithUserPreferences(settingsStorage)
@@ -110,7 +118,7 @@ namespace Toggl.Giskard
                     .WithNavigationService(navigationService)
                     .WithAccessRestrictionStorage(settingsStorage)
                     .WithPasswordManagerService<OnePasswordService>()
-                    .WithApiErrorHandlingService(new ApiErrorHandlingService(navigationService, settingsStorage))
+                    .WithErrorHandlingService(new ErrorHandlingService(navigationService, settingsStorage))
                     .Build();
 
             foundation.RevokeNewUserIfNeeded().Initialize();

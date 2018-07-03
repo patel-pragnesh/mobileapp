@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
     xmlns:local="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@android:color/white"
@@ -11,7 +10,7 @@
         android:orientation="horizontal"
         android:background="@color/blueToolbarBackground"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/expandedToolbarHeight">
+        android:layout_height="?android:attr/actionBarSize">
         <ImageView
             android:id="@+id/SelectTagsBackIcon"
             local:MvxBind="Click CloseCommand"
@@ -24,8 +23,9 @@
             android:layout_height="56dp" />
         <EditText
             local:MvxBind="Text Text"
+            android:gravity="left"
             android:textSize="19sp"
-            android:paddingLeft="16dp"
+            android:singleLine="true"
             android:letterSpacing="-0.01"
             android:lineSpacingExtra="5sp"
             android:hint="@string/AddTagsHint"
@@ -33,28 +33,39 @@
             android:textColor="@android:color/white"
             android:background="@color/blueToolbarBackground"
             android:textColorHint="@color/blueBackgroundTextHintColor"
-            android:layout_width="wrap_content"
+            android:layout_marginLeft="56dp"
+            android:layout_width="match_parent"
+            android:layout_centerVertical="true"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_below="@id/SelectTagsBackIcon"
-            android:layout_alignLeft="@id/SelectTagsBackIcon" />
+            android:layout_toLeftOf="@+id/SelectTagSaveButton" />
         <TextView
-            local:MvxBind="Click SaveCommand"
+            android:id="@+id/SelectTagSaveButton"
+            local:MvxBind="Click SaveCommand; Visibility Visibility(IsFilterEmpty, true)"
             android:textSize="14sp"
             android:clickable="true"
             android:textAllCaps="true"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="@string/Save"
+            android:text="@string/Done"
             android:gravity="center_vertical"
             android:src="@drawable/arrow_back"
             android:textColor="@android:color/white"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@id/SelectTagsBackIcon"
-            android:layout_alignBottom="@id/SelectTagsBackIcon" />
+            android:layout_alignParentRight="true" />
+        <ImageView
+            android:id="@+id/SelectTagsBackIcon"
+            local:MvxBind="Visibility Visibility(!IsFilterEmpty); Click ClearTextCommand"
+            android:padding="16dp"
+            android:clickable="true"
+            android:src="@drawable/close"
+            android:tint="@android:color/white"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignParentRight="true" />
     </RelativeLayout>
     <toggl.giskard.views.SelectTagsRecyclerView
         local:MvxBind="ItemsSource Tags; ItemClick SelectTagCommand; CreateCommand CreateTagCommand; Text Text; IsSuggestingCreation SuggestCreation"

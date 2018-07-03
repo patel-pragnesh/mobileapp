@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Immutable;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using MvvmCross.Core.ViewModels;
-using Toggl.Multivac;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Models;
+using Toggl.Multivac;
 
 namespace Toggl.Foundation.MvvmCross.ViewModels
 {
     [Preserve(AllMembers = true)]
     public class SyncFailuresViewModel : MvxViewModel
     {
-        public IEnumerable<SyncFailureItem> SyncFailures { get; private set; }
+        public IImmutableList<SyncFailureItem> SyncFailures { get; private set; }
 
         private readonly IInteractorFactory interactorFactory;
 
@@ -26,9 +26,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         {
             await base.Initialize();
 
-            SyncFailures = await interactorFactory
-                .GetItemsThatFailedToSync().Execute()
+            var syncFailures = await interactorFactory
+                .GetItemsThatFailedToSync()
+                .Execute()
                 .FirstAsync();
+
+            SyncFailures = syncFailures.ToImmutableList();
         }
     }
 }

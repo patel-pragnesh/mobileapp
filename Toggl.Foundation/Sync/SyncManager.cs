@@ -2,8 +2,10 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Exceptions;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
+using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave.Exceptions;
 using static Toggl.Foundation.Sync.SyncState;
 
@@ -15,6 +17,8 @@ namespace Toggl.Foundation.Sync
         private readonly ISyncStateQueue queue;
         private readonly IStateMachineOrchestrator orchestrator;
         private readonly IAnalyticsService analyticsService;
+        private readonly ILastTimeUsageStorage lastTimeUsageStorage;
+        private readonly ITimeService timeService;
 
         private bool isFrozen;
 
@@ -28,15 +32,21 @@ namespace Toggl.Foundation.Sync
         public SyncManager(
             ISyncStateQueue queue,
             IStateMachineOrchestrator orchestrator,
-            IAnalyticsService analyticsService)
+            IAnalyticsService analyticsService,
+            ILastTimeUsageStorage lastTimeUsageStorage,
+            ITimeService timeService)
         {
             Ensure.Argument.IsNotNull(queue, nameof(queue));
             Ensure.Argument.IsNotNull(orchestrator, nameof(orchestrator));
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
+            Ensure.Argument.IsNotNull(lastTimeUsageStorage, nameof(lastTimeUsageStorage));
+            Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
             this.queue = queue;
             this.orchestrator = orchestrator;
             this.analyticsService = analyticsService;
+            this.lastTimeUsageStorage = lastTimeUsageStorage;
+            this.timeService = timeService;
 
             progress = new BehaviorSubject<SyncProgress>(SyncProgress.Unknown);
             ProgressObservable = progress.AsObservable();
@@ -56,10 +66,12 @@ namespace Toggl.Foundation.Sync
 
         public IObservable<SyncState> ForceFullSync()
         {
+            lastTimeUsageStorage.SetFullSyncAttempt(timeService.CurrentDateTime);
+
             lock (stateLock)
             {
                 queue.QueuePullSync();
-                return startSyncIfNeededAndObserve();
+                return startSyncIfNeededAndObserve().Do(saveTimeWhenReachedSleep);
             }
         }
 
@@ -76,6 +88,14 @@ namespace Toggl.Foundation.Sync
                 return IsRunningSync
                     ? syncStatesUntilAndIncludingSleep().LastAsync()
                     : Observable.Return(Sleep);
+            }
+        }
+
+        private void saveTimeWhenReachedSleep(SyncState state)
+        {
+            if (state == Sleep)
+            {
+                lastTimeUsageStorage.SetSuccessfulFullSync(timeService.CurrentDateTime);
             }
         }
 
@@ -109,6 +129,12 @@ namespace Toggl.Foundation.Sync
         {
             queue.Clear();
             orchestrator.Start(Sleep);
+
+            if (error is NoWorkspaceException)
+            {
+                progress.OnError(error);
+                return;
+            }
 
             if (error is OfflineException)
             {

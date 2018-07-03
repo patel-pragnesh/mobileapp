@@ -40,10 +40,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             {
                 var text = Text.Trim();
                 return !string.IsNullOrEmpty(text)
-                       && !Tags.Any(tag => tag.Name == text.Trim())
+                       && Tags.None(tag => tag.Name == text.Trim())
                        && Encoding.UTF8.GetByteCount(Text) <= MaxTagNameLengthInBytes;
             }
         }
+
+        public bool IsFilterEmpty => string.IsNullOrWhiteSpace(Text);
 
         public MvxObservableCollection<SelectableTagViewModel> Tags { get; }
             = new MvxObservableCollection<SelectableTagViewModel>();
@@ -62,6 +64,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IMvxAsyncCommand CreateTagCommand { get; }
 
+        public IMvxCommand ClearTextCommand { get; }
+
         public IMvxCommand<SelectableTagViewModel> SelectTagCommand { get; }
 
         public SelectTagsViewModel(ITogglDataSource dataSource, IMvxNavigationService navigationService, IInteractorFactory interactorFactory)
@@ -78,6 +82,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             SaveCommand = new MvxAsyncCommand(save);
             CreateTagCommand = new MvxAsyncCommand(createTag);
             SelectTagCommand = new MvxCommand<SelectableTagViewModel>(selectTag);
+            ClearTextCommand = new MvxCommand(clearText);
         }
 
         public override void Prepare((long[] tagIds, long workspaceId) parameter)
@@ -150,6 +155,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Text = "";
 
             hasTagsSubject.OnNext(true);
+        }
+
+        private void clearText()
+        {
+            Text = "";
         }
     }
 }

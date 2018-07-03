@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using FluentAssertions;
 using FsCheck.Xunit;
 using NSubstitute;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
@@ -18,21 +20,22 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class EditDurationViewModelTest : BaseViewModelTests<EditDurationViewModel>
         {
             protected override EditDurationViewModel CreateViewModel()
-                => new EditDurationViewModel(NavigationService, TimeService, DataSource);
+                => new EditDurationViewModel(NavigationService, TimeService, DataSource, AnalyticsService);
         }
 
         public sealed class TheConstructor : EditDurationViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(ThreeParameterConstructorTestData))]
-            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService, bool useDataSource)
+            [ClassData(typeof(FourParameterConstructorTestData))]
+            public void ThrowsIfAnyOfTheArgumentsIsNull(bool useNavigationService, bool useTimeService, bool useDataSource, bool useAnalyticsService)
             {
                 var navigationService = useNavigationService ? NavigationService : null;
                 var timeService = useTimeService ? TimeService : null;
                 var dataSource = useDataSource ? DataSource : null;
+                var analyticsService = useAnalyticsService ? AnalyticsService : null;
 
                 Action tryingToConstructWithEmptyParameters =
-                    () => new EditDurationViewModel(navigationService, timeService, dataSource);
+                    () => new EditDurationViewModel(navigationService, timeService, dataSource, analyticsService);
 
                 tryingToConstructWithEmptyParameters.Should().Throw<ArgumentNullException>();
             }
@@ -47,8 +50,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var start = now.AddHours(-2);
                 var parameter = DurationParameter.WithStartAndDuration(start, null);
                 TimeService.CurrentDateTime.Returns(now);
-                ViewModel.Prepare(parameter);
-                
+
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
                 ViewModel.Duration = TimeSpan.FromHours(4);
 
                 var expectedStart = start.AddHours(-2);
@@ -61,8 +65,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var start = now.AddHours(-2);
                 var parameter = DurationParameter.WithStartAndDuration(start, now - start);
                 TimeService.CurrentDateTime.Returns(now);
-                ViewModel.Prepare(parameter);
-                
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
                 ViewModel.Duration = TimeSpan.FromHours(4);
 
                 var expectedStop = now.AddHours(2);
@@ -79,7 +83,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 tickObservable.Connect();
                 TimeService.CurrentDateTimeObservable.Returns(tickObservable);
                 TimeService.CurrentDateTime.Returns(now);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 tickSubject.OnNext(now.AddHours(2));
 
@@ -99,7 +103,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 tickObservable.Connect();
                 TimeService.CurrentDateTimeObservable.Returns(tickObservable);
                 TimeService.CurrentDateTime.Returns(now);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 var newCurrentTime = now + duration;
                 tickSubject.OnNext(newCurrentTime);
@@ -116,7 +120,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var start = now;
                 var parameter = DurationParameter.WithStartAndDuration(start, null);
 
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.StartTime.Should().Be(start);
             }
@@ -128,7 +132,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var parameter = DurationParameter.WithStartAndDuration(start, null);
                 TimeService.CurrentDateTime.Returns(now);
 
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.StartTime.Should().BeSameDateAs(start);
             }
@@ -140,7 +144,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var stop = start.AddHours(2);
                 var parameter = DurationParameter.WithStartAndDuration(start, stop - now);
 
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.StartTime.Should().BeSameDateAs(start);
             }
@@ -150,7 +154,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var parameter = DurationParameter.WithStartAndDuration(now, null);
                 TimeService.CurrentDateTimeObservable.Returns(Substitute.For<IObservable<DateTimeOffset>>());
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 TimeService.CurrentDateTimeObservable.Received().Subscribe(Arg.Any<AnonymousObserver<DateTimeOffset>>());
             }
@@ -161,7 +165,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var start = new DateTimeOffset(2018, 01, 15, 12, 34, 56, TimeSpan.Zero);
                 var parameter = DurationParameter.WithStartAndDuration(start, null);
 
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.IsRunning.Should().BeTrue();
             }
@@ -173,7 +177,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var duration = TimeSpan.FromMinutes(20);
                 var parameter = DurationParameter.WithStartAndDuration(start, duration);
 
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.IsRunning.Should().BeFalse();
             }
@@ -184,6 +188,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task ClosesTheViewModel()
             {
+                var parameter = DurationParameter.WithStartAndDuration(DateTimeOffset.UtcNow, null);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
                 await ViewModel.CloseCommand.ExecuteAsync();
 
                 await NavigationService.Received().Close(Arg.Is(ViewModel), Arg.Any<DurationParameter>());
@@ -192,7 +199,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public async Task ReturnsTheDefaultParameter()
             {
                 var parameter = DurationParameter.WithStartAndDuration(DateTimeOffset.UtcNow, null);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 await ViewModel.CloseCommand.ExecuteAsync();
 
@@ -205,6 +212,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task ClosesTheViewModel()
             {
+                var parameter = DurationParameter.WithStartAndDuration(DateTimeOffset.UtcNow, null);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
                 await ViewModel.SaveCommand.ExecuteAsync();
 
                 await NavigationService.Received().Close(Arg.Is(ViewModel), Arg.Any<DurationParameter>());
@@ -219,7 +229,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 TimeService.CurrentDateTime.Returns(now);
                 if (start >= now) return;
 
-                ViewModel.Prepare(DurationParameter.WithStartAndDuration(start, stop - start));
+                ViewModel.Prepare(new EditDurationParameters(DurationParameter.WithStartAndDuration(start, stop - start)));
                 ViewModel.Duration = TimeSpan.FromMinutes(10);
 
                 ViewModel.SaveCommand.ExecuteAsync().Wait();
@@ -234,7 +244,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 if (start > now) return;
                 TimeService.CurrentDateTime.Returns(now);
-                ViewModel.Prepare(DurationParameter.WithStartAndDuration(start, null));
+
+                ViewModel.Prepare(new EditDurationParameters(DurationParameter.WithStartAndDuration(start, null)));
                 ViewModel.Duration = TimeSpan.FromMinutes(10);
 
                 ViewModel.SaveCommand.ExecuteAsync().Wait();
@@ -254,7 +265,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void SetsTheIsEditingFlagsCorrectlyWhenNothingWasEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
 
@@ -265,7 +276,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void SetsTheIsEditingFlagsCorrectlyWhenStopTimeWasEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
                 ViewModel.EditStopTimeCommand.Execute();
 
                 ViewModel.EditStartTimeCommand.Execute();
@@ -277,7 +288,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ClosesEditingWhenStartTimeWasBeingEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
                 ViewModel.EditStartTimeCommand.Execute();
 
                 ViewModel.EditStartTimeCommand.Execute();
@@ -289,7 +300,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void InitializesTheEditTimePropertyWithTheStartTime()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
 
@@ -299,7 +310,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void SetsTheMinimumAndMaximumDateForTheDatePicker()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
 
@@ -314,7 +325,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void EmitsNewUnitWhenEditStartTimeCommandIsExecuted()
             {
                 var parameter = DurationParameter.WithStartAndDuration(new DateTimeOffset(2018, 1, 2, 3, 4, 5, TimeSpan.Zero), TimeSpan.Zero);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
                 var observer = Substitute.For<IObserver<Unit>>();
                 ViewModel.StartTimeChanging.Subscribe(observer);
 
@@ -333,7 +344,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void SetsTheIsEditingFlagsCorrectlyWhenNothingWasEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
 
@@ -344,7 +355,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void SetsTheIsEditingFlagsCorrectlyWhenStopTimeWasEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
                 ViewModel.EditStartTimeCommand.Execute();
 
                 ViewModel.EditStopTimeCommand.Execute();
@@ -356,7 +367,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ClosesEditingWhenStartTimeWasBeingEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
                 ViewModel.EditStopTimeCommand.Execute();
 
                 ViewModel.EditStopTimeCommand.Execute();
@@ -368,7 +379,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void InitializesTheEditTimePropertyWithTheStartTime()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
 
@@ -378,7 +389,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void SetsTheMinimumAndMaximumDateForTheDatePicker()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
 
@@ -391,7 +402,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var now = new DateTimeOffset(2018, 02, 20, 0, 0, 0, TimeSpan.Zero);
                 var runningTEParameter = DurationParameter.WithStartAndDuration(parameter.Start, null);
-                ViewModel.Prepare(runningTEParameter);
+                ViewModel.Prepare(new EditDurationParameters(runningTEParameter));
                 TimeService.CurrentDateTime.Returns(now);
 
                 ViewModel.EditStopTimeCommand.Execute();
@@ -407,7 +418,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var runningTEParameter = DurationParameter.WithStartAndDuration(parameter.Start, null);
                 var subject = new BehaviorSubject<DateTimeOffset>(now);
                 var observable = subject.AsObservable().Publish();
-                ViewModel.Prepare(runningTEParameter);
+                ViewModel.Prepare(new EditDurationParameters(runningTEParameter));
                 TimeService.CurrentDateTime.Returns(now);
                 TimeService.CurrentDateTimeObservable.Returns(observable);
 
@@ -427,7 +438,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ClearsAllTimeEditingFlagsWhenStartTimeWasEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
                 ViewModel.StopEditingTimeCommand.Execute();
@@ -440,7 +451,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ClearsAllTimeEditingFlagsWhenStopTimeWasEdited()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
                 ViewModel.StopEditingTimeCommand.Execute();
@@ -460,7 +471,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ReturnsTheStartTimeWhenIsEditingStartTime()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
 
@@ -470,7 +481,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact]
             public void ReturnsTheStopTimeWhenIsEditingStopTime()
             {
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
 
@@ -481,7 +492,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void DoesNotAcceptAnyValueWhenNotEditingNeitherStartNorStopTime()
             {
                 var editedValue = new DateTimeOffset(2018, 02, 20, 0, 0, 0, TimeSpan.Zero);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditedTime = editedValue;
 
@@ -494,7 +505,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void ChangesJustTheStartTime()
             {
                 var editedValue = new DateTimeOffset(2018, 01, 07, 0, 0, 0, TimeSpan.Zero);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
                 ViewModel.EditedTime = editedValue;
@@ -508,7 +519,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void DoesNotAllowChangingTheStartTimeToMoreThanTheMaximumDate()
             {
                 var editedValue = parameter.Start.Add(parameter.Duration.Value).AddHours(1);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
                 ViewModel.EditedTime = editedValue;
@@ -522,7 +533,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void DoesNotAllowChangingTheStartTimeToLessThanTheMinimumDate()
             {
                 var editedValue = parameter.Start.AddHours(-1000);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStartTimeCommand.Execute();
                 ViewModel.EditedTime = editedValue;
@@ -536,7 +547,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void ChangesJustTheStopTime()
             {
                 var editedValue = new DateTimeOffset(2018, 02, 20, 0, 0, 0, TimeSpan.Zero);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
                 ViewModel.EditedTime = editedValue;
@@ -550,7 +561,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void DoesNotAllowChangingTheStopTimeToMoreThanTheMaximumDate()
             {
                 var editedValue = parameter.Start.AddHours(1000);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
                 ViewModel.EditedTime = editedValue;
@@ -563,13 +574,99 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void DoesNotAllowChangingTheStopTimeToLessThanTheMinimumDate()
             {
                 var editedValue = parameter.Start.AddHours(-1);
-                ViewModel.Prepare(parameter);
+                ViewModel.Prepare(new EditDurationParameters(parameter));
 
                 ViewModel.EditStopTimeCommand.Execute();
                 ViewModel.EditedTime = editedValue;
 
                 ViewModel.EditedTime.Should().Be(ViewModel.MinimumDateTime);
                 ViewModel.StopTime.Should().Be(ViewModel.MinimumDateTime);
+            }
+        }
+
+        public sealed class TheIsDurationInitiallyFocusedProperty : EditDurationViewModelTest
+        {
+            private static DurationParameter parameter = DurationParameter.WithStartAndDuration(
+                new DateTimeOffset(2018, 01, 13, 0, 0, 0, TimeSpan.Zero),
+                TimeSpan.FromMinutes(7));
+
+            [Fact]
+            public void DefaultToNone()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+                ViewModel.IsDurationInitiallyFocused.Should().Be(false);
+            }
+
+            [Fact]
+            public void ShouldBeSetProperly()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter, isStartingNewEntry: true, isDurationInitiallyFocused: true));
+                ViewModel.IsDurationInitiallyFocused.Should().Be(true);
+            }
+        }
+
+        public sealed class TheAnalyticsService : EditDurationViewModelTest
+        {
+            private static readonly DurationParameter parameter = DurationParameter.WithStartAndDuration(
+                new DateTimeOffset(2018, 01, 13, 0, 0, 0, TimeSpan.Zero),
+                TimeSpan.FromMinutes(7));
+
+            [Fact, LogIfTooSlow]
+            public void ReceivesEventWhenViewModelCloses()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
+                ViewModel.CloseCommand.Execute();
+
+                AnalyticsService.Received().Track(
+                    Arg.Is<ITrackableEvent>(trackableEvent =>
+                        trackableEvent.EventName == "EditDuration"
+                        && trackableEvent.ToDictionary().ContainsKey("navigationOrigin")
+                        && trackableEvent.ToDictionary().ContainsKey("result")
+                        && trackableEvent.ToDictionary()["navigationOrigin"] == EditDurationEvent.NavigationOrigin.Edit.ToString()
+                        && trackableEvent.ToDictionary()["result"] == EditDurationEvent.Result.Cancel.ToString()
+                    )
+                );
+            }
+
+            [Fact, LogIfTooSlow]
+            public void ReceivesEventWhenViewModelSaves()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter, isStartingNewEntry: true));
+
+                ViewModel.SaveCommand.Execute();
+
+                AnalyticsService.Received().Track(
+                    Arg.Is<ITrackableEvent>(trackableEvent =>
+                        trackableEvent.EventName == "EditDuration"
+                        && trackableEvent.ToDictionary().ContainsKey("navigationOrigin")
+                        && trackableEvent.ToDictionary().ContainsKey("result")
+                        && trackableEvent.ToDictionary()["navigationOrigin"] == EditDurationEvent.NavigationOrigin.Start.ToString()
+                        && trackableEvent.ToDictionary()["result"] == EditDurationEvent.Result.Save.ToString()
+                    )
+                );
+            }
+
+            [Fact, LogIfTooSlow]
+            public void SetsCorrectParametersOnEdition()
+            {
+                ViewModel.Prepare(new EditDurationParameters(parameter));
+
+                ViewModel.TimeEditedWithSource(EditTimeSource.WheelBothTimes);
+                ViewModel.TimeEditedWithSource(EditTimeSource.BarrelStartDate);
+                ViewModel.SaveCommand.Execute();
+
+                AnalyticsService.Received().Track(
+                    Arg.Is<ITrackableEvent>(trackableEvent =>
+                        trackableEvent.EventName == "EditDuration"
+                        && trackableEvent.ToDictionary().ContainsKey("changedBothTimesWithWheel")
+                        && trackableEvent.ToDictionary().ContainsKey("changedStartDateWithBarrel")
+                        && trackableEvent.ToDictionary().ContainsKey("changedEndDateWithBarrel")
+                        && trackableEvent.ToDictionary()["changedBothTimesWithWheel"] == true.ToString()
+                        && trackableEvent.ToDictionary()["changedStartDateWithBarrel"] == true.ToString()
+                        && trackableEvent.ToDictionary()["changedEndDateWithBarrel"] == false.ToString()
+                    )
+                );
             }
         }
     }

@@ -125,6 +125,11 @@ namespace Toggl.Daneel
             );
 
             registry.RegisterCustomBindingFactory<UIView>(
+                ViewLongPressCommandTargetBinding.BindingName,
+                view => new ViewLongPressCommandTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<UIView>(
                 ViewVisibilityWithFadeTargetBinding.BindingName,
                 view => new ViewVisibilityWithFadeTargetBinding(view)
             );

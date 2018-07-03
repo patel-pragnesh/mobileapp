@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Toggl.Ultrawave.Tests.Integration.BaseTests;
 using Xunit;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
-using Toggl.Ultrawave.Tests.Integration.Helper;
+using Toggl.Ultrawave.Models;
+using Task = System.Threading.Tasks.Task;
 
 namespace Toggl.Ultrawave.Tests.Integration
 {
@@ -37,7 +37,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ReturnsAllWorkspaceFeaturesForMultipleWorkspaces()
             {
                 var (togglClient, user) = await SetupTestUser();
-                var anotherWorkspace = await togglClient.Workspaces.Create(Guid.NewGuid().ToString());
+                var anotherWorkspace = await togglClient.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 var workspaceFeatureCollection = await CallEndpointWith(togglClient);
 

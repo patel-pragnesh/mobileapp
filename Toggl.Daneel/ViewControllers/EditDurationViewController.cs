@@ -14,6 +14,13 @@ using UIKit;
 using static Toggl.Daneel.Extensions.FontExtensions;
 using Toggl.Daneel.Converters;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Toggl.Foundation.Analytics;
+using Toggl.Foundation.DTOs;
+using Toggl.Foundation.MvvmCross.Extensions;
+using Toggl.Foundation.MvvmCross.Parameters;
+using Toggl.Multivac.Extensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -26,6 +33,8 @@ namespace Toggl.Daneel.ViewControllers
         private bool viewDidAppear = false;
 
         private IDisposable startTimeChangingSubscription;
+
+        private CompositeDisposable disposeBag = new CompositeDisposable();
 
         public EditDurationViewController() : base(nameof(EditDurationViewController))
         {
@@ -195,6 +204,37 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.IsRunning);
 
             bindingSet.Apply();
+
+            // Interaction observables for analytics
+
+            var editingStart = Observable.Merge(
+                StartView.Tapped().Select(true),
+                EndView.Tapped().Select(false)
+            );
+
+            var dateComponentChanged = DatePicker.DateComponentChanged()
+                .WithLatestFrom(editingStart,
+                    (_, isStart) => isStart ? EditTimeSource.BarrelStartDate : EditTimeSource.BarrelStopDate
+                 );
+
+            var timeComponentChanged = DatePicker.TimeComponentChanged()
+                .WithLatestFrom(editingStart,
+                    (_, isStart) => isStart ? EditTimeSource.BarrelStartTime : EditTimeSource.BarrelStopTime
+                 );
+
+            var durationInputChanged = Observable
+                .FromEventPattern(e => DurationInput.DurationChanged += e, e => DurationInput.DurationChanged -= e)
+                .Select(EditTimeSource.NumpadDuration);
+
+            Observable.Merge(
+                    dateComponentChanged,
+                    timeComponentChanged,
+                    WheelView.TimeEdited,
+                    durationInputChanged
+                )
+                .Distinct()
+                .Subscribe(ViewModel.TimeEditedWithSource)
+                .DisposedBy(disposeBag);
         }
 
         public override void ViewDidLayoutSubviews()
@@ -210,6 +250,8 @@ namespace Toggl.Daneel.ViewControllers
 
             if (!disposing) return;
 
+            disposeBag?.Dispose();
+
             startTimeChangingSubscription?.Dispose();
         }
 
@@ -219,7 +261,9 @@ namespace Toggl.Daneel.ViewControllers
 
             viewDidAppear = true;
 
-            DurationInput.BecomeFirstResponder();
+            if (ViewModel.IsDurationInitiallyFocused) {
+                DurationInput.BecomeFirstResponder();
+            }
         }
 
         protected override void KeyboardWillShow(object sender, UIKeyboardEventArgs e)

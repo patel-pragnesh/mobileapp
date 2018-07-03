@@ -659,5 +659,32 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         (builder, _) => builder.Append(grapheme))
                     .ToString();
         }
+
+        public sealed class TheIsFilterEmptyProperty : SelectTagsViewModelTest
+        {
+            [Theory, LogIfTooSlow]
+            [InlineData("")]
+            [InlineData("     ")]
+            [InlineData("\t")]
+            [InlineData("  \t  ")]
+            public void IsTrueWhenTextIsEmptyOrWhitespace(string text)
+            {
+                ViewModel.Text = text;
+
+                ViewModel.IsFilterEmpty.Should().BeTrue();
+            }
+
+            [Theory, LogIfTooSlow]
+            [InlineData("1")]
+            [InlineData("4")]
+            [InlineData("  6    ")]
+            [InlineData("\t7  ")]
+            public void IsFalseWhenTextIsNotEmptyOrWhitespace(string text)
+            {
+                ViewModel.Text = text;
+
+                ViewModel.IsFilterEmpty.Should().BeFalse();
+            }
+        }
     }
 }

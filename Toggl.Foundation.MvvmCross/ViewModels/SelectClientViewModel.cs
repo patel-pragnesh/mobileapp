@@ -34,7 +34,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             {
                 var text = Text.Trim();
                 return !string.IsNullOrEmpty(text)
-                    && !Suggestions.Any(s => s.Name == text)
+                    && Suggestions.None(s => s.Name == text)
                     && text.LengthInBytes() <= MaxClientNameLengthInBytes;
             }
         }

@@ -64,6 +64,7 @@ namespace Toggl.Daneel
 
             Mvx.RegisterSingleton<IMvxNavigationService>(navigationService);
             return navigationService;
+
         }
 
         protected override void InitializeApp(IMvxPluginManager pluginManager, IMvxApplication app)
@@ -78,6 +79,10 @@ namespace Toggl.Daneel
             var database = new Database();
             var scheduler = Scheduler.Default;
             var timeService = new TimeService(scheduler);
+            var topViewControllerProvider = (ITopViewControllerProvider)Presenter;
+            var mailService = new MailService(topViewControllerProvider);
+            var dialogService = new DialogService(topViewControllerProvider);
+            var platformConstants = new PlatformConstants();
             var suggestionProviderContainer = new SuggestionProviderContainer(
                 new MostUsedTimeEntrySuggestionProvider(database, timeService, maxNumberOfSuggestions)
             );
@@ -92,19 +97,23 @@ namespace Toggl.Daneel
                     .ForClient(userAgent, appVersion)
                     .WithDatabase(database)
                     .WithScheduler(scheduler)
+                    .WithMailService(mailService)
                     .WithTimeService(timeService)
                     .WithApiEnvironment(environment)
                     .WithGoogleService<GoogleService>()
+                    .WithRatingService<RatingService>()
                     .WithLicenseProvider<LicenseProvider>()
                     .WithAnalyticsService(analyticsService)
-                    .WithPlatformConstants<PlatformConstants>()
+                    .WithPlatformConstants(platformConstants)
+                    .WithRemoteConfigService<RemoteConfigService>()
                     .WithApiFactory(new ApiFactory(environment, userAgent))
                     .WithBackgroundService(new BackgroundService(timeService))
                     .WithApplicationShortcutCreator<ApplicationShortcutCreator>()
                     .WithSuggestionProviderContainer(suggestionProviderContainer)
-                    .WithMailService(new MailService((ITopViewControllerProvider)Presenter))
 
                     .StartRegisteringPlatformServices()
+                    .WithDialogService(dialogService)
+                    .WithLastTimeUsageStorage(settingsStorage)
                     .WithBrowserService<BrowserService>()
                     .WithKeyValueStorage(keyValueStorage)
                     .WithUserPreferences(settingsStorage)
@@ -112,8 +121,8 @@ namespace Toggl.Daneel
                     .WithNavigationService(navigationService)
                     .WithAccessRestrictionStorage(settingsStorage)
                     .WithPasswordManagerService<OnePasswordService>()
-                    .WithDialogService(new DialogService((ITopViewControllerProvider)Presenter))
-                    .WithApiErrorHandlingService(new ApiErrorHandlingService(navigationService, settingsStorage))
+                    .WithErrorHandlingService(new ErrorHandlingService(navigationService, settingsStorage))
+                    .WithFeedbackService(new FeedbackService(userAgent, mailService, dialogService, platformConstants))
                     .Build();
 
             foundation.RevokeNewUserIfNeeded().Initialize();

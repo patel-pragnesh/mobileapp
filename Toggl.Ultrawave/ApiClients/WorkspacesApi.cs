@@ -32,9 +32,9 @@ namespace Toggl.Ultrawave.ApiClients
             return observable;
         }
 
-        public IObservable<IWorkspace> Create(string name)
+        public IObservable<IWorkspace> Create(IWorkspace workspace)
         {
-            var dto = new UserApi.WorkspaceParameters { Name = name, InitialPricingPlan = PricingPlans.Free };
+            var dto = new UserApi.WorkspaceParameters { Name = workspace.Name, InitialPricingPlan = PricingPlans.Free };
             var json = serializer.Serialize(dto, SerializationReason.Post, features: null);
 
             return CreateObservable<Workspace>(endPoints.Post, AuthHeader, json);

@@ -12,6 +12,9 @@
     <OutputPath>..\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Analytics\ComplexEvents\StartTimeEntryEvent.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -33,6 +36,7 @@
     <Folder Include="Analytics\" />
     <Folder Include="Interactors\Sync\" />
     <Folder Include="Serialization\" />
+    <Folder Include="Experiments\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />

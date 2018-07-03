@@ -31,7 +31,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IAnalyticsService analyticsService;
         private readonly IOnboardingStorage onboardingStorage;
         private readonly IMvxNavigationService navigationService;
-        private readonly IApiErrorHandlingService apiErrorHandlingService;
+        private readonly IErrorHandlingService errorHandlingService;
+        private readonly ILastTimeUsageStorage lastTimeUsageStorage;
+        private readonly ITimeService timeService;
 
         private IDisposable getCountrySubscription;
         private IDisposable signupDisposable;
@@ -42,6 +44,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public string CountryButtonTitle { get; private set; } = Resources.SelectCountry;
 
         public bool IsCountryErrorVisible { get; private set; } = false;
+
+        public bool IsCountryValid => countryId.HasValue;
 
         public Email Email { get; set; } = Email.Empty;
 
@@ -79,21 +83,27 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IAnalyticsService analyticsService,
             IOnboardingStorage onboardingStorage,
             IMvxNavigationService navigationService,
-            IApiErrorHandlingService apiErrorHandlingService)
+            IErrorHandlingService errorHandlingService,
+            ILastTimeUsageStorage lastTimeUsageStorage,
+            ITimeService timeService)
         {
             Ensure.Argument.IsNotNull(apiFactory, nameof(apiFactory));
             Ensure.Argument.IsNotNull(loginManager, nameof(loginManager));
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
-            Ensure.Argument.IsNotNull(apiErrorHandlingService, nameof(apiErrorHandlingService));
+            Ensure.Argument.IsNotNull(errorHandlingService, nameof(errorHandlingService));
+            Ensure.Argument.IsNotNull(lastTimeUsageStorage, nameof(lastTimeUsageStorage));
+            Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
             this.apiFactory = apiFactory;
             this.loginManager = loginManager;
             this.analyticsService = analyticsService;
             this.onboardingStorage = onboardingStorage;
             this.navigationService = navigationService;
-            this.apiErrorHandlingService = apiErrorHandlingService;
+            this.errorHandlingService = errorHandlingService;
+            this.lastTimeUsageStorage = lastTimeUsageStorage;
+            this.timeService = timeService;
 
             LoginCommand = new MvxAsyncCommand(login);
             GoogleSignupCommand = new MvxCommand(googleSignup);
@@ -163,6 +173,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async void onDataSource(ITogglDataSource dataSource)
         {
+            lastTimeUsageStorage.SetLogin(timeService.CurrentDateTime);
+
             await dataSource.StartSyncing();
 
             onboardingStorage.SetIsNewUser(true);
@@ -176,7 +188,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsLoading = false;
             onCompleted();
 
-            if (apiErrorHandlingService.TryHandleDeprecationError(exception))
+            if (errorHandlingService.TryHandleDeprecationError(exception))
                 return;
 
             switch (exception)

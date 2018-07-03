@@ -164,12 +164,35 @@ namespace Toggl.Giskard.Fragments
 
         private void updateTimePickerWidgets(bool is24HoursMode)
         {
+            if (startTimePicker != null)
+            {
+                startTimePicker.ValueChanged -= updateStartTime;
+                startTimePicker.Dispose();
+            }
             startTimePicker = new TogglDroidTimePicker(Context, is24HoursMode);
-            stopTimePicker = new TogglDroidTimePicker(Context, is24HoursMode);
             startTimePickerContainer.RemoveAllViews();
-            stopTimePickerContainer.RemoveAllViews();
             startTimePickerContainer.AddView(startTimePicker);
+            startTimePicker.ValueChanged += updateStartTime;
+
+            if (stopTimePicker != null)
+            {
+                stopTimePicker.ValueChanged -= updateStopTime;
+                stopTimePicker.Dispose();
+            }
+            stopTimePicker = new TogglDroidTimePicker(Context, is24HoursMode);
+            stopTimePickerContainer.RemoveAllViews();
             stopTimePickerContainer.AddView(stopTimePicker);
+            stopTimePicker.ValueChanged += updateStopTime;
+        }
+
+        private void updateStartTime(object sender, EventArgs args)
+        {
+            ViewModel.StartTime = startTimePicker.Value;
+        }
+
+        private void updateStopTime(object sender, EventArgs args)
+        {
+            ViewModel.StopTime = stopTimePicker.Value;
         }
 
         private Dictionary<TemporalInconsistency, int> inconsistencyMessages = new Dictionary<TemporalInconsistency, int>

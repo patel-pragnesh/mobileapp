@@ -9,6 +9,8 @@ using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
+using System.Reactive.Disposables;
+using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 
 namespace Toggl.Giskard.Activities
 {
@@ -16,8 +18,10 @@ namespace Toggl.Giskard.Activities
     [Activity(Theme = "@style/AppTheme",
               ScreenOrientation = ScreenOrientation.Portrait,
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
-    public sealed class StartTimeEntryActivity : MvxAppCompatActivity<StartTimeEntryViewModel>
+    public sealed partial class StartTimeEntryActivity : MvxAppCompatActivity<StartTimeEntryViewModel>, IReactiveBindingHolder
     {
+        public CompositeDisposable DisposeBag { get; private set; } = new CompositeDisposable();
+
         protected override void OnCreate(Bundle bundle)
         {
             this.ChangeStatusBarColor(new Color(ContextCompat.GetColor(this, Resource.Color.blueStatusBarBackground)));
@@ -26,6 +30,14 @@ namespace Toggl.Giskard.Activities
             SetContentView(Resource.Layout.StartTimeEntryActivity);
 
             OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
+
+            initializeViews();
+            setupBindings();
+        }
+
+        private void setupBindings()
+        {
+            this.Bind(durationLabel.Tapped(), _ => ViewModel.SelectTimeCommand.Execute(Duration));
         }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -49,6 +61,15 @@ namespace Toggl.Giskard.Activities
         {
             base.Finish();
             OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_bottom);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (!isDisposing) return;
+
+            DisposeBag?.Dispose();
         }
     }
 }

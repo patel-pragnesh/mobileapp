@@ -1,6 +1,5 @@
-﻿using MvvmCross.Binding.BindingContext;
-using MvvmCross.iOS.Views;
-using Toggl.Daneel.Extensions;
+﻿using MvvmCross.iOS.Views;
+using Toggl.Daneel.Cells.Settings;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation;
 using Toggl.Foundation.MvvmCross.ViewModels;
@@ -8,30 +7,21 @@ using UIKit;
 
 namespace Toggl.Daneel.ViewControllers
 {
-    public sealed partial class LicensesViewController : MvxViewController<LicensesViewModel>
+    public sealed class LicensesViewController : MvxTableViewController<LicensesViewModel>
     {
-        public LicensesViewController() : base(nameof(LicensesViewController), null)
-        {
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             Title = Resources.Licenses;
 
-            LicensesTableView.RowHeight = UITableView.AutomaticDimension;
-            LicensesTableView.EstimatedRowHeight = 396;
-            LicensesTableView.SectionHeaderHeight = 44;
+            TableView.Source = new LicensesTableViewSource(ViewModel.Licenses);
+            TableView.EstimatedRowHeight = 396;
+            TableView.SectionHeaderHeight = 44;
+            TableView.RowHeight = UITableView.AutomaticDimension;
 
-            var source = new LicensesTableViewSource(LicensesTableView);
-            LicensesTableView.Source = source;
-
-            var bindingSet = this.CreateBindingSet<LicensesViewController, LicensesViewModel>();
-
-            bindingSet.Bind(source).To(vm => vm.Licenses);
-
-            bindingSet.Apply();
+            TableView.RegisterNibForCellReuse(LicensesViewCell.Nib, LicensesTableViewSource.CellIdentifier);
+            TableView.RegisterNibForHeaderFooterViewReuse(LicensesHeaderViewCell.Nib, LicensesTableViewSource.HeaderIdentifier);
         }
     }
 }

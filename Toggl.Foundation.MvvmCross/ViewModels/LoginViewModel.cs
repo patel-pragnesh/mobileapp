@@ -26,7 +26,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IOnboardingStorage onboardingStorage;
         private readonly IMvxNavigationService navigationService;
         private readonly IPasswordManagerService passwordManagerService;
-        private readonly IApiErrorHandlingService apiErrorHandlingService;
+        private readonly IErrorHandlingService errorHandlingService;
+        private readonly ILastTimeUsageStorage lastTimeUsageStorage;
+        private readonly ITimeService timeService;
 
         private IDisposable loginDisposable;
 
@@ -71,21 +73,27 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IOnboardingStorage onboardingStorage,
             IMvxNavigationService navigationService,
             IPasswordManagerService passwordManagerService,
-            IApiErrorHandlingService apiErrorHandlingService)
+            IErrorHandlingService errorHandlingService,
+            ILastTimeUsageStorage lastTimeUsageStorage,
+            ITimeService timeService)
         {
             Ensure.Argument.IsNotNull(loginManager, nameof(loginManager));
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(passwordManagerService, nameof(passwordManagerService));
-            Ensure.Argument.IsNotNull(apiErrorHandlingService, nameof(apiErrorHandlingService));
+            Ensure.Argument.IsNotNull(errorHandlingService, nameof(errorHandlingService));
+            Ensure.Argument.IsNotNull(lastTimeUsageStorage, nameof(lastTimeUsageStorage));
+            Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
             this.loginManager = loginManager;
             this.analyticsService = analyticsService;
             this.onboardingStorage = onboardingStorage;
             this.navigationService = navigationService;
             this.passwordManagerService = passwordManagerService;
-            this.apiErrorHandlingService = apiErrorHandlingService;
+            this.errorHandlingService = errorHandlingService;
+            this.lastTimeUsageStorage = lastTimeUsageStorage;
+            this.timeService = timeService;
 
             SignupCommand = new MvxAsyncCommand(signup);
             GoogleLoginCommand = new MvxCommand(googleLogin);
@@ -115,6 +123,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private async void onDataSource(ITogglDataSource dataSource)
         {
+            lastTimeUsageStorage.SetLogin(timeService.CurrentDateTime);
+
             await dataSource.StartSyncing();
 
             IsLoading = false;
@@ -129,7 +139,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IsLoading = false;
             onCompleted();
 
-            if (apiErrorHandlingService.TryHandleDeprecationError(exception))
+            if (errorHandlingService.TryHandleDeprecationError(exception))
                 return;
 
             switch (exception)

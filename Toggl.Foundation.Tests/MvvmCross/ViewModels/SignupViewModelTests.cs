@@ -15,7 +15,7 @@ using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
 using Toggl.Multivac;
 using Toggl.Multivac.Models;
-using Toggl.Ultrawave;
+using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave.Exceptions;
 using Toggl.Ultrawave.Network;
 using Xunit;
@@ -33,6 +33,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected Password InvalidPassword { get; } = Password.Empty;
 
             protected ILocation Location { get; } = Substitute.For<ILocation>();
+            protected ILastTimeUsageStorage LastTimeUsageStorage { get; } = Substitute.For<ILastTimeUsageStorage>();
 
             protected override SignupViewModel CreateViewModel()
                 => new SignupViewModel(
@@ -41,7 +42,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     AnalyticsService,
                     OnboardingStorage,
                     NavigationService,
-                    ApiErrorHandlingService);
+                    ErrorHandlingService,
+                    LastTimeUsageStorage,
+                    TimeService);
 
             protected override void AdditionalSetup()
             {
@@ -57,21 +60,25 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheConstructor : SignupViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(SixParameterConstructorTestData))]
+            [ClassData(typeof(EightParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool useApiFactory,
                 bool userLoginManager,
                 bool useAnalyticsService,
                 bool useOnboardingStorage,
                 bool userNavigationService,
-                bool useApiErrorHandlingService)
+                bool useApiErrorHandlingService,
+                bool useLastTimeUsageStorage,
+                bool useTimeService)
             {
                 var apiFactory = useApiFactory ? ApiFactory : null;
                 var loginManager = userLoginManager ? LoginManager : null;
                 var analyticsSerivce = useAnalyticsService ? AnalyticsService : null;
                 var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
                 var navigationService = userNavigationService ? NavigationService : null;
-                var apiErrorHandlingService = useApiErrorHandlingService ? ApiErrorHandlingService : null;
+                var apiErrorHandlingService = useApiErrorHandlingService ? ErrorHandlingService : null;
+                var lastTimeUsageService = useLastTimeUsageStorage ? LastTimeUsageStorage : null;
+                var timeService = useTimeService ? TimeService : null;
 
                 Action tryingToConstructWithEmptyParameters =
                     () => new SignupViewModel(
@@ -80,7 +87,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         analyticsSerivce,
                         onboardingStorage,
                         navigationService,
-                        apiErrorHandlingService);
+                        apiErrorHandlingService,
+                        lastTimeUsageService,
+                        timeService);
 
                 tryingToConstructWithEmptyParameters
                     .Should().Throw<ArgumentNullException>();
@@ -186,6 +195,24 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 ViewModel.IsCountryErrorVisible.Should().BeFalse();
             }
+
+            [Fact, LogIfTooSlow]
+            public async Task IsCountryValidShouldBeFalseWhenNetworkFailed()
+            {
+                Api.Location.Get().Returns(Observable.Throw<ILocation>(new Exception()));
+
+                await ViewModel.Initialize();
+
+                ViewModel.IsCountryValid.Should().BeFalse();
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task IsCountryValidShouldBeTrueWhenApiSucceeds()
+            {
+                await ViewModel.Initialize();
+
+                ViewModel.IsCountryValid.Should().BeTrue();
+            }
         }
 
         public sealed class TheGoogleSignupCommand : SignupViewModelTest
@@ -268,6 +295,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
             public sealed class WhenSignupSucceeds : SuccessfulSignupTest
             {
+                protected override void ExecuteCommand()
+                {
+                    ViewModel.GoogleSignupCommand.Execute();
+                }
+
                 protected override void AdditionalViewModelSetup()
                 {
                     base.AdditionalViewModelSetup();
@@ -275,8 +307,17 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     LoginManager
                         .SignUpWithGoogle()
                         .Returns(Observable.Return(DataSource));
+                }
 
-                    ViewModel.GoogleSignupCommand.Execute();
+                [Property]
+                public void SavesTheTimeOfLastLogin(DateTimeOffset now)
+                {
+                    var viewModel = CreateViewModel();
+                    TimeService.CurrentDateTime.Returns(now);
+
+                    viewModel.GoogleSignupCommand.Execute();
+
+                    LastTimeUsageStorage.Received().SetLogin(now);
                 }
             }
         }
@@ -326,9 +367,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void PassesTheCredentialsToLoginViewModelIfUserTriedToSignUpWithExistingEmail()
             {
+                var request = Substitute.For<IRequest>();
+                request.Endpoint.Returns(new Uri("http://any.url.com"));
                 var exception = new EmailIsAlreadyUsedException(
                     new BadRequestException(
-                        Substitute.For<IRequest>(), Substitute.For<IResponse>()
+                        request, Substitute.For<IResponse>()
                     )
                 );
                 LoginManager
@@ -452,6 +495,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 public sealed class WhenSignupSucceeds : SuccessfulSignupTest
                 {
+                    protected override void ExecuteCommand()
+                    {
+                        ViewModel.SignupCommand.Execute();
+                    }
+
                     protected override void AdditionalViewModelSetup()
                     {
                         base.AdditionalViewModelSetup();
@@ -466,7 +514,20 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         NavigationService
                             .Navigate<bool>(typeof(TermsOfServiceViewModel))
                             .Returns(true);
-                        ViewModel.SignupCommand.Execute();
+                    }
+
+                    [Property]
+                    public void SavesTheTimeOfLastLogin(DateTimeOffset now)
+                    {
+                        var viewModel = CreateViewModel();
+                        viewModel.Initialize().Wait();
+                        viewModel.Email = ValidEmail;
+                        viewModel.Password = ValidPassword;
+                        TimeService.CurrentDateTime.Returns(now);
+
+                        viewModel.SignupCommand.Execute();
+
+                        LastTimeUsageStorage.Received().SetLogin(now);
                     }
                 }
 
@@ -518,9 +579,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     [Fact, LogIfTooSlow]
                     public void SetsEmailAlreadyUsedErrorIfReceivedEmailIsAlreadyusedException()
                     {
+                        var request = Substitute.For<IRequest>();
+                        request.Endpoint.Returns(new Uri("https://any.url.com"));
                         prepareException(new EmailIsAlreadyUsedException(
                             new BadRequestException(
-                                Substitute.For<IRequest>(),
+                                request,
                                 Substitute.For<IResponse>()
                             )
                         ));
@@ -545,32 +608,37 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public abstract class SuccessfulSignupTest : SignupViewModelTest
         {
-            protected override void AdditionalViewModelSetup()
-            {
-                base.AdditionalViewModelSetup();
-            }
+            protected abstract void ExecuteCommand();
 
             [Fact, LogIfTooSlow]
             public void StartsSyncing()
             {
+                ExecuteCommand();
+
                 DataSource.Received().StartSyncing();
             }
 
             [Fact, LogIfTooSlow]
             public void SetsIsNewUserToTrue()
             {
+                ExecuteCommand();
+
                 OnboardingStorage.Received().SetIsNewUser(true);
             }
 
             [Fact, LogIfTooSlow]
             public void SetsUserSignedUp()
             {
+                ExecuteCommand();
+
                 OnboardingStorage.Received().SetUserSignedUp();
             }
 
             [Fact, LogIfTooSlow]
             public void NavigatesToMainViewModel()
             {
+                ExecuteCommand();
+
                 NavigationService.Received().Navigate<MainViewModel>();
             }
         }

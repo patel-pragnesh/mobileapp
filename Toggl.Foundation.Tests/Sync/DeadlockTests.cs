@@ -12,6 +12,7 @@ using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Tests.Sync.States;
 using Toggl.Multivac.Extensions;
+using Toggl.PrimeRadiant.Settings;
 using Xunit;
 using static Toggl.Foundation.Sync.SyncState;
 
@@ -38,13 +39,15 @@ namespace Toggl.Foundation.Tests.Sync
             protected void Reset()
             {
                 var analyticsService = Substitute.For<IAnalyticsService>();
+                var lastTimeUsageStorage = Substitute.For<ILastTimeUsageStorage>();
+                var timeService = Substitute.For<ITimeService>();
                 Queue = new SyncStateQueue();
                 Transitions = new TransitionHandlerProvider();
                 Scheduler = new TestScheduler();
                 StateMachine = new StateMachine(Transitions, Scheduler, Substitute.For<ISubject<Unit>>());
                 EntryPoints = new StateMachineEntryPoints();
                 Orchestrator = new StateMachineOrchestrator(StateMachine, EntryPoints);
-                SyncManager = new SyncManager(Queue, Orchestrator, analyticsService);
+                SyncManager = new SyncManager(Queue, Orchestrator, analyticsService, lastTimeUsageStorage, timeService);
             }
 
             protected StateResult PreparePullTransitions(int n)
@@ -66,7 +69,7 @@ namespace Toggl.Foundation.Tests.Sync
                         observer.OnCompleted();
                     });
 
-                    Transitions.ConfigureTransition(lastResult, transition);
+                    Transitions.ConfigureTransition(lastResult, new TestSyncState(transition));
 
                     lastResult = nextResult;
                 }
@@ -77,7 +80,7 @@ namespace Toggl.Foundation.Tests.Sync
             protected void PrepareFailingTransition(StateResult lastResult)
             {
                 Func<IObservable<ITransition>> failingTransition = () => Observable.Throw<ITransition>(new TestException());
-                Transitions.ConfigureTransition(lastResult, failingTransition);
+                Transitions.ConfigureTransition(lastResult, new TestSyncState(failingTransition));
             }
         }
 
@@ -233,7 +236,7 @@ namespace Toggl.Foundation.Tests.Sync
                 Reset();
                 var someResult = new StateResult();
                 var lastResult = PrepareTransitions(someResult, n);
-                Transitions.ConfigureTransition(lastResult, () => Observable.Never<ITransition>());
+                Transitions.ConfigureTransition(lastResult, new TestSyncState(Observable.Never<ITransition>));
 
                 var observable = stateMachineFinised();
                 StateMachine.Start(someResult.Transition());

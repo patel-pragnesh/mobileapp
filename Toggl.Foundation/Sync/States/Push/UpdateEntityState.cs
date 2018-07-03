@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Reactive.Linq;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources.Interfaces;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.Ultrawave.ApiClients;
+using static Toggl.Foundation.Sync.PushSyncOperation;
 
 namespace Toggl.Foundation.Sync.States.Push
 {
@@ -25,8 +28,9 @@ namespace Toggl.Foundation.Sync.States.Push
         public UpdateEntityState(
             IUpdatingApiClient<TModel> api,
             IBaseDataSource<TThreadsafeModel> dataSource,
+            IAnalyticsService analyticsService,
             Func<TModel, TThreadsafeModel> convertToThreadsafeModel)
-            : base(dataSource)
+            : base(dataSource, analyticsService)
         {
             Ensure.Argument.IsNotNull(api, nameof(api));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
@@ -43,7 +47,9 @@ namespace Toggl.Foundation.Sync.States.Push
                 .SelectMany(result => result is IgnoreResult<TThreadsafeModel>
                     ? entityChanged(entity)
                     : succeeded(extractFrom(result)))
-                .Catch(Fail(entity));
+                .Track(AnalyticsService.EntitySynced, Update, entity.GetSafeTypeName())
+                .Track(AnalyticsService.EntitySyncStatus, entity.GetSafeTypeName(), $"{Update}:{Resources.Success}")
+                .Catch(Fail(entity, Update));
 
         private IObservable<TModel> update(TModel entity)
             => entity == null

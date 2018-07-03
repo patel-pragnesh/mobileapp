@@ -192,7 +192,8 @@ namespace Toggl.Foundation.Tests.Interactors
             {
                 await CallInteractor(CreatePrototype(ValidTime, ValidDescription, true, ProjectId));
 
-                AnalyticsService.Received().TimeEntryStarted.Track(TimeEntryStartOrigin.Continue);
+                AnalyticsService.Received().Track(Arg.Is<StartTimeEntryEvent>(
+                        startTimeEntryEvent => startTimeEntryEvent.Origin == TimeEntryStartOrigin.Continue));
             }
 
             [Fact, LogIfTooSlow]
@@ -235,7 +236,8 @@ namespace Toggl.Foundation.Tests.Interactors
             {
                 await CallInteractor(CreatePrototype(ValidTime, ValidDescription, true, ProjectId));
 
-                AnalyticsService.Received().TimeEntryStarted.Track(TimeEntryStartOrigin.Suggestion);
+                AnalyticsService.Received().Track(Arg.Is<StartTimeEntryEvent>(
+                    startTimeEntryEvent => startTimeEntryEvent.Origin == TimeEntryStartOrigin.Suggestion));
             }
 
             [Fact, LogIfTooSlow]
@@ -259,7 +261,8 @@ namespace Toggl.Foundation.Tests.Interactors
             {
                 await CallInteractor(CreatePrototype(ValidTime, ValidDescription, true, ProjectId));
 
-                AnalyticsService.Received().TimeEntryStarted.Track(TimeEntryStartOrigin.Timer);
+                AnalyticsService.Received().Track(Arg.Is<StartTimeEntryEvent>(
+                    startTimeEntryEvent => startTimeEntryEvent.Origin == TimeEntryStartOrigin.Timer));
             }
 
             [Fact, LogIfTooSlow]
@@ -268,7 +271,8 @@ namespace Toggl.Foundation.Tests.Interactors
                 var prototype = CreatePrototype(ValidTime, ValidDescription, true, ProjectId, duration: TimeSpan.FromMinutes(1));
                 await CallInteractor(prototype);
 
-                AnalyticsService.Received().TimeEntryStarted.Track(TimeEntryStartOrigin.Manual);
+                AnalyticsService.Received().Track(Arg.Is<StartTimeEntryEvent>(
+                    startTimeEntryEvent => startTimeEntryEvent.Origin == TimeEntryStartOrigin.Manual));
             }
 
             [Fact, LogIfTooSlow]

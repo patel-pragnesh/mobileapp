@@ -3,16 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.Multivac.Models;
 using Toggl.Ultrawave.Exceptions;
+using Toggl.Ultrawave.Models;
 using Toggl.Ultrawave.Network;
 using Toggl.Ultrawave.Tests.Integration.BaseTests;
 using Toggl.Ultrawave.Tests.Integration.Helper;
 using Xunit;
+using Task = System.Threading.Tasks.Task;
 
 namespace Toggl.Ultrawave.Tests.Integration
 {
@@ -382,7 +383,7 @@ namespace Toggl.Ultrawave.Tests.Integration
             public async Task ChangesDefaultWorkspace()
             {
                 var (togglClient, user) = await SetupTestUser();
-                var secondWorkspace = await togglClient.Workspaces.Create(Guid.NewGuid().ToString());
+                var secondWorkspace = await togglClient.Workspaces.Create(new Workspace { Name = Guid.NewGuid().ToString() });
 
                 var userWithUpdates = new Ultrawave.Models.User(user);
                 userWithUpdates.DefaultWorkspaceId = secondWorkspace.Id;

@@ -12,18 +12,17 @@ using MvvmCross.Platform.WeakSubscription;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Extensions;
-using Toggl.Daneel.Onboarding.CreationView;
-using Toggl.Daneel.Onboarding.StartTimeEntryView;
 using Toggl.Daneel.Presentation.Attributes;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Onboarding.CreationView;
+using Toggl.Foundation.MvvmCross.Onboarding.StartTimeEntryView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
 using UIKit;
-using static Toggl.PrimeRadiant.Extensions.OnboardingStepExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -41,7 +40,7 @@ namespace Toggl.Daneel.ViewControllers
 
         private ISubject<bool> isDescriptionEmptySubject;
 
-        public StartTimeEntryViewController() 
+        public StartTimeEntryViewController()
             : base(nameof(StartTimeEntryViewController))
         {
         }
@@ -101,11 +100,11 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(source)
                       .For(v => v.CreateCommand)
                       .To(vm => vm.CreateCommand);
-            
+
             bindingSet.Bind(source)
                       .For(v => v.IsSuggestingProjects)
                       .To(vm => vm.IsSuggestingProjects);
-            
+
             bindingSet.Bind(source)
                       .For(v => v.Text)
                       .To(vm => vm.CurrentQuery);
@@ -148,7 +147,7 @@ namespace Toggl.Daneel.ViewControllers
                       .For(v => v.TintColor)
                       .To(vm => vm.IsSuggestingTags)
                       .WithConversion(buttonColorConverter);
-            
+
             bindingSet.Bind(BillableButton)
                       .For(v => v.TintColor)
                       .To(vm => vm.IsBillable)
@@ -244,6 +243,9 @@ namespace Toggl.Daneel.ViewControllers
         {
             var tapRecognizer = new UITapGestureRecognizer(() =>
             {
+                if(!TimeLabel.Hidden)
+                    ViewModel.DurationTapped.Execute();
+
                 switchTimeLabelAndInput();
 
                 if (!TimeInput.Hidden)

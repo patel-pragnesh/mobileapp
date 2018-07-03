@@ -9,6 +9,8 @@ namespace Toggl.Giskard.Extensions
 {
     public static class ActivityExtensions
     {
+        private static readonly Color lollipopFallbackStatusBarColor = Color.ParseColor("#2C2C2C");
+
         public static void ChangeStatusBarColor(this Activity activity, Color color, bool useDarkIcons = false)
         {
             var window = activity.Window;
@@ -16,7 +18,14 @@ namespace Toggl.Giskard.Extensions
             window.ClearFlags(WindowManagerFlags.TranslucentStatus);
             window.SetStatusBarColor(color);
 
-            if (MarshmallowApis.AreNotAvailable) return;
+            if (MarshmallowApis.AreNotAvailable)
+            {
+                if (color == Color.White && useDarkIcons)
+                {
+                    window.SetStatusBarColor(lollipopFallbackStatusBarColor);
+                }
+                return;
+            }
 
             window.DecorView.SystemUiVisibility =
                 (StatusBarVisibility)(useDarkIcons ? SystemUiFlags.LightStatusBar : SystemUiFlags.Visible);

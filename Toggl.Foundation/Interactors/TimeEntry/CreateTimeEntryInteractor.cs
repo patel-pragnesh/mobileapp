@@ -65,8 +65,9 @@ namespace Toggl.Foundation.Interactors
                 .FirstAsync()
                 .Select(userFromPrototype)
                 .SelectMany(dataSource.TimeEntries.Create)
+                .Do(notifyOfNewTimeEntryIfPossible)
                 .Do(_ => dataSource.SyncManager.PushSync())
-                .Track(analyticsService.TimeEntryStarted, origin);
+                .Track(StartTimeEntryEvent.With(origin), analyticsService);
 
         private TimeEntry userFromPrototype(IThreadSafeUser user)
             => idProvider.GetNextIdentifier()
@@ -83,5 +84,11 @@ namespace Toggl.Foundation.Interactors
                 .SetAt(timeService.CurrentDateTime)
                 .SetSyncStatus(SyncStatus.SyncNeeded)
                 .Build();
+
+        private void notifyOfNewTimeEntryIfPossible(IThreadSafeTimeEntry timeEntry)
+        {
+            if (dataSource.TimeEntries is TimeEntriesDataSource timeEntriesDataSource)
+                timeEntriesDataSource.OnTimeEntryStarted(timeEntry, origin);
+        }
     }
 }

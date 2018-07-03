@@ -84,6 +84,9 @@ your app to continue.</string>
 understand and agree to Toggl\'s</string>
     <string name="NothingHere">Nothing here</string>
     <string name="NoTimeEntries">You have no time entries\nfor selected time period.</string>
+    <string name="AboutTermsOfService">Terms of Service</string>
+    <string name="AboutPrivacyPolicy">Privacy Policy</string>
+    <string name="AboutLicenses">Licenses</string>
 
     <string name="MainTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.MainTemplateSelector, Toggl.Giskard</string>
     <string name="ReportsTemplateSelector" translatable="false">Toggl.Giskard.TemplateSelectors.ReportsTemplateSelector, Toggl.Giskard</string>

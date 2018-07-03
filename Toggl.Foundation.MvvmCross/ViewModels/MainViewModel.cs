@@ -11,13 +11,20 @@ using PropertyChanged;
 using Toggl.Foundation;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.Experiments;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.Parameters;
+using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels;
+using Toggl.Foundation.MvvmCross.ViewModels.Hints;
+using Toggl.Foundation.Services;
 using Toggl.Foundation.Suggestions;
 using Toggl.Foundation.Sync;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
+using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Settings;
 
 [assembly: MvxNavigation(typeof(MainViewModel), ApplicationUrls.Main.Regex)]
@@ -35,10 +42,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly ITimeService timeService;
         private readonly ITogglDataSource dataSource;
         private readonly IUserPreferences userPreferences;
+        private readonly IAnalyticsService analyticsService;
         private readonly IOnboardingStorage onboardingStorage;
         private readonly IInteractorFactory interactorFactory;
         private readonly IMvxNavigationService navigationService;
         private readonly TimeSpan currentTimeEntryDueTime = TimeSpan.FromMilliseconds(50);
+
+        private RatingViewExperiment ratingViewExperiment;
+
+        private readonly TimeSpan ratingViewTimeout = TimeSpan.FromMinutes(5);
 
         public TimeSpan CurrentTimeEntryElapsedTime { get; private set; } = TimeSpan.Zero;
 
@@ -97,6 +109,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public SuggestionsViewModel SuggestionsViewModel { get; }
 
+        public RatingViewModel RatingViewModel { get; }
+
         public IOnboardingStorage OnboardingStorage => onboardingStorage;
 
         public IMvxNavigationService NavigationService => navigationService;
@@ -123,32 +137,43 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IScheduler scheduler,
             ITogglDataSource dataSource,
             ITimeService timeService,
+            IRatingService ratingService,
             IUserPreferences userPreferences,
-            IOnboardingStorage onboardingStorage,
+            IFeedbackService feedbackService,
             IAnalyticsService analyticsService,
+            IOnboardingStorage onboardingStorage,
             IInteractorFactory interactorFactory,
             IMvxNavigationService navigationService,
+            IRemoteConfigService remoteConfigService,
             ISuggestionProviderContainer suggestionProviders)
         {
             Ensure.Argument.IsNotNull(scheduler, nameof(scheduler));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
+            Ensure.Argument.IsNotNull(ratingService, nameof(ratingService));
             Ensure.Argument.IsNotNull(userPreferences, nameof(userPreferences));
+            Ensure.Argument.IsNotNull(feedbackService, nameof(feedbackService));
+            Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
             Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
+            Ensure.Argument.IsNotNull(remoteConfigService, nameof(remoteConfigService));
             Ensure.Argument.IsNotNull(suggestionProviders, nameof(suggestionProviders));
 
             this.scheduler = scheduler;
             this.dataSource = dataSource;
             this.timeService = timeService;
             this.userPreferences = userPreferences;
+            this.analyticsService = analyticsService;
             this.interactorFactory = interactorFactory;
             this.navigationService = navigationService;
             this.onboardingStorage = onboardingStorage;
 
-            TimeEntriesLogViewModel = new TimeEntriesLogViewModel(timeService, dataSource, interactorFactory, onboardingStorage, analyticsService, navigationService);
             SuggestionsViewModel = new SuggestionsViewModel(dataSource, interactorFactory, suggestionProviders);
+            RatingViewModel = new RatingViewModel(timeService, dataSource, ratingService, feedbackService, analyticsService, onboardingStorage, navigationService);
+            TimeEntriesLogViewModel = new TimeEntriesLogViewModel(timeService, dataSource, interactorFactory, onboardingStorage, analyticsService, navigationService);
+
+            ratingViewExperiment = new RatingViewExperiment(timeService, dataSource, onboardingStorage, remoteConfigService);
 
             RefreshCommand = new MvxCommand(refresh);
             OpenReportsCommand = new MvxAsyncCommand(openReports);
@@ -171,6 +196,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             await TimeEntriesLogViewModel.Initialize();
             await SuggestionsViewModel.Initialize();
+            await RatingViewModel.Initialize();
 
             TimeEntryCardVisibility = dataSource
                 .TimeEntries
@@ -193,7 +219,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Merge(dataSource.TimeEntries.Updated.Select(_ => Unit.Default))
                 .Merge(dataSource.TimeEntries.Deleted.Select(_ => Unit.Default))
                 .Merge(dataSource.TimeEntries.Created.Select(_ => Unit.Default))
-                .Subscribe(_ =>
+                .Subscribe((Unit _) =>
                 {
                     RaisePropertyChanged(nameof(ShouldShowTimeEntriesLog));
                     RaisePropertyChanged(nameof(ShouldShowWelcomeBack));
@@ -223,6 +249,26 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     await stopTimeEntry();
                     break;
             }
+
+            ratingViewExperiment
+                .RatingViewShouldBeVisible
+                .Subscribe(presentRatingViewIfNeeded)
+                .DisposedBy(disposeBag);
+        }
+
+        private void presentRatingViewIfNeeded(bool shouldBevisible)
+        {
+            if (!shouldBevisible) return;
+
+            if (onboardingStorage.RatingViewOutcome().HasValue) return;
+
+            navigationService.ChangePresentation(new ToggleRatingViewVisibilityHint());
+            analyticsService.RatingViewWasShown.Track();
+            onboardingStorage.SetRatingViewOutcome(RatingViewOutcome.NoInteraction, timeService.CurrentDateTime);
+            timeService.RunAfterDelay(ratingViewTimeout, () =>
+            {
+                navigationService.ChangePresentation(new ToggleRatingViewVisibilityHint());
+            });
         }
 
         private async Task continueMostRecentEntry()
@@ -245,8 +291,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             CurrentTimeEntryElapsedTime = timeService.CurrentDateTime - currentTimeEntryStart ?? TimeSpan.Zero;
 
             CurrentTimeEntryTask = timeEntry?.Task?.Name ?? "";
-            CurrentTimeEntryProject = timeEntry?.Project?.Name ?? "";
-            CurrentTimeEntryProjectColor = timeEntry?.Project?.Color ?? "";
+            CurrentTimeEntryProject = timeEntry?.Project?.DisplayName() ?? "";
+            CurrentTimeEntryProjectColor = timeEntry?.Project?.DisplayColor() ?? "";
             CurrentTimeEntryClient = timeEntry?.Project?.Client?.Name ?? "";
 
             isStopButtonEnabled = timeEntry != null;

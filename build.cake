@@ -129,7 +129,6 @@ private TemporaryFileTransformation GetIosAnalyticsServicesConfigurationTransfor
     var projectId = EnvironmentVariable("TOGGL_PROJECT_ID");
     var storageBucket = EnvironmentVariable("TOGGL_STORAGE_BUCKET");
     var googleAppId = EnvironmentVariable("TOGGL_GOOGLE_APP_ID");
-    var facebookAppId = EnvironmentVariable("TOGGL_FACEBOOK_APP_ID");
 
     var filePath = GetFiles(path).Single();
     var file = TransformTextFile(filePath).ToString();
@@ -147,7 +146,6 @@ private TemporaryFileTransformation GetIosAnalyticsServicesConfigurationTransfor
                         .Replace("{TOGGL_PROJECT_ID}", projectId)
                         .Replace("{TOGGL_STORAGE_BUCKET}", storageBucket)
                         .Replace("{TOGGL_GOOGLE_APP_ID}", googleAppId)
-                        .Replace("{TOGGL_FACEBOOK_APP_ID}", facebookAppId)
     };
 }
 
@@ -220,6 +218,8 @@ private TemporaryFileTransformation GetIosInfoConfigurationTransformation()
 
     var commitCount = GetCommitCount();
     var reversedClientId = EnvironmentVariable("TOGGL_REVERSED_CLIENT_ID");
+    var facebookAppId = EnvironmentVariable("TOGGL_FACEBOOK_APP_ID");
+    
     var bundleId = bundleIdToReplace;
     var appName = appNameToReplace;
     var iconSet = iconSetToReplace;
@@ -245,6 +245,7 @@ private TemporaryFileTransformation GetIosInfoConfigurationTransformation()
         Path = path,
         Original = file,
         Temporary = file.Replace("{TOGGL_REVERSED_CLIENT_ID}", reversedClientId)
+                        .Replace("{TOGGL_FACEBOOK_APP_ID}", facebookAppId)
                         .Replace("IOS_BUNDLE_VERSION", commitCount)
                         .Replace(bundleIdToReplace, bundleId)
                         .Replace(appNameToReplace, appName)

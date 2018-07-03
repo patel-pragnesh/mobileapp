@@ -1,28 +1,27 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CoreGraphics;
+using Foundation;
 using MvvmCross.Binding.BindingContext;
 using MvvmCross.Binding.iOS;
 using MvvmCross.Core.ViewModels;
 using MvvmCross.iOS.Views;
+using MvvmCross.Platform.WeakSubscription;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Combiners;
 using Toggl.Daneel.Extensions;
 using Toggl.Daneel.Presentation.Attributes;
+using Toggl.Daneel.Presentation.Transition;
 using Toggl.Foundation;
-using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Combiners;
+using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Onboarding.EditView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
-using Toggl.Daneel.Presentation.Transition;
-using System.Reactive.Subjects;
-using System.ComponentModel;
-using MvvmCross.Platform.WeakSubscription;
-using System.Reactive.Linq;
-using Toggl.Daneel.Onboarding.EditView;
-using Toggl.PrimeRadiant.Extensions;
-using Foundation;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -80,8 +79,8 @@ namespace Toggl.Daneel.ViewControllers
                 Color.EditTimeEntry.ClientText.ToNativeColor(),
                 false
             );
-            var stopRunningTimeEntryAndEditDurationForStoppedConverter = new BoolToConstantValueConverter<IMvxCommand>(
-                ViewModel.StopCommand, ViewModel.EditDurationCommand);
+            var stopRunningTimeEntryAndSelectStopTimeForStoppedConverter = new BoolToConstantValueConverter<IMvxCommand>(
+                ViewModel.StopCommand, ViewModel.SelectStopTimeCommand);
 
             var bindingSet = this.CreateBindingSet<EditTimeEntryViewController, EditTimeEntryViewModel>();
 
@@ -110,6 +109,10 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(DescriptionTextView)
                       .For(v => v.BindText())
                       .To(vm => vm.Description);
+
+            bindingSet.Bind(DescriptionTextView)
+                      .For(v => v.BindTap())
+                      .To(vm => vm.StartEditingDescriptionCommand);
 
             bindingSet.Bind(BillableSwitch)
                       .For(v => v.BindAnimatedOn())
@@ -150,11 +153,11 @@ namespace Toggl.Daneel.ViewControllers
 
             bindingSet.Bind(DurationView)
                       .For(v => v.BindTap())
-                      .To(vm => vm.EditDurationCommand);
+                      .To(vm => vm.SelectDurationCommand);
 
             bindingSet.Bind(StartTimeView)
                       .For(v => v.BindTap())
-                      .To(vm => vm.EditDurationCommand);
+                      .To(vm => vm.SelectStartTimeCommand);
 
             bindingSet.Bind(StopButton)
                       .To(vm => vm.StopCommand);
@@ -162,7 +165,7 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(EndTimeView)
                       .For(v => v.BindTap())
                       .To(vm => vm.IsTimeEntryRunning)
-                      .WithConversion(stopRunningTimeEntryAndEditDurationForStoppedConverter);
+                      .WithConversion(stopRunningTimeEntryAndSelectStopTimeForStoppedConverter);
 
             bindingSet.Bind(ProjectTaskClientLabel)
                       .For(v => v.BindTap())
@@ -243,7 +246,7 @@ namespace Toggl.Daneel.ViewControllers
         public override void ViewDidLayoutSubviews()
         {
             base.ViewDidLayoutSubviews();
-            
+
             //This binding needs to be created, when TagsTextView has it's
             //proper size. In ViewDidLoad() TagsTextView width isn't initialized
             //yet, which results in displaying less tags than possible

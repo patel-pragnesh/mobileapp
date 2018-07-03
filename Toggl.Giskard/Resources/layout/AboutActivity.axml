@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/lightGray"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/Toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/toolbarBlack"
+        local:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/AboutLicensesButton"
+        android:textSize="15sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:paddingLeft="16dp"
+        android:textAllCaps="false"
+        android:gravity="center_vertical"
+        android:text="@string/AboutLicenses"
+        android:textColor="@android:color/black"
+        android:background="?attr/selectableItemBackground"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent" />
+    <View
+        android:visibility="gone"
+        android:background="@color/separator"
+        android:layout_height="0.5dp"
+        android:layout_width="match_parent" />
+    <TextView
+        android:id="@+id/AboutPrivacyPolicyButton"
+        android:textSize="15sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingLeft="16dp"
+        android:textAllCaps="false"
+        android:gravity="center_vertical"
+        android:textColor="@android:color/black"
+        android:text="@string/AboutPrivacyPolicy"
+        android:background="?attr/selectableItemBackground"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent" />
+    <View
+        android:background="@color/separator"
+        android:layout_height="0.5dp"
+        android:layout_width="match_parent" />
+    <TextView
+        android:id="@+id/AboutTermsOfServiceButton"
+        android:textSize="15sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingLeft="16dp"
+        android:textAllCaps="false"
+        android:gravity="center_vertical"
+        android:textColor="@android:color/black"
+        android:text="@string/AboutTermsOfService"
+        android:background="?attr/selectableItemBackground"
+        android:layout_height="48dp"
+        android:layout_width="match_parent" />
+    <View
+        android:background="@color/separator"
+        android:layout_height="0.5dp"
+        android:layout_width="match_parent" />
+</LinearLayout>

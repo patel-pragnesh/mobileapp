@@ -15,12 +15,12 @@ using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
 using Toggl.Daneel.Combiners;
 using Toggl.Daneel.Extensions;
-using Toggl.Daneel.Onboarding.MainView;
 using Toggl.Daneel.Suggestions;
 using Toggl.Daneel.Views;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation.MvvmCross.Converters;
 using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant.Extensions;
@@ -85,6 +85,11 @@ namespace Toggl.Daneel.ViewControllers
         private readonly ISubject<bool> isEmptySubject = new BehaviorSubject<bool>(false);
         private readonly ISubject<int> timeEntriesCountSubject = new BehaviorSubject<int>(0);
 
+        private readonly UIView tableHeader = new UIView();
+        private readonly UIView suggestionsContaier = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
+        private readonly UIView ratingViewContainer = new UIView { TranslatesAutoresizingMaskIntoConstraints = false };
+        private readonly SuggestionsView suggestionsView = new SuggestionsView { TranslatesAutoresizingMaskIntoConstraints = false };
+
         public MainViewController()
             : base(nameof(MainViewController), null)
         {
@@ -100,12 +105,9 @@ namespace Toggl.Daneel.ViewControllers
 
             prepareOnboarding();
 
-            var suggestionsView = new SuggestionsView();
+            setupTableViewHeader();
 
-            TimeEntriesLogTableView.TableHeaderView = suggestionsView;
             TimeEntriesLogTableView.Source = source;
-
-            suggestionsView.DataContext = ViewModel.SuggestionsViewModel;
 
             source.Initialize();
 
@@ -178,6 +180,10 @@ namespace Toggl.Daneel.ViewControllers
                       .For(v => v.SuggestionTappedCommad)
                       .To(vm => vm.SuggestionsViewModel.StartTimeEntryCommand);
 
+            bindingSet.Bind(StartTimeEntryButton)
+                      .For(v => v.BindLongPress())
+                      .To(vm => vm.AlternativeStartTimeEntryCommand);
+
             //Visibility
             bindingSet.Bind(WelcomeBackView)
                       .For(v => v.BindVisibility())
@@ -228,6 +234,28 @@ namespace Toggl.Daneel.ViewControllers
 
             View.SetNeedsLayout();
             View.LayoutIfNeeded();
+        }
+
+        private void setupTableViewHeader()
+        {
+            TimeEntriesLogTableView.TableHeaderView = tableHeader;
+
+            tableHeader.TranslatesAutoresizingMaskIntoConstraints = false;
+            tableHeader.WidthAnchor.ConstraintEqualTo(TimeEntriesLogTableView.WidthAnchor).Active = true;
+
+            tableHeader.AddSubview(suggestionsContaier);
+            tableHeader.AddSubview(ratingViewContainer);
+
+            suggestionsContaier.ConstrainToViewSides(tableHeader);
+            ratingViewContainer.ConstrainToViewSides(tableHeader);
+
+            suggestionsContaier.TopAnchor.ConstraintEqualTo(tableHeader.TopAnchor).Active = true;
+            suggestionsContaier.BottomAnchor.ConstraintEqualTo(ratingViewContainer.TopAnchor).Active = true;
+            ratingViewContainer.BottomAnchor.ConstraintEqualTo(tableHeader.BottomAnchor).Active = true;
+
+            suggestionsContaier.AddSubview(suggestionsView);
+            suggestionsView.ConstrainInView(suggestionsContaier);
+            suggestionsView.DataContext = ViewModel.SuggestionsViewModel;
         }
 
         private void onTimeEntryCardVisibilityChanged(bool visible)
@@ -311,6 +339,37 @@ namespace Toggl.Daneel.ViewControllers
                 onTimeEntryCardVisibilityChanged(blockedTimeEntryCardVisibilityChange.Value);
                 blockedTimeEntryCardVisibilityChange = null;
             }
+        }
+
+        RatingView ratingView;
+        public void ShowRatingView()
+        {
+            ratingView = RatingView.Create();
+            ratingView.TranslatesAutoresizingMaskIntoConstraints = false;
+            ratingView.DataContext = ViewModel.RatingViewModel;
+            ratingViewContainer.AddSubview(ratingView);
+            ratingView.ConstrainInView(ratingViewContainer);
+        }
+
+        public void HideRatingView()
+        {
+            ratingView.RemoveFromSuperview();
+            ratingView.Dispose();
+            ratingView = null;
+
+            //We have to scroll a little to update the header size.
+            //Using LayoutSubviews(), SetNeedsLayout(), LayoutIfNeeded() etc. does not work.
+            var offset = TimeEntriesLogTableView.ContentOffset;
+            var rect = new CGRect
+            {
+                X = offset.X,
+                Y = offset.Y == 0
+                    ? TimeEntriesLogTableView.Frame.Height + 1
+                    : offset.Y - 1,
+                Width = 1,
+                Height = 1
+            };
+            TimeEntriesLogTableView.ScrollRectToVisible(rect, true);
         }
 
         private void prepareViews()
@@ -480,7 +539,11 @@ namespace Toggl.Daneel.ViewControllers
 
             timeEntriesCountDisposable = ViewModel.WeakSubscribe(() => ViewModel.TimeEntriesCount, onTimeEntriesCountChanged);
 
-            var swipeRightCanBeShown = tapToEditStepIsVisible.Select(isVisible => !isVisible);
+            var swipeRightCanBeShown =
+                UIDevice.CurrentDevice.CheckSystemVersion(11, 0)
+                    ? tapToEditStepIsVisible.Select(isVisible => !isVisible)
+                    : Observable.Return(false);
+
             swipeRightStep = new SwipeRightOnboardingStep(swipeRightCanBeShown, timeEntriesCountSubject.AsObservable())
                 .ToDismissable(nameof(SwipeRightOnboardingStep), storage);
 
