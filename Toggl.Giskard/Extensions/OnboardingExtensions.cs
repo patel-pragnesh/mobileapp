@@ -12,7 +12,7 @@ namespace Toggl.Giskard.Extensions
 {
     public static class OnboardingExtensions
     {
-        private const int delayBeforeCheckingForWindowToken = 100;
+        private const int windowTokenCheckInterval = 100;
 
         public static IDisposable ManageDismissableTooltip(this IOnboardingStep step, PopupWindow tooltip, View anchor, Func<PopupWindow, View, PopupOffsets> popupOffsetsGenerator, IOnboardingStorage storage)
         {
@@ -89,7 +89,7 @@ namespace Toggl.Giskard.Extensions
                 }
 
                 return Observable
-                    .Interval(TimeSpan.FromMilliseconds(delayBeforeCheckingForWindowToken))
+                    .Interval(TimeSpan.FromMilliseconds(windowTokenCheckInterval))
                     .Subscribe(_ => checkForToken());
             });
 
