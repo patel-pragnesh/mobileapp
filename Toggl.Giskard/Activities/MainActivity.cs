@@ -17,6 +17,7 @@ using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using Toggl.Giskard.Extensions;
+using Toggl.Giskard.Helper;
 using static Toggl.Foundation.Sync.SyncProgress;
 using static Toggl.Giskard.Extensions.CircularRevealAnimation.AnimationType;
 using FoundationResources = Toggl.Foundation.Resources;
@@ -158,7 +159,11 @@ namespace Toggl.Giskard.Activities
         {
             if (playButtonTooltipPopupWindow == null)
             {
-                playButtonTooltipPopupWindow = createPlayButtonTooltipPopupWindow();
+                playButtonTooltipPopupWindow = PopupWindowFactory.PopupWindowWithText(
+                    this,
+                    Resource.Layout.TooltipWithRightArrow,
+                    Resource.Id.TooltipText,
+                    Resource.String.OnboardingTapToStartTimer);
             }
 
             var storage = ViewModel.OnboardingStorage;
