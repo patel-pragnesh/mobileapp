@@ -77,13 +77,6 @@ namespace Toggl.Giskard.Activities
             disposeBag = null;
         }
 
-        private PopupOffsets createPlayButtonTooltipPopupOffsets(PopupWindow window, View view)
-        {
-            var horizontalOffset = -(window.ContentView.MeasuredWidth + 8.DpToPixels(this));
-            var verticalOffset = -(window.ContentView.MeasuredHeight + Math.Abs(window.ContentView.MeasuredHeight - view.Height) / 2);
-            return new PopupOffsets(horizontalOffset, verticalOffset);
-        }
-
         private void onSyncChanged(object sender, PropertyChangedEventArgs args)
         {
             switch (ViewModel.SyncingProgress)
