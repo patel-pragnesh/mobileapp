@@ -158,7 +158,11 @@ namespace Toggl.Giskard.Activities
             var storage = ViewModel.OnboardingStorage;
 
             new StartTimeEntryOnboardingStep(storage)
-                .ManageDismissableTooltip(playButtonTooltipPopupWindow, playButton, createPlayButtonTooltipPopupOffsets, storage)
+                .ManageDismissableTooltip(
+                    playButtonTooltipPopupWindow,
+                    playButton,
+                    (popup, anchor) => popup.LeftVerticallyCenteredOffsetsTo(anchor, dpExtraRightMargin: 8),
+                    storage)
                 .DisposedBy(disposeBag);
         }
 
