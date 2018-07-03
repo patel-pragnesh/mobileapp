@@ -36,12 +36,12 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private IDisposable loginDisposable;
 
+        private readonly Subject<bool> isShowPasswordButtonVisibleSubject = new Subject<bool>();
+        private readonly BehaviorSubject<bool> isLoadingSubject = new BehaviorSubject<bool>(false);
+        private readonly BehaviorSubject<string> errorMessageSubject = new BehaviorSubject<string>("");
+        private readonly BehaviorSubject<bool> isPasswordMaskedSubject = new BehaviorSubject<bool>(true);
         private readonly BehaviorSubject<Email> emailSubject = new BehaviorSubject<Email>(Multivac.Email.Empty);
         private readonly BehaviorSubject<Password> passwordSubject = new BehaviorSubject<Password>(Multivac.Password.Empty);
-        private readonly BehaviorSubject<string> errorMessageSubject = new BehaviorSubject<string>("");
-        private readonly BehaviorSubject<bool> isLoadingSubject = new BehaviorSubject<bool>(false);
-        private readonly BehaviorSubject<bool> isPasswordMaskedSubject = new BehaviorSubject<bool>(true);
-        private readonly Subject<bool> isShowPasswordButtonVisibleSubject = new Subject<bool>();
 
         public bool IsPasswordManagerAvailable { get; }
 
@@ -80,14 +80,14 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(lastTimeUsageStorage, nameof(lastTimeUsageStorage));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
 
+            this.timeService = timeService;
             this.loginManager = loginManager;
             this.analyticsService = analyticsService;
             this.onboardingStorage = onboardingStorage;
             this.navigationService = navigationService;
-            this.passwordManagerService = passwordManagerService;
             this.errorHandlingService = errorHandlingService;
             this.lastTimeUsageStorage = lastTimeUsageStorage;
-            this.timeService = timeService;
+            this.passwordManagerService = passwordManagerService;
 
             var emailObservable = emailSubject.AsObservable();
             var passwordObservable = passwordSubject.AsObservable();
@@ -170,46 +170,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                     .Subscribe(onDataSource, onError, onCompleted);
         }
 
-        private async void onDataSource(ITogglDataSource dataSource)
-        {
-            lastTimeUsageStorage.SetLogin(timeService.CurrentDateTime);
-
-            await dataSource.StartSyncing();
-
-            isLoadingSubject.OnNext(false);
-
-            onboardingStorage.SetIsNewUser(false);
-
-            await navigationService.Navigate<MainViewModel>();
-        }
-
-        private void onError(Exception exception)
-        {
-            isLoadingSubject.OnNext(false);
-            onCompleted();
-
-            if (errorHandlingService.TryHandleDeprecationError(exception))
-                return;
-
-            switch (exception)
-            {
-                case UnauthorizedException forbidden:
-                    errorMessageSubject.OnNext(Resources.IncorrectEmailOrPassword);
-                    break;
-                case GoogleLoginException googleEx when googleEx.LoginWasCanceled:
-                    errorMessageSubject.OnNext("");
-                    break;
-                default:
-                    errorMessageSubject.OnNext(Resources.GenericLoginError);
-                    break;
-            }
-        }
-
-        private void onCompleted()
-        {
-            loginDisposable?.Dispose();
-            loginDisposable = null;
-        }
         public async Task StartPasswordManager()
         {
             if (!passwordManagerService.IsAvailable) return;
@@ -263,6 +223,47 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             var parameter = CredentialsParameter.With(emailSubject.Value, passwordSubject.Value);
             return navigationService.Navigate<SignupViewModel, CredentialsParameter>(parameter);
+        }
+
+        private async void onDataSource(ITogglDataSource dataSource)
+        {
+            lastTimeUsageStorage.SetLogin(timeService.CurrentDateTime);
+
+            await dataSource.StartSyncing();
+
+            isLoadingSubject.OnNext(false);
+
+            onboardingStorage.SetIsNewUser(false);
+
+            await navigationService.Navigate<MainViewModel>();
+        }
+
+        private void onError(Exception exception)
+        {
+            isLoadingSubject.OnNext(false);
+            onCompleted();
+
+            if (errorHandlingService.TryHandleDeprecationError(exception))
+                return;
+
+            switch (exception)
+            {
+                case UnauthorizedException forbidden:
+                    errorMessageSubject.OnNext(Resources.IncorrectEmailOrPassword);
+                    break;
+                case GoogleLoginException googleEx when googleEx.LoginWasCanceled:
+                    errorMessageSubject.OnNext("");
+                    break;
+                default:
+                    errorMessageSubject.OnNext(Resources.GenericLoginError);
+                    break;
+            }
+        }
+
+        private void onCompleted()
+        {
+            loginDisposable?.Dispose();
+            loginDisposable = null;
         }
     }
 }
