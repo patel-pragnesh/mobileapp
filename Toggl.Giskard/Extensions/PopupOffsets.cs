@@ -1,6 +1,6 @@
 ﻿namespace Toggl.Giskard.Extensions
 {
-    public class PopupOffsets
+    public struct PopupOffsets
     {
         public int HorizontalOffset { get; }
         public int VerticalOffset { get; }
