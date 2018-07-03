@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Android.Views;
 using Android.Widget;
 using MvvmCross.Platform.Core;
+using Toggl.Multivac;
 using Toggl.PrimeRadiant.Extensions;
 using Toggl.PrimeRadiant.Onboarding;
 using Toggl.PrimeRadiant.Settings;
@@ -16,10 +17,8 @@ namespace Toggl.Giskard.Extensions
 
         public static IDisposable ManageDismissableTooltip(this IOnboardingStep step, PopupWindow tooltip, View anchor, Func<PopupWindow, View, PopupOffsets> popupOffsetsGenerator, IOnboardingStorage storage)
         {
-            if (tooltip == null || anchor == null)
-            {
-                throw new InvalidOperationException("Your PopupWindow must not be null and the anchor should exist.");
-            }
+            Ensure.Argument.IsNotNull(anchor, nameof(tooltip));
+            Ensure.Argument.IsNotNull(anchor, nameof(anchor));
 
             var dismissableStep = step.ToDismissable(step.GetType().FullName, storage);
 
