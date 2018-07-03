@@ -50,7 +50,7 @@ namespace Toggl.Foundation
         }
 
         public static void ConfigureTransitions(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             ITogglDatabase database,
             ITogglApi api,
             ITogglDataSource dataSource,
@@ -66,7 +66,7 @@ namespace Toggl.Foundation
         }
 
         private static void configurePullTransitions(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             ITogglDatabase database,
             ITogglApi api,
             ITogglDataSource dataSource,
@@ -174,7 +174,7 @@ namespace Toggl.Foundation
         }
 
         private static void configurePushTransitions(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             ITogglApi api,
             ITogglDataSource dataSource,
             IAnalyticsService analyticsService,
@@ -193,7 +193,7 @@ namespace Toggl.Foundation
         }
 
         private static IStateResult configurePush<TModel, TDatabase, TThreadsafe>(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             IStateResult entryPoint,
             IDataSource<TThreadsafe, TDatabase> dataSource,
             IAnalyticsService analyticsService,
@@ -261,7 +261,7 @@ namespace Toggl.Foundation
         }
 
         private static IStateResult configureCreateOnlyPush<TModel, TDatabase, TThreadsafe>(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             IStateResult entryPoint,
             IDataSource<TThreadsafe, TDatabase> dataSource,
             IAnalyticsService analyticsService,
@@ -313,7 +313,7 @@ namespace Toggl.Foundation
         }
 
         private static IStateResult configurePushSingleton<TModel, TThreadsafe>(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             IStateResult entryPoint,
             ISingletonDataSource<TThreadsafe> dataSource,
             IAnalyticsService analyticsService,

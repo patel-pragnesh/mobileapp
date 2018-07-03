@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Linq;
 using Foundation;
 using MvvmCross.Core.Navigation;
 using MvvmCross.Core.ViewModels;
@@ -14,7 +13,6 @@ using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Services;
 using Toggl.Foundation.Shortcuts;
 using UIKit;
-
 
 namespace Toggl.Daneel
 {
@@ -66,11 +64,12 @@ namespace Toggl.Daneel
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
             var openUrlOptions = new UIApplicationOpenUrlOptions(options);
-            var googleResponse = Google.SignIn.SignIn.SharedInstance.HandleUrl(url, openUrlOptions.SourceApplication, openUrlOptions.Annotation);
+            var facebookOptions = new NSDictionary<NSString, NSObject>(
+                options.Keys.Select(key => (NSString)key).ToArray(),
+                options.Values);
 
-            var facebookResponse = Facebook.CoreKit.ApplicationDelegate.SharedInstance.OpenUrl(app, url, (NSDictionary<NSString, NSObject>)options);
-
-            return googleResponse || facebookResponse;
+            return Google.SignIn.SignIn.SharedInstance.HandleUrl(url, openUrlOptions.SourceApplication, openUrlOptions.Annotation)
+                || Facebook.CoreKit.ApplicationDelegate.SharedInstance.OpenUrl(app, url, facebookOptions);
         }
 
         public override void OnActivated(UIApplication application)

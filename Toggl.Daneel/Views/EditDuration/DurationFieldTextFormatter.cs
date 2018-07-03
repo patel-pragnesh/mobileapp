@@ -1,44 +1,21 @@
-﻿using System;
-using Foundation;
-using Toggl.Foundation.Helper;
+﻿using Foundation;
 using MvvmCross.Plugins.Color.iOS;
 using UIKit;
 using Color = Toggl.Foundation.MvvmCross.Helper.Color;
+using Toggl.Daneel.Extensions;
+using Toggl.Multivac;
 
 namespace Toggl.Daneel.Views.EditDuration
 {
-    public sealed class DurationFieldTextFormatter
+    public static class DurationFieldTextFormatter
     {
-        private const char splitDelimiter = ':';
-        private static UIColor placeHolderColor = Color.Common.PlaceholderText.ToNativeColor();
+        private static readonly UIColor placeHolderColor = Color.Common.PlaceholderText.ToNativeColor();
 
-        public static NSAttributedString AttributedStringFor(string durationText)
+        public static NSAttributedString AttributedStringFor(string durationText, UIFont font)
         {
-            var result = new NSMutableAttributedString();
-            var segments = durationText.Split(splitDelimiter);
-            var isZeroChecking = true;
-
-            for (int i = 0; i < segments.Length; ++i)
-            {
-                bool isLastSegment = i == segments.Length - 1;
-                if ((segments[i] == "00" || segments[i] == "0") && isZeroChecking)
-                {
-                    result.Append(new NSAttributedString(segments[i], foregroundColor: placeHolderColor));
-                    if (!isLastSegment)
-                    {
-                        result.Append(new NSAttributedString(splitDelimiter.ToString(), foregroundColor: placeHolderColor));
-                    }
-                }
-                else
-                {
-                    isZeroChecking = false;
-                    result.Append(new NSAttributedString(segments[i]));
-                    if (!isLastSegment)
-                    {
-                        result.Append(new NSAttributedString(splitDelimiter.ToString()));
-                    }
-                }
-            }
+            var prefixLength = DurationHelper.LengthOfDurationPrefix(durationText);
+            var result = new NSMutableAttributedString(durationText, font: font.GetMonospacedDigitFont(), foregroundColor: UIColor.Black);
+            result.AddAttribute(UIStringAttributeKey.ForegroundColor, placeHolderColor, new NSRange(0, prefixLength));
             return result;
         }
     }

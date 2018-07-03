@@ -54,7 +54,7 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(titleButton)
                       .For(v => v.BindTitle())
                       .To(vm => vm.CurrentDateRangeString);
-            
+
             bindingSet.Bind(source)
                       .For(v => v.ViewModel)
                       .To(vm => vm);

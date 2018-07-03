@@ -105,6 +105,58 @@ namespace Toggl.Foundation.Tests.DataSources
                     Arg.Is<Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode>>(conflictResolution => conflictResolution != null),
                     Arg.Is<IRivalsResolver<IDatabaseTimeEntry>>(resolver => resolver != null));
             }
+
+            [Fact]
+            public async ThreadingTask EmitsObservableEventsForTheNewlyCreatedRunningTimeEntry()
+            {
+                var createdObserver = TestScheduler.CreateObserver<IThreadSafeTimeEntry>();
+                var newTimeEntry = new MockTimeEntry { Id = -1, Duration = null };
+                Repository.BatchUpdate(
+                    Arg.Any<IEnumerable<(long, IDatabaseTimeEntry)>>(),
+                    Arg.Any<Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode>>(),
+                    Arg.Any<IRivalsResolver<IDatabaseTimeEntry>>())
+                    .Returns(Observable.Return(new IConflictResolutionResult<IDatabaseTimeEntry>[]
+                    {
+                        new CreateResult<IDatabaseTimeEntry>(newTimeEntry)
+                    }));
+
+                var timeEntriesSource = new TimeEntriesDataSource(Repository, TimeService);
+                timeEntriesSource.Created.Subscribe(createdObserver);
+                await timeEntriesSource.Create(newTimeEntry);
+
+                createdObserver.Messages.Single().Value.Value.Id.Should().Be(newTimeEntry.Id);
+                createdObserver.Messages.Single().Value.Value.Duration.Should().BeNull();
+            }
+
+            [Fact]
+            public async ThreadingTask EmitsObservableEventsForTheNewRunningTimeEntryAndTheStoppedTimeEntry()
+            {
+                var durationAfterStopping = 100;
+                var updatedObserver = TestScheduler.CreateObserver<EntityUpdate<IThreadSafeTimeEntry>>();
+                var createdObserver = TestScheduler.CreateObserver<IThreadSafeTimeEntry>();
+                var runningTimeEntry = new MockTimeEntry { Id = 1, Duration = null };
+                var newTimeEntry = new MockTimeEntry { Id = -2, Duration = null };
+                Repository.GetAll(Arg.Any<Func<IDatabaseTimeEntry, bool>>())
+                    .Returns(Observable.Return(new IDatabaseTimeEntry[] { runningTimeEntry }));
+                Repository.BatchUpdate(
+                    Arg.Any<IEnumerable<(long, IDatabaseTimeEntry)>>(),
+                    Arg.Any<Func<IDatabaseTimeEntry, IDatabaseTimeEntry, ConflictResolutionMode>>(),
+                    Arg.Any<IRivalsResolver<IDatabaseTimeEntry>>())
+                    .Returns(Observable.Return(new IConflictResolutionResult<IDatabaseTimeEntry>[]
+                    {
+                        new UpdateResult<IDatabaseTimeEntry>(runningTimeEntry.Id, runningTimeEntry.With(durationAfterStopping)),
+                        new CreateResult<IDatabaseTimeEntry>(newTimeEntry)
+                    }));
+
+                var timeEntriesSource = new TimeEntriesDataSource(Repository, TimeService);
+                timeEntriesSource.Updated.Subscribe(updatedObserver);
+                timeEntriesSource.Created.Subscribe(createdObserver);
+                await timeEntriesSource.Create(newTimeEntry);
+
+                updatedObserver.Messages.Single().Value.Value.Entity.Duration.Should().Be(durationAfterStopping);
+                createdObserver.Messages.Single().Value.Value.Id.Should().Be(newTimeEntry.Id);
+                createdObserver.Messages.Single().Value.Value.Duration.Should().BeNull();
+            }
         }
 
         public sealed class TheGetAllMethod : TimeEntryDataSourceTest

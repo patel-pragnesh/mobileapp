@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using FluentAssertions;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
-using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Sync.States.Push;
 using Toggl.Foundation.Tests.Helpers;
