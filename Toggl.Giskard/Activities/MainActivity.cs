@@ -14,9 +14,9 @@ using MvvmCross.Droid.Views.Attributes;
 using MvvmCross.Platform.WeakSubscription;
 using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
-using Toggl.Multivac.Extensions;
 using Toggl.Giskard.Extensions;
 using Toggl.Giskard.Helper;
+using Toggl.Multivac.Extensions;
 using static Toggl.Foundation.Sync.SyncProgress;
 using static Toggl.Giskard.Extensions.CircularRevealAnimation.AnimationType;
 using FoundationResources = Toggl.Foundation.Resources;
@@ -45,7 +45,6 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.MainActivity);
-
             OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
 
             SetSupportActionBar(FindViewById<Toolbar>(Resource.Id.Toolbar));

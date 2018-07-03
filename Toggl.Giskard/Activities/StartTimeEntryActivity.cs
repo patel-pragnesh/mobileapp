@@ -1,15 +1,15 @@
+using System.Reactive.Disposables;
 using Android.App;
 using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
+using Android.Support.V4.Content;
 using Android.Views;
 using Android.Widget;
-using Android.Support.V4.Content;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
-using System.Reactive.Disposables;
 using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 
 namespace Toggl.Giskard.Activities
@@ -28,16 +28,16 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.StartTimeEntryActivity);
-
             OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
 
             initializeViews();
             setupBindings();
         }
 
-        private void setupBindings()
+        public override void Finish()
         {
-            this.Bind(durationLabel.Tapped(), _ => ViewModel.SelectTimeCommand.Execute(Duration));
+            base.Finish();
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_bottom);
         }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -57,10 +57,9 @@ namespace Toggl.Giskard.Activities
             FindViewById<EditText>(Resource.Id.StartTimeEntryDescriptionTextField).RequestFocus();
         }
 
-        public override void Finish()
+        private void setupBindings()
         {
-            base.Finish();
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_bottom);
+            this.Bind(durationLabel.Tapped(), _ => ViewModel.SelectTimeCommand.Execute(Duration));
         }
 
         protected override void Dispose(bool isDisposing)

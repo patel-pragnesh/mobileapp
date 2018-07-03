@@ -1,11 +1,8 @@
-﻿using System.Linq;
-using Android.App;
+﻿using Android.App;
 using Android.Content.PM;
-using Android.Gms.Common;
 using Android.Graphics;
 using Android.OS;
 using Android.Views;
-using Android.Widget;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
@@ -20,12 +17,13 @@ namespace Toggl.Giskard.Activities
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize)]
     public sealed class SignUpActivity : MvxAppCompatActivity<SignupViewModel>
     {
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
+        protected override void OnCreate(Bundle bundle)
+        { 
             this.ChangeStatusBarColor(Color.White, true);
 
-            base.OnCreate(savedInstanceState);
+            base.OnCreate(bundle);
             SetContentView(Resource.Layout.SignUpActivity);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
         }
     }
 }

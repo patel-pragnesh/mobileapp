@@ -25,7 +25,6 @@ namespace Toggl.Giskard.Activities
             
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.SelectClientActivity);
-
             OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
         }
 

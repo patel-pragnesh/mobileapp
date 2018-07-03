@@ -24,11 +24,16 @@ namespace Toggl.Giskard.Activities
             
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.EditTimeEntryActivity);
-
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
 
             initializeViews();
             setupBindings();
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_bottom);
         }
 
         private void setupBindings()

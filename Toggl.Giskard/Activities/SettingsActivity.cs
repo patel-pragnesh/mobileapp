@@ -28,7 +28,7 @@ namespace Toggl.Giskard.Activities
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.SettingsActivity);
 
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_right, Resource.Animation.abc_fade_out);
 
             InitializeViews();
 
@@ -88,7 +88,7 @@ namespace Toggl.Giskard.Activities
         public override void Finish()
         {
             base.Finish();
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_right);
         }
     }
 }

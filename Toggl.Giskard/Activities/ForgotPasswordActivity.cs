@@ -33,6 +33,7 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ForgotPasswordActivity);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_right, Resource.Animation.abc_fade_out);
 
             setupToolbar();
 
@@ -41,6 +42,12 @@ namespace Toggl.Giskard.Activities
 
             passwordResetSuccessfullyDisposable =
                 ViewModel.WeakSubscribe(() => ViewModel.PasswordResetSuccessful, showResetPasswordSuccessToast);
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_right);
         }
 
         private void setupInputField()

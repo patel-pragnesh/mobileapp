@@ -3,11 +3,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using Android.App;
 using Android.Content.PM;
-using Android.Gms.Common;
 using Android.Graphics;
 using Android.OS;
 using Android.Views;
-using Android.Widget;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
@@ -30,6 +28,7 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.LoginActivity);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
 
             InitializeViews();
 
@@ -51,9 +50,9 @@ namespace Toggl.Giskard.Activities
             this.BindVoid(loginButton.Tapped(), ViewModel.Login);
             this.BindVoid(googleLoginButton.Tapped(), ViewModel.GoogleLogin);
             this.Bind(forgotPasswordView.Tapped(), ViewModel.ForgotPassword);
-        }
 
-        private string loginButtonTitle(bool isLoading)
-            => isLoading ? "" : Resources.GetString(Resource.String.Login);
+            string loginButtonTitle(bool isLoading)
+                => isLoading ? "" : Resources.GetString(Resource.String.Login);
+        }
     }
 }
