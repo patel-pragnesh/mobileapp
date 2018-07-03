@@ -7,17 +7,20 @@ using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
 using Android.Support.Design.Widget;
-using Android.Support.V7.Widget;
 using Android.Views;
+using Android.Widget;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using MvvmCross.Platform.WeakSubscription;
+using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac.Extensions;
 using Toggl.Giskard.Extensions;
+using Toggl.Giskard.Helper;
 using static Toggl.Foundation.Sync.SyncProgress;
 using static Toggl.Giskard.Extensions.CircularRevealAnimation.AnimationType;
 using FoundationResources = Toggl.Foundation.Resources;
+using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Toggl.Giskard.Activities
 {
@@ -29,11 +32,12 @@ namespace Toggl.Giskard.Activities
     {
         private const int snackbarDuration = 5000;
 
-        private IDisposable disposable;
+        private CompositeDisposable disposeBag;
         private View runningEntryCardFrame;
         private FloatingActionButton playButton;
         private FloatingActionButton stopButton;
         private CoordinatorLayout coordinatorLayout;
+        private PopupWindow playButtonTooltipPopupWindow;
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -55,12 +59,12 @@ namespace Toggl.Giskard.Activities
             stopButton = FindViewById<FloatingActionButton>(Resource.Id.MainStopButton);
             coordinatorLayout = FindViewById<CoordinatorLayout>(Resource.Id.MainCoordinatorLayout);
 
-            var disposeBag = new CompositeDisposable();
+            disposeBag = new CompositeDisposable();
 
-            disposeBag.Add(ViewModel.TimeEntryCardVisibility.Subscribe(onTimeEntryCardVisibilityChanged));
+            disposeBag.Add(ViewModel.IsTimeEntryRunning.Subscribe(onTimeEntryCardVisibilityChanged));
             disposeBag.Add(ViewModel.WeakSubscribe<PropertyChangedEventArgs>(nameof(ViewModel.SyncingProgress), onSyncChanged));
 
-            disposable = disposeBag;
+            setupStartTimeEntryOnboardingStep();
         }
 
         protected override void Dispose(bool disposing)
@@ -69,8 +73,8 @@ namespace Toggl.Giskard.Activities
 
             if (!disposing) return;
 
-            disposable?.Dispose();
-            disposable = null;
+            disposeBag?.Dispose();
+            disposeBag = null;
         }
 
         private void onSyncChanged(object sender, PropertyChangedEventArgs args)
@@ -131,6 +135,28 @@ namespace Toggl.Giskard.Activities
                     .OnAnimationEnd(_ => playButton.Show())
                     .Start();
             }
+        }
+
+        private void setupStartTimeEntryOnboardingStep()
+        {
+            if (playButtonTooltipPopupWindow == null)
+            {
+                playButtonTooltipPopupWindow = PopupWindowFactory.PopupWindowWithText(
+                    this,
+                    Resource.Layout.TooltipWithRightArrow,
+                    Resource.Id.TooltipText,
+                    Resource.String.OnboardingTapToStartTimer);
+            }
+
+            var storage = ViewModel.OnboardingStorage;
+
+            new StartTimeEntryOnboardingStep(storage)
+                .ManageDismissableTooltip(
+                    playButtonTooltipPopupWindow,
+                    playButton,
+                    (popup, anchor) => popup.LeftVerticallyCenteredOffsetsTo(anchor, dpExtraRightMargin: 8),
+                    storage)
+                .DisposedBy(disposeBag);
         }
 
         private sealed class FabAsyncHideListener : FloatingActionButton.OnVisibilityChangedListener

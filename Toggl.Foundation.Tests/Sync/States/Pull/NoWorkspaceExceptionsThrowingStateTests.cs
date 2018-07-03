@@ -5,35 +5,35 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using Toggl.Foundation.Sync.States;
-using Toggl.Foundation.Sync.States.Pull;
 using Toggl.Foundation.Tests.Mocks;
 using Toggl.Multivac.Models;
 using Xunit;
 using Toggl.Foundation.Exceptions;
+using Toggl.Foundation.Sync.States.Pull;
+using Toggl.Ultrawave.Exceptions;
 
 namespace Toggl.Foundation.Tests.Sync.States.Pull
 {
-    public sealed class NoWorkspaceExceptionsThrowingPersistStateTests
+    public sealed class NoWorkspaceExceptionsThrowingStateTests
     {
         private readonly IFetchObservables fetchObservables = Substitute.For<IFetchObservables>();
 
-        private readonly IPersistState internalState = Substitute.For<IPersistState>();
+        private readonly NoWorkspaceDetectingState state;
 
-        private readonly NoWorkspaceExceptionsThrowingPersistState state;
-
-        public NoWorkspaceExceptionsThrowingPersistStateTests()
+        public NoWorkspaceExceptionsThrowingStateTests()
         {
-            state = new NoWorkspaceExceptionsThrowingPersistState(internalState);
+            state = new NoWorkspaceDetectingState();
         }
 
         [Fact]
         public async Task ReturnsSuccessResultWhenWorkspacesArePresent()
         {
             var arrayWithWorkspace = new List<IWorkspace>(new[] { new MockWorkspace() });
-            fetchObservables.GetList<IWorkspace>().Returns(Observable.Return<List<IWorkspace>>(arrayWithWorkspace));
+            fetchObservables.GetList<IWorkspace>().Returns(Observable.Return(arrayWithWorkspace));
+
             var transition = await state.Start(fetchObservables);
 
-            transition.Result.Should().Be(state.FinishedPersisting);
+            transition.Result.Should().Be(state.Continue);
         }
 
         [Fact, LogIfTooSlow]
@@ -45,6 +45,16 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
             Func<Task> fetchWorkspaces = async () => await state.Start(fetchObservables);
 
             fetchWorkspaces.Should().Throw<NoWorkspaceException>();
+        }
+
+        [Fact, LogIfTooSlow]
+        public void ThrowsWhenTheDeviceIsOffline()
+        {
+            fetchObservables.GetList<IWorkspace>().Returns(Observable.Throw<List<IWorkspace>>(new OfflineException(new Exception())));
+
+            Action startingState = () => state.Start(fetchObservables).Wait();
+
+            startingState.Should().Throw<OfflineException>();
         }
     }
 }

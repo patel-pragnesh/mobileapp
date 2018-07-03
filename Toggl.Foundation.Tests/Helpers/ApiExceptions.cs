@@ -41,8 +41,7 @@ namespace Toggl.Foundation.Tests.Helpers
             {
                 new object[] { new ClientDeprecatedException(Substitute.For<IRequest>(), Substitute.For<IResponse>()), },
                 new object[] { new ApiDeprecatedException(Substitute.For<IRequest>(), Substitute.For<IResponse>()), },
-                new object[] { new UnauthorizedException(Substitute.For<IRequest>(), Substitute.For<IResponse>()), },
-                new object[] { new OfflineException() }
+                new object[] { new UnauthorizedException(Substitute.For<IRequest>(), Substitute.For<IResponse>()), }
             };
 
         public static IEnumerable<object[]> ServerExceptions

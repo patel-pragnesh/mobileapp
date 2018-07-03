@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -38,7 +37,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private CompositeDisposable disposeBag = new CompositeDisposable();
 
-        private readonly IScheduler scheduler;
         private readonly ITimeService timeService;
         private readonly ITogglDataSource dataSource;
         private readonly IUserPreferences userPreferences;
@@ -46,7 +44,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IOnboardingStorage onboardingStorage;
         private readonly IInteractorFactory interactorFactory;
         private readonly IMvxNavigationService navigationService;
-        private readonly TimeSpan currentTimeEntryDueTime = TimeSpan.FromMilliseconds(50);
 
         private RatingViewExperiment ratingViewExperiment;
 
@@ -72,12 +69,10 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public int NumberOfSyncFailures { get; private set; }
 
-        public IObservable<bool> TimeEntryCardVisibility { get; private set; }
+        public IObservable<bool> IsTimeEntryRunning { get; private set; }
 
         [DependsOn(nameof(SyncingProgress))]
         public bool ShowSyncIndicator => SyncingProgress == SyncProgress.Syncing;
-
-        public bool IsTimeEntryRunning => CurrentTimeEntryId.HasValue;
 
         public bool IsAddDescriptionLabelVisible =>
             string.IsNullOrEmpty(CurrentTimeEntryDescription)
@@ -134,7 +129,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public IMvxCommand ToggleManualMode { get; }
 
         public MainViewModel(
-            IScheduler scheduler,
             ITogglDataSource dataSource,
             ITimeService timeService,
             IRatingService ratingService,
@@ -147,7 +141,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IRemoteConfigService remoteConfigService,
             ISuggestionProviderContainer suggestionProviders)
         {
-            Ensure.Argument.IsNotNull(scheduler, nameof(scheduler));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
             Ensure.Argument.IsNotNull(ratingService, nameof(ratingService));
@@ -160,7 +153,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(remoteConfigService, nameof(remoteConfigService));
             Ensure.Argument.IsNotNull(suggestionProviders, nameof(suggestionProviders));
 
-            this.scheduler = scheduler;
             this.dataSource = dataSource;
             this.timeService = timeService;
             this.userPreferences = userPreferences;
@@ -198,12 +190,18 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             await SuggestionsViewModel.Initialize();
             await RatingViewModel.Initialize();
 
-            TimeEntryCardVisibility = dataSource
-                .TimeEntries
-                .CurrentlyRunningTimeEntry
-                .Throttle(currentTimeEntryDueTime, scheduler) // avoid overwhelming the UI with frequent updates
-                .Do(setRunningEntry)
-                .Select(timeEntry => timeEntry != null);
+            var connectableTimeEntryIsRunning =
+                dataSource
+                    .TimeEntries
+                    .CurrentlyRunningTimeEntry
+                    .Do(setRunningEntry)
+                    .Select(timeEntry => timeEntry != null)
+                    .DistinctUntilChanged()
+                    .Replay(1);
+
+            connectableTimeEntryIsRunning.Connect();
+
+            IsTimeEntryRunning = connectableTimeEntryIsRunning;
 
             var tickDisposable = timeService
                 .CurrentDateTimeObservable

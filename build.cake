@@ -18,6 +18,13 @@ private void FormatAndroidAxml()
 	StartProcess("mono", new ProcessSettings { Arguments = args });
 }
 
+private void GenerateSyncDiagram()
+{
+    var args = "bin/Debug/netcoreapp2.0/SyncDiagramGenerator.dll";
+
+    StartProcess("dotnet", new ProcessSettings { Arguments = args });
+}
+
 private Action Test(string[] projectPaths)
 {
     var settings = new DotNetCoreTestSettings { NoBuild = true };
@@ -401,6 +408,7 @@ Task("Clean")
             CleanDirectory("./Toggl.Ultrawave/obj");
             CleanDirectory("./Toggl.Ultrawave.Tests/obj");
             CleanDirectory("./Toggl.Ultrawave.Tests.Integration/obj");
+            CleanDirectory("./Toggl.Tools/SyncDiagramGenerator/obj");
         });
 
 Task("Format")
@@ -428,6 +436,13 @@ Task("Build.Tests.UI")
     .IsDependentOn("Nuget")
     .Does(BuildSolution("UITests"))
     .Does(GenerateApk("Release"));
+
+Task("BuildSyncDiagramGenerator")
+    .IsDependentOn("Nuget")
+    .Does(BuildSolution("SyncDiagramGenerator"));
+
+Task("GenerateSyncDiagram")
+    .Does(() => GenerateSyncDiagram());
 
 //iOS Builds
 Task("Build.Release.iOS.AdHoc")

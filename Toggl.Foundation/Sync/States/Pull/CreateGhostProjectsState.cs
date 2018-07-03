@@ -11,6 +11,7 @@ using Toggl.Multivac;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
 using Toggl.Multivac.Extensions;
+using Toggl.Ultrawave.Exceptions;
 using static Toggl.Multivac.Extensions.CommonFunctions;
 
 namespace Toggl.Foundation.Sync.States.Pull
@@ -22,6 +23,8 @@ namespace Toggl.Foundation.Sync.States.Pull
         private readonly IAnalyticsService analyticsService;
 
         public StateResult<IFetchObservables> FinishedPersisting { get; } = new StateResult<IFetchObservables>();
+
+        public StateResult<ApiException> ErrorOccured { get; } = new StateResult<ApiException>();
 
         public CreateGhostProjectsState(
             IProjectsSource dataSource,
@@ -43,7 +46,8 @@ namespace Toggl.Foundation.Sync.States.Pull
                 .SelectMany(createGhostProject)
                 .Count()
                 .Track(analyticsService.ProjectGhostsCreated)
-                .Select(FinishedPersisting.Transition(fetch));
+                .Select(FinishedPersisting.Transition(fetch))
+                .OnErrorReturnResult(ErrorOccured);
 
         private IObservable<bool> needsGhostProject(ITimeEntry timeEntry)
             => timeEntry.ProjectId.HasValue

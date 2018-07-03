@@ -113,6 +113,8 @@ namespace Toggl.Daneel.ViewControllers
 
         private void prepareViews()
         {
+            NavigationController.NavigationBarHidden = false;
+
             ResetPasswordButton.SetTitleColor(
                 Color.Login.DisabledButtonColor.ToNativeColor(),
                 UIControlState.Disabled
@@ -158,7 +160,7 @@ namespace Toggl.Daneel.ViewControllers
 
             //Otherwise title gets clipped
             var frame = backButton.Frame;
-            frame.Width = 50;
+            frame.Width = 90;
             backButton.Frame = frame;
             backButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
         }

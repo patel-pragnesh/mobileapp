@@ -55,19 +55,19 @@ namespace Toggl.Foundation.DataSources
         public override IObservable<IConflictResolutionResult<TThreadsafe>> OverwriteIfOriginalDidNotChange(
             TThreadsafe original, TThreadsafe entity)
             => base.OverwriteIfOriginalDidNotChange(original, entity)
-                .Do(handleConflictResolutionResult);
+                .Do(HandleConflictResolutionResult);
 
         public override IObservable<IEnumerable<IConflictResolutionResult<TThreadsafe>>> BatchUpdate(IEnumerable<TThreadsafe> entities)
             => base.BatchUpdate(entities)
                 .Do(updatedEntities => updatedEntities
-                    .ForEach(handleConflictResolutionResult));
+                    .ForEach(HandleConflictResolutionResult));
 
         public override IObservable<IEnumerable<IConflictResolutionResult<TThreadsafe>>> DeleteAll(IEnumerable<TThreadsafe> entities)
             => base.DeleteAll(entities)
                 .Do(updatedEntities => updatedEntities
-                    .ForEach(handleConflictResolutionResult));
+                    .ForEach(HandleConflictResolutionResult));
 
-        private void handleConflictResolutionResult(IConflictResolutionResult<TThreadsafe> result)
+        protected void HandleConflictResolutionResult(IConflictResolutionResult<TThreadsafe> result)
         {
             switch (result)
             {

@@ -2,38 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using Toggl.Foundation.Extensions;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
+using Toggl.Ultrawave.Exceptions;
 
 namespace Toggl.Foundation.Sync.States.Pull
 {
-    public sealed class SinceDateUpdatingPersistState<TInterface, TDatabaseInterface> : IPersistState
+    public sealed class SinceDateUpdatingState<TInterface, TDatabaseInterface> : ISyncState<IFetchObservables>
         where TInterface : ILastChangedDatable
         where TDatabaseInterface : TInterface, IDatabaseSyncable
     {
         private readonly ISinceParameterRepository sinceParameterRepository;
 
-        private readonly IPersistState internalState;
+        public StateResult<IFetchObservables> Finished { get; } = new StateResult<IFetchObservables>();
 
-        public StateResult<IFetchObservables> FinishedPersisting { get; } = new StateResult<IFetchObservables>();
-
-        public SinceDateUpdatingPersistState(
-            ISinceParameterRepository sinceParameterRepository,
-            IPersistState internalState)
+        public SinceDateUpdatingState(ISinceParameterRepository sinceParameterRepository)
         {
             Ensure.Argument.IsNotNull(sinceParameterRepository, nameof(sinceParameterRepository));
-            Ensure.Argument.IsNotNull(internalState, nameof(internalState));
 
             this.sinceParameterRepository = sinceParameterRepository;
-            this.internalState = internalState;
         }
 
         public IObservable<ITransition> Start(IFetchObservables fetch)
-            => internalState.Start(fetch)
-                .SelectMany(_ => fetch.GetList<TInterface>()
-                    .Do(maybeUpdateSinceDates)
-                    .Select(__ => FinishedPersisting.Transition(fetch)));
+            => fetch.GetList<TInterface>()
+                .Do(maybeUpdateSinceDates)
+                .Select(Finished.Transition(fetch));
 
         private void maybeUpdateSinceDates(List<TInterface> entities)
         {

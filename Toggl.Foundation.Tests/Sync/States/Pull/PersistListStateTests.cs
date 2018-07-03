@@ -9,7 +9,9 @@ using Toggl.Foundation.DataSources.Interfaces;
 using Toggl.Foundation.Sync;
 using Toggl.Foundation.Sync.States;
 using Toggl.Foundation.Sync.States.Pull;
+using Toggl.Foundation.Tests.Helpers;
 using Toggl.PrimeRadiant;
+using Toggl.Ultrawave.Exceptions;
 using Xunit;
 
 namespace Toggl.Foundation.Tests.Sync.States
@@ -36,6 +38,18 @@ namespace Toggl.Foundation.Tests.Sync.States
             var transition = await state.Start(observables).SingleAsync();
 
             transition.Result.Should().Be(state.FinishedPersisting);
+        }
+
+        [Theory]
+        [MemberData(nameof(ApiExceptions.ServerExceptions), MemberType = typeof(ApiExceptions))]
+        [MemberData(nameof(ApiExceptions.ClientExceptionsWhichAreNotReThrownInSyncStates), MemberType = typeof(ApiExceptions))]
+        public async Task ReturnsFailureResultWhenFetchingThrows(ApiException exception)
+        {
+            var fetchObservables = createFetchObservables(Observable.Throw<List<ITestModel>>(exception));
+
+            var transition = await state.Start(fetchObservables);
+
+            transition.Result.Should().Be(state.ErrorOccured);
         }
 
         [Fact, LogIfTooSlow]
@@ -76,6 +90,16 @@ namespace Toggl.Foundation.Tests.Sync.States
             Action startingState = () => state.Start(observables).SingleAsync().Wait();
 
             startingState.Should().Throw<TestException>();
+        }
+
+        [Fact, LogIfTooSlow]
+        public void ThrowsWhenTheDeviceIsOffline()
+        {
+            var observables = createFetchObservables(Observable.Throw<List<ITestModel>>(new OfflineException(new Exception())));
+
+            Action startingState = () => state.Start(observables).Wait();
+
+            startingState.Should().Throw<OfflineException>();
         }
 
         private IFetchObservables createObservables(List<ITestModel> entities = null)
