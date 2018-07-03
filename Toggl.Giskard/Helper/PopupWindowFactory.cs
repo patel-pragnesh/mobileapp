@@ -18,7 +18,7 @@ namespace Toggl.Giskard.Helper
 
             var popupWindow = new PopupWindow(context);
             var popupWindowContentView = LayoutInflater.From(context).Inflate(contentViewLayoutId, null, false);
-            var tooltipTextView = popupWindowContentView.FindViewById<TextView>(tooltipTextStringId);
+            var tooltipTextView = popupWindowContentView.FindViewById<TextView>(tooltipTextViewId);
 
             if (tooltipTextView == null)
             {
