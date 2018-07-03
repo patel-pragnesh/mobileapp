@@ -16,6 +16,7 @@ using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave.Exceptions;
 
@@ -42,9 +43,11 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly BehaviorSubject<bool> isPasswordMaskedSubject = new BehaviorSubject<bool>(true);
         private readonly Subject<bool> isShowPasswordButtonVisibleSubject = new Subject<bool>();
 
-        public IObservable<Email> Email { get; }
+        public bool IsPasswordManagerAvailable { get; }
 
-        public IObservable<Password> Password { get; }
+        public IObservable<string> Email { get; }
+
+        public IObservable<string> Password { get; }
 
         public IObservable<string> ErrorMessage { get; }
 
@@ -53,8 +56,6 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public IObservable<bool> IsLoading { get; }
 
         public IObservable<bool> LoginEnabled { get; }
-
-        public IObservable<bool> IsPasswordManagerAvailable { get; }
 
         public IObservable<bool> IsPasswordMasked { get; }
 
@@ -88,29 +89,46 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.lastTimeUsageStorage = lastTimeUsageStorage;
             this.timeService = timeService;
 
-            Email = emailSubject.AsObservable();
-            Password = passwordSubject.AsObservable();
-            IsLoading = isLoadingSubject.AsObservable();
-            ErrorMessage = errorMessageSubject.AsObservable().DistinctUntilChanged();
-            IsPasswordMasked = isPasswordMaskedSubject.AsObservable();
+            var emailObservable = emailSubject.AsObservable();
+            var passwordObservable = passwordSubject.AsObservable();
+
+            Email = emailObservable
+                .Select(email => email.ToString())
+                .DistinctUntilChanged();
+
+            Password = passwordSubject
+                .Select(password => password.ToString())
+                .DistinctUntilChanged();
+            
+            IsLoading = isLoadingSubject
+                .AsObservable()
+                .DistinctUntilChanged();
+
+            ErrorMessage = errorMessageSubject
+                .AsObservable()
+                .DistinctUntilChanged();
+
+            IsPasswordMasked = isPasswordMaskedSubject
+                .AsObservable()
+                .DistinctUntilChanged();
+
             IsShowPasswordButtonVisible = Password
                 .Select(password => password.Length > 1)
-                .CombineLatest(
-                    isShowPasswordButtonVisibleSubject.AsObservable(),
-                    (passwordIsLongEnough, valueFromSubject) => passwordIsLongEnough && valueFromSubject);
+                .CombineLatest(isShowPasswordButtonVisibleSubject.AsObservable(), CommonFunctions.And)
+                .DistinctUntilChanged();
 
-            HasError = ErrorMessage.Select(error => !string.IsNullOrEmpty(error));
-            LoginEnabled = Email
+            HasError = ErrorMessage
+                .Select(string.IsNullOrEmpty)
+                .Select(CommonFunctions.Invert);
+
+            LoginEnabled = emailObservable
                 .CombineLatest(
-                    Password,
+                    passwordObservable,
                     IsLoading,
                     (email, password, isLoading) => email.IsValid && password.IsValid && !isLoading)
                 .DistinctUntilChanged();
-            IsPasswordManagerAvailable = Observable.Create((IObserver<bool> observer) =>
-            {
-                observer.OnNext(passwordManagerService.IsAvailable);
-                return Disposable.Empty;
-            });
+            
+            IsPasswordManagerAvailable = passwordManagerService.IsAvailable;
         }
 
         public override void Prepare(CredentialsParameter parameter)

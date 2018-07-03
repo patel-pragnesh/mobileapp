@@ -34,12 +34,12 @@ namespace Toggl.Giskard.Activities
             InitializeViews();
 
             //Text
+            this.Bind(ViewModel.Email, emailEditText.BindText());
+            this.Bind(ViewModel.Password, passwordEditText.BindText());
             this.Bind(ViewModel.ErrorMessage, errorTextView.BindText());
             this.Bind(emailEditText.Text().Select(Email.From), ViewModel.SetEmail);
             this.Bind(passwordEditText.Text().Select(Password.From), ViewModel.SetPassword);
             this.Bind(ViewModel.IsLoading.Select(loginButtonTitle), loginButton.BindText());
-            this.Bind(ViewModel.Email.Select(email => email.ToString()), emailEditText.BindText());
-            this.Bind(ViewModel.Password.Select(password => password.ToString()), passwordEditText.BindText());
 
             //Visibility
             this.Bind(ViewModel.HasError, errorTextView.BindIsVisible());

@@ -33,29 +33,22 @@ namespace Toggl.Daneel.ViewControllers
             base.ViewDidLoad();
 
             NavigationController.NavigationBarHidden = true;
+            PasswordManagerButton.Hidden = !ViewModel.IsPasswordManagerAvailable;
 
             //Text
+            this.Bind(ViewModel.Email, EmailTextField.BindText());
             this.Bind(ViewModel.ErrorMessage, ErrorLabel.BindText());
+            this.Bind(ViewModel.Password, PasswordTextField.BindText());
             this.Bind(EmailTextField.Text().Select(Email.From), ViewModel.SetEmail);
             this.Bind(PasswordTextField.Text().Select(Password.From), ViewModel.SetPassword);
-            this.Bind(ViewModel.Email.Select(email => email.ToString()), EmailTextField.BindText());
             this.Bind(ViewModel.IsLoading.Select(loginButtonTitle), LoginButton.BindAnimatedTitle());
-            this.Bind(ViewModel.Password.Select(password => password.ToString()), PasswordTextField.BindText());
 
             //Visibility
             this.Bind(ViewModel.HasError, ErrorLabel.BindAnimatedIsVisible());
             this.Bind(ViewModel.IsLoading, ActivityIndicator.BindIsVisibleWithFade());
             this.Bind(ViewModel.IsPasswordMasked, PasswordTextField.BindSecureTextEntry());
             this.Bind(ViewModel.IsShowPasswordButtonVisible, ShowPasswordButton.BindIsVisible());
-            this.Bind(ViewModel.IsPasswordManagerAvailable, PasswordManagerButton.BindIsVisible());
-            this.Bind(PasswordTextField.FirstResponder(), ViewModel.SetIsShowPasswordButtonVisible);
-            this.Bind(
-                ViewModel
-                    .LoginEnabled
-                    .Select(enabled => enabled
-                            ? Color.Login.EnabledButtonColor.ToNativeColor()
-                            : Color.Login.DisabledButtonColor.ToNativeColor()),
-                LoginButton.BindTitleColor());
+            this.Bind(PasswordTextField.FirstResponder, ViewModel.SetIsShowPasswordButtonVisible);
 
             //Commands
             this.Bind(SignupCard.Tapped(), ViewModel.Signup);
@@ -67,8 +60,16 @@ namespace Toggl.Daneel.ViewControllers
 
             //Color
             this.Bind(ViewModel.HasError.Select(loginButtonTintColor), LoginButton.BindTintColor());
+            this.Bind(ViewModel.LoginEnabled.Select(loginButtonTitleColor),LoginButton.BindTitleColor());
 
             prepareViews();
+
+            UIColor loginButtonTintColor(bool hasError)
+                => hasError ? UIColor.White : UIColor.Black;
+            
+            UIColor loginButtonTitleColor(bool enabled) => enabled 
+                ? Color.Login.EnabledButtonColor.ToNativeColor()
+                : Color.Login.DisabledButtonColor.ToNativeColor();
         }
 
         public override void ViewDidLayoutSubviews()
