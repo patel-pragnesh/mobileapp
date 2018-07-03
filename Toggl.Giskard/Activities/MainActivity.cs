@@ -84,16 +84,6 @@ namespace Toggl.Giskard.Activities
             return new PopupOffsets(horizontalOffset, verticalOffset);
         }
 
-        private PopupWindow createPlayButtonTooltipPopupWindow()
-        {
-            var popupWindow = new PopupWindow(this);
-            var popupWindowContentView = LayoutInflater.From(this).Inflate(Resource.Layout.TooltipWithRightArrow, null, false);
-            popupWindowContentView.FindViewById<TextView>(Resource.Id.TooltipText).Text = GetString(Resource.String.OnboardingTapToStartTimer);
-            popupWindow.ContentView = popupWindowContentView;
-            popupWindow.SetBackgroundDrawable(null);
-            return popupWindow;
-        }
-
         private void onSyncChanged(object sender, PropertyChangedEventArgs args)
         {
             switch (ViewModel.SyncingProgress)
