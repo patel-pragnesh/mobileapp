@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
-using Android.Graphics;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
@@ -27,11 +26,7 @@ namespace Toggl.Giskard.Extensions
             => isVisible => view.Visibility = isVisible.ToVisibility();
 
         public static Action<string> BindText(this TextView textView)
-            => text =>
-            {
-                if (textView.Text != text)
-                    textView.Text = text;
-            };
+            => text => textView.Text = text;
 
         public static Action<bool> BindChecked(this CompoundButton compoundButton)
             => isChecked => compoundButton.Checked = isChecked;
