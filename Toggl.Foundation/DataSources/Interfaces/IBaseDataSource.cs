@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.PrimeRadiant;
 
@@ -13,6 +14,6 @@ namespace Toggl.Foundation.DataSources.Interfaces
 
         IObservable<T> Overwrite(T original, T entity);
 
-        IObservable<IConflictResolutionResult<T>> OverwriteIfOriginalDidNotChange(T original, T entity);
+        IObservable<IEnumerable<IConflictResolutionResult<T>>> OverwriteIfOriginalDidNotChange(T original, T entity);
     }
 }

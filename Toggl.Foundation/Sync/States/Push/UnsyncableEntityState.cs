@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using Toggl.Foundation.DataSources.Interfaces;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.Ultrawave.Exceptions;
 
@@ -47,7 +48,10 @@ namespace Toggl.Foundation.Sync.States.Push
         private IObservable<ITransition> markAsUnsyncable(T entity, string reason)
             => dataSource
                 .OverwriteIfOriginalDidNotChange(entity, createUnsyncableFrom(entity, reason))
-                .Select(updated => updated is UpdateResult<T> updateResult ? updateResult.Entity : entity)
+                .SelectMany(CommonFunctions.Identity)
+                .OfType<UpdateResult<T>>()
+                .Select(result => result.Entity)
+                .DefaultIfEmpty(entity)
                 .Select(unsyncable => MarkedAsUnsyncable.Transition(unsyncable));
     }
 }

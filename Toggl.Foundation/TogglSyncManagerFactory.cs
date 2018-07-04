@@ -50,7 +50,7 @@ namespace Toggl.Foundation
         }
 
         public static void ConfigureTransitions(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             ITogglDatabase database,
             ITogglApi api,
             ITogglDataSource dataSource,
@@ -66,7 +66,7 @@ namespace Toggl.Foundation
         }
 
         private static void configurePullTransitions(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             ITogglDatabase database,
             ITogglApi api,
             ITogglDataSource dataSource,
@@ -83,56 +83,56 @@ namespace Toggl.Foundation
             var fetchAllSince = new FetchAllSinceState(database, api, timeService);
 
             var persistWorkspaces =
-                new PersistListState<IWorkspace, IDatabaseWorkspace, IThreadSafeWorkspace>(dataSource.Workspaces, Workspace.Clean)
-                    .UpdateSince<IWorkspace, IDatabaseWorkspace>(database.SinceParameters)
-                    .ThrowNoWorkspaceExceptionIfNeeded()
-                    .CatchApiExceptions();
+                new PersistListState<IWorkspace, IDatabaseWorkspace, IThreadSafeWorkspace>(dataSource.Workspaces, Workspace.Clean);
+
+            var updateWorkspacesSinceDate =
+                new SinceDateUpdatingState<IWorkspace, IDatabaseWorkspace>(database.SinceParameters);
+
+            var detectNoWorkspaceState = new NoWorkspaceDetectingState();
 
             var persistWorkspaceFeatures =
                 new PersistListState<IWorkspaceFeatureCollection, IDatabaseWorkspaceFeatureCollection, IThreadSafeWorkspaceFeatureCollection>(
-                        dataSource.WorkspaceFeatures, WorkspaceFeatureCollection.From)
-                    .CatchApiExceptions();
+                    dataSource.WorkspaceFeatures, WorkspaceFeatureCollection.From);
 
             var persistUser =
-                new PersistSingletonState<IUser, IDatabaseUser, IThreadSafeUser>(dataSource.User, User.Clean)
-                    .TrackNoDefaultWorkspace(analyticsService)
-                    .CatchApiExceptions();
+                new PersistSingletonState<IUser, IDatabaseUser, IThreadSafeUser>(dataSource.User, User.Clean);
+
+            var noDefaultWorkspaceTrackingState = new NoDefaultWorkspaceTrackingState(analyticsService);
 
             var persistTags =
-                new PersistListState<ITag, IDatabaseTag, IThreadSafeTag>(dataSource.Tags, Tag.Clean)
-                    .UpdateSince<ITag, IDatabaseTag>(database.SinceParameters)
-                    .CatchApiExceptions();
+                new PersistListState<ITag, IDatabaseTag, IThreadSafeTag>(dataSource.Tags, Tag.Clean);
+
+            var updateTagsSinceDate = new SinceDateUpdatingState<ITag, IDatabaseTag>(database.SinceParameters);
 
             var persistClients =
-                new PersistListState<IClient, IDatabaseClient, IThreadSafeClient>(dataSource.Clients, Client.Clean)
-                    .UpdateSince<IClient, IDatabaseClient>(database.SinceParameters)
-                    .CatchApiExceptions();
+                new PersistListState<IClient, IDatabaseClient, IThreadSafeClient>(dataSource.Clients, Client.Clean);
+
+            var updateClientsSinceDate = new SinceDateUpdatingState<IClient, IDatabaseClient>(database.SinceParameters);
 
             var persistPreferences =
-                new PersistSingletonState<IPreferences, IDatabasePreferences, IThreadSafePreferences>(dataSource.Preferences, Preferences.Clean)
-                    .CatchApiExceptions();
+                new PersistSingletonState<IPreferences, IDatabasePreferences, IThreadSafePreferences>(dataSource.Preferences, Preferences.Clean);
 
             var persistProjects =
-                new PersistListState<IProject, IDatabaseProject, IThreadSafeProject>(dataSource.Projects, Project.Clean)
-                    .UpdateSince<IProject, IDatabaseProject>(database.SinceParameters)
-                    .CatchApiExceptions();
+                new PersistListState<IProject, IDatabaseProject, IThreadSafeProject>(dataSource.Projects, Project.Clean);
 
-            var createGhostProjects = new CreateGhostProjectsState(dataSource.Projects, analyticsService).CatchApiExceptions();
+            var updateProjectsSinceDate = new SinceDateUpdatingState<IProject, IDatabaseProject>(database.SinceParameters);
+
+            var createGhostProjects = new CreateGhostProjectsState(dataSource.Projects, analyticsService);
 
             var persistTimeEntries =
-                new PersistListState<ITimeEntry, IDatabaseTimeEntry, IThreadSafeTimeEntry>(dataSource.TimeEntries, TimeEntry.Clean)
-                    .UpdateSince<ITimeEntry, IDatabaseTimeEntry>(database.SinceParameters)
-                    .CatchApiExceptions();
+                new PersistListState<ITimeEntry, IDatabaseTimeEntry, IThreadSafeTimeEntry>(dataSource.TimeEntries, TimeEntry.Clean);
+
+            var updateTimeEntriesSinceDate = new SinceDateUpdatingState<ITimeEntry, IDatabaseTimeEntry>(database.SinceParameters);
 
             var persistTasks =
-                new PersistListState<ITask, IDatabaseTask, IThreadSafeTask>(dataSource.Tasks, Task.Clean)
-                    .UpdateSince<ITask, IDatabaseTask>(database.SinceParameters)
-                    .CatchApiExceptions();
+                new PersistListState<ITask, IDatabaseTask, IThreadSafeTask>(dataSource.Tasks, Task.Clean);
+
+            var updateTasksSinceDate = new SinceDateUpdatingState<ITask, IDatabaseTask>(database.SinceParameters);
 
             var refetchInaccessibleProjects =
-                new TryFetchInaccessibleProjectsState(dataSource.Projects, timeService, api.Projects)
-                    .CatchApiExceptions();
+                new TryFetchInaccessibleProjectsState(dataSource.Projects, timeService, api.Projects);
 
+            var retryOrThrow = new SevereApiExceptionsRethrowingState();
             var checkServerStatus = new CheckServerStatusState(api, scheduler, apiDelay, statusDelay, delayCancellation);
 
             var finished = new ResetAPIDelayState(apiDelay);
@@ -141,40 +141,58 @@ namespace Toggl.Foundation
 
             transitions.ConfigureTransition(entryPoint, fetchAllSince);
             transitions.ConfigureTransition(fetchAllSince.FetchStarted, persistWorkspaces);
-            transitions.ConfigureTransition(persistWorkspaces.UnsafeState.FinishedPersisting, persistUser);
-            transitions.ConfigureTransition(persistUser.UnsafeState.FinishedPersisting, persistWorkspaceFeatures);
-            transitions.ConfigureTransition(persistWorkspaceFeatures.UnsafeState.FinishedPersisting, persistPreferences);
-            transitions.ConfigureTransition(persistPreferences.UnsafeState.FinishedPersisting, persistTags);
-            transitions.ConfigureTransition(persistTags.UnsafeState.FinishedPersisting, persistClients);
-            transitions.ConfigureTransition(persistClients.UnsafeState.FinishedPersisting, persistProjects);
-            transitions.ConfigureTransition(persistProjects.UnsafeState.FinishedPersisting, persistTasks);
-            transitions.ConfigureTransition(persistTasks.UnsafeState.FinishedPersisting, createGhostProjects);
-            transitions.ConfigureTransition(createGhostProjects.UnsafeState.FinishedPersisting, persistTimeEntries);
-            transitions.ConfigureTransition(persistTimeEntries.UnsafeState.FinishedPersisting, refetchInaccessibleProjects);
-            transitions.ConfigureTransition(refetchInaccessibleProjects.UnsafeState.FetchNext, refetchInaccessibleProjects);
 
-            transitions.ConfigureTransition(refetchInaccessibleProjects.UnsafeState.FinishedPersisting, deleteOlderEntries);
+            transitions.ConfigureTransition(persistWorkspaces.FinishedPersisting, updateWorkspacesSinceDate);
+            transitions.ConfigureTransition(updateWorkspacesSinceDate.Finished, detectNoWorkspaceState);
+            transitions.ConfigureTransition(detectNoWorkspaceState.Continue, persistUser);
+
+            transitions.ConfigureTransition(persistUser.FinishedPersisting, noDefaultWorkspaceTrackingState);
+            transitions.ConfigureTransition(noDefaultWorkspaceTrackingState.Continue, persistWorkspaceFeatures);
+
+            transitions.ConfigureTransition(persistWorkspaceFeatures.FinishedPersisting, persistPreferences);
+
+            transitions.ConfigureTransition(persistPreferences.FinishedPersisting, persistTags);
+
+            transitions.ConfigureTransition(persistTags.FinishedPersisting, updateTagsSinceDate);
+            transitions.ConfigureTransition(updateTagsSinceDate.Finished, persistClients);
+
+            transitions.ConfigureTransition(persistClients.FinishedPersisting, updateClientsSinceDate);
+            transitions.ConfigureTransition(updateClientsSinceDate.Finished, persistProjects);
+
+            transitions.ConfigureTransition(persistProjects.FinishedPersisting, updateProjectsSinceDate);
+            transitions.ConfigureTransition(updateProjectsSinceDate.Finished, persistTasks);
+
+            transitions.ConfigureTransition(persistTasks.FinishedPersisting, updateTasksSinceDate);
+            transitions.ConfigureTransition(updateTasksSinceDate.Finished, createGhostProjects);
+
+            transitions.ConfigureTransition(createGhostProjects.FinishedPersisting, persistTimeEntries);
+            transitions.ConfigureTransition(persistTimeEntries.FinishedPersisting, updateTimeEntriesSinceDate);
+            transitions.ConfigureTransition(updateTimeEntriesSinceDate.Finished, refetchInaccessibleProjects);
+            transitions.ConfigureTransition(refetchInaccessibleProjects.FetchNext, refetchInaccessibleProjects);
+
+            transitions.ConfigureTransition(refetchInaccessibleProjects.FinishedPersisting, deleteOlderEntries);
             transitions.ConfigureTransition(deleteOlderEntries.FinishedDeleting, deleteNonReferencedGhostProjects);
 
-            transitions.ConfigureTransition(persistWorkspaces.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistUser.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistWorkspaceFeatures.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistPreferences.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistTags.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistClients.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistProjects.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistTasks.Failed, checkServerStatus);
-            transitions.ConfigureTransition(createGhostProjects.Failed, checkServerStatus);
-            transitions.ConfigureTransition(persistTimeEntries.Failed, checkServerStatus);
-            transitions.ConfigureTransition(refetchInaccessibleProjects.Failed, checkServerStatus);
+            transitions.ConfigureTransition(persistWorkspaces.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistUser.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistWorkspaceFeatures.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistPreferences.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistTags.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistClients.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistProjects.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistTasks.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(createGhostProjects.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(persistTimeEntries.ErrorOccured, retryOrThrow);
+            transitions.ConfigureTransition(refetchInaccessibleProjects.ErrorOccured, retryOrThrow);
 
+            transitions.ConfigureTransition(retryOrThrow.Retry, checkServerStatus);
             transitions.ConfigureTransition(checkServerStatus.Retry, checkServerStatus);
             transitions.ConfigureTransition(checkServerStatus.ServerIsAvailable, finished);
             transitions.ConfigureTransition(finished.Continue, fetchAllSince);
         }
 
         private static void configurePushTransitions(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             ITogglApi api,
             ITogglDataSource dataSource,
             IAnalyticsService analyticsService,
@@ -193,7 +211,7 @@ namespace Toggl.Foundation
         }
 
         private static IStateResult configurePush<TModel, TDatabase, TThreadsafe>(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             IStateResult entryPoint,
             IDataSource<TThreadsafe, TDatabase> dataSource,
             IAnalyticsService analyticsService,
@@ -261,7 +279,7 @@ namespace Toggl.Foundation
         }
 
         private static IStateResult configureCreateOnlyPush<TModel, TDatabase, TThreadsafe>(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             IStateResult entryPoint,
             IDataSource<TThreadsafe, TDatabase> dataSource,
             IAnalyticsService analyticsService,
@@ -313,7 +331,7 @@ namespace Toggl.Foundation
         }
 
         private static IStateResult configurePushSingleton<TModel, TThreadsafe>(
-            TransitionHandlerProvider transitions,
+            ITransitionConfigurator transitions,
             IStateResult entryPoint,
             ISingletonDataSource<TThreadsafe> dataSource,
             IAnalyticsService analyticsService,

@@ -87,6 +87,7 @@ understand and agree to Toggl\'s</string>
     <string name="AboutTermsOfService">Terms of Service</string>
     <string name="AboutPrivacyPolicy">Privacy Policy</string>
     <string name="AboutLicenses">Licenses</string>
+    <string name="OnboardingTapToStartTimer">Tap to start timer</string>
     <string name="Continue">Continue</string>
     <string name="Delete">Delete</string>
 

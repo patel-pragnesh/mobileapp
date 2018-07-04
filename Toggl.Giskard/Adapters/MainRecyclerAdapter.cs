@@ -66,10 +66,7 @@ namespace Toggl.Giskard.Adapters
                     };
 
                 case MainTemplateSelector.Suggestions:
-                    return new MainRecyclerViewSuggestionsViewHolder(inflatedView, itemBindingContext)
-                    {
-                        Click = SuggestionsViewModel.StartTimeEntryCommand
-                    };
+                    return new MainRecyclerViewSuggestionsViewHolder(inflatedView, itemBindingContext);
 
                 default:
                     return new MvxRecyclerViewHolder(inflatedView, itemBindingContext);

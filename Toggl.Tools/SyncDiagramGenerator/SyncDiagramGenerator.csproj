@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>$(SolutionDir)Toggl.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>../../bin/Debug/</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Toggl.Foundation\Toggl.Foundation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NSubstitute" Version="3.1.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Tools\SyncDiagramGenerator\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Tools\SyncDiagramGenerator\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Tools\SyncDiagramGenerator\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Tools\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Tools\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Tools\**" />
+  </ItemGroup>
+</Project>

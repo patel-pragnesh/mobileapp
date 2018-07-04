@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using FluentAssertions;
 using NSubstitute;
@@ -101,7 +102,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
             var entity = new TestModel(1, SyncStatus.InSync);
             dataSource
                 .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(Observable.Throw<IConflictResolutionResult<IThreadSafeTestModel>>(new TestException()));
+                .Returns(Observable.Throw<IEnumerable<IConflictResolutionResult<IThreadSafeTestModel>>>(new TestException()));
 
             var transition = state.Start(entity).SingleAsync().Wait();
             var parameter = ((Transition<(Exception Reason, IThreadSafeTestModel)>)transition).Parameter;
@@ -119,7 +120,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
                 .Returns(Observable.Return(Substitute.For<ITestModel>()));
             dataSource
                 .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(Observable.Return(new UpdateResult<IThreadSafeTestModel>(entity.Id, entity)));
+                .Returns(Observable.Return(new[] { new UpdateResult<IThreadSafeTestModel>(entity.Id, entity) }));
 
             state.Start(entity).SingleAsync().Wait();
 
@@ -136,7 +137,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
                 .Returns(Observable.Return(entity));
             dataSource
                 .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(Observable.Return(new IgnoreResult<IThreadSafeTestModel>(entity.Id)));
+                .Returns(Observable.Return(new[] { new IgnoreResult<IThreadSafeTestModel>(entity.Id) }));
 
             var transition = state.Start(entity).SingleAsync().Wait();
             var parameter = ((Transition<IThreadSafeTestModel>)transition).Parameter;
@@ -161,7 +162,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
                 .Returns(Observable.Return(localEntity));
             dataSource
                 .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(Observable.Return(new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity)));
+                .Returns(Observable.Return(new[] { new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity) }));
 
             var transition = state.Start(entity).SingleAsync().Wait();
             var parameter = ((Transition<IThreadSafeTestModel>)transition).Parameter;
@@ -189,7 +190,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
                 .Returns(Observable.Return(localEntity));
             dataSource
                 .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(Observable.Return(new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity)));
+                .Returns(Observable.Return(new[] { new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity) }));
 
             state.Start(entity).Wait();
 
@@ -214,7 +215,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
                 .Returns(Observable.Return(localEntity));
             dataSource
                 .OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(Observable.Return(new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity)));
+                .Returns(Observable.Return(new[] { new UpdateResult<IThreadSafeTestModel>(entity.Id, updatedEntity) }));
 
             state.Start(entity).Wait();
 
@@ -268,7 +269,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Push
         protected override void PrepareDatabaseOperationToThrow(Exception e)
         {
             dataSource.OverwriteIfOriginalDidNotChange(Arg.Any<IThreadSafeTestModel>(), Arg.Any<IThreadSafeTestModel>())
-                .Returns(_ => Observable.Throw<IConflictResolutionResult<IThreadSafeTestModel>>(e));
+                .Returns(_ => Observable.Throw<IEnumerable<IConflictResolutionResult<IThreadSafeTestModel>>>(e));
         }
     }
 }

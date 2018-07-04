@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Toggl.Foundation.DataSources.Interfaces;
+using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.PrimeRadiant;
+using Toggl.Ultrawave.Exceptions;
 
 namespace Toggl.Foundation.Sync.States.Pull
 {
@@ -20,6 +20,8 @@ namespace Toggl.Foundation.Sync.States.Pull
         private readonly Func<TInterface, TThreadsafeInterface> convertToThreadsafeEntity;
 
         public StateResult<IFetchObservables> FinishedPersisting { get; } = new StateResult<IFetchObservables>();
+
+        public StateResult<ApiException> ErrorOccured { get; } = new StateResult<ApiException>();
 
         public PersistSingletonState(
             ISingletonDataSource<TThreadsafeInterface> dataSource,
@@ -38,6 +40,7 @@ namespace Toggl.Foundation.Sync.States.Pull
                 .SelectMany(entity => entity == null
                     ? Observable.Return(Unit.Default)
                     : dataSource.UpdateWithConflictResolution(convertToThreadsafeEntity(entity)).Select(_ => Unit.Default))
-                .Select(_ => FinishedPersisting.Transition(fetch));
+                .Select(_ => FinishedPersisting.Transition(fetch))
+                .OnErrorReturnResult(ErrorOccured);
     }
 }
