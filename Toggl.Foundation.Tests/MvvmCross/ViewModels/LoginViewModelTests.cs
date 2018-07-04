@@ -1,35 +1,25 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using FsCheck;
 using FsCheck.Xunit;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Exceptions;
+using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.Tests.Generators;
-using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using FluentAssertions;
-using Microsoft.Reactive.Testing;
-using Toggl.Multivac.Extensions;
-using Xunit;
+using Toggl.Foundation.Tests.TestExtensions;
 using Toggl.Multivac;
+using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave.Exceptions;
 using Toggl.Ultrawave.Network;
 using Xunit;
-using Toggl.Foundation.Tests.TestExtensions;
-using FsCheck;
-using Microsoft.Reactive.Testing;
-using Toggl.Foundation.MvvmCross.Parameters;
-using Toggl.PrimeRadiant.Settings;
-using System.Linq;
-using System.Reactive;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -134,16 +124,16 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
         }
 
-        public sealed class TheIsPasswordManagerAvailableObservable : LoginViewModelTest
+        public sealed class TheIsPasswordManagerAvailableProperty : LoginViewModelTest
         {
             [Property]
             public void ReturnsWhetherThePasswordManagerIsAvailable(bool isAvailable)
             {
                 PasswordManagerService.IsAvailable.Returns(isAvailable);
-                var observer = Substitute.For<IObserver<bool>>();
-                ViewModel.IsPasswordManagerAvailable.Subscribe(observer);
 
-                observer.Received(1).OnNext(isAvailable);
+                var viewModel = CreateViewModel();
+
+                viewModel.IsPasswordManagerAvailable.Should().Be(isAvailable);
             }
         }
 
@@ -523,7 +513,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var scheduler = new TestScheduler();
                 var observable = arrangeCallToPasswordManagerWithValidCredentials();
-                var observer = Substitute.For<IObserver<Password>>();
+                var observer = Substitute.For<IObserver<string>>();
                 ViewModel.Password.Subscribe(observer);
 
                 scheduler.Schedule(TimeSpan.FromTicks(20), async () => await ViewModel.StartPasswordManager());
@@ -535,7 +525,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     disposed: 100
                 );
 
-                observer.Received(1).OnNext(ValidPassword);
+                observer.Received(1).OnNext(ValidPassword.ToString());
             }
 
             [Fact, LogIfTooSlow]
@@ -543,7 +533,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var scheduler = new TestScheduler();
                 var observable = arrangeCallToPasswordManagerWithInvalidCredentials();
-                var observer = Substitute.For<IObserver<Email>>();
+                var observer = Substitute.For<IObserver<string>>();
                 ViewModel.Email.Subscribe(observer);
 
                 scheduler.Schedule(TimeSpan.FromTicks(20), async () => await ViewModel.StartPasswordManager());
@@ -555,7 +545,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     disposed: 100
                 );
 
-                observer.Received(1).OnNext(InvalidEmail);
+                observer.Received(1).OnNext(InvalidEmail.ToString());
             }
 
             [Fact, LogIfTooSlow]
@@ -563,7 +553,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var scheduler = new TestScheduler();
                 var observable = arrangeCallToPasswordManagerWithValidCredentials();
-                var observer = Substitute.For<IObserver<Password>>();
+                var observer = Substitute.For<IObserver<string>>();
                 ViewModel.Password.Subscribe(observer);
 
                 scheduler.Schedule(TimeSpan.FromTicks(20), async () => await ViewModel.StartPasswordManager());
@@ -575,7 +565,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     disposed: 100
                 );
 
-                observer.Received(1).OnNext(ValidPassword);
+                observer.Received(1).OnNext(ValidPassword.ToString());
             }
 
             [Fact, LogIfTooSlow]
@@ -583,7 +573,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var scheduler = new TestScheduler();
                 var observable = arrangeCallToPasswordManagerWithInvalidCredentials();
-                var observer = Substitute.For<IObserver<Password>>();
+                var observer = Substitute.For<IObserver<string>>();
                 ViewModel.Password.Subscribe(observer);
 
                 scheduler.Schedule(TimeSpan.FromTicks(20), async () => await ViewModel.StartPasswordManager());
@@ -595,7 +585,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     disposed: 100
                 );
 
-                observer.Received(1).OnNext(Password.Empty);
+                observer.Received(1).OnNext(Password.Empty.ToString());
             }
 
             [Fact, LogIfTooSlow]
@@ -708,12 +698,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var email = Email.From(emailString.Get);
                 var password = Password.Empty;
                 var parameter = CredentialsParameter.With(email, password);
-                var observer = Substitute.For<IObserver<Email>>();
+                var observer = Substitute.For<IObserver<string>>();
                 ViewModel.Email.Subscribe(observer);
 
                 ViewModel.Prepare(parameter);
 
-                observer.Received(1).OnNext(email);
+                observer.Received(1).OnNext(email.ToString());
             }
 
             [Property]
@@ -722,12 +712,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var email = Email.Empty;
                 var password = Password.From(passwordString.Get);
                 var parameter = CredentialsParameter.With(email, password);
-                var observer = Substitute.For<IObserver<Password>>();
+                var observer = Substitute.For<IObserver<string>>();
                 ViewModel.Password.Subscribe(observer);
 
                 ViewModel.Prepare(parameter);
 
-                observer.Received(1).OnNext(password);
+                observer.Received(1).OnNext(password.ToString());
             }
         }
     }
