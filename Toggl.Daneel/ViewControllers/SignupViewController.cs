@@ -153,9 +153,10 @@ namespace Toggl.Daneel.ViewControllers
                 }
             };
 
-            PasswordTextField.ResignFirstResponder();
-
             ShowPasswordButton.SetupShowPasswordButton();
+
+            EmailTextField.ResignFirstResponder();
+            PasswordTextField.ResignFirstResponder();
         }
     }
 }

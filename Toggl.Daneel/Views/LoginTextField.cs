@@ -58,7 +58,7 @@ namespace Toggl.Daneel.Views
             FirstResponder = firstResponderSubject
                 .AsObservable()
                 .DistinctUntilChanged()
-                .StartWith(IsFirstResponder);
+                .StartWith(false);
             
             Layer.AddSublayer(underlineLayer);
             Layer.AddSublayer(placeholderLayer);
@@ -115,11 +115,10 @@ namespace Toggl.Daneel.Views
         public override bool BecomeFirstResponder()
         {
             var becomeFirstResponder = base.BecomeFirstResponder();
-
             if (becomeFirstResponder)
             {
+                firstResponderSubject.OnNext(true);
                 IsFirstResponderChanged?.Raise(this);
-                firstResponderSubject.OnNext(IsFirstResponder);
 
                 if (placeholderLayer.Frame.Top != 0)
                     movePlaceholderUp();
@@ -133,8 +132,8 @@ namespace Toggl.Daneel.Views
             var resignFirstResponder = base.ResignFirstResponder();
             if (resignFirstResponder)
             {
+                firstResponderSubject.OnNext(false);
                 IsFirstResponderChanged?.Raise(this);
-                firstResponderSubject.OnNext(IsFirstResponder);
 
                 if (string.IsNullOrEmpty(Text))
                     movePlaceholderDown();
