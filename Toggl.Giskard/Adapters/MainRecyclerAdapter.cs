@@ -61,9 +61,6 @@ namespace Toggl.Giskard.Adapters
                 case MainTemplateSelector.Item:
                     return new MainRecyclerViewLogViewHolder(inflatedView, itemBindingContext)
                     {
-                        ContinueBackground = inflatedView.FindViewById<View>(Resource.Id.MainLogBackgroundContinue),
-                        DeleteBackground = inflatedView.FindViewById<View>(Resource.Id.MainLogBackgroundDelete),
-                        ContentView = inflatedView.FindViewById<View>(Resource.Id.MainLogContentView),
                         Click = TimeEntriesLogViewModel.EditCommand,
                         ContinueCommand = TimeEntriesLogViewModel.ContinueTimeEntryCommand
                     };

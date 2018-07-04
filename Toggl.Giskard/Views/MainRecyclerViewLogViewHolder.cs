@@ -16,9 +16,9 @@ namespace Toggl.Giskard.Views
 
         public bool CanSync { get; set; }
 
-        public View ContinueBackground { get; set; }
-        public View DeleteBackground { get; set; }
-        public View ContentView { get; set; }
+        public View ContinueBackground { get; private set; }
+        public View DeleteBackground { get; private set; }
+        public View ContentView { get; private set; }
 
         private IMvxAsyncCommand<TimeEntryViewModel> continueCommand;
         public IMvxAsyncCommand<TimeEntryViewModel> ContinueCommand 
@@ -38,6 +38,9 @@ namespace Toggl.Giskard.Views
         public MainRecyclerViewLogViewHolder(View itemView, IMvxAndroidBindingContext context)
             : base(itemView, context)
         {
+            ContinueBackground = itemView.FindViewById<View>(Resource.Id.MainLogBackgroundContinue);
+            DeleteBackground = itemView.FindViewById<View>(Resource.Id.MainLogBackgroundDelete);
+            ContentView = itemView.FindViewById<View>(Resource.Id.MainLogContentView);
         }
 
         public MainRecyclerViewLogViewHolder(IntPtr handle, JniHandleOwnership ownership)
