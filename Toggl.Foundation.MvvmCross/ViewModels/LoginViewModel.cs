@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Login;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
-using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
@@ -25,6 +23,14 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
     [Preserve(AllMembers = true)]
     public sealed class LoginViewModel : MvxViewModel<CredentialsParameter>
     {
+        [Flags]
+        public enum ShakeTargets
+        {
+            None = 0,
+            Email = 1,
+            Password = 2
+        }
+
         private readonly ILoginManager loginManager;
         private readonly IAnalyticsService analyticsService;
         private readonly IOnboardingStorage onboardingStorage;
@@ -36,6 +42,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         private IDisposable loginDisposable;
 
+        private readonly Subject<ShakeTargets> shakeSubject = new Subject<ShakeTargets>();
         private readonly Subject<bool> isShowPasswordButtonVisibleSubject = new Subject<bool>();
         private readonly BehaviorSubject<bool> isLoadingSubject = new BehaviorSubject<bool>(false);
         private readonly BehaviorSubject<string> errorMessageSubject = new BehaviorSubject<string>("");
@@ -49,13 +56,15 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public IObservable<string> Password { get; }
 
-        public IObservable<string> ErrorMessage { get; }
-
         public IObservable<bool> HasError { get; }
 
         public IObservable<bool> IsLoading { get; }
 
         public IObservable<bool> LoginEnabled { get; }
+
+        public IObservable<ShakeTargets> Shake { get; }
+        
+        public IObservable<string> ErrorMessage { get; }
 
         public IObservable<bool> IsPasswordMasked { get; }
 
@@ -91,6 +100,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             var emailObservable = emailSubject.AsObservable();
             var passwordObservable = passwordSubject.AsObservable();
+
+            Shake = shakeSubject.AsObservable();
 
             Email = emailObservable
                 .Select(email => email.ToString())
@@ -148,13 +159,13 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public void Login()
         {
-            var emailInvalid = !emailSubject.Value.IsValid;
-            var passwordInvalid = !passwordSubject.Value.IsValid;
+            var shakeTargets = ShakeTargets.None;
+            shakeTargets |= emailSubject.Value.IsValid ? ShakeTargets.None : ShakeTargets.Email;
+            shakeTargets |= passwordSubject.Value.IsValid ? ShakeTargets.None : ShakeTargets.Password;
 
-            if (emailInvalid || passwordInvalid)
+            if (shakeTargets != ShakeTargets.None)
             {
-                var hint = new ShakeAuthenticationFieldHint(emailInvalid, passwordInvalid);
-                navigationService.ChangePresentation(hint);
+                shakeSubject.OnNext(shakeTargets);
                 return;
             }
 

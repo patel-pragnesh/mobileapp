@@ -46,7 +46,7 @@ namespace Toggl.Daneel.ViewControllers
             //Visibility
             this.Bind(ViewModel.HasError, ErrorLabel.BindAnimatedIsVisible());
             this.Bind(ViewModel.IsLoading, ActivityIndicator.BindIsVisibleWithFade());
-            this.Bind(ViewModel.IsPasswordMasked, PasswordTextField.BindSecureTextEntry());
+            this.Bind(ViewModel.IsPasswordMasked.Skip(1), PasswordTextField.BindSecureTextEntry());
             this.Bind(ViewModel.IsShowPasswordButtonVisible, ShowPasswordButton.BindIsVisible());
             this.Bind(PasswordTextField.FirstResponder, ViewModel.SetIsShowPasswordButtonVisible);
 
@@ -60,14 +60,24 @@ namespace Toggl.Daneel.ViewControllers
 
             //Color
             this.Bind(ViewModel.HasError.Select(loginButtonTintColor), LoginButton.BindTintColor());
-            this.Bind(ViewModel.LoginEnabled.Select(loginButtonTitleColor),LoginButton.BindTitleColor());
+            this.Bind(ViewModel.LoginEnabled.Select(loginButtonTitleColor), LoginButton.BindTitleColor());
+
+            //Animation
+            this.Bind(ViewModel.Shake, shakeTargets => 
+            {
+                if (shakeTargets.HasFlag(LoginViewModel.ShakeTargets.Email))
+                    EmailTextField.Shake();
+                
+                if (shakeTargets.HasFlag(LoginViewModel.ShakeTargets.Password))
+                    PasswordTextField.Shake();
+            });
 
             prepareViews();
 
             UIColor loginButtonTintColor(bool hasError)
                 => hasError ? UIColor.White : UIColor.Black;
-            
-            UIColor loginButtonTitleColor(bool enabled) => enabled 
+
+            UIColor loginButtonTitleColor(bool enabled) => enabled
                 ? Color.Login.EnabledButtonColor.ToNativeColor()
                 : Color.Login.DisabledButtonColor.ToNativeColor();
         }
@@ -89,11 +99,8 @@ namespace Toggl.Daneel.ViewControllers
 
             ActivityIndicator.Alpha = 0;
             ActivityIndicator.StartAnimation();
+            PasswordTextField.ResignFirstResponder();
         }
-
-        public void ShakeEmailField() => EmailTextField.Shake();
-
-        public void ShakePasswordField() => PasswordTextField.Shake();
 
         private void prepareViews()
         {
@@ -104,7 +111,8 @@ namespace Toggl.Daneel.ViewControllers
                 UIControlState.Disabled
             );
 
-            EmailTextField.ShouldReturn += _ => {
+            EmailTextField.ShouldReturn += _ =>
+            {
                 PasswordTextField.BecomeFirstResponder();
                 return false;
             };
@@ -122,10 +130,8 @@ namespace Toggl.Daneel.ViewControllers
                 PasswordTextField.ResignFirstResponder();
             }));
 
-            PasswordTextField.ResignFirstResponder();
-
-            ShowPasswordButton.SetupShowPasswordButton();
             prepareForgotPasswordButton();
+            ShowPasswordButton.SetupShowPasswordButton();
         }
 
         private void prepareForgotPasswordButton()

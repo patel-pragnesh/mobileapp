@@ -213,15 +213,6 @@ namespace Toggl.Daneel.Presentation
                         }
                         break;
                     }
-                case ShakeAuthenticationFieldHint shakeAuthenticationFieldHint:
-                    if (MasterNavigationController?.TopViewController is LoginViewController loginViewController)
-                    {
-                        if (shakeAuthenticationFieldHint.ShakeEmailField)
-                            loginViewController.ShakeEmailField();
-                        if (shakeAuthenticationFieldHint.ShakePasswordField)
-                            loginViewController.ShakePasswordField();
-                    }
-                    break;
             }
 
             base.ChangePresentation(hint);
