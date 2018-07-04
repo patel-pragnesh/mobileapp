@@ -39,6 +39,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
         public bool HasProject { get; }
 
+        public bool HasTags { get; }
+
         public bool HasDescription { get; }
 
         public bool NeedsSync { get; }
@@ -63,6 +65,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             StartTime = timeEntry.Start;
             IsBillable = timeEntry.Billable;
             TagIds = timeEntry.TagIds.ToArray();
+            HasTags = TagIds.Count() > 0;
             Description = timeEntry.Description;
             HasProject = timeEntry.Project != null;
             Duration = TimeSpan.FromSeconds(timeEntry.Duration.Value);

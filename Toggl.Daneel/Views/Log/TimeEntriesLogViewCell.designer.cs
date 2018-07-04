@@ -19,6 +19,12 @@ namespace Toggl.Daneel.Views
 		UIKit.NSLayoutConstraint AddDescriptionTopDistanceConstraint { get; set; }
 
 		[Outlet]
+		UIKit.UIImageView BillableImageView { get; set; }
+
+		[Outlet]
+		UIKit.NSLayoutConstraint BillableImageViewSpacingConstraint { get; set; }
+
+		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		UIKit.UIButton ContinueButton { get; set; }
 
@@ -39,6 +45,9 @@ namespace Toggl.Daneel.Views
 		Toggl.Daneel.Views.FadeView FadeView { get; set; }
 
 		[Outlet]
+		UIKit.NSLayoutConstraint FadeViewTrailingConstraint { get; set; }
+
+		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		UIKit.UILabel ProjectTaskClientLabel { get; set; }
 
@@ -47,7 +56,7 @@ namespace Toggl.Daneel.Views
 		UIKit.UIImageView SyncErrorImageView { get; set; }
 
 		[Outlet]
-		UIKit.UIView TapToEditBubble { get; set; }
+		UIKit.UIImageView TagsImageView { get; set; }
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
@@ -67,6 +76,11 @@ namespace Toggl.Daneel.Views
 			if (AddDescriptionTopDistanceConstraint != null) {
 				AddDescriptionTopDistanceConstraint.Dispose ();
 				AddDescriptionTopDistanceConstraint = null;
+			}
+
+			if (BillableImageView != null) {
+				BillableImageView.Dispose ();
+				BillableImageView = null;
 			}
 
 			if (ContinueButton != null) {
@@ -94,6 +108,11 @@ namespace Toggl.Daneel.Views
 				FadeView = null;
 			}
 
+			if (FadeViewTrailingConstraint != null) {
+				FadeViewTrailingConstraint.Dispose ();
+				FadeViewTrailingConstraint = null;
+			}
+
 			if (ProjectTaskClientLabel != null) {
 				ProjectTaskClientLabel.Dispose ();
 				ProjectTaskClientLabel = null;
@@ -104,19 +123,24 @@ namespace Toggl.Daneel.Views
 				SyncErrorImageView = null;
 			}
 
+			if (TagsImageView != null) {
+				TagsImageView.Dispose ();
+				TagsImageView = null;
+			}
+
 			if (TimeLabel != null) {
 				TimeLabel.Dispose ();
 				TimeLabel = null;
 			}
 
-			if (TapToEditBubble != null) {
-				TapToEditBubble.Dispose ();
-				TapToEditBubble = null;
-			}
-
 			if (UnsyncedImageView != null) {
 				UnsyncedImageView.Dispose ();
 				UnsyncedImageView = null;
+			}
+
+			if (BillableImageViewSpacingConstraint != null) {
+				BillableImageViewSpacingConstraint.Dispose ();
+				BillableImageViewSpacingConstraint = null;
 			}
 		}
 	}
