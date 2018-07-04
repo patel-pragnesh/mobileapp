@@ -131,6 +131,32 @@ namespace Toggl.Foundation.Tests.Sync.ConflictResolution
             fixedA.Duration.Should().Be((long)TimeSpan.FromDays(5).TotalSeconds);
         }
 
+        [Fact, LogIfTooSlow]
+        public void TheStoppedEntityMustHaveSyncStatusSetToSyncNeeded()
+        {
+            var now = arbitraryTime.AddDays(25);
+            timeService.CurrentDateTime.Returns(now);
+            var a = createTimeEntry(id: 1, duration: null, at: arbitraryTime.AddDays(21), start: arbitraryTime.AddDays(20));
+            var b = createTimeEntry(id: 2, duration: null, at: arbitraryTime.AddDays(22), start: arbitraryTime.AddDays(21));
+
+            var (fixedA, _) = resolver.FixRivals(a, b, timeEntries);
+
+            fixedA.SyncStatus.Should().Be(SyncStatus.SyncNeeded);
+        }
+
+        [Fact, LogIfTooSlow]
+        public void TheStoppedEntityMustHaveAtPropertySetToCurrentTime()
+        {
+            var now = arbitraryTime.AddDays(25);
+            timeService.CurrentDateTime.Returns(now);
+            var a = createTimeEntry(id: 1, at: arbitraryTime.AddDays(21), start: arbitraryTime.AddDays(20));
+            var b = createTimeEntry(id: 2, at: arbitraryTime.AddDays(22), start: arbitraryTime.AddDays(21));
+
+            var (fixedA, _) = resolver.FixRivals(a, b, timeEntries);
+
+            fixedA.At.Should().Be(now);
+        }
+
         private TimeEntry createTimeEntry(long id, DateTimeOffset? start = null, DateTimeOffset? at = null, long? duration = null)
             => TimeEntry.Clean(new MockTimeEntry
             {
