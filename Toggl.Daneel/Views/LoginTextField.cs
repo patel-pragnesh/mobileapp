@@ -48,6 +48,8 @@ namespace Toggl.Daneel.Views
 
         public override void AwakeFromNib()
         {
+            base.AwakeFromNib();
+
             Layer.AddSublayer(underlineLayer);
             Layer.AddSublayer(placeholderLayer);
             BorderStyle = UITextBorderStyle.None;

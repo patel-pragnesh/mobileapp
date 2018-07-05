@@ -14,6 +14,10 @@ using Toggl.Foundation.Services;
 using Toggl.Foundation.Shortcuts;
 using UIKit;
 
+#if USE_ANALYTICS
+using System.Linq;
+#endif
+
 namespace Toggl.Daneel
 {
     [Register(nameof(AppDelegate))]
