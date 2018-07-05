@@ -28,14 +28,14 @@ namespace Toggl.Ultrawave.Tests.Integration
                             }));
 
             [Fact]
-            public async Task DoesNotAcceptFeedbackFromADifferentUserFromTheLoggedIn()
+            public async Task DoesAcceptFeedbackFromADifferentUserFromTheLoggedIn()
             {
                 var (togglApi, user) = await SetupTestUser();
                 var email = Email.From($"{Guid.NewGuid()}@toggl.space");
 
                 Func<Task> sendingFeedback = async () => await togglApi.Feedback.Send(email, "ABC.", new Dictionary<string, string>());
 
-                sendingFeedback.Should().Throw<BadRequestException>();
+                sendingFeedback.Should().NotThrow();
             }
         }
     }
