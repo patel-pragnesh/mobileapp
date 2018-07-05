@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -19,10 +20,12 @@ using Toggl.Daneel.Suggestions;
 using Toggl.Daneel.Views;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation.MvvmCross.Converters;
+using Toggl.Foundation.MvvmCross.Extensions;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.Onboarding.MainView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Extensions;
 using Toggl.PrimeRadiant.Onboarding;
 using Toggl.PrimeRadiant.Settings;
@@ -34,7 +37,6 @@ namespace Toggl.Daneel.ViewControllers
     [MvxRootPresentation(WrapInNavigationController = true)]
     public partial class MainViewController : MvxViewController<MainViewModel>
     {
-        private const float animationAngle = 0.1f;
         private const float showCardDelay = 0.1f;
 
         private const float spiderHingeCornerRadius = 0.8f;
@@ -57,7 +59,7 @@ namespace Toggl.Daneel.ViewControllers
         private TimeEntriesLogViewCell firstTimeEntry;
 
         private bool viewInitialized;
-        private bool? blockedTimeEntryCardVisibilityChange;
+        private CancellationTokenSource cardAnimationCancellation;
 
         private DismissableOnboardingStep tapToEditStep;
         private DismissableOnboardingStep swipeLeftStep;
@@ -65,7 +67,7 @@ namespace Toggl.Daneel.ViewControllers
 
         private UIGestureRecognizer swipeLeftGestureRecognizer;
 
-        private IDisposable cardDisposable;
+        private CompositeDisposable disposeBag = new CompositeDisposable();
 
         private IDisposable tapToEditDisposable;
         private IDisposable firstTimeEntryDisposable;
@@ -81,7 +83,6 @@ namespace Toggl.Daneel.ViewControllers
         private IDisposable swipeToContinueWasUsedDisposable;
         private IDisposable swipeToDeleteWasUsedDisposable;
 
-        private readonly ISubject<bool> isRunningSubject = new BehaviorSubject<bool>(false);
         private readonly ISubject<bool> isEmptySubject = new BehaviorSubject<bool>(false);
         private readonly ISubject<int> timeEntriesCountSubject = new BehaviorSubject<int>(0);
 
@@ -110,9 +111,6 @@ namespace Toggl.Daneel.ViewControllers
             TimeEntriesLogTableView.Source = source;
 
             source.Initialize();
-
-            cardDisposable = ViewModel.TimeEntryCardVisibility
-                .ObserveOn(SynchronizationContext.Current).Subscribe(onTimeEntryCardVisibilityChanged);
 
             var timeEntriesLogFooter = new UIView(
                 new CGRect(0, 0, UIScreen.MainScreen.Bounds.Width, 64)
@@ -258,24 +256,6 @@ namespace Toggl.Daneel.ViewControllers
             suggestionsView.DataContext = ViewModel.SuggestionsViewModel;
         }
 
-        private void onTimeEntryCardVisibilityChanged(bool visible)
-        {
-            if (!viewInitialized)
-            {
-                blockedTimeEntryCardVisibilityChange = visible;
-                return;
-            }
-
-            if (visible)
-            {
-                showTimeEntryCard();
-            }
-            else
-            {
-                hideTimeEntryCard();
-            }
-        }
-
         public override void ViewWillAppear(bool animated)
         {
             base.ViewWillAppear(animated);
@@ -322,8 +302,8 @@ namespace Toggl.Daneel.ViewControllers
             swipeToDeleteWasUsedDisposable?.Dispose();
             swipeToDeleteWasUsedDisposable = null;
 
-            cardDisposable?.Dispose();
-            cardDisposable = null;
+            disposeBag?.Dispose();
+            disposeBag = null;
         }
 
         public override void ViewDidLayoutSubviews()
@@ -334,11 +314,17 @@ namespace Toggl.Daneel.ViewControllers
 
             viewInitialized = true;
 
-            if (blockedTimeEntryCardVisibilityChange.HasValue)
-            {
-                onTimeEntryCardVisibilityChanged(blockedTimeEntryCardVisibilityChange.Value);
-                blockedTimeEntryCardVisibilityChange = null;
-            }
+            ViewModel.IsTimeEntryRunning
+                .ObserveOn(SynchronizationContext.Current)
+                .Where(visible => visible)
+                .VoidSubscribe(showTimeEntryCard)
+                .DisposedBy(disposeBag);
+
+            ViewModel.IsTimeEntryRunning
+                .ObserveOn(SynchronizationContext.Current)
+                .Where(visible => !visible)
+                .VoidSubscribe(hideTimeEntryCard)
+                .DisposedBy(disposeBag);
         }
 
         RatingView ratingView;
@@ -407,30 +393,36 @@ namespace Toggl.Daneel.ViewControllers
 
         private void showTimeEntryCard()
         {
-            isRunningSubject.OnNext(true);
-
             StopTimeEntryButton.Hidden = false;
             CurrentTimeEntryCard.Hidden = false;
+
+            cardAnimationCancellation?.Cancel();
+            cardAnimationCancellation = new CancellationTokenSource();
 
             AnimationExtensions.Animate(Timings.EnterTiming, showCardDelay, Curves.EaseOut,
                 () => StartTimeEntryButton.Transform = CGAffineTransform.MakeScale(0.01f, 0.01f),
                 () =>
                 {
                     AnimationExtensions.Animate(Timings.LeaveTimingFaster, Curves.EaseIn,
-                        () => StopTimeEntryButton.Transform = CGAffineTransform.MakeScale(1.0f, 1.0f));
+                        () => StopTimeEntryButton.Transform = CGAffineTransform.MakeScale(1.0f, 1.0f),
+                        cancellationToken: cardAnimationCancellation.Token);
 
                     AnimationExtensions.Animate(Timings.LeaveTiming, Curves.CardOutCurve,
-                        () => CurrentTimeEntryCard.Transform = CGAffineTransform.MakeTranslation(0, 0));
-                });
+                        () => CurrentTimeEntryCard.Transform = CGAffineTransform.MakeTranslation(0, 0),
+                        cancellationToken: cardAnimationCancellation.Token);
+                },
+                cancellationToken: cardAnimationCancellation.Token);
         }
 
         private void hideTimeEntryCard()
         {
-            isRunningSubject.OnNext(false);
+            cardAnimationCancellation?.Cancel();
+            cardAnimationCancellation = new CancellationTokenSource();
 
             AnimationExtensions.Animate(Timings.LeaveTimingFaster, Curves.EaseIn,
                 () => StopTimeEntryButton.Transform = CGAffineTransform.MakeScale(0.01f, 0.01f),
-                () => StopTimeEntryButton.Hidden = true);
+                () => StopTimeEntryButton.Hidden = true,
+                cancellationToken: cardAnimationCancellation.Token);
 
             AnimationExtensions.Animate(Timings.LeaveTiming, Curves.CardOutCurve,
                 () => CurrentTimeEntryCard.Transform = CGAffineTransform.MakeTranslation(0, CurrentTimeEntryCard.Frame.Height),
@@ -439,9 +431,10 @@ namespace Toggl.Daneel.ViewControllers
                     CurrentTimeEntryCard.Hidden = true;
 
                     AnimationExtensions.Animate(Timings.EnterTiming, Curves.EaseOut,
-                        () => StartTimeEntryButton.Transform = CGAffineTransform.MakeScale(1f, 1f)
-                    );
-                });
+                        () => StartTimeEntryButton.Transform = CGAffineTransform.MakeScale(1f, 1f),
+                        cancellationToken: cardAnimationCancellation.Token);
+                },
+                cancellationToken: cardAnimationCancellation.Token);
         }
 
         //Spider is added in code, because IB doesn't allow adding subviews
@@ -498,7 +491,6 @@ namespace Toggl.Daneel.ViewControllers
         {
             var storage = ViewModel.OnboardingStorage;
 
-            isRunningSubject.OnNext(ViewModel.CurrentTimeEntryId.HasValue);
             isEmptySubject.OnNext(ViewModel.IsLogEmpty);
 
             isEmptyDisposable = ViewModel.WeakSubscribe(() => ViewModel.IsLogEmpty, onEmptyChanged);
@@ -506,7 +498,7 @@ namespace Toggl.Daneel.ViewControllers
             startButtonOnboardingDisposable = new StartTimeEntryOnboardingStep(storage)
                 .ManageDismissableTooltip(StartTimeEntryOnboardingBubbleView, storage);
 
-            stopButtonOnboardingDisposable = new StopTimeEntryOnboardingStep(storage, isRunningSubject.AsObservable())
+            stopButtonOnboardingDisposable = new StopTimeEntryOnboardingStep(storage, ViewModel.IsTimeEntryRunning)
                 .ManageDismissableTooltip(StopTimeEntryOnboardingBubbleView, storage);
 
             tapToEditStep = new EditTimeEntryOnboardingStep(storage, isEmptySubject.AsObservable())
@@ -563,7 +555,7 @@ namespace Toggl.Daneel.ViewControllers
             swipeRightAnimationDisposable = swipeRightStep.ManageSwipeActionAnimationOf(firstTimeEntry, Direction.Right);
 
             swipeToContinueWasUsedDisposable = Observable.FromEventPattern(source, nameof(MainTableViewSource.SwipeToContinueWasUsed))
-                .Subscribe(_ =>
+                .VoidSubscribe(() =>
                 {
                     swipeRightStep.Dismiss();
                     swipeToContinueWasUsedDisposable?.Dispose();
@@ -571,7 +563,7 @@ namespace Toggl.Daneel.ViewControllers
                 });
 
             swipeToDeleteWasUsedDisposable = Observable.FromEventPattern(source, nameof(MainTableViewSource.SwipeToDeleteWasUsed))
-                .Subscribe(_ =>
+                .VoidSubscribe(() =>
                 {
                     swipeLeftStep.Dismiss();
                     swipeToDeleteWasUsedDisposable?.Dispose();

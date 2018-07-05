@@ -37,7 +37,6 @@ namespace Toggl.Giskard.Autocomplete
 
         public override void Draw(Canvas canvas, ICharSequence text, int start, int end, float x, int top, int y, int bottom, Paint paint)
         {
-            
             var bounds = new Rect();
             paint.GetTextBounds(text.ToString(), start, end, bounds);
 

@@ -21,8 +21,7 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.AboutActivity);
-
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_right, Resource.Animation.abc_fade_out);
 
             InitializeViews();
 
@@ -31,6 +30,12 @@ namespace Toggl.Giskard.Activities
             this.Bind(termsOfServiceButton.Tapped(), ViewModel.OpenTermsOfServiceView);
 
             setupToolbar();
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_right);
         }
 
         private void setupToolbar()
@@ -50,12 +55,6 @@ namespace Toggl.Giskard.Activities
         private void onNavigateBack(object sender, Toolbar.NavigationClickEventArgs e)
         {
             Finish();
-        }
-
-        public override void Finish()
-        {
-            base.Finish();
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
         }
     }
 }

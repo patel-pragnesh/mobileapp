@@ -1,17 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FsCheck.Xunit;
+using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.Autocomplete;
+using Toggl.Foundation.Autocomplete.Span;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.Interactors;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels;
@@ -20,10 +24,9 @@ using Toggl.Foundation.Tests.Mocks;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Exceptions;
 using Toggl.PrimeRadiant.Models;
-using Toggl.Foundation.Models.Interfaces;
 using Xunit;
-using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 using static Toggl.Foundation.Helper.Constants;
+using static Toggl.Foundation.MvvmCross.Parameters.SelectTimeParameters.Origin;
 using static Toggl.Multivac.Extensions.FunctionalExtensions;
 using static Toggl.Multivac.Extensions.StringExtensions;
 using ITimeEntryPrototype = Toggl.Foundation.Models.ITimeEntryPrototype;
@@ -46,14 +49,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected const string ProjectColor = "#F41F19";
             protected const string Description = "Testing Toggl mobile apps";
 
-            protected IAutocompleteProvider AutocompleteProvider { get; } = Substitute.For<IAutocompleteProvider>();
-
+            protected ITestableObserver<TextFieldInfo> Observer { get; private set; }
             protected StartTimeEntryParameters DefaultParameter { get; } = new StartTimeEntryParameters(DateTimeOffset.UtcNow, "", null);
-
-            protected StartTimeEntryViewModelTest()
-            {
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1);
-            }
 
             protected override void AdditionalSetup()
             {
@@ -63,6 +60,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                    Arg.Any<string>(),
                    Arg.Any<string>()
                ).Returns(Observable.Return(true));
+            }
+
+            protected override void AdditionalViewModelSetup()
+            {
+                Observer = TestScheduler.CreateObserver<TextFieldInfo>();
+                ViewModel.TextFieldInfoObservable.Subscribe(Observer);
             }
 
             protected override StartTimeEntryViewModel CreateViewModel()
@@ -136,19 +139,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public void DoesNotStartTheTimerWhenDurationIsNotNull()
-            {
-                var observable = Substitute.For<IConnectableObservable<DateTimeOffset>>();
-                TimeService.CurrentDateTimeObservable.Returns(observable);
-                var duration = TimeSpan.FromSeconds(130);
-                var parameter = StartTimeEntryParameters.ForManualMode(DateTimeOffset.Now);
-
-                ViewModel.Prepare(parameter);
-
-                TimeService.CurrentDateTimeObservable.DidNotReceiveWithAnyArgs().Subscribe(null);
-            }
-
-            [Fact, LogIfTooSlow]
             public void StarsTheTimerWhenDurationIsNull()
             {
                 var observable = Substitute.For<IConnectableObservable<DateTimeOffset>>();
@@ -218,7 +208,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 await ViewModel.Initialize();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("", 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("", 0));
 
                 ViewModel.SuggestCreation.Should().BeFalse();
             }
@@ -228,7 +218,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 await ViewModel.Initialize();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor($"{QuerySymbol}", 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan($"{QuerySymbol}", 1));
 
                 ViewModel.SuggestCreation.Should().BeFalse();
             }
@@ -238,7 +228,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 await ViewModel.Initialize();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor($"{QuerySymbol}    ", 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan($"{QuerySymbol}    ", 1));
 
                 ViewModel.SuggestCreation.Should().BeFalse();
             }
@@ -248,8 +238,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 await ViewModel.Initialize();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo
-                    .WithTextAndCursor($"{QuerySymbol}{createLongString(MaxLength + 1)}", 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan($"{QuerySymbol}{createLongString(MaxLength + 1)}", 1));
 
                 ViewModel.SuggestCreation.Should().BeFalse();
             }
@@ -259,8 +248,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 await ViewModel.Initialize();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo
-                    .WithTextAndCursor($"{QuerySymbol}{QueryWithExactSuggestionMatch}", 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan($"{QuerySymbol}{QueryWithExactSuggestionMatch}", 1));
 
                 ViewModel.SuggestCreation.Should().BeFalse();
             }
@@ -295,34 +283,37 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 }
 
                 [Fact, LogIfTooSlow]
-                public void ReturnsFalseIfAProjectIsAlreadySelected()
+                public async Task ReturnsFalseIfAProjectIsAlreadySelected()
                 {
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1)
-                        .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
+                    var projectSpan = new ProjectSpan(ProjectId, ProjectName, ProjectColor, null, null);
+                    var querySpan = new QueryTextSpan("abcde @fgh", 10);
 
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("abcde @fgh", 10);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan, querySpan);
 
                     ViewModel.SuggestCreation.Should().BeFalse();
                 }
 
                 [Fact, LogIfTooSlow]
-                public void ReturnsFalseIfAProjectIsAlreadySelectedEvenIfInProjectSelectionMode()
+                public async Task ReturnsFalseIfAProjectIsAlreadySelectedEvenIfInProjectSelectionMode()
                 {
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1)
-                        .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
+                    var projectSpan = new ProjectSpan(ProjectId, ProjectName, ProjectColor, null, null);
+                    var querySpan = new QueryTextSpan("abcde @fgh", 10);
+
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan);
                     ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("abcde @fgh", 10);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan, querySpan);
 
                     ViewModel.SuggestCreation.Should().BeFalse();
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksProjectSelection()
+                public async Task TracksProjectSelection()
                 {
                     ViewModel.Prepare();
 
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("abcde @fgh", 10);
+                    await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("abcde @fgh", 10));
 
                     AnalyticsService.StartEntrySelectProject.Received().Track(ProjectTagSuggestionSource.TextField);
                 }
@@ -351,12 +342,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public async Task ReturnsTrueNoMatterThatAProjectIsAlreadySelected()
                 {
+                    var projectSpan = new ProjectSpan(ProjectId, ProjectName, ProjectColor, null, null);
+                    var querySpan = new QueryTextSpan("abcde #fgh", 10);
+
                     ViewModel.Prepare();
                     await ViewModel.Initialize();
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1)
-                        .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan);
 
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("abcde #fgh", 10);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan, querySpan);
 
                     ViewModel.SuggestCreation.Should().BeTrue();
                 }
@@ -364,23 +357,25 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public async Task ReturnsTrueNoMatterThatAProjectIsAlreadySelectedAndInTagSuccestionMode()
                 {
+                    var projectSpan = new ProjectSpan(ProjectId, ProjectName, ProjectColor, null, null);
+                    var querySpan = new QueryTextSpan("abcde #fgh", 10);
+
                     ViewModel.Prepare();
                     await ViewModel.Initialize();
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1)
-                        .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan);
                     ViewModel.ToggleTagSuggestionsCommand.Execute();
 
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("abcde #fgh", 10);
+                    await ViewModel.OnTextFieldInfoFromView(projectSpan, querySpan);
 
                     ViewModel.SuggestCreation.Should().BeTrue();
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksTagSelection()
+                public async Task TracksTagSelection()
                 {
                     ViewModel.Prepare();
 
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("abcde #fgh", 10);
+                    await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("abcde #fgh", 10));
 
                     AnalyticsService.StartEntrySelectTag.Received().Track(ProjectTagSuggestionSource.TextField);
                 }
@@ -398,7 +393,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     var project = Substitute.For<IThreadSafeProject>();
                     project.Id.Returns(10);
                     DataSource.Projects.GetById(Arg.Any<long>()).Returns(Observable.Return(project));
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor($"@{currentQuery}", 15);
+                    ViewModel.OnTextFieldInfoFromView(
+                        new QueryTextSpan($"@{currentQuery}", 15)
+                    ).GetAwaiter().GetResult();
 
                     ViewModel.Prepare();
                     ViewModel.Prepare(DefaultParameter);
@@ -436,7 +433,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                     await ViewModel.CreateCommand.ExecuteAsync();
 
-                    ViewModel.TextFieldInfo.ProjectName.Should().Be(currentQuery);
+                    var projectSpan = Observer.GetLatestInfo().GetProjectSpan();
+                    projectSpan.ProjectName.Should().Be(currentQuery);
                 }
             }
 
@@ -444,11 +442,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 private const string currentQuery = "My awesome Toggl project";
 
+                private readonly QueryTextSpan querySpan = new QueryTextSpan($"#{currentQuery}", 1);
+
                 public WhenSuggestingTags()
                 {
                     ViewModel.Prepare();
                     ViewModel.Prepare(DefaultParameter);
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor($"#{currentQuery}", 1);
+                    ViewModel.OnTextFieldInfoFromView(querySpan)
+                        .GetAwaiter().GetResult();
                 }
 
                 [Fact, LogIfTooSlow]
@@ -465,13 +466,16 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 {
                     long workspaceId = 100;
                     long projectId = 101;
-                    var project = Substitute.For<IThreadSafeProject>();
-                    project.Id.Returns(projectId);
-                    project.WorkspaceId.Returns(workspaceId);
-                    DataSource.Projects.GetById(Arg.Is(projectId))
-                        .Returns(Observable.Return(project));
-                    ViewModel.TextFieldInfo = ViewModel.TextFieldInfo
-                        .WithProjectInfo(workspaceId, projectId, "Project", "0000AF");
+                    var project = new MockProject
+                    {
+                        Id = projectId,
+                        WorkspaceId = workspaceId
+                    };
+                    DataSource.Projects.GetById(Arg.Is(projectId)).Returns(Observable.Return(project));
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(new ProjectSuggestion(project));
+                    await ViewModel.OnTextFieldInfoFromView(
+                        querySpan, new ProjectSpan(projectId, "Project", "0000AF", null, null)
+                    );
 
                     await ViewModel.CreateCommand.ExecuteAsync();
 
@@ -499,6 +503,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public async Task SelectsTheCreatedTag()
                 {
+                    TestScheduler.CreateObserver<TextFieldInfo>();
                     DataSource.Tags.Create(Arg.Any<string>(), Arg.Any<long>())
                         .Returns(callInfo =>
                         {
@@ -509,8 +514,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                     await ViewModel.CreateCommand.ExecuteAsync();
 
-                    ViewModel.TextFieldInfo.Tags.Should()
-                        .Contain(tag => tag.Name == currentQuery);
+
+                    var tags = Observer.GetLatestInfo().Spans.OfType<TagSpan>();
+                    tags.Should().Contain(tag => tag.TagName == currentQuery);
                 }
             }
         }
@@ -646,12 +652,14 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .ToList();
 
             [Fact, LogIfTooSlow]
-            public void StartProjectSuggestionEvenIfTheProjectHasAlreadyBeenSelected()
+            public async Task StartProjectSuggestionEvenIfTheProjectHasAlreadyBeenSelected()
             {
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1)
-                    .WithTextAndCursor(Description, Description.Length)
-                    .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
+                await ViewModel.OnTextFieldInfoFromView(
+
+                    new QueryTextSpan(Description, Description.Length),
+                    new ProjectSpan(ProjectId, ProjectName, ProjectColor, null, null)
+                );
 
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
@@ -670,7 +678,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public void ShowsCorrectProjectSuggestionsAfterProjectHasAlreadyBeenSelected()
+            public async Task ShowsCorrectProjectSuggestionsAfterProjectHasAlreadyBeenSelected()
             {
                 const int noProjectCount = 1;
                 var projects = createProjects(5);
@@ -678,10 +686,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(Observable.Return(projects));
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(WorkspaceId).WithTextAndCursor(Description, Description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(Description, Description.Length));
 
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
-                ViewModel.SelectSuggestionCommand.Execute(chosenProject);
+                await ViewModel.SelectSuggestionCommand.ExecuteAsync(chosenProject);
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
                 ViewModel.Suggestions.Should().HaveCount(1);
@@ -689,33 +697,34 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public void ProjectSuggestionsAreClearedOnProjectSelection()
+            public async Task ProjectSuggestionsAreClearedOnProjectSelection()
             {
                 var projects = createProjects(5);
                 var chosenProject = projects.First();
                 AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(Observable.Return(projects));
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(WorkspaceId).WithTextAndCursor(Description, Description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(Description, Description.Length));
 
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
-                ViewModel.SelectSuggestionCommand.Execute(chosenProject);
+                await ViewModel.SelectSuggestionCommand.ExecuteAsync(chosenProject);
 
                 ViewModel.IsSuggestingProjects.Should().BeFalse();
                 ViewModel.Suggestions.Should().HaveCount(0);
             }
 
             [Fact, LogIfTooSlow]
-            public void AddsAnAtSymbolAtTheEndOfTheQueryInOrderToStartProjectSuggestionMode()
+            public async Task AddsAnAtSymbolAtTheEndOfTheQueryInOrderToStartProjectSuggestionMode()
             {
                 const string description = "Testing Toggl Apps";
                 var expected = $"{description} @";
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, description.Length));
 
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
-                ViewModel.TextFieldInfo.Text.Should().Be(expected);
+                var querySpan = Observer.GetLatestInfo().GetQuerySpan();
+                querySpan.Text.Should().Be(expected);
             }
 
             [Theory, LogIfTooSlow]
@@ -727,10 +736,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData("Testing Toggl Apps @somequery")]
             [InlineData("Testing Toggl Apps @some query")]
             [InlineData("Testing Toggl Apps @some query @query")]
-            public void SetsTheIsSuggestingProjectsPropertyToFalseIfAlreadyInProjectSuggestionMode(string description)
+            public async Task SetsTheIsSuggestingProjectsPropertyToFalseIfAlreadyInProjectSuggestionMode(string description)
             {
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, description.Length));
 
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
@@ -741,21 +750,22 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData("@", "")]
             [InlineData("@somequery", "")]
             [InlineData("@some query", "")]
-            [InlineData("@some query@query", "@some query")]
+            [InlineData("@some query@query", "")]
             [InlineData("Testing Toggl Apps @", "Testing Toggl Apps ")]
             [InlineData("Testing Toggl Apps @somequery", "Testing Toggl Apps ")]
             [InlineData("Testing Toggl Apps @some query", "Testing Toggl Apps ")]
-            [InlineData("Testing Toggl Apps @some query @query", "Testing Toggl Apps @some query ")]
-            public void RemovesTheAtSymbolFromTheDescriptionTextIfAlreadyInProjectSuggestionMode(
+            [InlineData("Testing Toggl Apps @some query @query", "Testing Toggl Apps ")]
+            public async Task RemovesTheAtSymbolFromTheDescriptionTextIfAlreadyInProjectSuggestionMode(
                 string description, string expected)
             {
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, description.Length));
 
                 ViewModel.ToggleProjectSuggestionsCommand.Execute();
 
-                ViewModel.TextFieldInfo.Text.Should().Be(expected);
+                var querySpan = Observer.GetLatestInfo().GetQuerySpan();
+                querySpan.Text.Should().Be(expected);
             }
 
             [Fact, LogIfTooSlow]
@@ -809,16 +819,17 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
 
             [Fact, LogIfTooSlow]
-            public void AddsHashtagSymbolAtTheEndOfTheQueryInOrderToTagSuggestionMode()
+            public async Task AddsHashtagSymbolAtTheEndOfTheQueryInOrderToTagSuggestionMode()
             {
                 const string description = "Testing Toggl Apps";
                 var expected = $"{description} #";
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, description.Length));
 
                 ViewModel.ToggleTagSuggestionsCommand.Execute();
 
-                ViewModel.TextFieldInfo.Text.Should().Be(expected);
+                var querySpan = Observer.GetLatestInfo().GetQuerySpan();
+                querySpan.Text.Should().Be(expected);
             }
 
             [Theory, LogIfTooSlow]
@@ -830,10 +841,10 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData("Testing Toggl Apps #somequery")]
             [InlineData("Testing Toggl Apps #some query")]
             [InlineData("Testing Toggl Apps #some query #query")]
-            public void SetsTheIsSuggestingTagsPropertyToFalseIfAlreadyInTagSuggestionMode(string description)
+            public async Task SetsTheIsSuggestingTagsPropertyToFalseIfAlreadyInTagSuggestionMode(string description)
             {
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, description.Length));
 
                 ViewModel.ToggleTagSuggestionsCommand.Execute();
 
@@ -844,23 +855,25 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData("#", "")]
             [InlineData("#somequery", "")]
             [InlineData("#some query", "")]
-            [InlineData("#some query#query", "#some query")]
+            [InlineData("#some query#query", "")]
             [InlineData("Testing Toggl Apps #", "Testing Toggl Apps ")]
             [InlineData("Testing Toggl Apps #somequery", "Testing Toggl Apps ")]
             [InlineData("Testing Toggl Apps #some query", "Testing Toggl Apps ")]
-            [InlineData("Testing Toggl Apps #some query #query", "Testing Toggl Apps #some query ")]
-            public void RemovesTheHashtagSymbolFromTheDescriptionTextIfAlreadyInTagSuggestionMode(
+            [InlineData("Testing Toggl Apps #some query #query", "Testing Toggl Apps ")]
+            public async Task RemovesTheHashtagSymbolFromTheDescriptionTextIfAlreadyInTagSuggestionMode(
                 string description, string expected)
             {
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1)
-                    .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor)
-                    .WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(
+                    new ProjectSpan(ProjectId, ProjectName, ProjectColor),
+                    new QueryTextSpan(description, description.Length)
+                );
 
                 ViewModel.ToggleTagSuggestionsCommand.Execute();
 
-                ViewModel.TextFieldInfo.Text.Should().Be(expected);
+                var querySpan = Observer.GetLatestInfo().GetQuerySpan();
+                querySpan.Text.Should().Be(expected);
             }
 
             [Fact, LogIfTooSlow]
@@ -1084,8 +1097,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public async Task RespectsTheTimeZone()
             {
-                var now = new DateTimeOffset(2018, 2, 20, 13, 20, 0, TimeSpan.FromHours(5));
-                TimeService.CurrentDateTime.Returns(now);
+                var currentTime = new DateTimeOffset(2018, 2, 20, 13, 20, 0, TimeSpan.FromHours(5));
+                TimeService.CurrentDateTime.Returns(currentTime);
                 var selectedDate = new DateTimeOffset(2018, 2, 14, 0, 0, 0, TimeSpan.FromHours(5));
                 NavigationService
                     .Navigate<SelectDateTimeViewModel, DateTimePickerParameters, DateTimeOffset>(Arg.Any<DateTimePickerParameters>())
@@ -1150,28 +1163,38 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 private const long projectWorkspaceId = 13;
                 private const string description = "Testing Toggl apps";
 
-                private readonly IThreadSafeUser user = Substitute.For<IThreadSafeUser>();
-                private readonly IThreadSafeProject project = Substitute.For<IThreadSafeProject>();
+                private readonly IThreadSafeUser user;
+                private readonly IThreadSafeProject project;
 
                 private readonly DateTimeOffset startDate = DateTimeOffset.UtcNow;
 
                 public StartsANewTimeEntry()
                 {
-                    user.Id.Returns(userId);
-                    user.DefaultWorkspaceId.Returns(defaultWorkspaceId);
+                    var defaultWorkspace = new MockWorkspace { Id = defaultWorkspaceId };
+                    InteractorFactory.GetDefaultWorkspace().Execute().Returns(Observable.Return(defaultWorkspace));
+
+                    user = new MockUser
+                    {
+                        Id = userId,
+                        DefaultWorkspaceId = defaultWorkspaceId
+                    };
+
+                    project = new MockProject
+                    {
+                        Id = projectId,
+                        WorkspaceId = projectWorkspaceId
+                    };
+
                     DataSource.User.Current
                         .Returns(Observable.Return(user));
 
-                    project.Id.Returns(projectId);
-                    project.WorkspaceId.Returns(projectWorkspaceId);
                     DataSource.Projects
                          .GetById(projectId)
                          .Returns(Observable.Return(project));
 
                     var parameter = new StartTimeEntryParameters(startDate, "", null);
                     ViewModel.Prepare(parameter);
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(defaultWorkspaceId);
-
+                    ViewModel.Initialize().GetAwaiter().GetResult();
                 }
 
                 [Fact, LogIfTooSlow]
@@ -1194,7 +1217,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 }
 
                 [Theory, LogIfTooSlow]
-                [InlineData(null)]
                 [InlineData(" ")]
                 [InlineData("\t")]
                 [InlineData("\n")]
@@ -1202,7 +1224,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [InlineData("      \t  \n     ")]
                 public async Task ReducesDescriptionConsistingOfOnlyEmptyCharactersToAnEmptyString(string description)
                 {
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, 0);
+                    await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, 0));
 
                     await ViewModel.DoneCommand.ExecuteAsync();
 
@@ -1219,7 +1241,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [InlineData("      abcd\nefgh     ", "abcd\nefgh")]
                 public async Task TrimsDescriptionFromTheStartAndTheEndBeforeSaving(string description, string trimmed)
                 {
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, description.Length);
+                    await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(description, description.Length));
 
                     await ViewModel.DoneCommand.ExecuteAsync();
 
@@ -1326,34 +1348,32 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 }
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheIsDirtyFlag()
+                public async Task SetsTheIsDirtyFlag()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     ViewModel.IsDirty.Should().BeTrue();
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksProjectSelectionWhenProjectSymbolSelected()
+                public async Task TracksProjectSelectionWhenProjectSymbolSelected()
                 {
-                    QuerySymbolSuggestion projectSuggestion = QuerySymbolSuggestion.Suggestions
-                        .Where((s) => s.Symbol == QuerySymbols.ProjectsString)
-                        .First();
+                    var projectSuggestion = QuerySymbolSuggestion.Suggestions
+                        .First((s) => s.Symbol == QuerySymbols.ProjectsString);
 
-                    ViewModel.SelectSuggestionCommand.Execute(projectSuggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(projectSuggestion);
 
                     AnalyticsService.StartViewTapped.Received().Track(StartViewTapSource.PickEmptyStateProjectSuggestion);
                     AnalyticsService.StartEntrySelectProject.Received().Track(ProjectTagSuggestionSource.TableCellButton);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksTagSelectionWhenTagSymbolSelected()
+                public async Task TracksTagSelectionWhenTagSymbolSelected()
                 {
-                    QuerySymbolSuggestion tagSuggestion = QuerySymbolSuggestion.Suggestions
-                        .Where((s) => s.Symbol == QuerySymbols.TagsString)
-                        .First();
+                    var tagSuggestion = QuerySymbolSuggestion.Suggestions
+                        .First((s) => s.Symbol == QuerySymbols.TagsString);
 
-                    ViewModel.SelectSuggestionCommand.Execute(tagSuggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(tagSuggestion);
 
                     AnalyticsService.StartViewTapped.Received().Track(StartViewTapSource.PickEmptyStateTagSuggestion);
                     AnalyticsService.StartEntrySelectTag.Received().Track(ProjectTagSuggestionSource.TableCellButton);
@@ -1364,34 +1384,37 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 where TSuggestion : AutocompleteSuggestion
             {
                 [Fact, LogIfTooSlow]
-                public void SetsTheProjectIdToTheSuggestedProjectId()
+                public async Task SetsTheProjectIdToTheSuggestedProjectId()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.ProjectId.Should().Be(ProjectId);
+                    var projectSpan = Observer.GetLatestInfo().GetProjectSpan();
+                    projectSpan.ProjectId.Should().Be(ProjectId);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheProjectNameToTheSuggestedProjectName()
+                public async Task SetsTheProjectNameToTheSuggestedProjectName()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.ProjectName.Should().Be(ProjectName);
+                    var projectSpan = Observer.GetLatestInfo().GetProjectSpan();
+                    projectSpan.ProjectName.Should().Be(ProjectName);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheProjectColorToTheSuggestedProjectColor()
+                public async Task SetsTheProjectColorToTheSuggestedProjectColor()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.ProjectColor.Should().Be(ProjectColor);
+                    var projectSpan = Observer.GetLatestInfo().GetProjectSpan();
+                    projectSpan.ProjectColor.Should().Be(ProjectColor);
                 }
 
                 [Theory, LogIfTooSlow]
                 [InlineData(true)]
                 [InlineData(false)]
                 [InlineData(null)]
-                public void SetsTheAppropriateBillableValue(bool? billableValue)
+                public async Task SetsTheAppropriateBillableValue(bool? billableValue)
                 {
                     InteractorFactory.GetWorkspaceById(WorkspaceId).Execute().Returns(Observable.Return(Workspace));
                     InteractorFactory.IsBillableAvailableForProject(ProjectId).Execute()
@@ -1399,7 +1422,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     InteractorFactory.ProjectDefaultsToBillable(ProjectId).Execute()
                         .Returns(Observable.Return(billableValue ?? false));
 
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     ViewModel.IsBillable.Should().Be(billableValue ?? false);
                     ViewModel.IsBillableAvailable.Should().BeTrue();
@@ -1409,7 +1432,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [InlineData(true)]
                 [InlineData(false)]
                 [InlineData(null)]
-                public void DisablesBillableIfTheWorkspaceOfTheSelectedProjectDoesNotAllowIt(bool? billableValue)
+                public async Task DisablesBillableIfTheWorkspaceOfTheSelectedProjectDoesNotAllowIt(bool? billableValue)
                 {
                     Project.Billable.Returns(billableValue);
                     DataSource.Projects.GetById(ProjectId).Returns(Observable.Return(Project));
@@ -1419,7 +1442,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         .Execute()
                         .Returns(Observable.Return(false));
 
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     ViewModel.IsBillable.Should().BeFalse();
                     ViewModel.IsBillableAvailable.Should().BeFalse();
@@ -1431,15 +1454,17 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 protected ProjectTaskSuggestion()
                 {
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor("Something @togg", 15);
+                    ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("Something @togg", 15))
+                        .GetAwaiter().GetResult();
                 }
 
                 [Fact, LogIfTooSlow]
-                public void RemovesTheProjectQueryFromTheTextFieldInfo()
+                public async Task RemovesTheProjectQueryFromTheTextFieldInfo()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.Text.Should().Be("Something ");
+                    var querySpan = Observer.GetLatestInfo().FirstTextSpan();
+                    querySpan.Text.Should().Be("Something ");
                 }
 
                 [Fact, LogIfTooSlow]
@@ -1451,7 +1476,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     ViewModel.Prepare();
                     await ViewModel.Initialize();
 
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     await DialogService.Received().Confirm(
                         Arg.Is(Resources.DifferentWorkspaceAlertTitle),
@@ -1472,7 +1497,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     ViewModel.Prepare();
                     await ViewModel.Initialize();
 
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     await DialogService.DidNotReceive().Confirm(
                         Arg.Any<string>(),
@@ -1496,11 +1521,13 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                             var tag = Substitute.For<IThreadSafeTag>();
                             tag.Id.Returns(i);
                             return new TagSuggestion(tag);
-                        }).ForEach(ViewModel.SelectSuggestionCommand.Execute);
+                        })
+                        .ForEach(ViewModel.SelectSuggestionCommand.Execute);
 
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.Tags.Should().BeEmpty();
+                    var tags = Observer.GetLatestInfo().Spans.OfType<TagSpan>();
+                    tags.Should().BeEmpty();
                 }
             }
 
@@ -1514,19 +1541,32 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 }
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheTextFieldInfoTextToTheValueOfTheSuggestedDescription()
+                public async Task SetsTheTextFieldInfoTextToTheValueOfTheSuggestedDescription()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.Text.Should().Be(Description);
+                    var querySpan = Observer.GetLatestInfo().FirstTextSpan();
+                    querySpan.Text.Should().Be(Description);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksWhenTimeEntrySuggestionSelected()
+                public async Task TracksWhenTimeEntrySuggestionSelected()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     AnalyticsService.StartViewTapped.Received().Track(StartViewTapSource.PickTimeEntrySuggestion);
+                }
+
+                [Fact, LogIfTooSlow]
+                public async Task ChangesTheWorkspaceIfNeeded()
+                {
+                    const long expectedWorkspaceId = WorkspaceId + 1;
+                    TimeEntry.WorkspaceId.Returns(expectedWorkspaceId);
+                    var newSuggestion = new TimeEntrySuggestion(TimeEntry);
+
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(newSuggestion);
+
+                    Observer.GetLatestInfo().WorkspaceId.Should().Be(expectedWorkspaceId);
                 }
             }
 
@@ -1540,17 +1580,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 }
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheTaskIdToTheSameIdAsTheSelectedSuggestion()
+                public async Task SetsTheTaskIdToTheSameIdAsTheSelectedSuggestion()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.TaskId.Should().Be(TaskId);
+                    var projectSpan = Observer.GetLatestInfo().GetProjectSpan();
+                    projectSpan.TaskId.Should().Be(TaskId);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksWhenTaskSuggestionSelected()
+                public async Task TracksWhenTaskSuggestionSelected()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     AnalyticsService.StartViewTapped.Received().Track(StartViewTapSource.PickTaskSuggestion);
                 }
@@ -1566,17 +1607,18 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 }
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheTaskIdToNull()
+                public async Task SetsTheTaskIdToNull()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.TaskId.Should().BeNull();
+                    var projectSpan = Observer.GetLatestInfo().GetProjectSpan();
+                    projectSpan.TaskId.Should().BeNull();
                 }
 
                 [Theory, LogIfTooSlow]
                 [InlineData(true)]
                 [InlineData(false)]
-                public void SetsTheAppropriateBillableValueBasedOnTheWorkspaceWhenSelectingNoProject(bool isBillableAvailable)
+                public async Task SetsTheAppropriateBillableValueBasedOnTheWorkspaceWhenSelectingNoProject(bool isBillableAvailable)
                 {
                     InteractorFactory.GetWorkspaceById(WorkspaceId).Execute().Returns(Observable.Return(Workspace));
                     InteractorFactory.IsBillableAvailableForProject(ProjectId).Execute()
@@ -1585,20 +1627,20 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         .Returns(Observable.Return(isBillableAvailable));
                     var noProjectSuggestion = ProjectSuggestion.NoProject(WorkspaceId, Workspace.Name);
 
-                    ViewModel.SelectSuggestionCommand.Execute(noProjectSuggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(noProjectSuggestion);
 
                     ViewModel.IsBillable.Should().BeFalse();
                     ViewModel.IsBillableAvailable.Should().Be(isBillableAvailable);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksWhenProjectSuggestionSelected()
+                public async Task TracksWhenProjectSuggestionSelected()
                 {
                     DialogService
                         .Confirm(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
                         .Returns(Observable.Return(false));
 
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     AnalyticsService.StartViewTapped.Received().Track(StartViewTapSource.PickProjectSuggestion);
                 }
@@ -1612,29 +1654,32 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 {
                     Suggestion = new TagSuggestion(Tag);
 
-                    ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor("Something #togg", 15);
+                    ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("Something #togg", 15))
+                        .GetAwaiter().GetResult();
                 }
 
                 [Fact, LogIfTooSlow]
-                public void RemovesTheTagQueryFromTheTextFieldInfo()
+                public async Task RemovesTheTagQueryFromTheTextFieldInfo()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.Text.Should().Be("Something ");
+                    var querySpan = Observer.GetLatestInfo().Spans.OfType<TextSpan>().First();
+                    querySpan.Text.Should().Be("Something ");
                 }
 
                 [Fact, LogIfTooSlow]
-                public void AddsTheSuggestedTagToTheList()
+                public async Task AddsTheSuggestedTagToTheList()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.Tags.Should().Contain(Suggestion);
+                    var tags = Observer.GetLatestInfo().Spans.OfType<TagSpan>();
+                    tags.Should().Contain(t => t.TagId == Suggestion.TagId);
                 }
 
                 [Fact, LogIfTooSlow]
-                public void TracksWhenTagSuggestionSelected()
+                public async Task TracksWhenTagSuggestionSelected()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
                     AnalyticsService.StartViewTapped.Received().Track(StartViewTapSource.PickTagSuggestion);
                 }
@@ -1645,11 +1690,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 protected override QuerySymbolSuggestion Suggestion { get; } = QuerySymbolSuggestion.Suggestions.First();
 
                 [Fact, LogIfTooSlow]
-                public void SetsTheTextToTheQuerySymbolSelected()
+                public async Task SetsTheTextToTheQuerySymbolSelected()
                 {
-                    ViewModel.SelectSuggestionCommand.Execute(Suggestion);
+                    await ViewModel.SelectSuggestionCommand.ExecuteAsync(Suggestion);
 
-                    ViewModel.TextFieldInfo.Text.Should().Be(Suggestion.Symbol);
+                    var querySpan = Observer.GetLatestInfo().FirstTextSpan();
+                    querySpan.Text.Should().Be(Suggestion.Symbol);
                 }
             }
         }
@@ -1783,15 +1829,15 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheSuggestionsProperty : StartTimeEntryViewModelTest
         {
             [Fact, LogIfTooSlow]
-            public void IsClearedWhenThereAreNoWordsToQuery()
+            public async Task IsClearedWhenThereAreNoWordsToQuery()
             {
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor("", 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("", 0));
 
                 ViewModel.Suggestions.Should().HaveCount(0);
             }
 
             [Fact, LogIfTooSlow]
-            public void DoesNotSuggestAnythingWhenAProjectIsAlreadySelected()
+            public async Task DoesNotSuggestAnythingWhenAProjectIsAlreadySelected()
             {
                 var description = "abc";
                 var projectA = Substitute.For<IThreadSafeProject>();
@@ -1812,10 +1858,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 AutocompleteProvider.Query(Arg.Any<QueryInfo>()).Returns(suggestions);
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo =
-                    TextFieldInfo.Empty(1).WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor(description, description.Length);
+                await ViewModel.OnTextFieldInfoFromView(
+                    new QueryTextSpan(description, description.Length),
+                    new ProjectSpan(ProjectId, ProjectName, ProjectColor)
+                );
 
                 ViewModel.Suggestions.Should().HaveCount(1);
                 ViewModel.Suggestions[0].Should().HaveCount(1);
@@ -1830,80 +1877,80 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Theory, LogIfTooSlow]
             [InlineData("abc @def")]
             [InlineData("abc #def")]
-            public void DoesNotChangeSuggestionsWhenOnlyTheCursorMovesForward(string text)
+            public async Task DoesNotChangeSuggestionsWhenOnlyTheCursorMovesForward(string text)
             {
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(text, text.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, text.Length));
                 AutocompleteProvider.ClearReceivedCalls();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor(text, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, 0));
 
-                AutocompleteProvider.DidNotReceive().Query(Arg.Any<QueryInfo>());
+                await AutocompleteProvider.DidNotReceive().Query(Arg.Any<QueryInfo>());
             }
 
             [Theory, LogIfTooSlow]
             [InlineData("abc @def")]
             [InlineData("abc #def")]
-            public void ChangesSuggestionsWhenTheCursorMovesBackBehindTheOldCursorPosition(string text)
+            public async Task ChangesSuggestionsWhenTheCursorMovesBackBehindTheOldCursorPosition(string text)
             {
                 var extendedText = text + "x";
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(extendedText, text.Length);
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor(extendedText, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(extendedText, text.Length));
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(extendedText, 0));
                 AutocompleteProvider.ClearReceivedCalls();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor(extendedText, extendedText.Length);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(extendedText, extendedText.Length));
 
-                AutocompleteProvider.Received().Query(Arg.Any<QueryInfo>());
+                await AutocompleteProvider.Received().Query(Arg.Any<QueryInfo>());
             }
 
             [Theory, LogIfTooSlow]
             [InlineData("abc @def")]
             [InlineData("abc #def")]
-            public void ChangesSuggestionsWhenTheCursorMovesBeforeTheQuerySymbolAndUserStartsTyping(string text)
+            public async Task ChangesSuggestionsWhenTheCursorMovesBeforeTheQuerySymbolAndUserStartsTyping(string text)
             {
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(text, text.Length);
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor(text, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, text.Length));
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, 0));
                 AutocompleteProvider.ClearReceivedCalls();
 
-                ViewModel.TextFieldInfo = ViewModel.TextFieldInfo.WithTextAndCursor("x" + text, 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("x" + text, 1));
 
-                AutocompleteProvider.Received().Query(Arg.Is<QueryInfo>(query => query.Text.StartsWith("x")));
+                await AutocompleteProvider.Received().Query(Arg.Is<QueryInfo>(query => query.Text.StartsWith("x")));
             }
 
             [Fact, LogIfTooSlow]
-            public void DoesNotSetTheIsDirtyFlagIfTheTextFieldIsEmpty()
+            public async Task DoesNotSetTheIsDirtyFlagIfTheTextFieldIsEmpty()
             {
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan());
 
                 ViewModel.IsDirty.Should().BeFalse();
             }
 
             [Fact, LogIfTooSlow]
-            public void SetsTheIsDirtyFlag()
+            public async Task SetsTheIsDirtyFlag()
             {
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor("a", 1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("a", 1));
 
                 ViewModel.IsDirty.Should().BeTrue();
             }
 
             [Fact, LogIfTooSlow]
-            public void ClearsTheIsDirtyFlagIfTheTextFieldIsErased()
+            public async Task ClearsTheIsDirtyFlagIfTheTextFieldIsErased()
             {
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor("a", 1);
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan("a", 1));
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan());
 
                 ViewModel.IsDirty.Should().BeFalse();
             }
@@ -1912,9 +1959,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheDescriptionRemainingBytesProperty : StartTimeEntryViewModelTest
         {
             [Fact, LogIfTooSlow]
-            public void IsMaxIfTheTextIsEmpty()
+            public async Task IsMaxIfTheTextIsEmpty()
             {
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan());
 
                 ViewModel.DescriptionRemainingBytes.Should()
                     .Be(MaxTimeEntryDescriptionLengthInBytes);
@@ -1925,24 +1972,24 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData("Some emojis: 🔥😳👻")]
             [InlineData("Some weird characters: āčēļķīņš")]
             [InlineData("Some random arabic characters: ظۓڰڿڀ")]
-            public void IsDecreasedForEachByteInTheText(string text)
+            public async Task IsDecreasedForEachByteInTheText(string text)
             {
                 var expectedRemainingByteCount
                     = MaxTimeEntryDescriptionLengthInBytes - text.LengthInBytes();
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(text, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, 0));
 
                 ViewModel.DescriptionRemainingBytes.Should()
                     .Be(expectedRemainingByteCount);
             }
 
             [Fact, LogIfTooSlow]
-            public void IsNegativeWhenTextLengthExceedsMax()
+            public async Task IsNegativeWhenTextLengthExceedsMax()
             {
                 var bytesOverLimit = 5;
                 var longString = new string('0', MaxTimeEntryDescriptionLengthInBytes + bytesOverLimit);
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(longString, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(longString, 0));
 
                 ViewModel.DescriptionRemainingBytes.Should().Be(-bytesOverLimit);
             }
@@ -1955,11 +2002,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [InlineData(20)]
             [InlineData(2999)]
             [InlineData(3000)]
-            public void IsFalseIfTextIsShorterOrEqualToMax(int byteCount)
+            public async Task IsFalseIfTextIsShorterOrEqualToMax(int byteCount)
             {
                 var text = new string('0', byteCount);
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(text, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, 0));
 
                 ViewModel.DescriptionLengthExceeded.Should().BeFalse();
             }
@@ -1967,11 +2014,11 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Theory, LogIfTooSlow]
             [InlineData(MaxTimeEntryDescriptionLengthInBytes + 1)]
             [InlineData(MaxTimeEntryDescriptionLengthInBytes + 20)]
-            public void IsTrueWhenTextIsLongerThanMax(int byteCount)
+            public async Task IsTrueWhenTextIsLongerThanMax(int byteCount)
             {
                 var text = new string('0', byteCount);
 
-                ViewModel.TextFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(text, 0);
+                await ViewModel.OnTextFieldInfoFromView(new QueryTextSpan(text, 0));
 
                 ViewModel.DescriptionLengthExceeded.Should().BeTrue();
             }
@@ -1989,15 +2036,15 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 ViewModel.Prepare();
                 ViewModel.Prepare(DefaultParameter);
                 await ViewModel.Initialize();
-                ViewModel.TextFieldInfo = TextFieldInfo
-                    .Empty(1)
-                    .WithTextAndCursor($"{QuerySymbols.Tags}{query}", 1);
+                await ViewModel.OnTextFieldInfoFromView(
+                    new QueryTextSpan($"{QuerySymbols.Tags}{query}", 1)
+                );
 
                 ViewModel.ShouldShowNoTagsInfoMessage.Should().BeTrue();
             }
 
             [Theory, LogIfTooSlow]
-            [InlineData(1, "")]
+            [InlineData(1, " ")]
             [InlineData(2, "#tag")]
             [InlineData(8, "@Project")]
             [InlineData(3, "Time entry")]
@@ -2010,9 +2057,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 DataSource.Tags.GetAll().Returns(Observable.Return(tags));
                 ViewModel.Prepare(DefaultParameter);
                 await ViewModel.Initialize();
-                ViewModel.TextFieldInfo = TextFieldInfo
-                    .Empty(1)
-                    .WithTextAndCursor(query, 1);
+                await ViewModel.OnTextFieldInfoFromView(
+                    new QueryTextSpan(query, 1)
+                );
 
                 ViewModel.ShouldShowNoTagsInfoMessage.Should().BeFalse();
             }
@@ -2030,10 +2077,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Returns(Observable.Return(tag));
                 ViewModel.Prepare(DefaultParameter);
                 await ViewModel.Initialize();
-                ViewModel.TextFieldInfo = TextFieldInfo
-                    .Empty(1)
-                    .WithWorkspace(10)
-                    .WithTextAndCursor($"{QuerySymbols.Tags}{query}", 1);
+                await ViewModel.OnTextFieldInfoFromView(
+                    new QueryTextSpan($"{QuerySymbols.Tags}{query}", 1)
+                );
 
                 ViewModel.CreateCommand.Execute();
 
@@ -2041,4 +2087,23 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             }
         }
     }
+
+    public static class TestExtensions
+    {
+        public static Task OnTextFieldInfoFromView(this StartTimeEntryViewModel viewModel, params ISpan[] spans)
+            => viewModel.OnTextFieldInfoFromView(spans.ToImmutableList());
+
+        public static TextFieldInfo GetLatestInfo(this ITestableObserver<TextFieldInfo> observer)
+            => observer.Messages.Last().Value.Value;
+
+        public static QueryTextSpan GetQuerySpan(this TextFieldInfo textFieldInfo)
+            => textFieldInfo.Spans.OfType<QueryTextSpan>().Single();
+
+        public static ProjectSpan GetProjectSpan(this TextFieldInfo textFieldInfo)
+            => textFieldInfo.Spans.OfType<ProjectSpan>().Single();
+
+        public static TextSpan FirstTextSpan(this TextFieldInfo textFieldInfo)
+            => textFieldInfo.Spans.OfType<TextSpan>().First();
+    }
 }
+

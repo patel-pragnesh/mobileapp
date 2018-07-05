@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using Toggl.Foundation.Autocomplete.Span;
 using Toggl.Foundation.Autocomplete.Suggestions;
+using Toggl.Multivac.Extensions;
 
 namespace Toggl.Foundation.Autocomplete
 {
@@ -22,45 +25,48 @@ namespace Toggl.Foundation.Autocomplete
 
         public static QueryInfo ParseFieldInfo(TextFieldInfo info)
         {
-            if (string.IsNullOrEmpty(info.Text))
+            var querySpan = info.GetSpanWithCurrentTextCursor();
+
+            if (string.IsNullOrEmpty(querySpan?.Text))
                 return emptyQueryInfo;
 
-            return searchByQuerySymbols(info)
-                ?? getDefaultQueryInfo(info.Text);
+            return searchByQuerySymbols(querySpan, info) ?? getDefaultQueryInfo(querySpan.Text);
         }
 
-        private static QueryInfo? searchByQuerySymbols(TextFieldInfo info)
+        private static QueryInfo? searchByQuerySymbols(QueryTextSpan span, TextFieldInfo info)
         {
-            int indexOfQuerySymbol = info.DescriptionCursorPosition;
-            string stringToSearch;
-            do
-            {
-                stringToSearch = info.Text.Substring(0, indexOfQuerySymbol);
-                indexOfQuerySymbol = stringToSearch.LastIndexOfAny(getQuerySymbols(info));
-            } while (indexOfQuerySymbol > 0 && Char.IsWhiteSpace(stringToSearch[indexOfQuerySymbol - 1]) == false);
+            var validQuerySymbols = info.ValidQuerySymbols();
+            var text = span.Text;
 
-            if (indexOfQuerySymbol >= 0)
-            {
-                var startingIndex = indexOfQuerySymbol + 1;
-                var stringLength = info.Text.Length - indexOfQuerySymbol - 1;
-                var type = getSuggestionType(stringToSearch[indexOfQuerySymbol]);
-                var text = info.Text.Substring(startingIndex, stringLength);
+            var possibleIndexOfQuerySymbol = 
+                text.Substring(0, span.CursorPosition)
+                    .Select((character, index) => ((int?)index, character))
+                    .Where(tuple => validQuerySymbols.Contains(tuple.Item2))
+                    .Select(tuple => tuple.Item1)
+                    .FirstOrDefault(querySymbolIndex =>
+                    {
+                        var previousIndex = querySymbolIndex.Value - 1;
+                        var isValidSymbolIndex = previousIndex < 0 || Char.IsWhiteSpace(text[previousIndex]);
 
-                return new QueryInfo(text, type);
-            }
+                        return isValidSymbolIndex;
+                    });
 
-            return null;
+            if (possibleIndexOfQuerySymbol == null)
+                return null;
+
+            var indexOfQuerySymbol = possibleIndexOfQuerySymbol.Value;
+            var startingIndex = indexOfQuerySymbol + 1;
+            var stringLength = text.Length - indexOfQuerySymbol - 1;
+            var type = getSuggestionType(text[indexOfQuerySymbol]);
+            var queryText = text.Substring(startingIndex, stringLength);
+
+            return new QueryInfo(queryText, type);
         }
 
         private static QueryInfo getDefaultQueryInfo(string text)
             => text.Length < minimumQueryLength
                 ? emptyQueryInfo
                 : new QueryInfo(text, AutocompleteSuggestionType.TimeEntries);
-
-        private static char[] getQuerySymbols(TextFieldInfo info)
-            => info.ProjectId.HasValue
-                ? QuerySymbols.ProjectSelected
-                : QuerySymbols.All;
 
         private static AutocompleteSuggestionType getSuggestionType(char symbol)
             => symbol == QuerySymbols.Projects

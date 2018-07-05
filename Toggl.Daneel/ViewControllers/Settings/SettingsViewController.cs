@@ -27,6 +27,7 @@ namespace Toggl.Daneel.ViewControllers
             prepareViews();
 
             Title = ViewModel.Title;
+            VersionLabel.Text = ViewModel.Version;
 
             LoggingOutView.Hidden = true;
 
@@ -46,6 +47,7 @@ namespace Toggl.Daneel.ViewControllers
                 SyncedView.Hidden = true;
             });
 
+            this.Bind(HelpView.Tapped(), ViewModel.OpenHelpView);
             this.Bind(LogoutButton.Tapped(), ViewModel.TryLogout);
             this.Bind(AboutView.Tapped(), ViewModel.OpenAboutView);
             this.Bind(FeedbackView.Tapped(), ViewModel.SubmitFeedback);

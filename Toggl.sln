@@ -53,6 +53,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toggl.Giskard.Tests", "Togg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toggl.Daneel.Tests", "Toggl.Daneel.Tests\Toggl.Daneel.Tests.csproj", "{D8346459-DE6B-4511-8697-3B35D35F1E90}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{A48D346E-2233-479A-8F90-3EFBFEA97ED5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncDiagramGenerator", "Toggl.Tools\SyncDiagramGenerator\SyncDiagramGenerator.csproj", "{148C791B-9824-4DC6-9494-4FEEB21988C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		ApiTests|Any CPU = ApiTests|Any CPU
@@ -74,6 +78,7 @@ Global
 		Release.PlayStore|Any CPU = Release.PlayStore|Any CPU
 		Release.AdHoc.Giskard|Any CPU = Release.AdHoc.Giskard|Any CPU
 		UITests|Any CPU = UITests|Any CPU
+		SyncDiagramGenerator|Any CPU = SyncDiagramGenerator|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8CE4E64C-5719-4660-96AC-CF2ABA3A335E}.ApiTests|Any CPU.ActiveCfg = Debug|iPhoneSimulator
@@ -142,6 +147,8 @@ Global
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.UITests|Any CPU.ActiveCfg = Release|Any CPU
 		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.UITests|Any CPU.Build.0 = Release|Any CPU
+		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.SyncDiagramGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AF7BE5E-AF9D-4EA7-AF7F-28D07B8DEF24}.SyncDiagramGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E90E4D61-D55E-4185-AE9E-C8977140694A}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -189,6 +196,8 @@ Global
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.UITests|Any CPU.ActiveCfg = Release|Any CPU
 		{5ACEB155-9DD4-4309-BCC9-997A09950393}.UITests|Any CPU.Build.0 = Release|Any CPU
+		{5ACEB155-9DD4-4309-BCC9-997A09950393}.SyncDiagramGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ACEB155-9DD4-4309-BCC9-997A09950393}.SyncDiagramGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8598D5CB-4E3A-4F99-8E80-CC4EA8609ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -255,6 +264,8 @@ Global
 		{3A603451-31B2-4975-9366-3212BEA78F57}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.UITests|Any CPU.ActiveCfg = Release|Any CPU
 		{3A603451-31B2-4975-9366-3212BEA78F57}.UITests|Any CPU.Build.0 = Release|Any CPU
+		{3A603451-31B2-4975-9366-3212BEA78F57}.SyncDiagramGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A603451-31B2-4975-9366-3212BEA78F57}.SyncDiagramGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7716BCE9-A3D4-4359-A02E-94380BDF83C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -325,6 +336,8 @@ Global
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.Release.AdHoc.Giskard|Any CPU.Build.0 = Release|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.UITests|Any CPU.ActiveCfg = Release|Any CPU
 		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.UITests|Any CPU.Build.0 = Release|Any CPU
+		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.SyncDiagramGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{09D75C0B-3367-4678-97EF-6EADE64AF09C}.SyncDiagramGenerator|Any CPU.Build.0 = Debug|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.ApiTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CB2B0786-217F-455A-9349-0FC69468D3B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -476,6 +489,12 @@ Global
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.Release.PlayStore|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.Release.AdHoc.Giskard|Any CPU.ActiveCfg = Debug|iPhoneSimulator
 		{D8346459-DE6B-4511-8697-3B35D35F1E90}.UITests|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{148C791B-9824-4DC6-9494-4FEEB21988C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{148C791B-9824-4DC6-9494-4FEEB21988C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{148C791B-9824-4DC6-9494-4FEEB21988C7}.UnitTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{148C791B-9824-4DC6-9494-4FEEB21988C7}.UnitTests|Any CPU.Build.0 = Debug|Any CPU
+		{148C791B-9824-4DC6-9494-4FEEB21988C7}.SyncDiagramGenerator|Any CPU.ActiveCfg = Debug|Any CPU
+		{148C791B-9824-4DC6-9494-4FEEB21988C7}.SyncDiagramGenerator|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -499,5 +518,6 @@ Global
 		{95E279D3-026E-4E31-92D2-44F4ABA0F511} = {707BB64D-7A0C-46D0-BFC3-CC64D708FEBA}
 		{3098288F-5579-435C-94CC-311ACFEDA7F0} = {707BB64D-7A0C-46D0-BFC3-CC64D708FEBA}
 		{D8346459-DE6B-4511-8697-3B35D35F1E90} = {4796CD10-F5B5-4843-AD7A-2691438E5A6C}
+		{148C791B-9824-4DC6-9494-4FEEB21988C7} = {A48D346E-2233-479A-8F90-3EFBFEA97ED5}
 	EndGlobalSection
 EndGlobal

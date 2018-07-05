@@ -84,6 +84,15 @@ namespace Toggl.Daneel.Views.EditDuration
             durationInputDelegate.FinishEditing -= finishEditing;
         }
 
+        public override void LayoutSubviews()
+        {
+            base.LayoutSubviews();
+
+            var frame = Frame;
+            frame.Size = AttributedText.Size;
+            Frame = frame;
+        }
+
         public override bool ResignFirstResponder()
         {
             LostFocus.Raise(this);
@@ -134,7 +143,7 @@ namespace Toggl.Daneel.Views.EditDuration
 
         private void setText(string text)
         {
-            AttributedText = DurationFieldTextFormatter.AttributedStringFor(text);
+            AttributedText = DurationFieldTextFormatter.AttributedStringFor(text, Font);
         }
 
         // Disable copy, paste, delete

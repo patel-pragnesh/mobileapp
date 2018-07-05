@@ -30,7 +30,7 @@ namespace Toggl.Daneel.Binding
 
         protected override void SetValue(IEnumerable<string> value)
         {
-            var tagTokens = value.GetTagTokens(tokenLeftMargin, tokenRightMargin);
+            var tagTokens = value.Select(tag => tag.GetTagToken(tokenLeftMargin, tokenRightMargin));
 
             nfloat totalLength = 0;
             var cumulativeLengths = tagTokens

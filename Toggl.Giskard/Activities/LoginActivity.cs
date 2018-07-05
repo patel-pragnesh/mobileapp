@@ -1,17 +1,12 @@
-using System;
-using System.Linq;
 using Android.App;
 using Android.Content.PM;
-using Android.Gms.Common;
 using Android.Graphics;
 using Android.OS;
 using Android.Views;
-using Android.Widget;
 using MvvmCross.Droid.Support.V7.AppCompat;
 using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
-using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Toggl.Giskard.Activities
 {
@@ -28,6 +23,9 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.LoginActivity);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
         }
+
+
     }
 }

@@ -1,165 +1,171 @@
 // WARNING
 //
-// This file has been generated automatically by Visual Studio to store outlets and
-// actions made in the UI designer. If it is removed, they will be lost.
-// Manual changes to this file may not be handled correctly.
+// This file has been generated automatically by Visual Studio from the outlets and
+// actions declared in your storyboard file.
+// Manual changes to this file will not be maintained.
 //
 using Foundation;
+using System;
 using System.CodeDom.Compiler;
 
 namespace Toggl.Daneel.ViewControllers
 {
-	[Register ("StartTimeEntryViewController")]
-	partial class StartTimeEntryViewController
-	{
-		[Outlet]
-		UIKit.UIView AddProjectOnboardingBubble { get; set; }
+    [Register ("StartTimeEntryViewController")]
+    partial class StartTimeEntryViewController
+    {
+        [Outlet]
+        UIKit.UIView AddProjectOnboardingBubble { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton BillableButton { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.NSLayoutConstraint BillableButtonWidthConstraint { get; set; }
+        [Outlet]
+        UIKit.UILabel DescriptionRemainingLengthLabel { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.NSLayoutConstraint BottomDistanceConstraint { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIView BottomOptionsSheet { get; set; }
+        [Outlet]
+        Toggl.Daneel.Views.AutocompleteTextViewPlaceholder Placeholder { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton CloseButton { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton DateTimeButton { get; set; }
+        [Outlet]
+        UIKit.UIButton StartDateButton { get; set; }
 
-		[Outlet]
-		UIKit.UILabel DescriptionRemainingLengthLabel { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		Toggl.Daneel.Views.AutocompleteTextView DescriptionTextView { get; set; }
+        [Outlet]
+        Toggl.Daneel.Views.EditDuration.DurationField TimeInput { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton DoneButton { get; set; }
 
-		[Outlet]
-		Toggl.Daneel.Views.AutocompleteTextViewPlaceholder Placeholder { get; set; }
+        [Outlet]
+        UIKit.UILabel TimeLabel { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton ProjectsButton { get; set; }
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton BillableButton { get; set; }
 
-		[Outlet]
-		UIKit.UIButton StartDateButton { get; set; }
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.NSLayoutConstraint BillableButtonWidthConstraint { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UITableView SuggestionsTableView { get; set; }
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.NSLayoutConstraint BottomDistanceConstraint { get; set; }
 
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIKit.UIButton TagsButton { get; set; }
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIView BottomOptionsSheet { get; set; }
 
-		[Outlet]
-		Toggl.Daneel.Views.EditDuration.DurationField TimeInput { get; set; }
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton CloseButton { get; set; }
 
-		[Outlet]
-		UIKit.UILabel TimeLabel { get; set; }
-		
-		void ReleaseDesignerOutlets ()
-		{
-			if (AddProjectOnboardingBubble != null) {
-				AddProjectOnboardingBubble.Dispose ();
-				AddProjectOnboardingBubble = null;
-			}
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton DateTimeButton { get; set; }
 
-			if (TimeLabel != null) {
-				TimeLabel.Dispose ();
-				TimeLabel = null;
-			}
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UITextView DescriptionTextView { get; set; }
 
-			if (BillableButton != null) {
-				BillableButton.Dispose ();
-				BillableButton = null;
-			}
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton DoneButton { get; set; }
 
-			if (BillableButtonWidthConstraint != null) {
-				BillableButtonWidthConstraint.Dispose ();
-				BillableButtonWidthConstraint = null;
-			}
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton ProjectsButton { get; set; }
 
-			if (BottomDistanceConstraint != null) {
-				BottomDistanceConstraint.Dispose ();
-				BottomDistanceConstraint = null;
-			}
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UITableView SuggestionsTableView { get; set; }
 
-			if (BottomOptionsSheet != null) {
-				BottomOptionsSheet.Dispose ();
-				BottomOptionsSheet = null;
-			}
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UIButton TagsButton { get; set; }
 
-			if (CloseButton != null) {
-				CloseButton.Dispose ();
-				CloseButton = null;
-			}
+        void ReleaseDesignerOutlets ()
+        {
+            if (AddProjectOnboardingBubble != null) {
+                AddProjectOnboardingBubble.Dispose ();
+                AddProjectOnboardingBubble = null;
+            }
 
-			if (DateTimeButton != null) {
-				DateTimeButton.Dispose ();
-				DateTimeButton = null;
-			}
+            if (BillableButton != null) {
+                BillableButton.Dispose ();
+                BillableButton = null;
+            }
 
-			if (DescriptionRemainingLengthLabel != null) {
-				DescriptionRemainingLengthLabel.Dispose ();
-				DescriptionRemainingLengthLabel = null;
-			}
+            if (BillableButtonWidthConstraint != null) {
+                BillableButtonWidthConstraint.Dispose ();
+                BillableButtonWidthConstraint = null;
+            }
 
-			if (DescriptionTextView != null) {
-				DescriptionTextView.Dispose ();
-				DescriptionTextView = null;
-			}
+            if (BottomDistanceConstraint != null) {
+                BottomDistanceConstraint.Dispose ();
+                BottomDistanceConstraint = null;
+            }
 
-			if (DoneButton != null) {
-				DoneButton.Dispose ();
-				DoneButton = null;
-			}
+            if (BottomOptionsSheet != null) {
+                BottomOptionsSheet.Dispose ();
+                BottomOptionsSheet = null;
+            }
 
-			if (Placeholder != null) {
-				Placeholder.Dispose ();
-				Placeholder = null;
-			}
+            if (CloseButton != null) {
+                CloseButton.Dispose ();
+                CloseButton = null;
+            }
 
-			if (ProjectsButton != null) {
-				ProjectsButton.Dispose ();
-				ProjectsButton = null;
-			}
+            if (DateTimeButton != null) {
+                DateTimeButton.Dispose ();
+                DateTimeButton = null;
+            }
 
-			if (StartDateButton != null) {
-				StartDateButton.Dispose ();
-				StartDateButton = null;
-			}
+            if (DescriptionRemainingLengthLabel != null) {
+                DescriptionRemainingLengthLabel.Dispose ();
+                DescriptionRemainingLengthLabel = null;
+            }
 
-			if (SuggestionsTableView != null) {
-				SuggestionsTableView.Dispose ();
-				SuggestionsTableView = null;
-			}
+            if (DescriptionTextView != null) {
+                DescriptionTextView.Dispose ();
+                DescriptionTextView = null;
+            }
 
-			if (TagsButton != null) {
-				TagsButton.Dispose ();
-				TagsButton = null;
-			}
+            if (DoneButton != null) {
+                DoneButton.Dispose ();
+                DoneButton = null;
+            }
 
-			if (TimeInput != null) {
-				TimeInput.Dispose ();
-				TimeInput = null;
-			}
-		}
-	}
+            if (Placeholder != null) {
+                Placeholder.Dispose ();
+                Placeholder = null;
+            }
+
+            if (ProjectsButton != null) {
+                ProjectsButton.Dispose ();
+                ProjectsButton = null;
+            }
+
+            if (StartDateButton != null) {
+                StartDateButton.Dispose ();
+                StartDateButton = null;
+            }
+
+            if (SuggestionsTableView != null) {
+                SuggestionsTableView.Dispose ();
+                SuggestionsTableView = null;
+            }
+
+            if (TagsButton != null) {
+                TagsButton.Dispose ();
+                TagsButton = null;
+            }
+
+            if (TimeInput != null) {
+                TimeInput.Dispose ();
+                TimeInput = null;
+            }
+
+            if (TimeLabel != null) {
+                TimeLabel.Dispose ();
+                TimeLabel = null;
+            }
+        }
+    }
 }

@@ -203,7 +203,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public Task OpenAboutView()
             => navigationService.Navigate<AboutViewModel>();
 
-        public Task ShowHelpView() => 
+        public Task OpenHelpView() => 
             navigationService.Navigate<BrowserViewModel, BrowserParameters>(
                 BrowserParameters.WithUrlAndTitle(platformConstants.HelpUrl, Resources.Help)
             );

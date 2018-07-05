@@ -70,38 +70,48 @@ namespace Toggl.Giskard.Adapters
         {
             calculateHeaderIndexes();
 
-            MvxSingleton<IMvxMainThreadDispatcher>.Instance.RequestMainThreadAction(() =>
+            MvxSingleton<IMvxMainThreadDispatcher>
+                .Instance
+                .RequestMainThreadAction(() => notifyForChanges(args));
+        }
+
+        private void notifyForChanges(ChildCollectionChangedEventArgs args)
+        {
+            var groupHeaderIndex = default(int);
+
+            lock (headerListLock)
             {
-                var groupHeaderIndex = headerIndexes[args.CollectionIndex];
-                NotifyItemChanged(groupHeaderIndex + HeaderOffsetForAnimation);
+                groupHeaderIndex = headerIndexes[args.CollectionIndex];
+            }
 
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var index in args.Indexes)
-                        {
-                            var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
-                            NotifyItemInserted(itemIndex);
-                        }
-                        break;
+            NotifyItemChanged(groupHeaderIndex + HeaderOffsetForAnimation);
 
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var index in args.Indexes)
-                        {
-                            var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
-                            NotifyItemRemoved(itemIndex);
-                        }
-                        break;
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var index in args.Indexes)
+                    {
+                        var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
+                        NotifyItemInserted(itemIndex);
+                    }
+                    break;
 
-                    case NotifyCollectionChangedAction.Replace:
-                        foreach (var index in args.Indexes)
-                        {
-                            var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
-                            NotifyItemChanged(itemIndex);
-                        }
-                        break;
-                }
-            });
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var index in args.Indexes)
+                    {
+                        var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
+                        NotifyItemRemoved(itemIndex);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (var index in args.Indexes)
+                    {
+                        var itemIndex = groupHeaderIndex + index + 1 + HeaderOffsetForAnimation;
+                        NotifyItemChanged(itemIndex);
+                    }
+                    break;
+            }
         }
 
         protected virtual int HeaderOffsetForAnimation => 0;
@@ -171,14 +181,20 @@ namespace Toggl.Giskard.Adapters
             if (collection == null)
                 return null;
 
-            var groupIndex = headerIndexes.IndexOf(viewPosition);
-            if (groupIndex >= 0)
-                return collection[groupIndex];
+            if (collection.Count == 0)
+                return null;
 
-            var currentGroupIndex = headerIndexes.FindLastIndex(index => index < viewPosition);
-            var offset = headerIndexes[currentGroupIndex] + 1;
-            var indexInGroup = viewPosition - offset;
-            return collection[currentGroupIndex][indexInGroup];
+            lock (headerListLock)
+            {
+                var groupIndex = headerIndexes.IndexOf(viewPosition);
+                if (groupIndex >= 0)
+                    return collection[groupIndex];
+
+                var currentGroupIndex = headerIndexes.FindLastIndex(index => index < viewPosition);
+                var offset = headerIndexes[currentGroupIndex] + 1;
+                var indexInGroup = viewPosition - offset;
+                return collection[currentGroupIndex][indexInGroup];
+            }
         }
     }
 }

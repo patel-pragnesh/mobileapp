@@ -8,7 +8,6 @@ using MvvmCross.Droid.Views.Attributes;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Giskard.Extensions;
 using Toggl.Giskard.Views;
-using static Android.Support.V7.Widget.Toolbar;
 
 namespace Toggl.Giskard.Activities
 {
@@ -27,12 +26,19 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.ReportsActivity);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_right, Resource.Animation.abc_fade_out);
 
             reportsRecyclerView = FindViewById<ReportsRecyclerView>(Resource.Id.ReportsActivityRecyclerView);
             reportsMainContainer = FindViewById<ReportsLinearLayout>(Resource.Id.ReportsActivityMainContainer);
             reportsMainContainer.CalendarContainer = FindViewById(Resource.Id.ReportsCalendarContainer);
 
             setupToolbar();
+        }
+
+        public override void Finish()
+        {
+            base.Finish();
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_right);
         }
 
         private void setupToolbar()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Sync;
 
 namespace Toggl.Foundation.Extensions
 {
@@ -31,5 +32,9 @@ namespace Toggl.Foundation.Extensions
                 analyticsEvent.Track(parameter);
                 return Observable.Throw<T>(exception);
             });
+
+        public static IObservable<ITransition> OnErrorReturnResult<T>(this IObservable<ITransition> observable, StateResult<T> errorResult)
+            where T : Exception
+            => observable.Catch((T exception) => Observable.Return(errorResult.Transition(exception)));
     }
 }

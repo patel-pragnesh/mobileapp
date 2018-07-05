@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using MvvmCross.Platform.Converters;
-using static Toggl.Multivac.Extensions.ClampExtension;
+using static Toggl.Multivac.Extensions.NumericExtensions;
 
 namespace Toggl.Foundation.MvvmCross.Converters
 {

@@ -41,7 +41,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             protected override MainViewModel CreateViewModel()
             {
                 var vm = new MainViewModel(
-                    Scheduler,
                     DataSource,
                     TimeService,
                     RatingService,
@@ -53,6 +52,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     NavigationService,
                     RemoteConfigService,
                     SuggestionProviderContainer);
+
                 vm.Prepare();
 
                 return vm;
@@ -75,9 +75,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public sealed class TheConstructor : MainViewModelTest
         {
             [Theory, LogIfTooSlow]
-            [ClassData(typeof(TwelveParameterConstructorTestData))]
+            [ClassData(typeof(ElevenParameterConstructorTestData))]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
-                bool useScheduler,
                 bool useDataSource,
                 bool useTimeService,
                 bool useRatingService,
@@ -90,7 +89,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 bool useRemoteConfigService,
                 bool useSuggestionProviderContainer)
             {
-                var scheduler = useScheduler ? Scheduler : null;
                 var dataSource = useDataSource ? DataSource : null;
                 var timeService = useTimeService ? TimeService : null;
                 var ratingService = useRatingService ? RatingService : null;
@@ -105,7 +103,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 Action tryingToConstructWithEmptyParameters =
                     () => new MainViewModel(
-                        scheduler,
                         dataSource,
                         timeService,
                         ratingService,
@@ -229,7 +226,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var observable = Observable.Return(timeEntry);
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(observable);
                 ViewModel.Initialize().Wait();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 await CallCommand();
 
@@ -314,7 +310,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(observable);
 
                 ViewModel.Initialize().Wait();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
                 Scheduler.AdvanceBy(TimeSpan.FromMilliseconds(50).Ticks);
             }
 
@@ -420,7 +415,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var observable = Observable.Return(timeEntry);
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(observable);
                 ViewModel.Initialize().Wait();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 await ViewModel.EditTimeEntryCommand.ExecuteAsync();
 
@@ -436,7 +430,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var observable = Observable.Return(timeEntry);
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(observable);
                 ViewModel.Initialize().Wait();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel.EditTimeEntryCommand.ExecuteAsync().Wait();
 
@@ -450,7 +443,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var observable = Observable.Return<IThreadSafeTimeEntry>(null);
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(observable);
                 ViewModel.Initialize().Wait();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel.EditTimeEntryCommand.ExecuteAsync().Wait();
 
@@ -495,7 +487,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 DataSource.TimeEntries.CurrentlyRunningTimeEntry.Returns(currentTimeEntrySubject.AsObservable());
 
                 await ViewModel.Initialize();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
                 currentTimeEntrySubject.OnNext(timeEntry);
                 Scheduler.AdvanceBy(TimeSpan.FromMilliseconds(50).Ticks);
             }
@@ -625,7 +616,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     .Updated
                     .Returns(Observable.Never<EntityUpdate<IThreadSafeTimeEntry>>());
                 await ViewModel.Initialize();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel
                     .IsWelcome
@@ -690,7 +680,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 PrepareIsWelcome(true);
                 await ViewModel.Initialize();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel.ShouldShowEmptyState.Should().BeTrue();
             }
@@ -701,7 +690,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 PrepareSuggestion();
 
                 await ViewModel.Initialize();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel.ShouldShowEmptyState.Should().BeFalse();
             }
@@ -712,7 +700,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 PrepareTimeEntry();
 
                 await ViewModel.Initialize();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel.ShouldShowEmptyState.Should().BeFalse();
             }
@@ -722,7 +709,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 PrepareIsWelcome(false);
                 await ViewModel.Initialize();
-                ViewModel.TimeEntryCardVisibility.Subscribe(_ => { });
 
                 ViewModel.ShouldShowEmptyState.Should().BeFalse();
             }

@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Linq;
-using Toggl.Foundation.Models;
+using System.Reactive.Subjects;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
+using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DTOs;
 using Toggl.Foundation.Exceptions;
+using Toggl.Foundation.Extensions;
+using Toggl.Foundation.Models;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Sync.ConflictResolution;
-using System.Reactive.Subjects;
-using Toggl.Foundation.Analytics;
+using Toggl.Foundation.Extensions;
 
 namespace Toggl.Foundation.DataSources
 {
@@ -51,7 +53,7 @@ namespace Toggl.Foundation.DataSources
 
             this.timeService = timeService;
 
-            CurrentlyRunningTimeEntry = 
+            CurrentlyRunningTimeEntry =
                 GetAll(te => te.IsDeleted == false && te.Duration == null)
                     .Select(tes => tes.SingleOrDefault())
                     .StartWith()
@@ -79,10 +81,12 @@ namespace Toggl.Foundation.DataSources
 
         public override IObservable<IThreadSafeTimeEntry> Create(IThreadSafeTimeEntry entity)
             => Repository.UpdateWithConflictResolution(entity.Id, entity, alwaysCreate, RivalsResolver)
-                .OfType<CreateResult<IDatabaseTimeEntry>>()
-                .Select(result => result.Entity)
-                .Select(Convert)
-                .Do(CreatedSubject.OnNext);
+                .ToThreadSafeResult(Convert)
+                .SelectMany(CommonFunctions.Identity)
+                .Do(HandleConflictResolutionResult)
+                .OfType<CreateResult<IThreadSafeTimeEntry>>()
+                .FirstAsync()
+                .Select(result => result.Entity);
 
         public IObservable<IThreadSafeTimeEntry> Stop(DateTimeOffset stopTime)
             => GetAll(te => te.IsDeleted == false && te.Duration == null)

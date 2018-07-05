@@ -17,6 +17,8 @@ using Toggl.Foundation.MvvmCross.Combiners;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using UIKit;
+using Toggl.Daneel.Converters;
+using System.Collections.Generic;
 
 namespace Toggl.Daneel.Views
 {
@@ -24,6 +26,9 @@ namespace Toggl.Daneel.Views
     {
         private const float noProjectDistance = 24;
         private const float hasProjectDistance = 14;
+
+        private const float hasTagsBillableSpacing = 37;
+        private const float noTagsBillableSpacing = 10;
 
         public static readonly NSString Key = new NSString(nameof(TimeEntriesLogViewCell));
         public static readonly UINib Nib;
@@ -55,11 +60,15 @@ namespace Toggl.Daneel.Views
                 var visibilityConverter = new MvxVisibilityValueConverter();
                 var durationCombiner = new DurationValueCombiner();
                 var invertedVisibilityConverter = new MvxInvertedVisibilityValueConverter();
+                var fadeViewConstraintValueCombiner =
+                    new TimeEntryLogViewCellFadeViewConstraintValueCombiner();
                 var projectTaskClientCombiner = new ProjectTaskClientValueCombiner(
                     ProjectTaskClientLabel.Font.CapHeight,
                     Color.TimeEntriesLog.ClientColor.ToNativeColor(),
                     true
                 );
+                var billableSpacingConstraintValueConverter = 
+                    new BoolToConstantValueConverter<nfloat>(hasTagsBillableSpacing, noTagsBillableSpacing);
                 var descriptionTopDistanceValueConverter = 
                     new BoolToConstantValueConverter<nfloat>(hasProjectDistance, noProjectDistance);
                 
@@ -120,6 +129,27 @@ namespace Toggl.Daneel.Views
                           .For(v => v.BindVisibility())
                           .To(vm => vm.CanSync)
                           .WithConversion(visibilityConverter);
+
+                bindingSet.Bind(BillableImageView)
+                          .For(v => v.BindVisibility())
+                          .To(vm => vm.IsBillable)
+                          .WithConversion(visibilityConverter);
+
+                bindingSet.Bind(TagsImageView)
+                          .For(v => v.BindVisibility())
+                          .To(vm => vm.HasTags)
+                          .WithConversion(visibilityConverter);
+
+                bindingSet.Bind(FadeViewTrailingConstraint)
+                          .For(v => v.Constant)
+                          .ByCombining(fadeViewConstraintValueCombiner,
+                                       v => v.IsBillable,
+                                       v => v.HasTags);
+                
+                bindingSet.Bind(BillableImageViewSpacingConstraint)
+                          .For(v => v.Constant)
+                          .To(vm => vm.HasTags)
+                          .WithConversion(billableSpacingConstraintValueConverter);
                 
                 bindingSet.Apply();
             });

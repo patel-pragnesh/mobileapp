@@ -28,8 +28,13 @@ namespace Toggl.Giskard.Activities
 
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.EditProjectActivity);
+            OverridePendingTransition(Resource.Animation.abc_slide_in_bottom, Resource.Animation.abc_fade_out);
+        }
 
-            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_fade_out);
+        public override void Finish()
+        {
+            base.Finish();
+            OverridePendingTransition(Resource.Animation.abc_fade_in, Resource.Animation.abc_slide_out_bottom);
         }
 
         protected override void OnStart()
@@ -37,20 +42,6 @@ namespace Toggl.Giskard.Activities
             base.OnStart();
 
             setupToolbar();
-        }
-
-        private void setupToolbar()
-        {
-            var toolbar = FindViewById<Toolbar>(Resource.Id.Toolbar);
-
-            toolbar.Title = ViewModel.Title;
-
-            SetSupportActionBar(toolbar);
-
-            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
-            SupportActionBar.SetDisplayShowHomeEnabled(true);
-
-            toolbar.NavigationClick += onNavigateBack;
         }
 
         public override bool OnKeyDown(Keycode keyCode, KeyEvent e)
@@ -69,6 +60,20 @@ namespace Toggl.Giskard.Activities
             }
 
             return base.OnKeyDown(keyCode, e);
+        }
+
+        private void setupToolbar()
+        {
+            var toolbar = FindViewById<Toolbar>(Resource.Id.Toolbar);
+
+            toolbar.Title = ViewModel.Title;
+
+            SetSupportActionBar(toolbar);
+
+            SupportActionBar.SetDisplayHomeAsUpEnabled(true);
+            SupportActionBar.SetDisplayShowHomeEnabled(true);
+
+            toolbar.NavigationClick += onNavigateBack;
         }
 
         private void onNavigateBack(object sender, NavigationClickEventArgs e)

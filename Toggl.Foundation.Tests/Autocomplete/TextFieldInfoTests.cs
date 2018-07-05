@@ -1,11 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Immutable;
+using System.Linq;
 using FluentAssertions;
-using FsCheck.Xunit;
-using NSubstitute;
 using Toggl.Foundation.Autocomplete;
-using Toggl.Foundation.Autocomplete.Suggestions;
-using Toggl.Foundation.Models.Interfaces;
-using Toggl.PrimeRadiant.Models;
+using Toggl.Foundation.Autocomplete.Span;
 using Xunit;
 
 namespace Toggl.Foundation.Tests.Autocomplete
@@ -15,179 +12,118 @@ namespace Toggl.Foundation.Tests.Autocomplete
         public abstract class TextFieldInfoTest
         {
             protected const long WorkspaceId = 9;
+
+            protected const string Description = "Testing Toggl mobile apps";
+
             protected const long ProjectId = 10;
             protected const string ProjectName = "Toggl";
             protected const string ProjectColor = "#F41F19";
-            protected const string Description = "Testing Toggl mobile apps";
+
             protected const long TaskId = 13;
             protected const string TaskName = "Test Toggl apps";
 
-            protected TextFieldInfo CreateDefaultTextFieldInfo() =>
-                TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(Description, Description.Length)
-                    .WithProjectAndTaskInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor, TaskId, TaskName);
-        }
-
-        public sealed class TheDescriptionCursorPositionProperty : TextFieldInfoTest
-        {
-            [Property]
-            public void AlwaysReturnsACursorPositionThatsLessThanOrEqualTheLengthOfTheText(string text, int cursor)
+            protected TextFieldInfo CreateDefaultTextFieldInfo()
             {
-                if (text == null) return;
+                var spans = new ISpan[]
+                {
+                    new QueryTextSpan(Description, Description.Length),
+                    new ProjectSpan(ProjectId, ProjectName, ProjectColor, TaskId, TaskName)
+                };
 
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId).WithTextAndCursor(text, cursor);
-
-                textFieldInfo.DescriptionCursorPosition.Should().BeLessOrEqualTo(text.Length);
-            }
-        }
-
-        public sealed class TheWithWorkspaceMethod : TextFieldInfoTest
-        {
-            [Fact, LogIfTooSlow]
-            public void ReturnsTheSameObjectWhenWorkspaceDoesNotChange()
-            {
-                var textFieldInfo = CreateDefaultTextFieldInfo();
-
-                var changedFieldInfo = textFieldInfo.WithWorkspace(WorkspaceId);
-
-                changedFieldInfo.Should().Be(textFieldInfo);
-            }
-
-            [Fact, LogIfTooSlow]
-            public void RemovesProjectTaskAndTagsWhenWorkspaceChanges()
-            {
-                var tag = createTagSuggestion(123);
-                var textFieldInfo = CreateDefaultTextFieldInfo().AddTag(tag);
-
-                var changedFieldInfo = textFieldInfo.WithWorkspace(99);
-
-                changedFieldInfo.Should().NotBe(textFieldInfo);
-                changedFieldInfo.ProjectId.Should().BeNull();
-                changedFieldInfo.ProjectName.Should().BeNullOrEmpty();
-                changedFieldInfo.ProjectColor.Should().BeNullOrEmpty();
-                changedFieldInfo.TaskId.Should().BeNull();
-                changedFieldInfo.TaskName.Should().BeNullOrEmpty();
-                changedFieldInfo.Tags.Should().BeEmpty();
-            }
-        }
-
-        public sealed class TheWithTextAndCursorMethod : TextFieldInfoTest
-        {
-            [Fact, LogIfTooSlow]
-            public void ChangesOnlyTheTextAndCursorPositionWhileMaintainingTheOtherFields()
-            {
-                const string newDescription = "Some other text";
-                var expected = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(newDescription, newDescription.Length)
-                    .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
-
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                        .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor)
-                        .WithTextAndCursor(newDescription, newDescription.Length);
-
-                textFieldInfo.Text.Should().Be(expected.Text);
-                textFieldInfo.TaskId.Should().Be(expected.TaskId);
-                textFieldInfo.ProjectId.Should().Be(expected.ProjectId);
-                textFieldInfo.ProjectName.Should().Be(expected.ProjectName);
-                textFieldInfo.ProjectColor.Should().Be(expected.ProjectColor);
-                textFieldInfo.CursorPosition.Should().Be(expected.CursorPosition);
+                return TextFieldInfo.Empty(WorkspaceId).ReplaceSpans(spans.ToImmutableList());
             }
         }
 
         public sealed class TheWithProjectInfoMethod : TextFieldInfoTest
         {
+            private const long newWorkspaceId = 100;
+
+            const long newProjectId = 200;
+            const string newProjectName = "Some other project";
+            const string newProjectColor = "Some other project";
+
+            private const long newTaskId = 300;
+            private const string newTaskName = "New task";
+
             [Fact, LogIfTooSlow]
-            public void ChangesOnlyTheProjectRelatedInfoWhileMaintainingTheOtherFields()
+            public void ReplacesTheExistingProjectSpanIfItExists()
             {
-                const long newProjectId = 11;
-                const string newProjectName = "Some other project";
-                const string newProjectColor = "Some other project";
-                var expected = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(Description, Description.Length)
-                    .WithProjectInfo(WorkspaceId, newProjectId, newProjectName, newProjectColor);
+                var oldTextFieldInfo = CreateDefaultTextFieldInfo();
+                var textFieldInfo = oldTextFieldInfo
+                    .WithProject(WorkspaceId, newProjectId, newProjectName, newProjectColor, null, null);
 
-                var textFieldInfo =
-                    CreateDefaultTextFieldInfo()
-                        .WithProjectInfo(WorkspaceId, newProjectId, newProjectName, newProjectColor);
-
-                textFieldInfo.Text.Should().Be(expected.Text);
-                textFieldInfo.CursorPosition.Should().Be(expected.CursorPosition);
+                var projectSpan = textFieldInfo.Spans.OfType<ProjectSpan>().Single();
+                projectSpan.ProjectId.Should().Be(newProjectId);
+                projectSpan.ProjectName.Should().Be(newProjectName);
+                projectSpan.ProjectColor.Should().Be(newProjectColor);
             }
 
             [Fact, LogIfTooSlow]
-            public void RemovesTheTaskIdAndTaskName()
+            public void RemovesAllTagsIfTheWorkspaceChanges()
             {
-                const long newProjectId = 11;
-                const string newProjectName = "Some other project";
-                const string newProjectColor = "Some other project";
+                var oldTextFieldInfo = CreateDefaultTextFieldInfo()
+                    .AddTag(1, "1").AddTag(2, "2").AddTag(3, "3");
 
-                var textFieldInfo =
-                    CreateDefaultTextFieldInfo()
-                        .WithProjectInfo(WorkspaceId, newProjectId, newProjectName, newProjectColor);
+                var textFieldInfo = oldTextFieldInfo
+                    .WithProject(newWorkspaceId, newProjectId, newProjectName, newProjectColor, newTaskId, newTaskName);
 
-                textFieldInfo.TaskId.Should().BeNull();
-                textFieldInfo.TaskName.Should().BeEmpty();
-            }
-        }
-
-        public sealed class TheWithProjectAndTaskInfoMethod : TextFieldInfoTest
-        {
-            private const long workspaceId = 10;
-            private const long projectId = 20;
-            private const string projectName = "New project";
-            private const string projectColor = "FFAABB";
-            private const long taskId = 30;
-            private const string taskName = "New task";
-
-            [Fact, LogIfTooSlow]
-            public void SetsTheProjectInfo()
-            {
-                var textFieldInfo = CreateDefaultTextFieldInfo()
-                    .WithProjectAndTaskInfo(workspaceId, projectId, projectName, projectColor, taskId, taskName);
-
-                textFieldInfo.ProjectId.Should().Be(projectId);
-                textFieldInfo.ProjectName.Should().Be(projectName);
-                textFieldInfo.ProjectColor.Should().Be(projectColor);
+                textFieldInfo.Spans.Should().NotContain(span => span is TagSpan);
             }
 
             [Fact, LogIfTooSlow]
             public void SetsTheTaskInfo()
             {
                 var textFieldInfo = CreateDefaultTextFieldInfo()
-                    .WithProjectAndTaskInfo(workspaceId, projectId, projectName, projectColor, taskId, taskName);
+                    .WithProject(WorkspaceId, newProjectId, newProjectName, newProjectColor, newTaskId, newTaskName);
 
-                textFieldInfo.TaskId.Should().Be(taskId);
-                textFieldInfo.TaskName.Should().Be(taskName);
+                var projectSpan = textFieldInfo.Spans.OfType<ProjectSpan>().Single();
+                projectSpan.TaskId.Should().Be(newTaskId);
+                projectSpan.TaskName.Should().Be(newTaskName);
+            }
+
+            [Fact, LogIfTooSlow]
+            public void DoesNotAllowDuplicatesEvenIfNoQuerySpanExists()
+            {
+                var textFieldInfo = TextFieldInfo
+                    .Empty(WorkspaceId)
+                    .WithProject(WorkspaceId, ProjectId, ProjectName, ProjectColor, TaskId, TaskName);
+
+                var newTextFieldinfo = textFieldInfo
+                    .WithProject(WorkspaceId, newProjectId, newProjectName, newProjectColor, newTaskId, newTaskName);
+
+                var projectSpan = newTextFieldinfo.Spans.OfType<ProjectSpan>().Single();
+                projectSpan.ProjectId.Should().Be(newProjectId);
             }
         }
 
-        public sealed class TheRemoveProjectQueryFromDescriptionIfNeededMethod : TextFieldInfoTest
+        public sealed class TheRemoveProjectQueryIfNeededMethod : TextFieldInfoTest
         {
+
             [Fact, LogIfTooSlow]
             public void RemovesTheProjectQueryIfAnyAtSymbolIsPresent()
             {
                 var newDescription = $"{Description}@something";
 
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(newDescription, newDescription.Length)
-                    .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor)
-                    .RemoveProjectQueryFromDescriptionIfNeeded();
+                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId).ReplaceSpans(
+                    new QueryTextSpan(newDescription, newDescription.Length),
+                    new ProjectSpan(ProjectId, ProjectName, ProjectColor)
+                ).RemoveProjectQueryIfNeeded();
 
-                textFieldInfo.Text.Should().Be(Description);
+                textFieldInfo.GetQuerySpan().Text.Should().Be(Description);
             }
 
             [Fact, LogIfTooSlow]
-            public void RemovesTheProjectQueryFromTheLastAtSymbolIsPresent()
+            public void RemovesTheProjectQueryFromTheFirstAtSymbolIsPresent()
             {
                 var newDescription = $"{Description}@something";
                 var longDescription = $"{newDescription}@else";
 
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(longDescription, longDescription.Length)
-                    .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor)
-                    .RemoveProjectQueryFromDescriptionIfNeeded();
+                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId).ReplaceSpans(
+                    new QueryTextSpan(longDescription, longDescription.Length),
+                    new ProjectSpan(ProjectId, ProjectName, ProjectColor)
+                ).RemoveProjectQueryIfNeeded();
 
-                textFieldInfo.Text.Should().Be(newDescription);
+                textFieldInfo.GetQuerySpan().Text.Should().Be(Description);
             }
 
             [Fact, LogIfTooSlow]
@@ -196,13 +132,13 @@ namespace Toggl.Foundation.Tests.Autocomplete
                 var textFieldInfo = CreateDefaultTextFieldInfo();
 
                 var newTextFieldInfo =
-                    textFieldInfo.RemoveProjectQueryFromDescriptionIfNeeded();
+                    textFieldInfo.RemoveProjectQueryIfNeeded();
 
-                textFieldInfo.Should().Be(newTextFieldInfo);
+                textFieldInfo.Description.Should().Be(newTextFieldInfo.Description);
             }
         }
 
-        public sealed class RemoveTagQueryFromDescriptionIfNeeded : TextFieldInfoTest
+        public sealed class RemoveTagQueryIfNeeded : TextFieldInfoTest
         {
             [Fact, LogIfTooSlow]
             public void RemovesTheTagQueryIfAnyHashtagSymbolIsPresent()
@@ -210,23 +146,23 @@ namespace Toggl.Foundation.Tests.Autocomplete
                 var newDescription = $"{Description}#something";
 
                 var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(newDescription, newDescription.Length)
-                    .RemoveTagQueryFromDescriptionIfNeeded();
+                    .ReplaceSpans(new QueryTextSpan(newDescription, newDescription.Length))
+                    .RemoveTagQueryIfNeeded();
 
-                textFieldInfo.Text.Should().Be(Description);
+                textFieldInfo.GetQuerySpan().Text.Should().Be(Description);
             }
 
             [Fact, LogIfTooSlow]
-            public void RemovesTheTagQueryFromTheLastAtSymbolIsPresent()
+            public void RemovesTheTagQueryFromTheFirstAtSymbolPresent()
             {
                 var newDescription = $"{Description}#something";
                 var longDescription = $"{newDescription}#else";
 
                 var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(longDescription, longDescription.Length)
-                    .RemoveTagQueryFromDescriptionIfNeeded();
+                    .ReplaceSpans(new QueryTextSpan(longDescription, longDescription.Length))
+                    .RemoveTagQueryIfNeeded();
 
-                textFieldInfo.Text.Should().Be(newDescription);
+                textFieldInfo.GetQuerySpan().Text.Should().Be(Description);
             }
 
             [Fact, LogIfTooSlow]
@@ -235,9 +171,9 @@ namespace Toggl.Foundation.Tests.Autocomplete
                 var textFieldInfo = CreateDefaultTextFieldInfo();
 
                 var newTextFieldInfo =
-                    textFieldInfo.RemoveTagQueryFromDescriptionIfNeeded();
+                    textFieldInfo.RemoveTagQueryIfNeeded();
 
-                textFieldInfo.Should().Be(newTextFieldInfo);
+                textFieldInfo.Description.Should().Be(newTextFieldInfo.Description);
             }
         }
 
@@ -246,72 +182,37 @@ namespace Toggl.Foundation.Tests.Autocomplete
             [Fact, LogIfTooSlow]
             public void AddsTagsCorrectly()
             {
-                var tag1 = createTagSuggestion(1);
-                var tag2 = createTagSuggestion(2);
+                var textFieldInfo =
+                    TextFieldInfo.Empty(WorkspaceId)
+                        .AddTag(1, "1")
+                        .AddTag(2, "2");
 
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                                                 .AddTag(tag1)
-                                                 .AddTag(tag2);
+                var tags = textFieldInfo.Spans.OfType<TagSpan>().ToList();
 
-                textFieldInfo.Tags.Should().HaveCount(2);
-                textFieldInfo.Tags[0].Should().Be(tag1);
-                textFieldInfo.Tags[1].Should().Be(tag2);
+                tags.Count.Should().Be(2);
+                tags[0].TagId.Should().Be(1);
+                tags[1].TagId.Should().Be(2);
             }
 
             [Fact, LogIfTooSlow]
             public void DoesNotAddTagIfAlreadyAdded()
             {
-                var tag = createTagSuggestion(1);
+                var textFieldInfo =
+                    TextFieldInfo.Empty(WorkspaceId)
+                        .AddTag(1, "1")
+                        .AddTag(1, "1");
 
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                                                 .AddTag(tag)
-                                                 .AddTag(tag);
-
-                textFieldInfo.Tags.Should().HaveCount(1);
+                textFieldInfo.Spans.OfType<TagSpan>().Should().HaveCount(1);
             }
         }
+    }
 
-        public sealed class TheRemoveProjectInfoMethod : TextFieldInfoTest
-        {
-            [Fact, LogIfTooSlow]
-            public void RemovesAllProjectRelatedFields()
-            {
-                var newDescription = $"{Description}@something";
+    public static class TestExtensions
+    {
+        public static QueryTextSpan GetQuerySpan(this TextFieldInfo textFieldInfo)
+            => textFieldInfo.Spans.OfType<QueryTextSpan>().Single();
 
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId)
-                    .WithTextAndCursor(newDescription, newDescription.Length)
-                    .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor)
-                    .RemoveProjectInfo();
-
-                textFieldInfo.ProjectId.Should().BeNull();
-                textFieldInfo.ProjectName.Should().BeEmpty();
-                textFieldInfo.ProjectColor.Should().BeEmpty();
-            }
-        }
-
-        public sealed class TheClearTagsMethod : TextFieldInfoTest
-        {
-            [Fact, LogIfTooSlow]
-            public void RemovesAllTags()
-            {
-                var tags = Enumerable.Range(10, 10)
-                    .Select(createTagSuggestion);
-                var textFieldInfo = TextFieldInfo.Empty(WorkspaceId);
-                foreach (var tag in tags)
-                    textFieldInfo = textFieldInfo.AddTag(tag);
-
-                var newtextFieldInfo = textFieldInfo.ClearTags();
-
-                newtextFieldInfo.Tags.Should().BeEmpty();
-            }
-        }
-
-        private static TagSuggestion createTagSuggestion(int id)
-        {
-            var tag = Substitute.For<IThreadSafeTag>();
-            tag.Id.Returns(id);
-            tag.Name.Returns($"Tag{id}");
-            return new TagSuggestion(tag);
-        }
+        public static TextFieldInfo ReplaceSpans(this TextFieldInfo textFieldInfo, params ISpan[] spans)
+            => textFieldInfo.ReplaceSpans(spans.ToImmutableList());
     }
 }

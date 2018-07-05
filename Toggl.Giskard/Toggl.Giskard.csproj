@@ -47,6 +47,8 @@
     <AndroidSigningStorePass>{KEYSTORE_PASSWORD}</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>{KEYSTORE_ALIAS}</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>{KEYSTORE_ALIAS_PASSWORD}</AndroidSigningKeyPass>
+    <AotAssemblies>true</AotAssemblies>
+    <EnableLLVM>true</EnableLLVM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.PlayStore|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -67,6 +69,8 @@
     <AndroidSigningStorePass>{KEYSTORE_PASSWORD}</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>{KEYSTORE_ALIAS}</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>{KEYSTORE_ALIAS_PASSWORD}</AndroidSigningKeyPass>
+    <AotAssemblies>true</AotAssemblies>
+    <EnableLLVM>true</EnableLLVM>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -271,6 +275,10 @@
     <Compile Include="Activities\SelectProjectActivity.cs" />
     <Compile Include="Adapters\SelectProjectRecyclerAdapter.cs" />
     <Compile Include="Bindings\TextInputLayoutErrorTextTargetBinding.cs" />
+    <Compile Include="Extensions\OnboardingExtensions.cs" />
+    <Compile Include="Extensions\PopupOffsets.cs" />
+    <Compile Include="Extensions\PopupWindowWithDefaultGravityExtenstions.cs" />
+    <Compile Include="Helper\PopupWindowFactory.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
@@ -323,10 +331,8 @@
     <Compile Include="Views\StartTimeEntryRecyclerView.cs" />
     <Compile Include="Adapters\StartTimeEntryRecyclerAdapter.cs" />
     <Compile Include="Adapters\SegmentedRecyclerAdapter.cs" />
-    <Compile Include="Autocomplete\AutocompleteTextWatcher.cs" />
-    <Compile Include="Autocomplete\TokenExtensions.cs" />
+    <Compile Include="Autocomplete\AutocompleteExtensions.cs" />
     <Compile Include="Autocomplete\TokenSpan.cs" />
-    <Compile Include="Bindings\EditTextTextFieldInfoTargetBinding.cs" />
     <Compile Include="Autocomplete\ProjectTokenSpan.cs" />
     <Compile Include="Autocomplete\TagsTokenSpan.cs" />
     <Compile Include="Services\AnalyticsService.cs" />
@@ -424,6 +430,7 @@
     <Compile Include="Activities\AboutActivity.ViewBinds.cs">
       <DependentUpon>AboutActivity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\AutocompleteEditText.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
@@ -800,6 +807,11 @@
     <AndroidResource Include="Resources\layout\TooltipWithLeftTopArrow.axml" />
     <AndroidResource Include="Resources\layout\TooltipWithRightTopArrow.axml" />
     <AndroidResource Include="Resources\layout\TooltipWithRightBottomArrow.axml" />
+    <AndroidResource Include="Resources\layout\TooltipWithRightArrow.axml" />
+    <AndroidResource Include="Resources\anim\abc_slide_in_right.xml" />
+    <AndroidResource Include="Resources\anim\abc_slide_out_left.xml" />
+    <AndroidResource Include="Resources\anim\abc_slide_in_left.xml" />
+    <AndroidResource Include="Resources\anim\abc_slide_out_right.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Toggl.Foundation\Toggl.Foundation.csproj">

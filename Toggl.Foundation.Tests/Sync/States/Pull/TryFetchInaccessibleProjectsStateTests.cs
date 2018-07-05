@@ -15,6 +15,7 @@ using Toggl.Multivac.Models;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 using Toggl.Ultrawave.ApiClients;
+using Toggl.Ultrawave.Exceptions;
 using Xunit;
 
 namespace Toggl.Foundation.Tests.Sync.States.Pull
@@ -180,7 +181,27 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
             await dataSource.Received()
                 .Update(Arg.Is<IThreadSafeProject>(project => project.Id == 4 && project.SyncStatus == SyncStatus.InSync));
         }
-                
+
+        [Fact, LogIfTooSlow]
+        public void ThrowsWhenTheDeviceIsOffline()
+        {
+            setStoredProjects(
+                new MockProject
+                {
+                    Id = 1,
+                    WorkspaceId = 1,
+                    Name = "A",
+                    Color = "#",
+                    SyncStatus = SyncStatus.RefetchingNeeded,
+                    At = now.AddHours(-35)
+                });
+            api.Search(1, Arg.Any<long[]>())
+                .Returns(Observable.Throw<List<IProject>>(new OfflineException(new Exception())));
+
+            Action startingState = () => state.Start(fetch).SingleAsync().Wait();
+
+            startingState.Should().Throw<OfflineException>();
+        }
 
         private void setStoredProjects(params IThreadSafeProject[] projects)
         {
