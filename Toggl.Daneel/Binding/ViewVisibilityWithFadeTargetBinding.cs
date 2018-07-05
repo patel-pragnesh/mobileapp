@@ -22,7 +22,7 @@ namespace Toggl.Daneel.Binding
         {
             var alpha = value ? 1 : 0;
 
-            Task.Delay(1).ContinueWith(_ =>
+            Task.Delay(10).ContinueWith(_ =>
             {
                 UIApplication.SharedApplication.InvokeOnMainThread(() =>
                 {
