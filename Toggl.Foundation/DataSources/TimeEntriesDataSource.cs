@@ -14,6 +14,7 @@ using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Models;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.Sync.ConflictResolution;
+using Toggl.Foundation.Extensions;
 
 namespace Toggl.Foundation.DataSources
 {
@@ -52,7 +53,7 @@ namespace Toggl.Foundation.DataSources
 
             this.timeService = timeService;
 
-            CurrentlyRunningTimeEntry = 
+            CurrentlyRunningTimeEntry =
                 GetAll(te => te.IsDeleted == false && te.Duration == null)
                     .Select(tes => tes.SingleOrDefault())
                     .StartWith()
@@ -79,7 +80,7 @@ namespace Toggl.Foundation.DataSources
         }
 
         public override IObservable<IThreadSafeTimeEntry> Create(IThreadSafeTimeEntry entity)
-            => Repository.BatchUpdate(new[] { (entity.Id, (IDatabaseTimeEntry)entity) }, alwaysCreate, RivalsResolver)
+            => Repository.UpdateWithConflictResolution(entity.Id, entity, alwaysCreate, RivalsResolver)
                 .ToThreadSafeResult(Convert)
                 .SelectMany(CommonFunctions.Identity)
                 .Do(HandleConflictResolutionResult)

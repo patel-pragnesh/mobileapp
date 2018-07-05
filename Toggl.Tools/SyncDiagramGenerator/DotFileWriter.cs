@@ -14,6 +14,11 @@ namespace SyncDiagramGenerator
 
             assignUniqueIdsTo(nodes);
 
+            Console.WriteLine($"Cleaning up labels of {nodes.Count} nodes and {edges.Count} edges");
+
+            cleanUpLabels(nodes);
+            cleanUpLabels(edges);
+
             Console.WriteLine($"Serialising {nodes.Count} nodes and {edges.Count} edges to DOT format");
 
             var fileContent = serialise(nodes, edges);
@@ -21,6 +26,32 @@ namespace SyncDiagramGenerator
             Console.WriteLine($"Writing DOT file to {outPath}");
 
             File.WriteAllText(outPath, fileContent);
+        }
+
+        private void cleanUpLabels(IEnumerable<ILabeled> labeledList)
+        {
+            foreach (var labeled in labeledList)
+            {
+                labeled.Label = cleanLabel(labeled.Label);
+            }
+        }
+
+        private string cleanLabel(string label)
+        {
+            var typeSeparatorIndex = label.IndexOf('<');
+
+            var (name, types) = typeSeparatorIndex == -1
+                ? (label, null)
+                : (label.Substring(0, typeSeparatorIndex), label.Substring(typeSeparatorIndex));
+
+            const string suffixToStrip = "state";
+            var cleanName = name.EndsWith(suffixToStrip, StringComparison.OrdinalIgnoreCase)
+                ? name.Substring(0, name.Length - suffixToStrip.Length)
+                : name;
+
+            return types == null
+                ? cleanName
+                : $@"{cleanName}\n{types}";
         }
 
         private void assignUniqueIdsTo(List<Node> nodes)
@@ -50,6 +81,8 @@ namespace SyncDiagramGenerator
             var builder = new StringBuilder();
 
             builder.AppendLine("digraph SyncGraph {");
+
+            builder.AppendLine("node [shape=box,style=rounded];");
 
             foreach (var node in nodes)
             {

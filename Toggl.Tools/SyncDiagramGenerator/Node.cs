@@ -1,6 +1,6 @@
 ﻿namespace SyncDiagramGenerator
 {
-    internal sealed class Node
+    internal sealed class Node : ILabeled
     {
         public enum NodeType
         {

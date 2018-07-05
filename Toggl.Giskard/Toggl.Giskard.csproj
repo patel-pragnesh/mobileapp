@@ -46,6 +46,8 @@
     <AndroidSigningStorePass>{KEYSTORE_PASSWORD}</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>{KEYSTORE_ALIAS}</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>{KEYSTORE_ALIAS_PASSWORD}</AndroidSigningKeyPass>
+    <AotAssemblies>true</AotAssemblies>
+    <EnableLLVM>true</EnableLLVM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release.PlayStore|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -65,6 +67,8 @@
     <AndroidSigningStorePass>{KEYSTORE_PASSWORD}</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>{KEYSTORE_ALIAS}</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>{KEYSTORE_ALIAS_PASSWORD}</AndroidSigningKeyPass>
+    <AotAssemblies>true</AotAssemblies>
+    <EnableLLVM>true</EnableLLVM>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -328,10 +332,8 @@
     <Compile Include="Views\StartTimeEntryRecyclerView.cs" />
     <Compile Include="Adapters\StartTimeEntryRecyclerAdapter.cs" />
     <Compile Include="Adapters\SegmentedRecyclerAdapter.cs" />
-    <Compile Include="Autocomplete\AutocompleteTextWatcher.cs" />
-    <Compile Include="Autocomplete\TokenExtensions.cs" />
+    <Compile Include="Autocomplete\AutocompleteExtensions.cs" />
     <Compile Include="Autocomplete\TokenSpan.cs" />
-    <Compile Include="Bindings\EditTextTextFieldInfoTargetBinding.cs" />
     <Compile Include="Autocomplete\ProjectTokenSpan.cs" />
     <Compile Include="Autocomplete\TagsTokenSpan.cs" />
     <Compile Include="Services\AnalyticsService.cs" />
@@ -429,6 +431,7 @@
     <Compile Include="Activities\AboutActivity.ViewBinds.cs">
       <DependentUpon>AboutActivity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\AutocompleteEditText.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
 using Toggl.Foundation.Autocomplete;
+using Toggl.Foundation.Autocomplete.Span;
 using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Interactors;
 using Xunit;
@@ -54,7 +55,8 @@ namespace Toggl.Foundation.Tests.Autocomplete
                 [InlineData("Testing Toggl mobile apps")]
                 public async Task WhenTheUserBeginsTypingADescription(string description)
                 {
-                    var textFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(description, 0);
+                    var textFieldInfo = TextFieldInfo.Empty(1)
+                        .ReplaceSpans(new QueryTextSpan(description, 0));
 
                     await Provider.Query(QueryInfo.ParseFieldInfo(textFieldInfo));
 
@@ -71,7 +73,8 @@ namespace Toggl.Foundation.Tests.Autocomplete
                     string description)
                 {
                     var actualDescription = $"{description} @{description}";
-                    var textFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(actualDescription, 0);
+                    var textFieldInfo = TextFieldInfo.Empty(1)
+                        .ReplaceSpans(new QueryTextSpan(actualDescription, 0));
 
                     await Provider.Query(QueryInfo.ParseFieldInfo(textFieldInfo));
 
@@ -85,9 +88,10 @@ namespace Toggl.Foundation.Tests.Autocomplete
                 public async Task WhenTheUserHasAlreadySelectedAProjectAndTypesTheAtSymbol()
                 {
                     var description = $"Testing Mobile Apps @toggl";
-                    var textFieldInfo = TextFieldInfo.Empty(1)
-                        .WithTextAndCursor(description, description.Length)
-                        .WithProjectInfo(WorkspaceId, ProjectId, ProjectName, ProjectColor);
+                    var textFieldInfo = TextFieldInfo.Empty(1).ReplaceSpans(
+                        new QueryTextSpan(description, description.Length),
+                        new ProjectSpan(ProjectId, ProjectName, ProjectColor)
+                    );
 
                     await Provider.Query(QueryInfo.ParseFieldInfo(textFieldInfo));
 
@@ -104,7 +108,8 @@ namespace Toggl.Foundation.Tests.Autocomplete
             public async Task UsesGetProjectsAutocompleteSuggestionsInteractorWhenTheAtSymbolIsTyped(string description)
             {
                 var actualDescription = $"{description} @{description}";
-                var textFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(actualDescription, description.Length + 2);
+                var textFieldInfo = TextFieldInfo.Empty(1)
+                    .ReplaceSpans(new QueryTextSpan(actualDescription, description.Length + 2));
 
                 await Provider.Query(QueryInfo.ParseFieldInfo(textFieldInfo));
 
@@ -120,7 +125,8 @@ namespace Toggl.Foundation.Tests.Autocomplete
             public async Task UsesGetTagsAutocompleteSuggestionsInteractorWhenTheHashtagSymbolIsTyped(string description)
             {
                 var actualDescription = $"{description} #{description}";
-                var textFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor(actualDescription, description.Length + 2);
+                var textFieldInfo = TextFieldInfo.Empty(1)
+                    .ReplaceSpans(new QueryTextSpan(actualDescription, description.Length + 2));
 
                 await Provider.Query(QueryInfo.ParseFieldInfo(textFieldInfo));
 
@@ -133,7 +139,7 @@ namespace Toggl.Foundation.Tests.Autocomplete
             [Fact, LogIfTooSlow]
             public async Task DoesNotUseInteractorsWhenTheSarchStringIsEmpty()
             {
-                var textFieldInfo = TextFieldInfo.Empty(1).WithTextAndCursor("", 0);
+                var textFieldInfo = TextFieldInfo.Empty(1).ReplaceSpans(new QueryTextSpan());
 
                 await Provider.Query(QueryInfo.ParseFieldInfo(textFieldInfo));
 

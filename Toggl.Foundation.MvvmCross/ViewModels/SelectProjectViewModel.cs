@@ -13,7 +13,7 @@ using Toggl.Foundation.Extensions;
 using Toggl.Foundation.Interactors;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Foundation.MvvmCross.Collections;
-using Toggl.Foundation.MvvmCross.Helper;
+using Toggl.Foundation.MvvmCross.Extensions;
 using Toggl.Foundation.MvvmCross.Parameters;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;

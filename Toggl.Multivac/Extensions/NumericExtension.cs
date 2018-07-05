@@ -2,7 +2,7 @@
 
 namespace Toggl.Multivac.Extensions
 {
-    public static class ClampExtension
+    public static class NumericExtensions
     {
         public static T Clamp<T>(this T num, T min, T max) where T : IComparable
         {
@@ -10,5 +10,8 @@ namespace Toggl.Multivac.Extensions
             if (num.CompareTo(max) > 0) return max;
             return num;
         }
+
+        public static bool IsInRange(this int number, int min, int max)
+            => number >= min && number <= max;
     }
 }

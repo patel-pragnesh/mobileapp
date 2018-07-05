@@ -677,7 +677,6 @@
     <Compile Include="Bootstrap\ColorPluginBootstrap.cs" />
     <Compile Include="Bootstrap\VisibilityPluginBootstrap.cs" />
     <Compile Include="ViewSources\StartTimeEntryTableViewSource.cs" />
-    <Compile Include="Binding\AutocompleteTextViewTextInfoTargetBinding.cs" />
     <Compile Include="Presentation\Attributes\ModalDialogPresentationAttribute.cs" />
     <Compile Include="Presentation\Transition\ModalDialogPresentationController.cs" />
     <Compile Include="Presentation\Transition\ModalDialogTransitionDelegate.cs" />
@@ -882,12 +881,10 @@
     <Compile Include="ApplicationShortcutCreator.cs" />
     <Compile Include="Extensions\PointExtensions.cs" />
     <Compile Include="Services\MailService.cs" />
-    <Compile Include="Autocomplete\AutocompleteTextViewDelegate.cs" />
     <Compile Include="Autocomplete\TokenTextAttachment.cs" />
-    <Compile Include="Autocomplete\TokenExtensions.cs" />
+    <Compile Include="Autocomplete\AutocompleteExtensions.cs" />
     <Compile Include="Services\AnalyticsService.cs" />
     <Compile Include="Views\AutocompleteTextViewPlaceholder.cs" />
-    <Compile Include="Views\AutocompleteTextView.cs" />
     <Compile Include="Views\EditDuration\DurationField.cs" />
     <Compile Include="Views\EditDuration\NumberKeyPressedEventArgs.cs" />
     <Compile Include="Binding\ButtonImageTargetBinding.cs" />
@@ -993,6 +990,7 @@
     <Compile Include="Cells\SyncFailures\SyncFailureCell.designer.cs">
       <DependentUpon>SyncFailureCell.cs</DependentUpon>
     </Compile>
+    <Compile Include="Autocomplete\Constants.cs" />
     <Compile Include="Binding\ViewLongPressCommandTargetBinding.cs" />
     <Compile Include="Cells\Settings\LicensesHeaderViewCell.cs" />
     <Compile Include="Cells\Settings\LicensesHeaderViewCell.designer.cs">

@@ -1,17 +1,18 @@
 ﻿using Android.Graphics;
-using MvvmCross.Plugins.Color.Droid;
-using FoundationColor = Toggl.Foundation.MvvmCross.Helper.Color;
 
 namespace Toggl.Giskard.Autocomplete
 {
     public sealed class TagsTokenSpan : TokenSpan
     {
-        public int TagIndex { get; }
+        public long TagId { get; }
 
-        public TagsTokenSpan(int tagIndex)
+        public string TagName { get; }
+
+        public TagsTokenSpan(long tagId, string tagName)
             : base(Color.White, Color.White, true)
         {
-            TagIndex = tagIndex;
+            TagId = tagId;
+            TagName = tagName;
         }
     }
 }

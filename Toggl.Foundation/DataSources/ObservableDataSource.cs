@@ -52,10 +52,10 @@ namespace Toggl.Foundation.DataSources
             => base.Delete(id)
                 .Do(_ => DeletedSubject.OnNext(id));
 
-        public override IObservable<IConflictResolutionResult<TThreadsafe>> OverwriteIfOriginalDidNotChange(
+        public override IObservable<IEnumerable<IConflictResolutionResult<TThreadsafe>>> OverwriteIfOriginalDidNotChange(
             TThreadsafe original, TThreadsafe entity)
             => base.OverwriteIfOriginalDidNotChange(original, entity)
-                .Do(HandleConflictResolutionResult);
+                .Do(results => results.Do(HandleConflictResolutionResult));
 
         public override IObservable<IEnumerable<IConflictResolutionResult<TThreadsafe>>> BatchUpdate(IEnumerable<TThreadsafe> entities)
             => base.BatchUpdate(entities)

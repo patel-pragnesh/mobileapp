@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
+using Java.Lang;
 using Toggl.Giskard.Adapters;
 using Toggl.Multivac.Extensions;
 
@@ -17,11 +18,16 @@ namespace Toggl.Giskard.Extensions
                 .FromEventPattern(e => button.Click += e, e => button.Click -= e)
                 .SelectUnit();
 
-        public static IObservable<string> Text(this EditText editText)
+        public static IObservable<string> Text(this TextView textView)
             => Observable
-                .FromEventPattern<TextChangedEventArgs>(e => editText.TextChanged += e, e => editText.TextChanged -= e)
-                .Select(_ => editText.Text);
+                .FromEventPattern<TextChangedEventArgs>(e => textView.TextChanged += e, e => textView.TextChanged -= e)
+                .Select(args => ((EditText)args.Sender).Text);
 
+        public static IObservable<ICharSequence> TextFormatted(this TextView textView)
+            => Observable
+                .FromEventPattern<TextChangedEventArgs>(e => textView.TextChanged += e, e => textView.TextChanged -= e)
+                .Select(args => ((EditText)args.Sender).TextFormatted);
+        
         public static Action<bool> BindIsVisible(this View view)
             => isVisible => view.Visibility = isVisible.ToVisibility();
 

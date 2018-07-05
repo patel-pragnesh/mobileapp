@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using Foundation;
 using MvvmCross.Binding;
 using MvvmCross.Binding.BindingContext;
@@ -11,32 +14,37 @@ using MvvmCross.Core.ViewModels;
 using MvvmCross.Platform.WeakSubscription;
 using MvvmCross.Plugins.Color.iOS;
 using MvvmCross.Plugins.Visibility;
+using Toggl.Daneel.Autocomplete;
 using Toggl.Daneel.Extensions;
 using Toggl.Daneel.Presentation.Attributes;
 using Toggl.Daneel.ViewSources;
 using Toggl.Foundation;
+using Toggl.Foundation.Autocomplete;
 using Toggl.Foundation.Autocomplete.Suggestions;
 using Toggl.Foundation.MvvmCross.Converters;
+using Toggl.Foundation.MvvmCross.Extensions;
 using Toggl.Foundation.MvvmCross.Helper;
 using Toggl.Foundation.MvvmCross.Onboarding.CreationView;
 using Toggl.Foundation.MvvmCross.Onboarding.StartTimeEntryView;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using UIKit;
+using static Toggl.Daneel.Autocomplete.AutocompleteExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
     [ModalCardPresentation]
     public sealed partial class StartTimeEntryViewController : KeyboardAwareViewController<StartTimeEntryViewModel>
     {
-        private UIImage greyCheckmarkButtonImage;
+        private bool isUpdatingDescriptionField;
 
+        private UIImage greyCheckmarkButtonImage;
         private UIImage greenCheckmarkButtonImage;
 
         private IDisposable descriptionDisposable;
         private IDisposable addProjectOrTagOnboardingDisposable;
         private IDisposable disabledConfirmationButtonOnboardingDisposable;
-
 
         private ISubject<bool> isDescriptionEmptySubject;
 
@@ -127,10 +135,6 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.DisplayedTime)
                       .Mode(MvxBindingMode.OneWayToSource);
 
-            bindingSet.Bind(DescriptionTextView)
-                      .For(v => v.BindTextFieldInfo())
-                      .To(vm => vm.TextFieldInfo);
-
             bindingSet.Bind(TimeLabel)
                       .For(v => v.Text)
                       .To(vm => vm.DisplayedTime)
@@ -184,12 +188,43 @@ namespace Toggl.Daneel.ViewControllers
             bindingSet.Bind(ProjectsButton).To(vm => vm.ToggleProjectSuggestionsCommand);
 
             bindingSet.Apply();
+
+            // Reactive
+            this.Bind(ViewModel.TextFieldInfoObservable, onTextFieldInfo);
+
+            DescriptionTextView.AttributedText()
+                .CombineLatest(DescriptionTextView.CursorPosition(), (text, _) => text)
+                .Where(_ => !isUpdatingDescriptionField)
+                .SubscribeOn(ThreadPoolScheduler.Instance)
+                .Do(_ => updatePlaceholder())
+                .Select(text => text.AsImmutableSpans((int)DescriptionTextView.SelectedRange.Location))
+                .ObserveOn(SynchronizationContext.Current)
+                .Subscribe(async info => await ViewModel.OnTextFieldInfoFromView(info))
+                .DisposedBy(DisposeBag);
+        }
+
+        private void onTextFieldInfo(TextFieldInfo textFieldInfo)
+        {
+            isUpdatingDescriptionField = true;
+            var (attributedText, cursorPosition) = textFieldInfo.AsAttributedTextAndCursorPosition();
+
+            DescriptionTextView.AttributedText = attributedText;
+
+            var positionToSet = DescriptionTextView.GetPosition(DescriptionTextView.BeginningOfDocument, cursorPosition);
+            DescriptionTextView.SelectedTextRange = DescriptionTextView.GetTextRange(positionToSet, positionToSet);
+            updatePlaceholder();
+            isUpdatingDescriptionField = false;
         }
 
         private void switchTimeLabelAndInput()
         {
             TimeLabel.Hidden = !TimeLabel.Hidden;
             TimeInput.Hidden = !TimeInput.Hidden;
+        }
+
+        private void updatePlaceholder()
+        {
+            Placeholder.UpdateVisibility(DescriptionTextView);
         }
 
         protected override void KeyboardWillShow(object sender, UIKeyboardEventArgs e)
@@ -233,7 +268,7 @@ namespace Toggl.Daneel.ViewControllers
             DescriptionTextView.TintColor = Color.StartTimeEntry.Cursor.ToNativeColor();
             DescriptionTextView.BecomeFirstResponder();
 
-            Placeholder.TextView = DescriptionTextView;
+            Placeholder.ConfigureWith(DescriptionTextView);
             Placeholder.Text = Resources.StartTimeEntryPlaceholder;
 
             prepareTimeViews();
@@ -243,7 +278,7 @@ namespace Toggl.Daneel.ViewControllers
         {
             var tapRecognizer = new UITapGestureRecognizer(() =>
             {
-                if(!TimeLabel.Hidden)
+                if (!TimeLabel.Hidden)
                     ViewModel.DurationTapped.Execute();
 
                 switchTimeLabelAndInput();

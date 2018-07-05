@@ -45,14 +45,14 @@ namespace Toggl.Giskard
                 view => new EditTextFocusTargetBinding(view)
             );
 
-            registry.RegisterCustomBindingFactory<EditText>(
-                EditTextTextFieldInfoTargetBinding.BindingName,
-                view => new EditTextTextFieldInfoTargetBinding(view)
-            );
-
             registry.RegisterCustomBindingFactory<FloatingActionButton>(
                 FabVisibilityTargetBinding.BindingName,
                 view => new FabVisibilityTargetBinding(view)
+            );
+
+            registry.RegisterCustomBindingFactory<TextInputLayout>(
+                TextInputLayoutErrorTextTargetBinding.BindingName,
+                view => new TextInputLayoutErrorTextTargetBinding(view)
             );
 
             registry.RegisterCustomBindingFactory<TextView>(
@@ -88,11 +88,6 @@ namespace Toggl.Giskard
             registry.RegisterCustomBindingFactory<View>(
                 ViewWidthPercentageTargetBinding.BindingName,
                 view => new ViewWidthPercentageTargetBinding(view)
-            );
-
-            registry.RegisterCustomBindingFactory<TextInputLayout>(
-                TextInputLayoutErrorTextTargetBinding.BindingName,
-                view => new TextInputLayoutErrorTextTargetBinding(view)
             );
         }
     }

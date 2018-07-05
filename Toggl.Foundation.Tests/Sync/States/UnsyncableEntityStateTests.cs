@@ -125,7 +125,10 @@ namespace Toggl.Foundation.Tests.Sync.States
         private void prepareBatchUpdate(IThreadSafeTestModel entity)
         {
             dataSource.OverwriteIfOriginalDidNotChange(entity, Arg.Any<IThreadSafeTestModel>())
-                .Returns(callInfo => Observable.Return(new UpdateResult<IThreadSafeTestModel>(callInfo.ArgAt<IThreadSafeTestModel>(1).Id, callInfo.ArgAt<IThreadSafeTestModel>(1))));
+                .Returns(callInfo => Observable.Return(new[]
+                {
+                    new UpdateResult<IThreadSafeTestModel>(callInfo.ArgAt<IThreadSafeTestModel>(1).Id, callInfo.ArgAt<IThreadSafeTestModel>(1))
+                }));
         }
 
         private static IRequest request => Substitute.For<IRequest>();

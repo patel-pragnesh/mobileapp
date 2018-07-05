@@ -55,11 +55,13 @@ namespace Toggl.Daneel.Views
 
         public override void AwakeFromNib()
         {
+            base.AwakeFromNib();
+
             FirstResponder = firstResponderSubject
                 .AsObservable()
                 .DistinctUntilChanged()
                 .StartWith(false);
-            
+
             Layer.AddSublayer(underlineLayer);
             Layer.AddSublayer(placeholderLayer);
             BorderStyle = UITextBorderStyle.None;

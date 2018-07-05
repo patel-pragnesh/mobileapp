@@ -26,8 +26,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
     {
         public abstract class SettingsViewModelTest : BaseViewModelTests<SettingsViewModel>
         {
-            protected TestScheduler TestScheduler { get; } = new TestScheduler();
-
             protected ISubject<IThreadSafeUser> UserSubject;
             protected ISubject<SyncProgress> ProgressSubject;
             protected ISubject<IThreadSafePreferences> PreferencesSubject;

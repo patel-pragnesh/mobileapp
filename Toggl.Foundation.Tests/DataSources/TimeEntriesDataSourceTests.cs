@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
+using NSubstitute.Routing.Handlers;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.DTOs;
 using Toggl.Foundation.Exceptions;
