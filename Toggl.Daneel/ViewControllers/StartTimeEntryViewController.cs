@@ -30,7 +30,6 @@ using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using UIKit;
-using static Toggl.Daneel.Autocomplete.AutocompleteExtensions;
 
 namespace Toggl.Daneel.ViewControllers
 {
@@ -47,6 +46,8 @@ namespace Toggl.Daneel.ViewControllers
         private IDisposable disabledConfirmationButtonOnboardingDisposable;
 
         private ISubject<bool> isDescriptionEmptySubject;
+
+        private IUITextInputDelegate emptyInputDelegate = new EmptyInputDelegate();
 
         public StartTimeEntryViewController()
             : base(nameof(StartTimeEntryViewController))
@@ -208,6 +209,7 @@ namespace Toggl.Daneel.ViewControllers
             isUpdatingDescriptionField = true;
             var (attributedText, cursorPosition) = textFieldInfo.AsAttributedTextAndCursorPosition();
 
+            DescriptionTextView.InputDelegate = emptyInputDelegate;
             DescriptionTextView.AttributedText = attributedText;
 
             var positionToSet = DescriptionTextView.GetPosition(DescriptionTextView.BeginningOfDocument, cursorPosition);
