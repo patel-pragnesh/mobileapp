@@ -22,6 +22,9 @@ namespace Toggl.Daneel.Binding
         {
             var alpha = value ? 1 : 0;
 
+            if (Target.Alpha == alpha)
+                return;
+
             Task.Delay(10).ContinueWith(_ =>
             {
                 UIApplication.SharedApplication.InvokeOnMainThread(() =>
