@@ -33,7 +33,7 @@ namespace Toggl.Ultrawave.Tests.Integration
                 var (togglApi, user) = await SetupTestUser();
                 var email = Email.From($"{Guid.NewGuid()}@toggl.space");
 
-                Action sendingFeedback = async () => await togglApi.Feedback.Send(email, "ABC.", new Dictionary<string, string>());
+                Func<Task> sendingFeedback = async () => await togglApi.Feedback.Send(email, "ABC.", new Dictionary<string, string>());
 
                 sendingFeedback.Should().Throw<BadRequestException>();
             }
