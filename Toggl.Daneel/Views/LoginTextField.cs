@@ -119,6 +119,9 @@ namespace Toggl.Daneel.Views
             return resignFirstResponder;
         }
 
+        public override bool CanBecomeFirstResponder 
+            => true;
+
         private void updateBottomLine()
         {
             underlineLayer.Frame = new CGRect(
