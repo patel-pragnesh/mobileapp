@@ -128,6 +128,8 @@ namespace Toggl.Giskard.Services
 
         private void login()
         {
+            if (!isLoggingIn) return;
+
             if (!googleApiClient.IsConnected)
             {
                 throw new GoogleLoginException(false);
