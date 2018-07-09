@@ -116,7 +116,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
 
             loginDisposable =
                 loginManager
-                    .Login(Email, Password)
+                    .Login(Email.trimmed(), Password)
                     .Track(analyticsService.Login, AuthenticationMethod.EmailAndPassword)
                     .Subscribe(onDataSource, onError, onCompleted);
         }
