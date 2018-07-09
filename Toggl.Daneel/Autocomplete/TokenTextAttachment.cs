@@ -6,6 +6,8 @@ namespace Toggl.Daneel.Autocomplete
 {
     public abstract class TokenTextAttachment : NSTextAttachment
     {
+        public const int TokenMargin = 3;
+
         protected const int LineHeight = 24;
         protected const int TokenHeight = 22;
         protected const int TokenPadding = 6;

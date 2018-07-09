@@ -11,16 +11,11 @@ namespace Toggl.Daneel.Autocomplete
     {
         private static readonly UIColor borderColor = Color.StartTimeEntry.TokenBorder.ToNativeColor();
 
-        public TagTextAttachment(
-            NSAttributedString stringToDraw, 
-            nfloat textVerticalOffset,
-            nfloat fontDescender,
-            int leftMargin,
-            int rightMargin)
+        public TagTextAttachment(NSAttributedString stringToDraw, nfloat textVerticalOffset, nfloat fontDescender)
             : base (fontDescender)
         {
             var size = new CGSize(
-                stringToDraw.Size.Width + leftMargin + rightMargin + (TokenPadding * 2),
+                stringToDraw.Size.Width + TokenMargin + TokenMargin + (TokenPadding * 2),
                 LineHeight
             );
 
@@ -28,16 +23,16 @@ namespace Toggl.Daneel.Autocomplete
             using (var context = UIGraphics.GetCurrentContext())
             {
                 var tokenPath = UIBezierPath.FromRoundedRect(new CGRect(
-                    x: leftMargin,
+                    x: TokenMargin,
                     y: TokenVerticallOffset,
-                    width: size.Width - leftMargin - rightMargin,
+                    width: size.Width - TokenMargin - TokenMargin,
                     height: TokenHeight
                 ), TokenCornerRadius);
                 context.AddPath(tokenPath.CGPath);
                 context.SetStrokeColor(borderColor.CGColor);
                 context.StrokePath();
 
-                stringToDraw.DrawString(new CGPoint(leftMargin + TokenPadding, textVerticalOffset));
+                stringToDraw.DrawString(new CGPoint(TokenMargin + TokenPadding, textVerticalOffset));
 
                 var image = UIGraphics.GetImageFromCurrentImageContext();
                 UIGraphics.EndImageContext();

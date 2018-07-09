@@ -12,26 +12,20 @@ namespace Toggl.Daneel.Autocomplete
         private const int dotRadius = dotDiameter / 2;
         private const int dotYOffset = (LineHeight / 2) - dotRadius;
 
-        public ProjectTextAttachment(
-            NSAttributedString projectStringToDraw, 
-            nfloat textVerticalOffset,
-            UIColor projectColor,
-            nfloat fontDescender,
-            int leftMargin,
-            int rightMargin)
-            : base (fontDescender)
+        public ProjectTextAttachment(NSAttributedString projectStringToDraw, UIColor projectColor, nfloat textVerticalOffset, nfloat fontDescender)
+            : base(fontDescender)
         {
             const int circleWidth = dotDiameter + dotPadding;
-            var totalWidth = projectStringToDraw.Size.Width + circleWidth + leftMargin + rightMargin + (TokenPadding * 2);
+            var totalWidth = projectStringToDraw.Size.Width + circleWidth + TokenMargin + TokenMargin + (TokenPadding * 2);
             var size = new CGSize(totalWidth, LineHeight);
 
             UIGraphics.BeginImageContextWithOptions(size, false, 0.0f);
             using (var context = UIGraphics.GetCurrentContext())
             {
                 var tokenPath = UIBezierPath.FromRoundedRect(new CGRect(
-                    x: leftMargin,
+                    x: TokenMargin,
                     y: TokenVerticallOffset,
-                    width: totalWidth - leftMargin - rightMargin,
+                    width: totalWidth - TokenMargin - TokenMargin,
                     height: TokenHeight
                 ), TokenCornerRadius);
                 context.AddPath(tokenPath.CGPath);
@@ -39,7 +33,7 @@ namespace Toggl.Daneel.Autocomplete
                 context.FillPath();
 
                 var dot = UIBezierPath.FromRoundedRect(new CGRect(
-                    x: dotPadding + leftMargin,
+                    x: dotPadding + TokenMargin,
                     y: dotYOffset,
                     width: dotDiameter,
                     height: dotDiameter
@@ -48,7 +42,7 @@ namespace Toggl.Daneel.Autocomplete
                 context.SetFillColor(projectColor.CGColor);
                 context.FillPath();
 
-                projectStringToDraw.DrawString(new CGPoint(circleWidth + leftMargin + TokenPadding, textVerticalOffset));
+                projectStringToDraw.DrawString(new CGPoint(circleWidth + TokenMargin + TokenPadding, textVerticalOffset));
 
                 var image = UIGraphics.GetImageFromCurrentImageContext();
                 UIGraphics.EndImageContext();
