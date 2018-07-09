@@ -23,8 +23,8 @@ namespace Toggl.Daneel.Autocomplete
         private const int lineHeight = 24;
         private const int maxTextLength = 50;
 
-        private const int textFieldInfoTokenLeftMargin = 6;
-        private const int textFieldInfoTokenRightMargin = 0;
+        private const int textFieldInfoTokenLeftMargin = 3;
+        private const int textFieldInfoTokenRightMargin = 3;
 
         private static readonly nfloat textVerticalOffset;
         private static readonly NSParagraphStyle paragraphStyle;
