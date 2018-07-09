@@ -67,5 +67,19 @@ namespace Toggl.Multivac.Tests
                 email.ToString().Should().Be(emailString);
             }
         }
+
+        public sealed class TheTrimmedMethod
+        {
+            [Theory, LogIfTooSlow]
+            [InlineData(" email@with.spaceBothSides ")]
+            [InlineData(" email@with.spaceFront")]
+            [InlineData("email@with.spaceBack ")]
+            public void ReturnsNewEmailWithTrimmedEndSpaces(string mail)
+            {
+                var email = Email.From(mail).TrimmedEnd();
+
+                email.ToString().Should().Be(mail.TrimEnd());
+            }
+        }
     }
 }
