@@ -99,7 +99,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             GoogleLoginCommand = new MvxCommand(googleLogin);
             LoginCommand = new MvxCommand(login, () 
                 => { 
-                    Email = Email.Trimmed(); 
+                    Email = Email.TrimmedEnd(); 
                     return LoginEnabled; 
                 });
             ForgotPasswordCommand = new MvxAsyncCommand(forgotPassword);

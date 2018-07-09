@@ -22,8 +22,8 @@ namespace Toggl.Multivac
 
         public override string ToString() => email;
 
-        public Email Trimmed()
-            => new Email(email.Trim());
+        public Email TrimmedEnd()
+            => new Email(email.TrimEnd());
 
         public static Email From(string email) => new Email(email);
 
