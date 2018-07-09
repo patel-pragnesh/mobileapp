@@ -209,7 +209,7 @@ namespace Toggl.Daneel.ViewControllers
             isUpdatingDescriptionField = true;
             var (attributedText, cursorPosition) = textFieldInfo.AsAttributedTextAndCursorPosition();
 
-            DescriptionTextView.InputDelegate = emptyInputDelegate;
+            DescriptionTextView.InputDelegate = emptyInputDelegate; //This line is needed for when the user selects from suggestion and the iOS autocorrect is ready to add text at the same time. Without this line both will happen.
             DescriptionTextView.AttributedText = attributedText;
 
             var positionToSet = DescriptionTextView.GetPosition(DescriptionTextView.BeginningOfDocument, cursorPosition);
