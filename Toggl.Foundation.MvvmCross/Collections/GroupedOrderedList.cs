@@ -27,9 +27,12 @@ namespace Toggl.Foundation.MvvmCross.Collections
             this.groupingKey = groupingKey;
             this.descending = descending;
 
-            if (initialItems == null) {
+            if (initialItems == null)
+            {
                 sections = new List<List<TItem>> { };
-            } else {
+            }
+            else
+            {
                 sections = initialItems
                     .OrderBy(orderingKey)
                     .GroupBy(groupingKey)
@@ -48,20 +51,17 @@ namespace Toggl.Foundation.MvvmCross.Collections
             var sectionIndex = sections
                 .IndexOf(g => groupingKey(g.First()).CompareTo(groupingKey(item)) == 0);
 
-            if (sectionIndex == -1) {
+            if (sectionIndex == -1)
                 return null;
-            }
 
             var rowIndex = sections[sectionIndex].IndexOf(item);
-            if (rowIndex == -1) {
+            if (rowIndex == -1)
                 return null;
-            }
 
             sections[sectionIndex].RemoveAt(rowIndex);
 
-            if (sections[sectionIndex].Count == 0) {
+            if (sections[sectionIndex].Count == 0)
                 sections.RemoveAt(sectionIndex);
-            }
 
             return new SectionedIndex { Section = sectionIndex, Row = rowIndex };
         }
@@ -78,23 +78,31 @@ namespace Toggl.Foundation.MvvmCross.Collections
             var sectionIndex = sections
                 .IndexOf(g => groupingKey(g.First()).CompareTo(groupingKey(item)) == 0);
 
-            if (sectionIndex == -1) {
+            if (sectionIndex == -1)
+            {
                 var insertionIndex = sections.FindLastIndex(g => groupingKey(g.First()).CompareTo(groupingKey(item)) < 0);
                 List<TItem> list = new List<TItem> { item };
-                if (insertionIndex == -1) {
+                if (insertionIndex == -1)
+                {
                     sections.Insert(0, list);
                     return new SectionedIndex { Section = 0, Row = 0 };
-                } else {
+                }
+                else
+                {
                     sections.Insert(insertionIndex + 1, list);
                     return new SectionedIndex { Section = insertionIndex + 1, Row = 0 };
                 }
-            } else {
+            }
+            else
+            {
                 var rowIndex = sections[sectionIndex].FindLastIndex(i => orderingKey(i).CompareTo(orderingKey(item)) < 0);
                 if (rowIndex == -1)
                 {
                     sections[sectionIndex].Insert(0, item);
                     return new SectionedIndex { Section = sectionIndex, Row = 0 };
-                } else {
+                }
+                else
+                {
                     sections[sectionIndex].Insert(rowIndex + 1, item);
                     return new SectionedIndex { Section = sectionIndex, Row = rowIndex + 1 };
                 }
